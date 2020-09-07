@@ -1,0 +1,3 @@
+[submodule "AVR_PIg"]
+	path = AVR_PIg
+	url = git@github.com:BerZerKku/AVR_PIg.git
