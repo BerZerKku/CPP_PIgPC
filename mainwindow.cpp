@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 
 #include <QDebug>
+#include <QKeyEvent>
 #include <QTimer>
 
 MainWindow::MainWindow(QWidget *parent)
@@ -10,31 +11,45 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
+    connect(ui->textEdit, &QTextEdit::selectionChanged,
+            this, &MainWindow::clearSelection);
+
+    // FIXME Сделать подсчет необходимого размера виджетов.
+    ui->textEdit->setFixedSize(340, 240);
+    ui->kbd->setFixedSize(ui->textEdit->width(), ui->textEdit->width());
+    setFixedSize(sizeHint());
+
+    initParam();
+
     QTimer *timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &MainWindow::cycleMenu);
     timer->start(200);
 
-    connect(ui->textEdit, &QTextEdit::selectionChanged,
-            this, &MainWindow::clearSelection);
-
-    // FIXME Сделать подсчет необходимого размера виджета.
-    ui->textEdit->setFixedSize(340, 240);
-
-    menuInit();
+    installEventFilter(this);
 }
 
+//
 MainWindow::~MainWindow()
 {
     delete ui;
 }
 
-void MainWindow::test()
+//
+void MainWindow::clearSelection()
 {
-    qDebug() << __FUNCTION__;
+    QTextCursor c = ui->textEdit->textCursor();
+    c.clearSelection();
+    ui->textEdit->setTextCursor(c);
 }
 
 //
-void MainWindow::menuInit()
+void MainWindow::cycleMenu()
+{
+    menu.main();
+}
+
+//
+void MainWindow::initParam()
 {
     menu.sParam.password.init(0000);
     menu.sParam.Uart.Interface.set(TInterface::USB);
@@ -44,7 +59,7 @@ void MainWindow::menuInit()
     menu.sParam.Uart.Parity.set(TParity::EVEN);
     menu.sParam.Uart.StopBits.set(TStopBits::ONE);
 
-    menu.sParam.def.status.setEnable(true);
+    menu.sParam.def.status.setEnable(false);
 
     menu.sParam.prm.setNumCom(32);
     menu.sParam.local.setNumComPrm(32);
@@ -71,8 +86,8 @@ void MainWindow::menuInit()
     menu.sParam.glb.setCompatibility(GB_COMPATIBILITY_AVANT);
     menu.sParam.glb.setCompK400(GB_COMP_K400_AVANT);
 
-    menu.sParam.glb.setTypeDevice(AVANT_OPTO);
     menu.sParam.glb.setTypeOpto(TYPE_OPTO_STANDART);
+    menu.sParam.glb.setTypeDevice(AVANT_OPTO);
 
     menu.sParam.device = false;
 
@@ -84,16 +99,27 @@ void MainWindow::menuInit()
     menu.sParam.DateTime.setHour(0);
     menu.sParam.DateTime.setMinute(8);
     menu.sParam.DateTime.setSecond(37);
+
+    menu.sParam.prm.status.setRegime(GB_REGIME_ENABLED);
+    menu.sParam.prm.status.setState(0);
+    menu.sParam.prm.status.setFault(0);
+    menu.sParam.prm.status.setWarning(0);
+
+    menu.sParam.prd.status.setRegime(GB_REGIME_ENABLED);
+    menu.sParam.prd.status.setState(0);
+    menu.sParam.prd.status.setFault(1);
+    menu.sParam.prd.status.setWarning(0);
 }
 
-void MainWindow::cycleMenu()
+bool MainWindow::eventFilter(QObject *object, QEvent *event)
 {
-    menu.main();
+     if (event->type() == QEvent::KeyRelease) {
+        ui->kbd->keyPressed(static_cast<QKeyEvent*>(event)->key());
+    }
+
+    return QMainWindow::eventFilter(object, event);
 }
 
-void MainWindow::clearSelection()
-{
-    QTextCursor c = ui->textEdit->textCursor();
-    c.clearSelection();
-    ui->textEdit->setTextCursor(c);
-}
+
+
+

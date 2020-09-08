@@ -15,11 +15,11 @@ void vKEYmain(void) {
 }
 
 void vKEYset(eGB_TYPE_DEVICE type) {
-
+    w->ui->kbd->setType(type);
 }
 
 eKEY eKEYget(void) {
-
+    return w->ui->kbd->getKey();
 }
 
 uint8_t timePressKey() {
@@ -27,7 +27,6 @@ uint8_t timePressKey() {
 }
 
 void vLCDclear(void) {
-    qDebug() << __FUNCTION__;
     w->ui->textEdit->clear();
 }
 
@@ -53,7 +52,7 @@ bool vLCDputchar(const char* buf, uint8_t num) {
 
     for(quint8 row = 0; row < 7; row++) {
         for(quint16 col = 0; col < 20; col++) {
-            char symbol = (row == num) ? '-' : *buf++;
+            char symbol = (row == num) ? '=' : *buf++;
             if (symbol == '\0') {
                 symbol = ' ';
             }

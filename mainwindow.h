@@ -37,10 +37,10 @@ private:
 
     clMenu menu;    ///< Меню.
 
-    void test();
-
     /// Инициализация меню.
-    void menuInit();
+    void initParam();
+//    void keyPressEvent(QKeyEvent *event) override;
+    bool eventFilter(QObject* object, QEvent* event) override;
 
 private slots:
     void cycleMenu();  ///< Цикл 200 мс.

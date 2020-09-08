@@ -38,6 +38,7 @@ SOURCES += \
     PIg/src/protocols/standart/protocolS.cpp \
     main.cpp \
     mainwindow.cpp \
+    qkeyboard.cpp \
     wrapper.cpp
 
 HEADERS += \
@@ -69,10 +70,12 @@ HEADERS += \
     avr/io.h \
     avr/pgmspace.h \
     mainwindow.h \
+    qkeyboard.h \
     wrapper.hpp
 
 FORMS += \
-    mainwindow.ui
+    mainwindow.ui \
+    qkeyboard.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
