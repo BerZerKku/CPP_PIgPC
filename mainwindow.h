@@ -35,15 +35,25 @@ public:
 private:
     Ui::MainWindow *ui;
 
-    clMenu menu;    ///< Меню.
+    stGBparam params;   ///< Параметры.
+    clMenu menu;        ///< Меню.
 
-    /// Изменение параметра.
-    void changeParam();
+    /// Обработка команды.
+    void procCommand();
+    /// Обработка команд чтения журналов.
+    void procCommandReadJournal(eGB_COM com);
+    /// Обработка команд чтения параметров.
+    void procCommandReadParam(eGB_COM com);
+    /// Обработка команд записи параметров.
+    void procCommandWriteParam(eGB_COM com);
+    /// Обработка команд записи режима.
+    void procCommandWriteRegime(eGB_COM com);
     /// Инициализация меню.
     void initParam();
     /// Обработчик событий.
     bool eventFilter(QObject* object, QEvent* event) override;
-
+    /// Обработчик события после отображения формы.
+    void showEvent( QShowEvent* event ) override;
 
 private slots:
     void cycleMenu();  ///< Цикл 200 мс.

@@ -27,6 +27,8 @@ QKeyboard::QKeyboard(QWidget *parent) :
     f.setPointSize(15);
 
     for(QPushButton *btn: btns) {
+        btn->setText(getButtonName(KEY_EMPTY));
+        btn->setEnabled(false);
         btn->setFont(f);
         connect(btn, &QPushButton::clicked,
                 this->signalMapper, QOverload<>::of(&QSignalMapper::map));
