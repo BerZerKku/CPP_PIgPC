@@ -2,8 +2,10 @@
 #include "ui_mainwindow.h"
 
 #include <QDebug>
+#include <QFontMetrics>
 #include <QKeyEvent>
 #include <QTimer>
+#include <QScrollBar>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -14,11 +16,6 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->textEdit, &QTextEdit::selectionChanged,
             this, &MainWindow::clearSelection);
 
-    // FIXME Сделать подсчет необходимого размера виджетов.
-    ui->textEdit->setFixedSize(340, 240);
-    ui->kbd->setFixedSize(ui->textEdit->width(), ui->textEdit->width());
-    setFixedSize(sizeHint());
-
     initParam();
 
     QTimer *timer = new QTimer(this);
@@ -26,6 +23,22 @@ MainWindow::MainWindow(QWidget *parent)
     timer->start(200);
 
     installEventFilter(this);
+    ui->textEdit->installEventFilter(this);
+
+    QFont font("Monospace");
+    font.setStyleHint(QFont::TypeWriter);
+    font.setPointSize(20);
+    ui->textEdit->setFont(font);
+
+    QFontMetrics mfont(font);
+    QSize size = mfont.size(Qt::TextSingleLine, "12345678901234567890");
+
+    // FIXME Разобраться почему константы именно такие
+    ui->textEdit->setFixedSize(size.width() + 10, size.height()*7 + 10);
+    ui->kbd->setFixedSize(ui->textEdit->width(), ui->textEdit->width());
+    setFixedSize(sizeHint());
+    // Удаляет движение содержимого при прокрутке колесика мышки над testEdit
+    ui->textEdit->verticalScrollBar()->blockSignals(true);
 }
 
 //
@@ -45,7 +58,18 @@ void MainWindow::clearSelection()
 //
 void MainWindow::cycleMenu()
 {
-    menu.main();
+    menu.proc();
+    vLCDled();
+}
+
+//
+bool MainWindow::eventFilter(QObject *object, QEvent *event)
+{
+    if (event->type() == QEvent::KeyRelease) {
+        ui->kbd->keyPressed(static_cast<QKeyEvent*>(event)->key());
+    }
+
+    return QMainWindow::eventFilter(object, event);
 }
 
 //
@@ -100,26 +124,31 @@ void MainWindow::initParam()
     menu.sParam.DateTime.setMinute(8);
     menu.sParam.DateTime.setSecond(37);
 
+    menu.sParam.glb.status.setRegime(GB_REGIME_ENABLED);
+    menu.sParam.glb.status.setFault(0);
+    menu.sParam.glb.status.setWarning(0);
+
     menu.sParam.prm.status.setRegime(GB_REGIME_ENABLED);
-    menu.sParam.prm.status.setState(0);
+    menu.sParam.prm.status.setState(1);
     menu.sParam.prm.status.setFault(0);
     menu.sParam.prm.status.setWarning(0);
 
     menu.sParam.prd.status.setRegime(GB_REGIME_ENABLED);
-    menu.sParam.prd.status.setState(0);
-    menu.sParam.prd.status.setFault(1);
+    menu.sParam.prd.status.setState(1);
+    menu.sParam.prd.status.setFault(0);
     menu.sParam.prd.status.setWarning(0);
 }
 
-bool MainWindow::eventFilter(QObject *object, QEvent *event)
+//
+void MainWindow::setBacklight(bool enable)
 {
-     if (event->type() == QEvent::KeyRelease) {
-        ui->kbd->keyPressed(static_cast<QKeyEvent*>(event)->key());
-    }
+    QColor color = enable ? Qt::green : Qt::gray;
 
-    return QMainWindow::eventFilter(object, event);
+    if (color.isValid()) {
+         QString qss = QString("background-color: %1").arg(color.name());
+         ui->textEdit->setStyleSheet(qss);
+     }
 }
-
 
 
 

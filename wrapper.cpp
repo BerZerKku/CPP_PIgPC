@@ -9,6 +9,9 @@
 //#include "PIg/src/drivers/ks0108.h"
 
 extern MainWindow *w;
+static uint16_t uLedTimeOn = LCD_TIME_LED_ON;
+static eLCD_LED eLed = LED_OFF;
+static QString text;
 
 void vKEYmain(void) {
 
@@ -27,7 +30,9 @@ uint8_t timePressKey() {
 }
 
 void vLCDclear(void) {
+    text.clear();
     w->ui->textEdit->clear();
+//    w->ui->textEdit->clear();
 }
 
 void vLCDinit(void) {
@@ -39,7 +44,8 @@ void vLCDmain(void) {
 }
 
 void vLCDrefresh(void) {
-
+    w->ui->textEdit->clear();
+    w->ui->textEdit->setText(text);
 }
 
 bool vLCDdrawBoard(uint8_t num) {
@@ -47,9 +53,9 @@ bool vLCDdrawBoard(uint8_t num) {
 }
 
 bool vLCDputchar(const char* buf, uint8_t num) {
-    QString text;
     QTextCodec *codec = QTextCodec::codecForName("CP1251");
 
+    text.clear();
     for(quint8 row = 0; row < 7; row++) {
         for(quint16 col = 0; col < 20; col++) {
             char symbol = (row == num) ? '=' : *buf++;
@@ -58,18 +64,31 @@ bool vLCDputchar(const char* buf, uint8_t num) {
             }
             text += codec->toUnicode(&symbol, 1);
         }
-        text += "\n";
+        if (row != 6) {
+            text += "\n";
+        }
     }
-
-    w->ui->textEdit->setText(text);
 
     return true;
 }
 
 void vLCDsetLed(eLCD_LED val) {
-
+    if (val == LED_SWITCH)
+        uLedTimeOn = LCD_TIME_LED_ON;
+    else
+        eLed = val;
 }
 
 void vLCDled() {
+    const uint16_t step = 200; // период вызова в мс
+    bool enable = false;
 
+    if (eLed == LED_ON) {
+        enable = true;
+    } else if (uLedTimeOn > 0) {
+       uLedTimeOn = (uLedTimeOn > step) ? uLedTimeOn - step : 0;
+       enable = uLedTimeOn > 0;
+    }
+
+    w->setBacklight(enable);
 }

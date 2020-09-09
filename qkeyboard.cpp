@@ -147,7 +147,7 @@ void QKeyboard::keyPressed(int value)
 
     switch(static_cast<Qt::Key> (value)) {
         case Qt::Key_Backspace: // DOWN
-        case Qt::Key_E: {
+        case Qt::Key_C: {
             ekey = KEY_CANCEL;
         } break;
         case Qt::Key_Down: {
@@ -175,7 +175,11 @@ void QKeyboard::keyPressed(int value)
         }
     }
 
-    if (ekey != KEY_NO) {
+    // Анмимация нажатия кнопки, если она есть на экране
+    QMap<QPushButton*, eKEY> *m = alt ? &secondary : &primary;
+    if (m->values().contains(ekey)) {
+        m->key(ekey)->animateClick();
+    } else {
         btnPressed(ekey);
     }
 }
@@ -191,6 +195,7 @@ void QKeyboard::refresh()
 
     for(QPushButton *btn: btns) {
         btn->setText(getButtonName(m->value(btn)));
+        btn->setEnabled(m->value(btn) != KEY_EMPTY);
         signalMapper->setMapping(btn, m->value(btn));
     }
 

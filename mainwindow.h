@@ -32,6 +32,8 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+
+
 private:
     Ui::MainWindow *ui;
 
@@ -45,5 +47,6 @@ private:
 private slots:
     void cycleMenu();  ///< Цикл 200 мс.
     void clearSelection();  ///< Очистка выделения в textEdit.
+    void setBacklight(bool enable);
 };
 #endif // MAINWINDOW_H
