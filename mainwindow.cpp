@@ -47,6 +47,45 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::changeParam()
+{
+    eGB_COM com = menu.getTxCommand();
+
+    switch(com) {
+        case GB_COM_SET_REG_DISABLED: {
+            menu.sParam.glb.status.setRegime(GB_REGIME_DISABLED);
+            menu.sParam.def.status.setRegime(GB_REGIME_DISABLED);
+            menu.sParam.prd.status.setRegime(GB_REGIME_DISABLED);
+            menu.sParam.prm.status.setRegime(GB_REGIME_DISABLED);
+        } break;
+        case GB_COM_SET_REG_ENABLED: {
+            menu.sParam.glb.status.setRegime(GB_REGIME_ENABLED);
+            menu.sParam.def.status.setRegime(GB_REGIME_ENABLED);
+            menu.sParam.prd.status.setRegime(GB_REGIME_ENABLED);
+            menu.sParam.prm.status.setRegime(GB_REGIME_ENABLED);
+        } break;
+
+        case GB_COM_SET_TIME: {
+            bool ok = false;
+            uint8_t *buf = menu.sParam.txComBuf.getBuferAddress();
+            menu.sParam.DateTime.setYear(bcd2int(buf[0], ok));
+            menu.sParam.DateTime.setMonth(bcd2int(buf[1], ok));
+            menu.sParam.DateTime.setDay(bcd2int(buf[2], ok));
+            menu.sParam.DateTime.setHour(bcd2int(buf[3], ok));
+            menu.sParam.DateTime.setMinute(bcd2int(buf[4], ok));
+            menu.sParam.DateTime.setSecond(bcd2int(buf[5], ok));
+            Q_ASSERT(buf[6] == 0);
+            Q_ASSERT(buf[7] == 0);
+            menu.sParam.DateTime.setMsSecond(buf[6] + ((quint16) buf[7] << 8));
+            Q_ASSERT(buf[8] == 0);
+        } break;
+
+        default: {
+            qDebug() << "Нет обработчика команды: " << com;
+        }
+    }
+}
+
 //
 void MainWindow::clearSelection()
 {
@@ -60,6 +99,7 @@ void MainWindow::cycleMenu()
 {
     menu.proc();
     vLCDled();
+    changeParam();
 }
 
 //
@@ -147,7 +187,22 @@ void MainWindow::setBacklight(bool enable)
     if (color.isValid()) {
          QString qss = QString("background-color: %1").arg(color.name());
          ui->textEdit->setStyleSheet(qss);
-     }
+    }
+}
+
+quint8 MainWindow::bcd2int(quint8 bcd, bool &ok) const
+{
+    quint8 value;
+
+    ok = ((bcd & 0x0F) < 0x0A) && ((bcd & 0xF0) < 0xA0);
+    if (!ok) {
+        qDebug() << __FILE__ << __FUNCTION__ << __LINE__ << " Error: " << bcd;
+    }
+
+    value = bcd & 0x0F;
+    value += ((bcd >> 4) & 0x0F) * 10;
+
+    return value;
 }
 
 

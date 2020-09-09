@@ -32,21 +32,23 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-
-
 private:
     Ui::MainWindow *ui;
 
     clMenu menu;    ///< Меню.
 
+    /// Изменение параметра.
+    void changeParam();
     /// Инициализация меню.
     void initParam();
-//    void keyPressEvent(QKeyEvent *event) override;
+    /// Обработчик событий.
     bool eventFilter(QObject* object, QEvent* event) override;
+
 
 private slots:
     void cycleMenu();  ///< Цикл 200 мс.
     void clearSelection();  ///< Очистка выделения в textEdit.
     void setBacklight(bool enable);
+    quint8 bcd2int(quint8 bcd, bool &ok) const;
 };
 #endif // MAINWINDOW_H

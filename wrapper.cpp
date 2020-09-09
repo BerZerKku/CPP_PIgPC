@@ -80,7 +80,7 @@ void vLCDsetLed(eLCD_LED val) {
 }
 
 void vLCDled() {
-    const uint16_t step = 200; // период вызова в мс
+    const uint16_t step = 20; // период вызова/10мс
     bool enable = false;
 
     if (eLed == LED_ON) {
