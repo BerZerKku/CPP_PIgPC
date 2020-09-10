@@ -55,6 +55,7 @@ HEADERS += \
     PIg/src/paramBsp.h \
     PIg/src/paramDef.h \
     PIg/src/paramGlb.h \
+    PIg/src/paramIS.h \
     PIg/src/paramPrd.h \
     PIg/src/paramPrm.h \
     PIg/src/paramUart.h \

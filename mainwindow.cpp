@@ -124,12 +124,12 @@ void MainWindow::initParam()
     // Параметры хранящиеся во внутренней памяти МК
 
     menu.sParam.password.init(0000);
-    menu.sParam.Uart.Interface.set(TInterface::USB);
-    menu.sParam.Uart.Protocol.set(TProtocol::STANDART);
-    menu.sParam.Uart.BaudRate.set(TBaudRate::_19200);
-    menu.sParam.Uart.DataBits.set(TDataBits::_8);
-    menu.sParam.Uart.Parity.set(TParity::EVEN);
-    menu.sParam.Uart.StopBits.set(TStopBits::ONE);
+    params.Uart.Interface.set(TInterface::USB);
+    params.Uart.Protocol.set(TProtocol::STANDART);
+    params.Uart.BaudRate.set(TBaudRate::_19200);
+    params.Uart.DataBits.set(TDataBits::_8);
+    params.Uart.Parity.set(TParity::EVEN);
+    params.Uart.StopBits.set(TStopBits::ONE);
 
     // Параметры получаемые из БСП
 
@@ -243,8 +243,29 @@ void MainWindow::procCommandReadParam(eGB_COM com)
             }
         } break;
         case GB_COM_GET_NET_ADR: {
-            value = params.glb.getNetAddress();
-            menu.sParam.glb.setNetAddress(value);
+            qDebug() << "GB_COM_GET_NET_ADR, interface = " << params.Uart.Interface.get();
+
+            menu.sParam.glb.setNetAddress(params.glb.getNetAddress());
+            menu.sParam.Uart.Interface.set(params.Uart.Interface.get());
+            menu.sParam.Uart.Protocol.set(params.Uart.Protocol.get());
+            menu.sParam.Uart.BaudRate.set(params.Uart.BaudRate.get());
+            menu.sParam.Uart.DataBits.set(params.Uart.DataBits.get());
+            menu.sParam.Uart.Parity.set(params.Uart.Parity.get());
+            menu.sParam.Uart.StopBits.set(params.Uart.StopBits.get());
+
+            switch(menu.sParam.local.getSendDop()) {
+                case 1: value = menu.sParam.glb.getNetAddress(); break;
+                case 2: value = menu.sParam.Uart.Interface.get(); break;
+                case 3: value = menu.sParam.Uart.Protocol.get(); break;
+                case 4: value = menu.sParam.Uart.BaudRate.get(); break;
+                case 5: value = menu.sParam.Uart.DataBits.get(); break;
+                case 6: value = menu.sParam.Uart.Parity.get(); break;
+                case 7: value = menu.sParam.Uart.StopBits.get(); break;
+                default: qDebug() << __FILE__ << __FUNCTION__ <<
+                                     "Нет обработчика для доп. значения: " <<
+                                     hex << menu.sParam.local.getSendDop();
+            }
+
         } break;
         case GB_COM_GET_SOST: {
             menu.sParam.def.status.setRegime(params.def.status.getRegime());
@@ -380,7 +401,36 @@ void MainWindow::procCommandWriteParam(eGB_COM com)
         } break;
 
         case GB_COM_SET_NET_ADR: {
-            params.glb.setNetAddress(buf[0]);
+            uint8_t dop = buf[0];
+            uint8_t byte = buf[1];
+            qDebug() << "GB_COM_SET_NET_ADR" << hex << dop << byte;
+
+            switch(dop) {
+                case 1: {
+                    params.glb.setNetAddress(byte);
+                } break;
+                case 2: {
+                    params.Uart.Interface.set((TInterface::INTERFACE) byte);
+                } break;
+                case 3: {
+                    params.Uart.Protocol.set((TProtocol::PROTOCOL) byte);
+                } break;
+                case 4: {
+                    params.Uart.BaudRate.set((TBaudRate::BAUD_RATE) byte);
+                } break;
+                case 5: {
+                    params.Uart.DataBits.set((TDataBits::DATA_BITS) byte);
+                } break;
+                case 6: {
+                    params.Uart.Parity.set((TParity::PARITY) byte);
+                } break;
+                case 7: {
+                    params.Uart.StopBits.set((TStopBits::STOP_BITS) byte);
+                } break;
+                default: qDebug() << __FILE__ << __FUNCTION__ <<
+                                     "Нет обработчика для доп. значения: " <<
+                                     hex << buf[1];
+            }
         } break;
 
         default: {
