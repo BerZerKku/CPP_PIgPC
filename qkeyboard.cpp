@@ -58,7 +58,8 @@ void QKeyboard::btnPressed(int value)
         }
     }
 
-    qDebug() << "Button pressed: " << getButtonName(static_cast<eKEY> (value));
+    QString name = getButtonName(static_cast<eKEY> (value));
+    emit debug(QString("Button pressed: %1").arg(name));
 }
 
 //
@@ -146,6 +147,8 @@ eKEY QKeyboard::getKey()
 void QKeyboard::keyPressed(int value)
 {
     eKEY ekey = KEY_NO;
+
+    emit debug(QString("keyPressed: 0x%1").arg(value, 8, 16, QLatin1Char('0')));
 
     switch(static_cast<Qt::Key> (value)) {
         case Qt::Key_Backspace: // DOWN

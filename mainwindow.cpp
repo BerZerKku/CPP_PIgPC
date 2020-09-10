@@ -17,6 +17,7 @@ MainWindow::MainWindow(QWidget *parent)
             this, &MainWindow::clearSelection);
 
     initParam();
+    initClock();
 
     installEventFilter(this);
     ui->textEdit->installEventFilter(this);
@@ -30,21 +31,46 @@ MainWindow::MainWindow(QWidget *parent)
     QSize size = mfont.size(Qt::TextSingleLine, "12345678901234567890");
 
     // FIXME Разобраться почему константы именно такие
-    ui->textEdit->setFixedSize(size.width() + 10, size.height()*7 + 10);
+    ui->textEdit->setFixedSize(size.width() + 12, size.height()*7 + 10);
     ui->kbd->setFixedSize(ui->textEdit->width(), ui->textEdit->width());
     setFixedSize(sizeHint());
     // Удаляет движение содержимого при прокрутке колесика мышки над testEdit
     ui->textEdit->verticalScrollBar()->blockSignals(true);
 
-    QTimer *timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, this, &MainWindow::cycleMenu);
-    timer->start(200);
+    QTimer *timerMenu = new QTimer(this);
+    connect(timerMenu, &QTimer::timeout, this, &MainWindow::cycleMenu);
+    timerMenu->start(200);
+
+    QTimer *timerCommand = new QTimer(this);
+    connect(timerCommand, &QTimer::timeout, this, &MainWindow::procCommand);
+    timerMenu->start(100);
+
+    connect(ui->kbd, &QKeyboard::debug, this, &MainWindow::printDebug);
+
+    QTimer *timerClock = new QTimer(this);
+    connect(timerClock, &QTimer::timeout, this, &MainWindow::updateClock);
+    timerClock->start(1000);
 }
 
 //
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+quint8 MainWindow::bcd2int(quint8 bcd, bool &ok) const
+{
+    quint8 value;
+
+    ok = ((bcd & 0x0F) < 0x0A) && ((bcd & 0xF0) < 0xA0);
+    if (!ok) {
+        qDebug() << __FILE__ << __FUNCTION__ << __LINE__ << " Error: " << bcd;
+    }
+
+    value = bcd & 0x0F;
+    value += ((bcd >> 4) & 0x0F) * 10;
+
+    return value;
 }
 
 //
@@ -73,9 +99,23 @@ bool MainWindow::eventFilter(QObject *object, QEvent *event)
     return QMainWindow::eventFilter(object, event);
 }
 
-void MainWindow::showEvent(QShowEvent *event)
+//
+void MainWindow::initClock()
 {
-    QWidget::showEvent(event);
+    QDate date;
+    QTime time;
+
+    date.setDate(params.DateTime.getYear()+2000,
+                 params.DateTime.getMonth(),
+                 params.DateTime.getDay());
+
+    time.setHMS(params.DateTime.getHour(),
+                params.DateTime.getMinute(),
+                params.DateTime.getSecond());
+
+
+    dt.setDate(date);
+    dt.setTime(time);
 }
 
 //
@@ -143,6 +183,12 @@ void MainWindow::initParam()
 
     params.glb.status.setFault(0);
     params.glb.status.setWarning(0);
+}
+
+//
+void MainWindow::printDebug(QString msg)
+{
+    ui->debug->append(msg);
 }
 
 //
@@ -236,7 +282,6 @@ void MainWindow::procCommandReadParam(eGB_COM com)
             menu.sParam.glb.status.setWarning(params.glb.status.getWarning());
         } break;
         case GB_COM_GET_TIME: {
-            // FIXME Добавить обработку времени.
             menu.sParam.DateTime.setYear(params.DateTime.getYear());
             menu.sParam.DateTime.setMonth(params.DateTime.getMonth());
             menu.sParam.DateTime.setDay(params.DateTime.getDay());
@@ -331,6 +376,7 @@ void MainWindow::procCommandWriteParam(eGB_COM com)
             Q_ASSERT(buf[7] == 0);
             params.DateTime.setMsSecond(buf[6] + ((quint16) buf[7] << 8));
             Q_ASSERT(buf[8] == 0);
+            initClock();
         } break;
 
         case GB_COM_SET_NET_ADR: {
@@ -377,20 +423,23 @@ void MainWindow::setBacklight(bool enable)
     }
 }
 
-quint8 MainWindow::bcd2int(quint8 bcd, bool &ok) const
+//
+void MainWindow::showEvent(QShowEvent *event)
 {
-    quint8 value;
-
-    ok = ((bcd & 0x0F) < 0x0A) && ((bcd & 0xF0) < 0xA0);
-    if (!ok) {
-        qDebug() << __FILE__ << __FUNCTION__ << __LINE__ << " Error: " << bcd;
-    }
-
-    value = bcd & 0x0F;
-    value += ((bcd >> 4) & 0x0F) * 10;
-
-    return value;
+    QWidget::showEvent(event);
 }
 
+//
+void MainWindow::updateClock()
+{
+    dt = dt.addSecs(1);
 
+    params.DateTime.setYear(dt.date().year()-2000);
+    params.DateTime.setMonth(dt.date().month());
+    params.DateTime.setDay(dt.date().day());
+
+    params.DateTime.setHour(dt.time().hour());
+    params.DateTime.setMinute(dt.time().minute());
+    params.DateTime.setSecond(dt.time().second());
+}
 

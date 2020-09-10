@@ -1,6 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <QDateTime>
 #include <QMainWindow>
 #include "wrapper.hpp"
 
@@ -34,10 +35,13 @@ public:
 
 private:
     Ui::MainWindow *ui;
+    QDateTime dt;
 
     stGBparam params;   ///< Параметры.
     clMenu menu;        ///< Меню.
 
+    /// Преобразование bcd кода в целое.
+    quint8 bcd2int(quint8 bcd, bool &ok) const;
     /// Обработка команды.
     void procCommand();
     /// Обработка команд чтения журналов.
@@ -48,6 +52,8 @@ private:
     void procCommandWriteParam(eGB_COM com);
     /// Обработка команд записи режима.
     void procCommandWriteRegime(eGB_COM com);
+    /// Инициализация времени.
+    void initClock();
     /// Инициализация меню.
     void initParam();
     /// Обработчик событий.
@@ -55,10 +61,12 @@ private:
     /// Обработчик события после отображения формы.
     void showEvent( QShowEvent* event ) override;
 
+
 private slots:
     void cycleMenu();  ///< Цикл 200 мс.
     void clearSelection();  ///< Очистка выделения в textEdit.
+    void printDebug(QString msg);
     void setBacklight(bool enable);
-    quint8 bcd2int(quint8 bcd, bool &ok) const;
+    void updateClock();
 };
 #endif // MAINWINDOW_H

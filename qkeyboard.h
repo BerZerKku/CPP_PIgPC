@@ -37,6 +37,7 @@ private slots:
 
 signals:
     void clicked(int value);
+    void debug(QString msg);
 
 private:
     eKEY key = KEY_NO;
