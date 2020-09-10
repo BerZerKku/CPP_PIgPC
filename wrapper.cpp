@@ -26,13 +26,13 @@ eKEY eKEYget(void) {
 }
 
 uint8_t timePressKey() {
-
+    // FIXME В оригинале имеется еще обработка длительного нажатия кнопки.
+    return 0;
 }
 
 void vLCDclear(void) {
     text.clear();
     w->ui->textEdit->clear();
-//    w->ui->textEdit->clear();
 }
 
 void vLCDinit(void) {
