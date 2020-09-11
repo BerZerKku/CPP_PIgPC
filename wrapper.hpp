@@ -3,6 +3,7 @@
 
 #include "avr/io.h"
 #include "avr/pgmspace.h"
+#include <QDebug>
 
 #define COMPILE_TIME_ASSERT(expression) (void(0))
 

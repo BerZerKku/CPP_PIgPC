@@ -18,6 +18,7 @@ DEFINES += \
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 INCLUDEPATH += \
+    PIg/ \
     PIg/src \
     PIg/src/debug \
     PIg/src/drivers \
@@ -36,6 +37,7 @@ SOURCES += \
     PIg/src/protocols/standart/protocolBspS.cpp \
     PIg/src/protocols/standart/protocolPcS.cpp \
     PIg/src/protocols/standart/protocolS.cpp \
+    bsp.cpp \
     main.cpp \
     mainwindow.cpp \
     qkeyboard.cpp \
@@ -70,6 +72,7 @@ HEADERS += \
     PIg/src/protocols/standart/protocolS.h \
     avr/io.h \
     avr/pgmspace.h \
+    bsp.h \
     mainwindow.h \
     qkeyboard.h \
     wrapper.hpp

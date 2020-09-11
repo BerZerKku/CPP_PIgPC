@@ -4,9 +4,12 @@
 #include <QDateTime>
 #include <QMainWindow>
 #include "wrapper.hpp"
+#include "bsp.h"
 
 #include "PIg/src/drivers/ks0108.h"
 #include "PIg/src/menu/menu.h"
+#include "PIg/src/protocols/standart/protocolBspS.h"
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -35,38 +38,28 @@ public:
 
 private:
     Ui::MainWindow *ui;
-    QDateTime dt;
 
-    stGBparam params;   ///< Параметры.
     clMenu menu;        ///< Меню.
 
-    /// Преобразование bcd кода в целое.
-    quint8 bcd2int(quint8 bcd, bool &ok) const;
-    /// Обработка команды.
-    void procCommand();
-    /// Обработка команд чтения журналов.
-    void procCommandReadJournal(eGB_COM com);
-    /// Обработка команд чтения параметров.
-    void procCommandReadParam(eGB_COM com);
-    /// Обработка команд записи параметров.
-    void procCommandWriteParam(eGB_COM com);
-    /// Обработка команд записи режима.
-    void procCommandWriteRegime(eGB_COM com);
-    /// Инициализация времени.
-    void initClock();
+    Bsp bsp;                    ///< Блок БСП.
+    uint8_t bspBuf[128];        ///< Буфер для протокола общения с БСП.
+    clProtocolBspS *protBSPs;   ///< Протокол общения с БСП.
+
     /// Инициализация меню.
     void initParam();
     /// Обработчик событий.
     bool eventFilter(QObject* object, QEvent* event) override;
     /// Обработчик события после отображения формы.
     void showEvent( QShowEvent* event ) override;
-
+    /// Обработка принятых сообщений из БСП
+    void uartRead();
+    /// Передача сообщений в БСП.
+    void uartWrite();
 
 private slots:
     void cycleMenu();  ///< Цикл 200 мс.
     void clearSelection();  ///< Очистка выделения в textEdit.
     void printDebug(QString msg);
     void setBacklight(bool enable);
-    void updateClock();
 };
 #endif // MAINWINDOW_H

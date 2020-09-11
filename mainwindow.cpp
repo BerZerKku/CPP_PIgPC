@@ -17,7 +17,9 @@ MainWindow::MainWindow(QWidget *parent)
             this, &MainWindow::clearSelection);
 
     initParam();
-    initClock();
+
+    protBSPs = new clProtocolBspS(bspBuf, sizeof(bspBuf), &menu.sParam);
+    protBSPs->setEnable(PRTS_STATUS_NO);
 
     installEventFilter(this);
     ui->textEdit->installEventFilter(this);
@@ -34,43 +36,22 @@ MainWindow::MainWindow(QWidget *parent)
     ui->textEdit->setFixedSize(size.width() + 12, size.height()*7 + 10);
     ui->kbd->setFixedSize(ui->textEdit->width(), ui->textEdit->width());
     setFixedSize(sizeHint());
+
     // Удаляет движение содержимого при прокрутке колесика мышки над testEdit
     ui->textEdit->verticalScrollBar()->blockSignals(true);
 
+    connect(ui->kbd, &QKeyboard::debug, this, &MainWindow::printDebug);
+    connect(&bsp, &Bsp::debug, this, &MainWindow::printDebug);
+
     QTimer *timerMenu = new QTimer(this);
     connect(timerMenu, &QTimer::timeout, this, &MainWindow::cycleMenu);
-    timerMenu->start(200);
-
-    QTimer *timerCommand = new QTimer(this);
-    connect(timerCommand, &QTimer::timeout, this, &MainWindow::procCommand);
     timerMenu->start(100);
-
-    connect(ui->kbd, &QKeyboard::debug, this, &MainWindow::printDebug);
-
-    QTimer *timerClock = new QTimer(this);
-    connect(timerClock, &QTimer::timeout, this, &MainWindow::updateClock);
-    timerClock->start(1000);
 }
 
 //
 MainWindow::~MainWindow()
 {
     delete ui;
-}
-
-quint8 MainWindow::bcd2int(quint8 bcd, bool &ok) const
-{
-    quint8 value;
-
-    ok = ((bcd & 0x0F) < 0x0A) && ((bcd & 0xF0) < 0xA0);
-    if (!ok) {
-        qDebug() << __FILE__ << __FUNCTION__ << __LINE__ << " Error: " << bcd;
-    }
-
-    value = bcd & 0x0F;
-    value += ((bcd >> 4) & 0x0F) * 10;
-
-    return value;
 }
 
 //
@@ -84,9 +65,14 @@ void MainWindow::clearSelection()
 //
 void MainWindow::cycleMenu()
 {
-    menu.proc();
+    static uint8_t menucnt = 0;
+
+    uartRead();
+
+    menucnt = (menucnt >= 2) ? (menu.proc(), 0) : menucnt + 1;
     vLCDled();
-    procCommand();
+
+    uartWrite();
 }
 
 //
@@ -100,366 +86,17 @@ bool MainWindow::eventFilter(QObject *object, QEvent *event)
 }
 
 //
-void MainWindow::initClock()
-{
-    QDate date;
-    QTime time;
-
-    date.setDate(params.DateTime.getYear()+2000,
-                 params.DateTime.getMonth(),
-                 params.DateTime.getDay());
-
-    time.setHMS(params.DateTime.getHour(),
-                params.DateTime.getMinute(),
-                params.DateTime.getSecond());
-
-
-    dt.setDate(date);
-    dt.setTime(time);
-}
-
-//
 void MainWindow::initParam()
 {
     // Параметры хранящиеся во внутренней памяти МК
 
     menu.sParam.password.init(0000);
-    params.Uart.Interface.set(TInterface::USB);
-    params.Uart.Protocol.set(TProtocol::STANDART);
-    params.Uart.BaudRate.set(TBaudRate::_19200);
-    params.Uart.DataBits.set(TDataBits::_8);
-    params.Uart.Parity.set(TParity::EVEN);
-    params.Uart.StopBits.set(TStopBits::ONE);
-
-    // Параметры получаемые из БСП
-
-    params.glb.setNetAddress(15);
-
-    params.DateTime.setYear(20);
-    params.DateTime.setMonth(9);
-    params.DateTime.setDay(9);
-    params.DateTime.setHour(22);
-    params.DateTime.setMinute(6);
-    params.DateTime.setSecond(37);
-    params.DateTime.setMsSecond(987);
-
-    params.def.status.setEnable(false);
-    params.prm.setNumCom(32);
-    params.prd.setNumCom(32);
-    params.glb.setNumDevices(GB_NUM_DEVICES_2);
-    params.glb.setTypeLine(GB_TYPE_LINE_OPTO);
-    params.glb.setVersProgIC16(0x1112, GB_IC_BSP_MCU);
-    params.glb.setVersProgIC16(0x2122, GB_IC_BSP_DSP);
-    params.glb.setVersProgIC16(0x3132, GB_IC_PI_MCU);
-    params.glb.setVersProgIC16(0x4142, GB_IC_BSP_DSP_PLIS);
-    params.glb.setVersProgIC8(0x51, GB_IC_BSK_PLIS_PRD1);
-    params.glb.setVersProgIC8(0x61, GB_IC_BSK_PLIS_PRD2);
-    params.glb.setVersProgIC8(0x71, GB_IC_BSK_PLIS_PRM1);
-    params.glb.setVersProgIC8(0x81, GB_IC_BSK_PLIS_PRM2);
-    params.glb.setVersProgIC8(0x91, GB_IC_BSZ_PLIS);
-    params.glb.setCompatibility(GB_COMPATIBILITY_AVANT);
-    params.glb.setCompK400(GB_COMP_K400_AVANT);
-    params.glb.setTypeDevice(AVANT_OPTO);
-    params.glb.setTypeOpto(TYPE_OPTO_STANDART);
-
-    params.def.status.setRegime(GB_REGIME_ENABLED);
-    params.def.status.setState(1);
-    params.def.status.setDopByte(0);
-    params.def.status.setFault(0);
-    params.def.status.setWarning(0);
-    params.def.status.setRemoteNumber(1);
-
-    params.prm.status.setRegime(GB_REGIME_ENABLED);
-    params.prm.status.setState(1);
-    params.prm.status.setDopByte(0);
-    params.prm.status.setFault(0);
-    params.prm.status.setWarning(0);
-
-    params.prd.status.setRegime(GB_REGIME_ENABLED);
-    params.prd.status.setState(1);
-    params.prd.status.setDopByte(0);
-    params.prd.status.setFault(0);
-    params.prd.status.setWarning(0);
-
-    params.glb.status.setFault(0);
-    params.glb.status.setWarning(0);
 }
 
 //
 void MainWindow::printDebug(QString msg)
 {
     ui->debug->append(msg);
-}
-
-//
-void MainWindow::procCommand()
-{
-    eGB_COM com = menu.getTxCommand();
-
-    switch(com & GB_COM_MASK_GROUP) {
-        case GB_COM_MASK_GROUP_READ_PARAM: {
-            procCommandReadParam(com);
-        } break;
-        case GB_COM_MASK_GROUP_WRITE_REGIME: {
-            procCommandWriteRegime(com);
-        } break;
-        case GB_COM_MASK_GROUP_WRITE_PARAM: {
-            procCommandWriteParam(com);
-        } break;
-        case GB_COM_MASK_GROUP_READ_JOURNAL: {
-            procCommandReadJournal(com);
-        }break;
-    }
-
-    menu.setConnectionBsp(true);
-}
-
-//
-void MainWindow::procCommandReadJournal(eGB_COM com)
-{
-    switch(com) {
-        default: {
-            qDebug() << __FILE__ << __FUNCTION__ <<
-                        "Нет обработчика команды: 0x" << hex << com;
-        }
-    }
-}
-
-//
-void MainWindow::procCommandReadParam(eGB_COM com)
-{
-    uint16_t value = 0;
-
-    switch(com) {
-        case GB_COM_NO: {
-        } break;
-        case GB_COM_DEF_GET_LINE_TYPE: {
-            uint8_t act = GB_ACT_NO;
-            act = menu.sParam.glb.setNumDevices(params.glb.getNumDevices());
-            menu.sParam.def.setNumDevices(params.glb.getNumDevices());
-            menu.sParam.local.setNumDevices(menu.sParam.glb.getNumDevices()+1);
-            if (act & GB_ACT_NEW) {
-                menu.sParam.device = false;
-            }
-        } break;
-        case GB_COM_GET_NET_ADR: {
-            qDebug() << "GB_COM_GET_NET_ADR, interface = " << params.Uart.Interface.get();
-
-            menu.sParam.glb.setNetAddress(params.glb.getNetAddress());
-            menu.sParam.Uart.Interface.set(params.Uart.Interface.get());
-            menu.sParam.Uart.Protocol.set(params.Uart.Protocol.get());
-            menu.sParam.Uart.BaudRate.set(params.Uart.BaudRate.get());
-            menu.sParam.Uart.DataBits.set(params.Uart.DataBits.get());
-            menu.sParam.Uart.Parity.set(params.Uart.Parity.get());
-            menu.sParam.Uart.StopBits.set(params.Uart.StopBits.get());
-
-            switch(menu.sParam.local.getSendDop()) {
-                case 1: value = menu.sParam.glb.getNetAddress(); break;
-                case 2: value = menu.sParam.Uart.Interface.get(); break;
-                case 3: value = menu.sParam.Uart.Protocol.get(); break;
-                case 4: value = menu.sParam.Uart.BaudRate.get(); break;
-                case 5: value = menu.sParam.Uart.DataBits.get(); break;
-                case 6: value = menu.sParam.Uart.Parity.get(); break;
-                case 7: value = menu.sParam.Uart.StopBits.get(); break;
-                default: qDebug() << __FILE__ << __FUNCTION__ <<
-                                     "Нет обработчика для доп. значения: " <<
-                                     hex << menu.sParam.local.getSendDop();
-            }
-
-        } break;
-        case GB_COM_GET_SOST: {
-            menu.sParam.def.status.setRegime(params.def.status.getRegime());
-            menu.sParam.def.status.setState(params.def.status.getState());
-            menu.sParam.def.status.setDopByte(params.def.status.getDopByte());
-
-            menu.sParam.prm.status.setRegime(params.prm.status.getRegime());
-            menu.sParam.prm.status.setState(params.prm.status.getState());
-            menu.sParam.prm.status.setDopByte(params.prm.status.getDopByte());
-
-            // TODO Разобраться почему не используется второй приемник.
-
-            menu.sParam.prd.status.setRegime(params.prd.status.getRegime());
-            menu.sParam.prd.status.setState(params.prd.status.getState());
-            menu.sParam.prd.status.setDopByte(params.prd.status.getDopByte());
-
-            // NOTE В данном случае режимы всегда меняются одинаково. Логика не нужна.
-            menu.sParam.glb.status.setRegime(params.prd.status.getRegime());
-
-            // TODO Добавить состояние светодиодов и дискретных входов.
-            // TODO Добавить управление подсветкой.
-        } break;
-        case GB_COM_GET_FAULT: {
-            menu.sParam.def.status.setFault(params.def.status.getFault());
-            menu.sParam.def.status.setWarning(params.def.status.getWarning());
-            menu.sParam.def.status.setRemoteNumber(params.def.status.getRemoteNumber());
-
-            menu.sParam.prm.status.setFault(params.prm.status.getFault());
-            menu.sParam.prm.status.setWarning(params.prm.status.getWarning());
-
-            menu.sParam.prd.status.setFault(params.prm.status.getFault());
-            menu.sParam.prd.status.setWarning(params.prm.status.getWarning());
-
-            menu.sParam.glb.status.setFault(params.glb.status.getFault());
-            menu.sParam.glb.status.setWarning(params.glb.status.getWarning());
-        } break;
-        case GB_COM_GET_TIME: {
-            menu.sParam.DateTime.setYear(params.DateTime.getYear());
-            menu.sParam.DateTime.setMonth(params.DateTime.getMonth());
-            menu.sParam.DateTime.setDay(params.DateTime.getDay());
-            menu.sParam.DateTime.setHour(params.DateTime.getHour());
-            menu.sParam.DateTime.setMinute(params.DateTime.getMinute());
-            menu.sParam.DateTime.setSecond(params.DateTime.getSecond());
-            menu.sParam.DateTime.setMsSecond(params.DateTime.getMsSecond());
-
-            // TODO Добавить считывание записи журнала для АСУ ТП.
-        } break;
-        case GB_COM_GET_VERS: {
-            menu.sParam.def.status.setEnable(false);
-
-            menu.sParam.prm.setNumCom(params.prm.getNumCom());
-            menu.sParam.local.setNumComPrm(params.prm.getNumCom());
-            // FIXME Узнать что значит количество команд второго приемника.
-
-            menu.sParam.prd.setNumCom(params.prd.getNumCom());
-            menu.sParam.local.setNumComPrd(params.prd.getNumCom());
-
-            menu.sParam.glb.setNumDevices(params.glb.getNumDevices());
-            menu.sParam.def.setNumDevices(params.glb.getNumDevices());
-            menu.sParam.local.setNumDevices(menu.sParam.glb.getNumDevices()+1);
-
-            menu.sParam.glb.setTypeLine(params.glb.getTypeLine());
-
-            menu.sParam.glb.setVersProgIC16(
-                        params.glb.getVersProgIC(GB_IC_BSP_MCU),
-                        GB_IC_BSP_MCU);
-            menu.sParam.glb.setVersProgIC16(
-                        params.glb.getVersProgIC(GB_IC_BSP_DSP),
-                        GB_IC_BSP_DSP);
-            menu.sParam.glb.setVersProgIC16(
-                        params.glb.getVersProgIC(GB_IC_PI_MCU),
-                        GB_IC_PI_MCU);
-            menu.sParam.glb.setVersProgIC16(
-                        params.glb.getVersProgIC(GB_IC_BSP_DSP_PLIS),
-                        GB_IC_BSP_DSP_PLIS);
-
-            // NOTE Версии ниже 8-и битные, но в данном случае записывать как 16
-            menu.sParam.glb.setVersProgIC16(
-                        params.glb.getVersProgIC(GB_IC_BSK_PLIS_PRD1),
-                        GB_IC_BSK_PLIS_PRD1);
-            menu.sParam.glb.setVersProgIC16(
-                        params.glb.getVersProgIC(GB_IC_BSK_PLIS_PRD2),
-                        GB_IC_BSK_PLIS_PRD2);
-            menu.sParam.glb.setVersProgIC16(
-                        params.glb.getVersProgIC(GB_IC_BSK_PLIS_PRM1),
-                        GB_IC_BSK_PLIS_PRM1);
-            menu.sParam.glb.setVersProgIC16(
-                        params.glb.getVersProgIC(GB_IC_BSK_PLIS_PRM2),
-                        GB_IC_BSK_PLIS_PRM2);
-            menu.sParam.glb.setVersProgIC16(
-                        params.glb.getVersProgIC(GB_IC_BSZ_PLIS),
-                        GB_IC_BSZ_PLIS);
-
-            menu.sParam.glb.setCompatibility(params.glb.getCompatibility());
-            menu.sParam.glb.setCompK400(params.glb.getCompK400());
-
-            menu.sParam.glb.setTypeDevice(params.glb.getTypeDevice());
-            menu.sParam.glb.setTypeOpto(params.glb.getTypeOpto());
-
-            menu.sParam.device = false;
-        } break;
-        default: {
-            qDebug() << __FILE__ << __FUNCTION__ <<
-                        "Нет обработчика команды: 0x" << hex << com;
-        }
-    }
-
-    if ((com != GB_COM_NO) && (com == menu.sParam.local.getCom())) {
-        // FIXME Проверить правильность установки всех параметров.
-        menu.sParam.local.setValue(value);
-    }
-}
-
-//
-void MainWindow::procCommandWriteParam(eGB_COM com)
-{
-    uint8_t *buf = menu.sParam.txComBuf.getBuferAddress();
-
-    switch(com) {
-        case GB_COM_SET_TIME: {
-            bool ok = false;
-            params.DateTime.setYear(bcd2int(buf[0], ok));
-            params.DateTime.setMonth(bcd2int(buf[1], ok));
-            params.DateTime.setDay(bcd2int(buf[2], ok));
-            params.DateTime.setHour(bcd2int(buf[3], ok));
-            params.DateTime.setMinute(bcd2int(buf[4], ok));
-            params.DateTime.setSecond(bcd2int(buf[5], ok));
-            Q_ASSERT(buf[6] == 0);
-            Q_ASSERT(buf[7] == 0);
-            params.DateTime.setMsSecond(buf[6] + ((quint16) buf[7] << 8));
-            Q_ASSERT(buf[8] == 0);
-            initClock();
-        } break;
-
-        case GB_COM_SET_NET_ADR: {
-            uint8_t dop = buf[0];
-            uint8_t byte = buf[1];
-            qDebug() << "GB_COM_SET_NET_ADR" << hex << dop << byte;
-
-            switch(dop) {
-                case 1: {
-                    params.glb.setNetAddress(byte);
-                } break;
-                case 2: {
-                    params.Uart.Interface.set((TInterface::INTERFACE) byte);
-                } break;
-                case 3: {
-                    params.Uart.Protocol.set((TProtocol::PROTOCOL) byte);
-                } break;
-                case 4: {
-                    params.Uart.BaudRate.set((TBaudRate::BAUD_RATE) byte);
-                } break;
-                case 5: {
-                    params.Uart.DataBits.set((TDataBits::DATA_BITS) byte);
-                } break;
-                case 6: {
-                    params.Uart.Parity.set((TParity::PARITY) byte);
-                } break;
-                case 7: {
-                    params.Uart.StopBits.set((TStopBits::STOP_BITS) byte);
-                } break;
-                default: qDebug() << __FILE__ << __FUNCTION__ <<
-                                     "Нет обработчика для доп. значения: " <<
-                                     hex << buf[1];
-            }
-        } break;
-
-        default: {
-            qDebug() << __FILE__ << __FUNCTION__ <<
-                        "Нет обработчика команды: 0x" << hex << com;
-        }
-    }
-}
-
-//
-void MainWindow::procCommandWriteRegime(eGB_COM com)
-{
-    switch(com) {
-        case GB_COM_SET_REG_DISABLED: {
-            params.def.status.setRegime(GB_REGIME_DISABLED);
-            params.prd.status.setRegime(GB_REGIME_DISABLED);
-            params.prm.status.setRegime(GB_REGIME_DISABLED);
-        } break;
-        case GB_COM_SET_REG_ENABLED: {
-            params.def.status.setRegime(GB_REGIME_ENABLED);
-            params.prd.status.setRegime(GB_REGIME_ENABLED);
-            params.prm.status.setRegime(GB_REGIME_ENABLED);
-        } break;
-
-        default: {
-            qDebug() << __FILE__ << __FUNCTION__ <<
-                        "Нет обработчика команды: 0x" << hex << com;
-        }
-    }
 }
 
 //
@@ -479,17 +116,41 @@ void MainWindow::showEvent(QShowEvent *event)
     QWidget::showEvent(event);
 }
 
-//
-void MainWindow::updateClock()
+void MainWindow::uartRead()
 {
-    dt = dt.addSecs(1);
+    QVector<uint8_t> pkg = bsp.receiveFromBsp();
+    for(uint8_t byte: pkg) {
+        protBSPs->checkByte(byte);
+    }
 
-    params.DateTime.setYear(dt.date().year()-2000);
-    params.DateTime.setMonth(dt.date().month());
-    params.DateTime.setDay(dt.date().day());
+    protBSPs->checkStat();
+    if (protBSPs->getCurrentStatus() == PRTS_STATUS_READ_OK) {
+        menu.setConnectionBsp(true);
+        if (protBSPs->checkReadData()) {
+            protBSPs->getData(false);
+        }
+    } else {
+        // TODO Разобраться почему иногда нет команды на передачу!
+        qDebug() << __FILE__ << __FUNCTION__ << "Ошибка считывания пакета!";
+    }
+}
 
-    params.DateTime.setHour(dt.time().hour());
-    params.DateTime.setMinute(dt.time().minute());
-    params.DateTime.setSecond(dt.time().second());
+void MainWindow::uartWrite()
+{
+    protBSPs->checkStat();
+    if (protBSPs->getCurrentStatus() == PRTS_STATUS_NO) {
+        eGB_COM com = menu.getTxCommand();
+        if (com != GB_COM_NO) {
+            uint16_t num = protBSPs->sendData(com);
+            QVector<uint8_t> pkg;
+            for(uint16_t i = 0; i < num; i++) {
+                pkg.append(bspBuf[i]);
+            }
+            bsp.sendToBsp(pkg);
+            protBSPs->setCurrentStatus(PRTS_STATUS_NO);
+        } else {
+            qDebug() << __FILE__ << __FUNCTION__ << "Нет команды для передачи";
+        }
+    }
 }
 
