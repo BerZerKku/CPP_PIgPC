@@ -6,12 +6,15 @@
 #include <QKeyEvent>
 #include <QTimer>
 #include <QScrollBar>
+#include <QTextCodec>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    QTextCodec::setCodecForLocale(QTextCodec::codecForName("Windows-1251"));
 
     connect(ui->textEdit, &QTextEdit::selectionChanged,
             this, &MainWindow::clearSelection);
@@ -32,12 +35,12 @@ MainWindow::MainWindow(QWidget *parent)
     QFontMetrics mfont(font);
     QSize size = mfont.size(Qt::TextSingleLine, "12345678901234567890");
 
-    // FIXME –†–∞–∑–æ–±—Ä–∞—Ç—å—Å—è –ø–æ—á–µ–º—É –∫–æ–Ω—Å—Ç–∞–Ω—Ç—ã –∏–º–µ–Ω–Ω–æ —Ç–∞–∫–∏–µ
+    // FIXME –‡ÁÓ·‡Ú¸Òˇ ÔÓ˜ÂÏÛ ÍÓÌÒÚ‡ÌÚ˚ ËÏÂÌÌÓ Ú‡ÍËÂ
     ui->textEdit->setFixedSize(size.width() + 12, size.height()*7 + 10);
     ui->kbd->setFixedSize(ui->textEdit->width(), ui->textEdit->width());
     setFixedSize(sizeHint());
 
-    // –£–¥–∞–ª—è–µ—Ç –¥–≤–∏–∂–µ–Ω–∏–µ —Å–æ–¥–µ—Ä–∂–∏–º–æ–≥–æ –ø—Ä–∏ –ø—Ä–æ–∫—Ä—É—Ç–∫–µ –∫–æ–ª–µ—Å–∏–∫–∞ –º—ã—à–∫–∏ –Ω–∞–¥ testEdit
+    // ”‰‡ÎˇÂÚ ‰‚ËÊÂÌËÂ ÒÓ‰ÂÊËÏÓ„Ó ÔË ÔÓÍÛÚÍÂ ÍÓÎÂÒËÍ‡ Ï˚¯ÍË Ì‡‰ testEdit
     ui->textEdit->verticalScrollBar()->blockSignals(true);
 
     connect(ui->kbd, &QKeyboard::debug, this, &MainWindow::printDebug);
@@ -88,7 +91,7 @@ bool MainWindow::eventFilter(QObject *object, QEvent *event)
 //
 void MainWindow::initParam()
 {
-    // –ü–∞—Ä–∞–º–µ—Ç—Ä—ã —Ö—Ä–∞–Ω—è—â–∏–µ—Å—è –≤–æ –≤–Ω—É—Ç—Ä–µ–Ω–Ω–µ–π –ø–∞–º—è—Ç–∏ –ú–ö
+    // œ‡‡ÏÂÚ˚ ı‡Ìˇ˘ËÂÒˇ ‚Ó ‚ÌÛÚÂÌÌÂÈ Ô‡ÏˇÚË Ã 
 
     menu.sParam.password.init(0000);
 }
@@ -130,8 +133,8 @@ void MainWindow::uartRead()
             protBSPs->getData(false);
         }
     } else {
-        // TODO –†–∞–∑–æ–±—Ä–∞—Ç—å—Å—è –ø–æ—á–µ–º—É –∏–Ω–æ–≥–¥–∞ –Ω–µ—Ç –∫–æ–º–∞–Ω–¥—ã –Ω–∞ –ø–µ—Ä–µ–¥–∞—á—É!
-        qDebug() << __FILE__ << __FUNCTION__ << "–û—à–∏–±–∫–∞ —Å—á–∏—Ç—ã–≤–∞–Ω–∏—è –ø–∞–∫–µ—Ç–∞!";
+        // TODO –‡ÁÓ·‡Ú¸Òˇ ÔÓ˜ÂÏÛ ËÌÓ„‰‡ ÌÂÚ ÍÓÏ‡Ì‰˚ Ì‡ ÔÂÂ‰‡˜Û!
+//        qDebug() << QTime::currentTime() << __FILE__ << __FUNCTION__ << "Read packet error!";
     }
 }
 
@@ -149,7 +152,7 @@ void MainWindow::uartWrite()
             bsp.sendToBsp(pkg);
             protBSPs->setCurrentStatus(PRTS_STATUS_NO);
         } else {
-            qDebug() << __FILE__ << __FUNCTION__ << "–ù–µ—Ç –∫–æ–º–∞–Ω–¥—ã –¥–ª—è –ø–µ—Ä–µ–¥–∞—á–∏";
+//            qDebug() << QTime::currentTime() << __FILE__ << __FUNCTION__ << "No send package!";
         }
     }
 }

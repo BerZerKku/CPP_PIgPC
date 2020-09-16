@@ -1,4 +1,5 @@
 #include "bsp.h"
+#include "QTextCodec"
 #include <QTimer>
 
 Bsp::Bsp(QObject *parent) : QObject(parent)
@@ -101,7 +102,7 @@ void Bsp::initParam()
     params.Uart.Parity.set(TParity::EVEN);
     params.Uart.StopBits.set(TStopBits::ONE);
 
-    // РџР°СЂР°РјРµС‚СЂС‹ РїРѕР»СѓС‡Р°РµРјС‹Рµ РёР· Р‘РЎРџ
+    // Параметры получаемые из БСП
 
     params.glb.setNetAddress(15);
 
@@ -211,7 +212,7 @@ void Bsp::procCommandReadJournal(eGB_COM com, pkg_t &data)
             if (!data.isEmpty()) {
                 emit debug(msgSizeError.arg(data.size()));
             }
-            // TODO РћР±СЂР°Р±РѕС‚С‡РёРє РґР»СЏ РєРѕРјР°РЅРґС‹ С‡С‚РµРЅРёСЏ РєРѕР»РёС‡РµСЃС‚РІР° Р·Р°РїРёСЃРµР№ Р¶СѓСЂРЅР°Р»Р°.
+            // TODO Обработчик для команды чтения количества записей журнала.
             pkgTx.append(com);
             pkgTx.append(0);
             pkgTx.append(0);
@@ -221,7 +222,7 @@ void Bsp::procCommandReadJournal(eGB_COM com, pkg_t &data)
             if (!data.isEmpty()) {
                 emit debug(msgSizeError.arg(data.size()));
             }
-            // TODO РћР±СЂР°Р±РѕС‚С‡РёРє РґР»СЏ РєРѕРјР°РЅРґС‹ С‡С‚РµРЅРёСЏ РєРѕР»РёС‡РµСЃС‚РІР° Р·Р°РїРёСЃРµР№ Р¶СѓСЂРЅР°Р»Р°.
+            // TODO Обработчик для команды чтения количества записей журнала.
             pkgTx.append(com);
             pkgTx.append(0);
             pkgTx.append(0);
@@ -231,7 +232,7 @@ void Bsp::procCommandReadJournal(eGB_COM com, pkg_t &data)
             if (!data.isEmpty()) {
                 emit debug(msgSizeError.arg(data.size()));
             }
-            // TODO РћР±СЂР°Р±РѕС‚С‡РёРє РґР»СЏ РєРѕРјР°РЅРґС‹ С‡С‚РµРЅРёСЏ РєРѕР»РёС‡РµСЃС‚РІР° Р·Р°РїРёСЃРµР№ Р¶СѓСЂРЅР°Р»Р°.
+            // TODO Обработчик для команды чтения количества записей журнала.
             pkgTx.append(com);
             pkgTx.append(0);
             pkgTx.append(0);
@@ -241,15 +242,14 @@ void Bsp::procCommandReadJournal(eGB_COM com, pkg_t &data)
             if (!data.isEmpty()) {
                 emit debug(msgSizeError.arg(data.size()));
             }
-            // TODO РћР±СЂР°Р±РѕС‚С‡РёРє РґР»СЏ РєРѕРјР°РЅРґС‹ С‡С‚РµРЅРёСЏ РєРѕР»РёС‡РµСЃС‚РІР° Р·Р°РїРёСЃРµР№ Р¶СѓСЂРЅР°Р»Р°.
+            // TODO Обработчик для команды чтения количества записей журнала.
             pkgTx.append(com);
             pkgTx.append(0);
             pkgTx.append(0);
         } break;
 
         default: {
-            qDebug() << __FILE__ << __FUNCTION__ <<
-                        "РќРµС‚ РѕР±СЂР°Р±РѕС‚С‡РёРєР° РєРѕРјР°РЅРґС‹: 0x" << hex << com;
+            qDebug() << __FILE__ << __FUNCTION__ << "No command handler: 0x" << hex << com;
         }
     }
 }
@@ -298,7 +298,7 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data)
             pkgTx.append(params.prd.status.getRegime());
             pkgTx.append(params.prd.status.getState());
             pkgTx.append(params.prd.status.getDopByte());
-            // TODO Р Р°Р·РѕР±СЂР°С‚СЊСЃСЏ Р·Р°С‡РµРј РЅСѓР¶РµРЅ РІС‚РѕСЂРѕР№ РїСЂРёРµРјРЅРёРє
+            // TODO Разобраться зачем нужен второй приемник
             pkgTx.append(params.prm.status.getRegime());
             pkgTx.append(params.prm.status.getState());
             pkgTx.append(params.prm.status.getDopByte());
@@ -351,7 +351,7 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data)
             pkgTx.append(value >> 8);
             pkgTx.append(value);
 
-            // TODO Р Р°Р·РѕР±СЂР°С‚СЊСЃСЏ Р·Р°С‡РµРј РЅСѓР¶РµРЅ РІС‚РѕСЂРѕР№ РїСЂРёРµРјРЅРёРє
+            // TODO Разобраться зачем нужен второй приемник
             value = params.prm.status.getFaults();
             pkgTx.append(value >> 8);
             pkgTx.append(value);
@@ -359,10 +359,10 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data)
             pkgTx.append(value >> 8);
             pkgTx.append(value);
 
-            // TODO Р”РѕР±Р°РІРёС‚СЊ Р±Р°Р№С‚С‹ РґР°РЅРЅС‹С… РґР»СЏ Р Р—РЎРљ
+            // TODO Добавить байты данных для РЗСК
         } break;
         case GB_COM_GET_TIME: {
-            // TODO Р”РѕР±Р°РІРёС‚СЊ РѕР±СЂР°Р±РѕС‚РєСѓ С„Р»Р°РіР° РЅРѕРІРѕР№ Р·Р°РїРёСЃРё Р¶СѓСЂРЅР°Р»Р°
+            // TODO Добавить обработку флага новой записи журнала
             if (data.size() != 1) {
                 emit debug(msgSizeError.arg(data.size()));
             }
@@ -380,15 +380,15 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data)
             pkgTx.append(value);
             pkgTx.append(value >> 8);
 
-            // TODO Р”РѕР±Р°РІРёС‚СЊ СЃС‡РёС‚С‹РІР°РЅРёРµ Р·Р°РїРёСЃРё Р¶СѓСЂРЅР°Р»Р° РґР»СЏ РђРЎРЈ РўРџ.
+            // TODO Добавить считывание записи журнала для АСУ ТП.
         } break;
         case GB_COM_GET_VERS: {
             uint16_t vers = 0;
 
             pkgTx.append(com);
             pkgTx.append(params.def.status.isEnable() ? 1 : 0);
-            pkgTx.append(params.prm.getNumCom() / 4); // РїСЂРј1
-            pkgTx.append(params.prm.getNumCom() / 4); // РїСЂРј2
+            pkgTx.append(params.prm.getNumCom() / 4); // прм1
+            pkgTx.append(params.prm.getNumCom() / 4); // прм2
             pkgTx.append(params.prd.getNumCom() / 4);
             pkgTx.append(params.glb.getNumDevices());
             pkgTx.append(params.glb.getTypeLine());
@@ -427,7 +427,7 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data)
 
 //            menu.sParam.prm.setNumCom(params.prm.getNumCom());
 //            menu.sParam.local.setNumComPrm(params.prm.getNumCom());
-//            // FIXME РЈР·РЅР°С‚СЊ С‡С‚Рѕ Р·РЅР°С‡РёС‚ РєРѕР»РёС‡РµСЃС‚РІРѕ РєРѕРјР°РЅРґ РІС‚РѕСЂРѕРіРѕ РїСЂРёРµРјРЅРёРєР°.
+//            // FIXME Узнать что значит количество команд второго приемника.
 
 //            menu.sParam.prd.setNumCom(params.prd.getNumCom());
 //            menu.sParam.local.setNumComPrd(params.prd.getNumCom());
@@ -451,7 +451,7 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data)
 //                        params.glb.getVersProgIC(GB_IC_BSP_DSP_PLIS),
 //                        GB_IC_BSP_DSP_PLIS);
 
-//            // NOTE Р’РµСЂСЃРёРё РЅРёР¶Рµ 8-Рё Р±РёС‚РЅС‹Рµ, РЅРѕ РІ РґР°РЅРЅРѕРј СЃР»СѓС‡Р°Рµ Р·Р°РїРёСЃС‹РІР°С‚СЊ РєР°Рє 16
+//            // NOTE Версии ниже 8-и битные, но в данном случае записывать как 16
 //            menu.sParam.glb.setVersProgIC16(
 //                        params.glb.getVersProgIC(GB_IC_BSK_PLIS_PRD1),
 //                        GB_IC_BSK_PLIS_PRD1);
@@ -477,8 +477,7 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data)
 //            menu.sParam.device = false;
         } break;
         default: {
-            qDebug() << __FILE__ << __FUNCTION__ <<
-                        "РќРµС‚ РѕР±СЂР°Р±РѕС‚С‡РёРєР° РєРѕРјР°РЅРґС‹: 0x" << hex << com;
+            qDebug() << __FILE__ << __FUNCTION__ << "No command handler: 0x" << hex << com;
         }
     }
 }
@@ -490,56 +489,64 @@ void Bsp::procCommandWriteParam(eGB_COM com, pkg_t &data)
 
     switch(com) {
         case GB_COM_SET_TIME: {
-//            bool ok = false;
-//            params.DateTime.setYear(bcd2int(buf[0], ok));
-//            params.DateTime.setMonth(bcd2int(buf[1], ok));
-//            params.DateTime.setDay(bcd2int(buf[2], ok));
-//            params.DateTime.setHour(bcd2int(buf[3], ok));
-//            params.DateTime.setMinute(bcd2int(buf[4], ok));
-//            params.DateTime.setSecond(bcd2int(buf[5], ok));
-//            Q_ASSERT(buf[6] == 0);
-//            Q_ASSERT(buf[7] == 0);
-//            params.DateTime.setMsSecond(buf[6] + ((quint16) buf[7] << 8));
-//            Q_ASSERT(buf[8] == 0);
-            initClock();
+            qDebug() << data;
+
+            if (data.size() != 9) {
+                emit debug(msgSizeError.arg(data.size()));
+            } else {
+                bool ok = false;
+                params.DateTime.setYear(bcd2int(data.takeFirst(), ok));
+                params.DateTime.setMonth(bcd2int(data.takeFirst(), ok));
+                params.DateTime.setDay(bcd2int(data.takeFirst(), ok));
+                params.DateTime.setHour(bcd2int(data.takeFirst(), ok));
+                params.DateTime.setMinute(bcd2int(data.takeFirst(), ok));
+                params.DateTime.setSecond(bcd2int(data.takeFirst(), ok));
+
+                quint16 ms = data.takeFirst();
+                ms += data.takeFirst() << 8;
+                params.DateTime.setMsSecond(ms);
+
+                if (data.first() != 0) {
+                    emit debug(msgTimeSourceError.arg(data.first()));
+                }
+                data.removeFirst();
+                initClock();
+            }
         } break;
 
         case GB_COM_SET_NET_ADR: {
-//            uint8_t dop = menu.sParam.txComBuf.getInt8(0); // buf[0];
-//            uint8_t byte = menu.sParam.txComBuf.getInt8(1); // buf[1];
-//            qDebug() << "GB_COM_SET_NET_ADR" << hex << dop << byte;
+            uint8_t dop = data.takeFirst();
+            uint8_t byte = data.takeFirst();
 
-//            switch(dop) {
-//                case 1: {
-//                    params.glb.setNetAddress(byte);
-//                } break;
-//                case 2: {
-//                    params.Uart.Interface.set((TInterface::INTERFACE) byte);
-//                } break;
-//                case 3: {
-//                    params.Uart.Protocol.set((TProtocol::PROTOCOL) byte);
-//                } break;
-//                case 4: {
-//                    params.Uart.BaudRate.set((TBaudRate::BAUD_RATE) byte);
-//                } break;
-//                case 5: {
-//                    params.Uart.DataBits.set((TDataBits::DATA_BITS) byte);
-//                } break;
-//                case 6: {
-//                    params.Uart.Parity.set((TParity::PARITY) byte);
-//                } break;
-//                case 7: {
-//                    params.Uart.StopBits.set((TStopBits::STOP_BITS) byte);
-//                } break;
-//                default: qDebug() << __FILE__ << __FUNCTION__ <<
-//                                     "РќРµС‚ РѕР±СЂР°Р±РѕС‚С‡РёРєР° РґР»СЏ РґРѕРї. Р·РЅР°С‡РµРЅРёСЏ: " <<
-//                                     hex << buf[1];
-//            }
+            switch(dop) {
+                case 1: {
+                    params.glb.setNetAddress(byte);
+                } break;
+                case 2: {
+                    params.Uart.Interface.set((TInterface::INTERFACE) byte);
+                } break;
+                case 3: {
+                    params.Uart.Protocol.set((TProtocol::PROTOCOL) byte);
+                } break;
+                case 4: {
+                    params.Uart.BaudRate.set((TBaudRate::BAUD_RATE) byte);
+                } break;
+                case 5: {
+                    params.Uart.DataBits.set((TDataBits::DATA_BITS) byte);
+                } break;
+                case 6: {
+                    params.Uart.Parity.set((TParity::PARITY) byte);
+                } break;
+                case 7: {
+                    params.Uart.StopBits.set((TStopBits::STOP_BITS) byte);
+                } break;
+                default: qDebug() << __FILE__ << __FUNCTION__ <<
+                                     "No dop byte handler: " << hex << dop;
+            }
         } break;
 
         default: {
-            qDebug() << __FILE__ << __FUNCTION__ <<
-                        "РќРµС‚ РѕР±СЂР°Р±РѕС‚С‡РёРєР° РєРѕРјР°РЅРґС‹: 0x" << hex << com;
+            qDebug() << __FILE__ << __FUNCTION__ << "No command handler: 0x" << hex << com;
         }
     }
 }
@@ -572,8 +579,7 @@ void Bsp::procCommandWriteRegime(eGB_COM com, pkg_t &data)
         } break;
 
         default: {
-            qDebug() << __FILE__ << __FUNCTION__ <<
-                        "РќРµС‚ РѕР±СЂР°Р±РѕС‚С‡РёРєР° РєРѕРјР°РЅРґС‹: 0x" << hex << com;
+            qDebug() << __FILE__ << __FUNCTION__ << "No command handler: 0x" << hex << com;
         }
     }
 }
@@ -593,7 +599,7 @@ pkg_t Bsp::receiveFromBsp()
         pkg.insert(0, 0x55);
     }
 
-    qDebug() << "receiveFromBsp" << hex << pkg;
+//    qDebug() << "receiveFromBsp" << hex << pkg;
 
     return pkg;
 }
@@ -603,14 +609,14 @@ void Bsp::sendToBsp(pkg_t pkg)
 {
     eGB_COM com = checkPkg(pkg);
 
-    qDebug() << __FILE__ << __FUNCTION__ <<
-                "sendToBsp 0x" << hex << com << " : " << pkg;
+//    qDebug() << __FILE__ << __FUNCTION__ <<
+//                "sendToBsp 0x" << hex << com << " : " << pkg;
 
     pkgTx.clear();
     if (com != GB_COM_NO) {
         procCommand(com, pkg);
     } else {
-        qDebug() << "РћС€РёР±РєР° РїСЂРѕРІРµСЂРєРё СЃРѕРѕР±С‰РµРЅРёСЏ: " << hex << pkg;
+        qDebug() << __FILE__ << __FUNCTION__ << "Message check error: " << hex << pkg;
     }
 }
 

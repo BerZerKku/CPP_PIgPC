@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <QKeyEvent>
 #include <QPalette>
+#include <QTextCodec>
 
 QKeyboard::QKeyboard(QWidget *parent) :
     QWidget(parent),
@@ -75,13 +76,13 @@ QString QKeyboard::getButtonName(eKEY ekey) const
             name = " ";
         } break;
         case KEY_FUNC: {
-            name = "Р¤РЅ";
+            name = QString::fromLocal8Bit("Фн");
         } break;
         case KEY_ENTER: {
             name = QChar(0x23CE);
         } break;
         case KEY_CANCEL: {
-            name = "РћС‚РјРµРЅР°";
+            name = QString::fromLocal8Bit("Отмена");
         } break;
         case KEY_DOWN: {
             name = QChar(0x25BC);
@@ -96,13 +97,13 @@ QString QKeyboard::getButtonName(eKEY ekey) const
             name = QChar(0x25B2);
         } break;
         case KEY_MENU:{
-            name = "РњРµРЅСЋ";
+            name = QString::fromLocal8Bit("Меню");
         } break;
         case KEY_RESET: {
-            name = "РЎР±СЂРѕСЃ";
+            name = QString::fromLocal8Bit("Сброс");
         } break;
         case KEY_PUSK: {
-            name = "РџСѓСЃРє";
+            name = QString::fromLocal8Bit("Пуск");
         } break;
         case KEY_PUSK_UD: {
             name = "KEY_PUSK_UD";
@@ -111,7 +112,7 @@ QString QKeyboard::getButtonName(eKEY ekey) const
             name = "KEY_PUSK_NALAD";
         } break;
         case KEY_RESET_IND: {
-            name = "РЎР±СЂРѕСЃ\nРёРЅРґ.";
+            name = QString::fromLocal8Bit("Сброс\nинд.");
         } break;
         case KEY_CALL: {
             name = "KEY_CALL";
@@ -180,7 +181,7 @@ void QKeyboard::keyPressed(int value)
         }
     }
 
-    // РђРЅРјРёРјР°С†РёСЏ РЅР°Р¶Р°С‚РёСЏ РєРЅРѕРїРєРё, РµСЃР»Рё РѕРЅР° РµСЃС‚СЊ РЅР° СЌРєСЂР°РЅРµ
+    // Анмимация нажатия кнопки, если она есть на экране
     QMap<QPushButton*, eKEY> *m = alt ? &secondary : &primary;
     if (m->values().contains(ekey)) {
         m->key(ekey)->animateClick();

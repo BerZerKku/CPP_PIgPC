@@ -26,7 +26,7 @@ eKEY eKEYget(void) {
 }
 
 uint8_t timePressKey() {
-    // FIXME Р’ РѕСЂРёРіРёРЅР°Р»Рµ РёРјРµРµС‚СЃСЏ РµС‰Рµ РѕР±СЂР°Р±РѕС‚РєР° РґР»РёС‚РµР»СЊРЅРѕРіРѕ РЅР°Р¶Р°С‚РёСЏ РєРЅРѕРїРєРё.
+    // FIXME В оригинале имеется еще обработка длительного нажатия кнопки.
     return 0;
 }
 
@@ -80,7 +80,7 @@ void vLCDsetLed(eLCD_LED val) {
 }
 
 void vLCDled() {
-    const uint16_t step = 20; // РїРµСЂРёРѕРґ РІС‹Р·РѕРІР°/10РјСЃ
+    const uint16_t step = 20; // период вызова/10мс
     bool enable = false;
 
     if (eLed == LED_ON) {

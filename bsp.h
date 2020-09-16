@@ -12,20 +12,21 @@ class Bsp : public QObject
 {
     Q_OBJECT
 
-    const QString msgSizeError = "РћС€РёР±РѕС‡РЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ Р±Р°Р№С‚ РґР°РЅРЅС‹С… %1";
+    const QString msgSizeError = "Ошибочное количество байт данных %1";
+    const QString msgTimeSourceError = "Ошибочный источник комнды %1";
 
 public:
     explicit Bsp(QObject *parent = nullptr);
 
-    /** РџРµСЂРµРґР°РµС‚ РїР°РєРµС‚ РґР°РЅРЅС‹С… РІ Р‘РЎРџ.
+    /** Передает пакет данных в БСП.
      *
-     *  @param[in] pkg Р”Р°РЅРЅС‹Рµ.
+     *  @param[in] pkg Данные.
      */
     void sendToBsp(pkg_t pkg);
 
-    /** РџРѕР»СѓС‡Р°РµС‚ РїР°РєРµС‚ РґР°РЅРЅС‹С… РёР· Р‘РЎРџ
+    /** Получает пакет данных из БСП
      *
-     *  @return Р”Р°РЅРЅС‹Рµ.
+     *  @return Данные.
      */
     pkg_t receiveFromBsp();
 
@@ -33,32 +34,32 @@ signals:
     void debug(QString msg);
 
 private:
-    pkg_t pkgTx;        ///< Р”Р°РЅРЅС‹Рµ РґР»СЏ РїРµСЂРµРґР°С‡Рё.
-    QDateTime dt;       ///< Р”Р°С‚Р° Рё РІСЂРµРјСЏ.
-    stGBparam params;   ///< РџР°СЂР°РјРµС‚СЂС‹.
+    pkg_t pkgTx;        ///< Данные для передачи.
+    QDateTime dt;       ///< Дата и время.
+    stGBparam params;   ///< Параметры.
 
-    /// РџРѕРґСЃС‡РµС‚ РєРѕРЅС‚СЂРѕР»СЊРЅРѕР№ СЃСѓРјРјС‹.
+    /// Подсчет контрольной суммы.
     uint8_t calcCrc(pkg_t &pkg);
-    /// РџСЂРѕРІРµСЂРєР° РїР°РєРµС‚Р°.
+    /// Проверка пакета.
     eGB_COM checkPkg(pkg_t &pkg);
-    /// РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РІСЂРµРјРµРЅРё.
+    /// Инициализация времени.
     void initClock();
-    /// РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ.
+    /// Инициализация параметров.
     void initParam();
-    /// РћР±СЂР°Р±РѕС‚РєР° РєРѕРјР°РЅРґС‹.
+    /// Обработка команды.
     void procCommand(eGB_COM com, pkg_t &data);
-    /// РћР±СЂР°Р±РѕС‚РєР° РєРѕРјР°РЅРґ С‡С‚РµРЅРёСЏ Р¶СѓСЂРЅР°Р»РѕРІ.
+    /// Обработка команд чтения журналов.
     void procCommandReadJournal(eGB_COM com, pkg_t &data);
-    /// РћР±СЂР°Р±РѕС‚РєР° РєРѕРјР°РЅРґ С‡С‚РµРЅРёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ.
+    /// Обработка команд чтения параметров.
     void procCommandReadParam(eGB_COM com, pkg_t &data);
-    /// РћР±СЂР°Р±РѕС‚РєР° РєРѕРјР°РЅРґ Р·Р°РїРёСЃРё РїР°СЂР°РјРµС‚СЂРѕРІ.
+    /// Обработка команд записи параметров.
     void procCommandWriteParam(eGB_COM com, pkg_t &data);
-    /// РћР±СЂР°Р±РѕС‚РєР° РєРѕРјР°РЅРґ Р·Р°РїРёСЃРё СЂРµР¶РёРјР°.
+    /// Обработка команд записи режима.
     void procCommandWriteRegime(eGB_COM com, pkg_t &data);
 
-    /// РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ bcd РєРѕРґР° РІ С†РµР»РѕРµ.
+    /// Преобразование bcd кода в целое.
     quint8 bcd2int(quint8 bcd, bool &ok) const;
-    /// РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ С†РµР»РѕРіРѕ С‡РёСЃР»Р° РІ bcd РєРѕРґ.
+    /// Преобразование целого числа в bcd код.
     quint8 int2bcd(quint8 val, bool &ok) const;
 
 private slots:

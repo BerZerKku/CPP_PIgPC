@@ -39,26 +39,26 @@ public:
 private:
     Ui::MainWindow *ui;
 
-    clMenu menu;        ///< ÐœÐµÐ½ÑŽ.
+    clMenu menu;        ///< Ìåíþ.
 
-    Bsp bsp;                    ///< Ð‘Ð»Ð¾Ðº Ð‘Ð¡ÐŸ.
-    uint8_t bspBuf[128];        ///< Ð‘ÑƒÑ„ÐµÑ€ Ð´Ð»Ñ Ð¿Ñ€Ð¾Ñ‚Ð¾ÐºÐ¾Ð»Ð° Ð¾Ð±Ñ‰ÐµÐ½Ð¸Ñ Ñ Ð‘Ð¡ÐŸ.
-    clProtocolBspS *protBSPs;   ///< ÐŸÑ€Ð¾Ñ‚Ð¾ÐºÐ¾Ð» Ð¾Ð±Ñ‰ÐµÐ½Ð¸Ñ Ñ Ð‘Ð¡ÐŸ.
+    Bsp bsp;                    ///< Áëîê ÁÑÏ.
+    uint8_t bspBuf[128];        ///< Áóôåð äëÿ ïðîòîêîëà îáùåíèÿ ñ ÁÑÏ.
+    clProtocolBspS *protBSPs;   ///< Ïðîòîêîë îáùåíèÿ ñ ÁÑÏ.
 
-    /// Ð˜Ð½Ð¸Ñ†Ð¸Ð°Ð»Ð¸Ð·Ð°Ñ†Ð¸Ñ Ð¼ÐµÐ½ÑŽ.
+    /// Èíèöèàëèçàöèÿ ìåíþ.
     void initParam();
-    /// ÐžÐ±Ñ€Ð°Ð±Ð¾Ñ‚Ñ‡Ð¸Ðº ÑÐ¾Ð±Ñ‹Ñ‚Ð¸Ð¹.
+    /// Îáðàáîò÷èê ñîáûòèé.
     bool eventFilter(QObject* object, QEvent* event) override;
-    /// ÐžÐ±Ñ€Ð°Ð±Ð¾Ñ‚Ñ‡Ð¸Ðº ÑÐ¾Ð±Ñ‹Ñ‚Ð¸Ñ Ð¿Ð¾ÑÐ»Ðµ Ð¾Ñ‚Ð¾Ð±Ñ€Ð°Ð¶ÐµÐ½Ð¸Ñ Ñ„Ð¾Ñ€Ð¼Ñ‹.
+    /// Îáðàáîò÷èê ñîáûòèÿ ïîñëå îòîáðàæåíèÿ ôîðìû.
     void showEvent( QShowEvent* event ) override;
-    /// ÐžÐ±Ñ€Ð°Ð±Ð¾Ñ‚ÐºÐ° Ð¿Ñ€Ð¸Ð½ÑÑ‚Ñ‹Ñ… ÑÐ¾Ð¾Ð±Ñ‰ÐµÐ½Ð¸Ð¹ Ð¸Ð· Ð‘Ð¡ÐŸ
+    /// Îáðàáîòêà ïðèíÿòûõ ñîîáùåíèé èç ÁÑÏ
     void uartRead();
-    /// ÐŸÐµÑ€ÐµÐ´Ð°Ñ‡Ð° ÑÐ¾Ð¾Ð±Ñ‰ÐµÐ½Ð¸Ð¹ Ð² Ð‘Ð¡ÐŸ.
+    /// Ïåðåäà÷à ñîîáùåíèé â ÁÑÏ.
     void uartWrite();
 
 private slots:
-    void cycleMenu();  ///< Ð¦Ð¸ÐºÐ» 200 Ð¼Ñ.
-    void clearSelection();  ///< ÐžÑ‡Ð¸ÑÑ‚ÐºÐ° Ð²Ñ‹Ð´ÐµÐ»ÐµÐ½Ð¸Ñ Ð² textEdit.
+    void cycleMenu();  ///< Öèêë 200 ìñ.
+    void clearSelection();  ///< Î÷èñòêà âûäåëåíèÿ â textEdit.
     void printDebug(QString msg);
     void setBacklight(bool enable);
 };
