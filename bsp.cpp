@@ -95,6 +95,9 @@ void Bsp::initClock()
 //
 void Bsp::initParam()
 {
+    params.security.pwdAdmin.set(12345678);
+    params.security.pwdEngineer.set(87654321);
+
     params.Uart.Interface.set(TInterface::USB);
     params.Uart.Protocol.set(TProtocol::STANDART);
     params.Uart.BaudRate.set(TBaudRate::_19200);
@@ -264,7 +267,7 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data)
             if (!data.isEmpty()) {
                 emit debug(msgSizeError.arg(data.size()));
             }
-
+            //
             pkgTx.append(com);
             pkgTx.append(params.glb.getNumDevices());
         } break;
@@ -272,7 +275,7 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data)
             if (!data.isEmpty()) {
                 emit debug(msgSizeError.arg(data.size()));
             }
-
+            //
             pkgTx.append(com);
             pkgTx.append(params.glb.getNetAddress());
             pkgTx.append(params.Uart.Interface.get());
@@ -281,6 +284,16 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data)
             pkgTx.append(params.Uart.DataBits.get());
             pkgTx.append(params.Uart.Parity.get());
             pkgTx.append(params.Uart.StopBits.get());
+            uint32_t val = params.security.pwdEngineer.get();
+            pkgTx.append(val);
+            pkgTx.append(val >> 8);
+            pkgTx.append(val >> 16);
+            pkgTx.append(val >> 24);
+            val = params.security.pwdAdmin.get();
+            pkgTx.append(val);
+            pkgTx.append(val >> 8);
+            pkgTx.append(val >> 16);
+            pkgTx.append(val >> 24);
         } break;
         case GB_COM_GET_SOST: {
             if (data.size() != 1) {
@@ -319,13 +332,11 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data)
         } break;
         case GB_COM_GET_FAULT: {
             uint16_t value = 0;
-
             if (!data.isEmpty()) {
                 emit debug(msgSizeError.arg(data.size()));
             }
 
             pkgTx.append(com);
-
             value = params.def.status.getFaults();
             pkgTx.append(value >> 8);
             pkgTx.append(value);
