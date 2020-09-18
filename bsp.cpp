@@ -121,6 +121,7 @@ void Bsp::initParam()
     params.prm.setNumCom(32);
     params.prd.setNumCom(32);
     params.glb.setNumDevices(GB_NUM_DEVICES_2);
+    params.glb.setDeviceNum(2);
     params.glb.setTypeLine(GB_TYPE_LINE_OPTO);
     params.glb.setVersProgIC16(0x1112, GB_IC_BSP_MCU);
     params.glb.setVersProgIC16(0x2122, GB_IC_BSP_DSP);
@@ -263,6 +264,7 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data)
     switch(com) {
         case GB_COM_NO: {
         } break;
+
         case GB_COM_DEF_GET_LINE_TYPE: {
             if (!data.isEmpty()) {
                 emit debug(msgSizeError.arg(data.size()));
@@ -271,30 +273,7 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data)
             pkgTx.append(com);
             pkgTx.append(params.glb.getNumDevices());
         } break;
-        case GB_COM_GET_NET_ADR: {
-            if (!data.isEmpty()) {
-                emit debug(msgSizeError.arg(data.size()));
-            }
-            //
-            pkgTx.append(com);
-            pkgTx.append(params.glb.getNetAddress());
-            pkgTx.append(params.Uart.Interface.get());
-            pkgTx.append(params.Uart.Protocol.get());
-            pkgTx.append(params.Uart.BaudRate.get());
-            pkgTx.append(params.Uart.DataBits.get());
-            pkgTx.append(params.Uart.Parity.get());
-            pkgTx.append(params.Uart.StopBits.get());
-            uint32_t val = params.security.pwdEngineer.get();
-            pkgTx.append(val);
-            pkgTx.append(val >> 8);
-            pkgTx.append(val >> 16);
-            pkgTx.append(val >> 24);
-            val = params.security.pwdAdmin.get();
-            pkgTx.append(val);
-            pkgTx.append(val >> 8);
-            pkgTx.append(val >> 16);
-            pkgTx.append(val >> 24);
-        } break;
+
         case GB_COM_GET_SOST: {
             if (data.size() != 1) {
                 emit debug(msgSizeError.arg(data.size()));
@@ -330,6 +309,7 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data)
             di |= params.glb.getDInputTmControl() ? 0x04 : 0x00;
             pkgTx.append(di);
         } break;
+
         case GB_COM_GET_FAULT: {
             uint16_t value = 0;
             if (!data.isEmpty()) {
@@ -372,6 +352,7 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data)
 
             // TODO Добавить байты данных для РЗСК
         } break;
+
         case GB_COM_GET_TIME: {
             // TODO Добавить обработку флага новой записи журнала
             if (data.size() != 1) {
@@ -393,6 +374,42 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data)
 
             // TODO Добавить считывание записи журнала для АСУ ТП.
         } break;
+
+        case GB_COM_GET_NET_ADR: {
+            if (!data.isEmpty()) {
+                emit debug(msgSizeError.arg(data.size()));
+            }
+            //
+            pkgTx.append(com);
+            pkgTx.append(params.glb.getNetAddress());
+            pkgTx.append(params.Uart.Interface.get());
+            pkgTx.append(params.Uart.Protocol.get());
+            pkgTx.append(params.Uart.BaudRate.get());
+            pkgTx.append(params.Uart.DataBits.get());
+            pkgTx.append(params.Uart.Parity.get());
+            pkgTx.append(params.Uart.StopBits.get());
+            uint32_t val = params.security.pwdEngineer.get();
+            pkgTx.append(val);
+            pkgTx.append(val >> 8);
+            pkgTx.append(val >> 16);
+            pkgTx.append(val >> 24);
+            val = params.security.pwdAdmin.get();
+            pkgTx.append(val);
+            pkgTx.append(val >> 8);
+            pkgTx.append(val >> 16);
+            pkgTx.append(val >> 24);
+        } break;
+
+        case GB_COM_GET_DEVICE_NUM : {
+            if (!data.isEmpty()) {
+                emit debug(msgSizeError.arg(data.size()));
+            }
+            //
+            pkgTx.append(com);
+            pkgTx.append(params.glb.getDeviceNum());
+            qDebug() << GB_COM_GET_DEVICE_NUM << hex << pkgTx;
+        } break;
+
         case GB_COM_GET_VERS: {
             uint16_t vers = 0;
 
@@ -435,58 +452,8 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data)
             vers = params.glb.getVersProgIC(GB_IC_BSP_DSP);
             pkgTx.append(vers >> 8);
             pkgTx.append(vers);
-
-//            menu.sParam.prm.setNumCom(params.prm.getNumCom());
-//            menu.sParam.local.setNumComPrm(params.prm.getNumCom());
-//            // FIXME Узнать что значит количество команд второго приемника.
-
-//            menu.sParam.prd.setNumCom(params.prd.getNumCom());
-//            menu.sParam.local.setNumComPrd(params.prd.getNumCom());
-
-//            menu.sParam.glb.setNumDevices(params.glb.getNumDevices());
-//            menu.sParam.def.setNumDevices(params.glb.getNumDevices());
-//            menu.sParam.local.setNumDevices(menu.sParam.glb.getNumDevices()+1);
-
-//            menu.sParam.glb.setTypeLine(params.glb.getTypeLine());
-
-//            menu.sParam.glb.setVersProgIC16(
-//                        params.glb.getVersProgIC(GB_IC_BSP_MCU),
-//                        GB_IC_BSP_MCU);
-//            menu.sParam.glb.setVersProgIC16(
-//                        params.glb.getVersProgIC(GB_IC_BSP_DSP),
-//                        GB_IC_BSP_DSP);
-//            menu.sParam.glb.setVersProgIC16(
-//                        params.glb.getVersProgIC(GB_IC_PI_MCU),
-//                        GB_IC_PI_MCU);
-//            menu.sParam.glb.setVersProgIC16(
-//                        params.glb.getVersProgIC(GB_IC_BSP_DSP_PLIS),
-//                        GB_IC_BSP_DSP_PLIS);
-
-//            // NOTE Версии ниже 8-и битные, но в данном случае записывать как 16
-//            menu.sParam.glb.setVersProgIC16(
-//                        params.glb.getVersProgIC(GB_IC_BSK_PLIS_PRD1),
-//                        GB_IC_BSK_PLIS_PRD1);
-//            menu.sParam.glb.setVersProgIC16(
-//                        params.glb.getVersProgIC(GB_IC_BSK_PLIS_PRD2),
-//                        GB_IC_BSK_PLIS_PRD2);
-//            menu.sParam.glb.setVersProgIC16(
-//                        params.glb.getVersProgIC(GB_IC_BSK_PLIS_PRM1),
-//                        GB_IC_BSK_PLIS_PRM1);
-//            menu.sParam.glb.setVersProgIC16(
-//                        params.glb.getVersProgIC(GB_IC_BSK_PLIS_PRM2),
-//                        GB_IC_BSK_PLIS_PRM2);
-//            menu.sParam.glb.setVersProgIC16(
-//                        params.glb.getVersProgIC(GB_IC_BSZ_PLIS),
-//                        GB_IC_BSZ_PLIS);
-
-//            menu.sParam.glb.setCompatibility(params.glb.getCompatibility());
-//            menu.sParam.glb.setCompK400(params.glb.getCompK400());
-
-//            menu.sParam.glb.setTypeDevice(params.glb.getTypeDevice());
-//            menu.sParam.glb.setTypeOpto(params.glb.getTypeOpto());
-
-//            menu.sParam.device = false;
         } break;
+
         default: {
             qDebug() << __FILE__ << __FUNCTION__ << "No command handler: 0x" << hex << com;
         }
