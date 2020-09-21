@@ -398,6 +398,8 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data)
             pkgTx.append(val >> 8);
             pkgTx.append(val >> 16);
             pkgTx.append(val >> 24);
+
+//            qDebug() << __FILE__ << __FUNCTION__ << __LINE__ << pkgTx;
         } break;
 
         case GB_COM_GET_DEVICE_NUM : {
@@ -407,7 +409,6 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data)
             //
             pkgTx.append(com);
             pkgTx.append(params.glb.getDeviceNum());
-            qDebug() << GB_COM_GET_DEVICE_NUM << hex << pkgTx;
         } break;
 
         case GB_COM_GET_VERS: {
@@ -467,8 +468,6 @@ void Bsp::procCommandWriteParam(eGB_COM com, pkg_t &data)
 
     switch(com) {
         case GB_COM_SET_TIME: {
-            qDebug() << data;
-
             if (data.size() != 9) {
                 emit debug(msgSizeError.arg(data.size()));
             } else {
@@ -493,6 +492,7 @@ void Bsp::procCommandWriteParam(eGB_COM com, pkg_t &data)
         } break;
 
         case GB_COM_SET_NET_ADR: {
+            qDebug() << __FILE__ << __FUNCTION__ << __LINE__ << "pkg = " << data;
             uint8_t dop = data.takeFirst();
             uint8_t byte = data.takeFirst();
 
@@ -517,6 +517,22 @@ void Bsp::procCommandWriteParam(eGB_COM com, pkg_t &data)
                 } break;
                 case 7: {
                     params.Uart.StopBits.set((TStopBits::STOP_BITS) byte);
+                } break;
+                case 8: {
+                    uint32_t value = byte;
+                    value += static_cast<uint32_t> (data.takeFirst()) << 8;
+                    value += static_cast<uint32_t> (data.takeFirst()) << 16;
+                    value += static_cast<uint32_t> (data.takeFirst()) << 24;
+                    qDebug() << __FILE__ << __FUNCTION__ << __LINE__ << "pwdEngineer = " << value;
+                    params.security.pwdEngineer.set(value);
+                } break;
+                case 9: {
+                    uint32_t value = byte;
+                    value += static_cast<uint32_t> (data.takeFirst()) << 8;
+                    value += static_cast<uint32_t> (data.takeFirst()) << 16;
+                    value += static_cast<uint32_t> (data.takeFirst()) << 24;
+                    params.security.pwdAdmin.set(value);
+                    qDebug() << __FILE__ << __FUNCTION__ << __LINE__ << "pwdAdmin = " << value;
                 } break;
                 default: qDebug() << __FILE__ << __FUNCTION__ <<
                                      "No dop byte handler: " << hex << dop;

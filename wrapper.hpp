@@ -5,6 +5,7 @@
 #include "avr/pgmspace.h"
 #include <QDebug>
 
-#define COMPILE_TIME_ASSERT(expression) (void(0))
+#define COMPILE_TIME_ASSERT(expression) \
+    Q_STATIC_ASSERT_X(expression, "Error")
 
 #endif // WRAPPER_HPP
