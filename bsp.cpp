@@ -180,7 +180,7 @@ quint8 Bsp::int2bcd(quint8 val, bool &ok) const
 
     ok = (val < 100);
     if (!ok) {
-       qDebug() << __FILE__ << __FUNCTION__ << __LINE__ << " Error: " << val;
+        qWarning("Can't convert value 0x%.2X to BCD code!", val);
     }
 
     bcd = (val % 10);
@@ -253,7 +253,7 @@ void Bsp::procCommandReadJournal(eGB_COM com, pkg_t &data)
         } break;
 
         default: {
-            qDebug() << __FILE__ << __FUNCTION__ << "No command handler: 0x" << hex << com;
+            qWarning("No command handler: 0x%.2X", com);
         }
     }
 }
@@ -398,8 +398,6 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data)
             pkgTx.append(val >> 8);
             pkgTx.append(val >> 16);
             pkgTx.append(val >> 24);
-
-//            qDebug() << __FILE__ << __FUNCTION__ << __LINE__ << pkgTx;
         } break;
 
         case GB_COM_GET_DEVICE_NUM : {
@@ -456,7 +454,7 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data)
         } break;
 
         default: {
-            qDebug() << __FILE__ << __FUNCTION__ << "No command handler: 0x" << hex << com;
+            qWarning("No command handler: 0x%.2X", com);
         }
     }
 }
@@ -464,8 +462,6 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data)
 //
 void Bsp::procCommandWriteParam(eGB_COM com, pkg_t &data)
 {
-//    uint8_t *buf = menu.sParam.txComBuf.getBuferAddress();
-
     switch(com) {
         case GB_COM_SET_TIME: {
             if (data.size() != 9) {
@@ -492,7 +488,9 @@ void Bsp::procCommandWriteParam(eGB_COM com, pkg_t &data)
         } break;
 
         case GB_COM_SET_NET_ADR: {
-            qDebug() << __FILE__ << __FUNCTION__ << __LINE__ << "pkg = " << data;
+            qDebug() << "Com GB_COM_SET_NET_ADR package = " <<
+                        showbase << hex << data;
+
             uint8_t dop = data.takeFirst();
             uint8_t byte = data.takeFirst();
 
@@ -517,30 +515,27 @@ void Bsp::procCommandWriteParam(eGB_COM com, pkg_t &data)
                 } break;
                 case 7: {
                     params.Uart.StopBits.set((TStopBits::STOP_BITS) byte);
-                } break;
+                } break;                
                 case 8: {
                     uint32_t value = byte;
                     value += static_cast<uint32_t> (data.takeFirst()) << 8;
                     value += static_cast<uint32_t> (data.takeFirst()) << 16;
                     value += static_cast<uint32_t> (data.takeFirst()) << 24;
-                    qDebug() << __FILE__ << __FUNCTION__ << __LINE__ << "pwdEngineer = " << value;
-                    params.security.pwdEngineer.set(value);
+                    params.security.pwdAdmin.set(value);                 
                 } break;
                 case 9: {
                     uint32_t value = byte;
                     value += static_cast<uint32_t> (data.takeFirst()) << 8;
                     value += static_cast<uint32_t> (data.takeFirst()) << 16;
                     value += static_cast<uint32_t> (data.takeFirst()) << 24;
-                    params.security.pwdAdmin.set(value);
-                    qDebug() << __FILE__ << __FUNCTION__ << __LINE__ << "pwdAdmin = " << value;
+                    params.security.pwdEngineer.set(value);
                 } break;
-                default: qDebug() << __FILE__ << __FUNCTION__ <<
-                                     "No dop byte handler: " << hex << dop;
+                default: qDebug("No dop byte handler: 0x%.2X", dop);
             }
         } break;
 
         default: {
-            qDebug() << __FILE__ << __FUNCTION__ << "No command handler: 0x" << hex << com;
+            qWarning("No command handler: 0x%.2X", com);
         }
     }
 }
@@ -573,7 +568,7 @@ void Bsp::procCommandWriteRegime(eGB_COM com, pkg_t &data)
         } break;
 
         default: {
-            qDebug() << __FILE__ << __FUNCTION__ << "No command handler: 0x" << hex << com;
+            qWarning("No command handler: 0x%.2X", com);
         }
     }
 }
@@ -591,9 +586,9 @@ pkg_t Bsp::receiveFromBsp()
         pkg.append(calcCrc(pkg));
         pkg.insert(0, 0xAA);
         pkg.insert(0, 0x55);
-    }
 
-//    qDebug() << "receiveFromBsp" << hex << pkg;
+//        qDebug() << "receiveFromBsp: " << showbase << hex << pkg;
+    }
 
     return pkg;
 }
@@ -603,14 +598,13 @@ void Bsp::sendToBsp(pkg_t pkg)
 {
     eGB_COM com = checkPkg(pkg);
 
-//    qDebug() << __FILE__ << __FUNCTION__ <<
-//                "sendToBsp 0x" << hex << com << " : " << pkg;
-
     pkgTx.clear();
     if (com != GB_COM_NO) {
         procCommand(com, pkg);
+
+//        qDebug() << QString("sendToBsp: ") << showbase << hex << pkg;
     } else {
-        qDebug() << __FILE__ << __FUNCTION__ << "Message check error: " << hex << pkg;
+        qWarning() << "Message check error: " << showbase << hex << pkg;
     }
 }
 

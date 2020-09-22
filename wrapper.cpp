@@ -2,7 +2,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include <QDebug>
 #include <QTextCodec>
 
 //#include "PIg/src/drivers/keyboard.h"
@@ -14,7 +13,7 @@ static eLCD_LED eLed = LED_OFF;
 static QString text;
 
 void vKEYmain(void) {
-
+    qWarning("file:///%s:%i: %s", __FILE__, __LINE__, "your message");
 }
 
 void vKEYset(eGB_TYPE_DEVICE type) {
