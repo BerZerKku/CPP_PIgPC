@@ -38,7 +38,7 @@ MainWindow::MainWindow(QWidget *parent)
     // FIXME Разобраться почему константы именно такие
     ui->textEdit->setFixedSize(size.width() + 12, size.height()*7 + 10);
     ui->kbd->setFixedSize(ui->textEdit->width(), ui->textEdit->width());
-    setFixedSize(sizeHint());
+//    setFixedSize(sizeHint());
 
     // Удаляет движение содержимого при прокрутке колесика мышки над testEdit
     ui->textEdit->verticalScrollBar()->blockSignals(true);
@@ -93,7 +93,7 @@ void MainWindow::initParam()
 {
     // Параметры хранящиеся во внутренней памяти МК
 
-    menu.sParam.password.init(0000);
+//    menu.sParam.password.init(0000);
 }
 
 //

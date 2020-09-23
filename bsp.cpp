@@ -1,15 +1,27 @@
 #include "bsp.h"
 #include "QTextCodec"
 #include <QTimer>
+#include <QHeaderView>
 
-Bsp::Bsp(QObject *parent) : QObject(parent)
+Bsp::Bsp(QWidget *parent) : QTreeWidget(parent)
 {
+    codec = QTextCodec::codecForName("CP1251");
+
     initParam();
     initClock();
 
     QTimer *timerClock = new QTimer(this);
     connect(timerClock, &QTimer::timeout, this, &Bsp::updateClock);
     timerClock->start(1000);
+
+    QTreeWidgetItem* top = new QTreeWidgetItem();
+    insertTopLevelItem(0, top);
+    top->setText(0, "Parameters");
+
+    crtLineEdit(GB_PARAM_IS_PWD_ENGINEER);
+    crtLineEdit(GB_PARAM_IS_PWD_ADMIN);
+
+    header()->setFixedWidth(500);
 }
 
 
@@ -95,8 +107,8 @@ void Bsp::initClock()
 //
 void Bsp::initParam()
 {
-    params.security.pwdAdmin.set(12345678);
-    params.security.pwdEngineer.set(87654321);
+    params.security.pwdAdmin.set((uint8_t *) "12345678");
+    params.security.pwdEngineer.set((uint8_t *)"87654321");
 
     params.Uart.Interface.set(TInterface::USB);
     params.Uart.Protocol.set(TProtocol::STANDART);
@@ -187,6 +199,28 @@ quint8 Bsp::int2bcd(quint8 val, bool &ok) const
     bcd += (val / 10) << 4;
 
     return bcd;
+}
+
+QTreeWidgetItem *Bsp::crtLineEdit(eGB_PARAM param)
+{
+    QLineEdit *lineedit = new QLineEdit();
+    QTreeWidgetItem *item = new QTreeWidgetItem();
+
+
+    switch(param) {
+        case eGB_PARAM::GB_PARAM_IS_PWD_ADMIN: {
+            topLevelItem(0)->addChild(item);
+            item->setText(0, codec->toUnicode("Пароль администратора"));
+        } break;
+
+        case eGB_PARAM::GB_PARAM_IS_PWD_ENGINEER: {
+            topLevelItem(0)->addChild(item);
+            item->setText(0, codec->toUnicode("Пароль инженера"));
+            lineedit->setText("1243121231");
+        } break;
+    }
+
+    setItemWidget(item, 1, lineedit);
 }
 
 //
@@ -388,16 +422,14 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data)
             pkgTx.append(params.Uart.DataBits.get());
             pkgTx.append(params.Uart.Parity.get());
             pkgTx.append(params.Uart.StopBits.get());
-            uint32_t val = params.security.pwdEngineer.get();
-            pkgTx.append(val);
-            pkgTx.append(val >> 8);
-            pkgTx.append(val >> 16);
-            pkgTx.append(val >> 24);
+            uint8_t* val = params.security.pwdEngineer.get();
+            for(uint8_t i = 0; i < PWD_LEN; i++) {
+                pkgTx.append(*val++);
+            }
             val = params.security.pwdAdmin.get();
-            pkgTx.append(val);
-            pkgTx.append(val >> 8);
-            pkgTx.append(val >> 16);
-            pkgTx.append(val >> 24);
+            for(uint8_t i = 0; i < PWD_LEN; i++) {
+                pkgTx.append(*val++);
+            }
         } break;
 
         case GB_COM_GET_DEVICE_NUM : {
@@ -492,43 +524,56 @@ void Bsp::procCommandWriteParam(eGB_COM com, pkg_t &data)
                         showbase << hex << data;
 
             uint8_t dop = data.takeFirst();
-            uint8_t byte = data.takeFirst();
-
             switch(dop) {
                 case 1: {
+                    uint8_t byte = data.takeFirst();
                     params.glb.setNetAddress(byte);
                 } break;
                 case 2: {
+                    uint8_t byte = data.takeFirst();
                     params.Uart.Interface.set((TInterface::INTERFACE) byte);
                 } break;
                 case 3: {
+                    uint8_t byte = data.takeFirst();
                     params.Uart.Protocol.set((TProtocol::PROTOCOL) byte);
                 } break;
                 case 4: {
+                    uint8_t byte = data.takeFirst();
                     params.Uart.BaudRate.set((TBaudRate::BAUD_RATE) byte);
                 } break;
                 case 5: {
+                    uint8_t byte = data.takeFirst();
                     params.Uart.DataBits.set((TDataBits::DATA_BITS) byte);
                 } break;
                 case 6: {
+                    uint8_t byte = data.takeFirst();
                     params.Uart.Parity.set((TParity::PARITY) byte);
                 } break;
                 case 7: {
+                    uint8_t byte = data.takeFirst();
                     params.Uart.StopBits.set((TStopBits::STOP_BITS) byte);
                 } break;                
                 case 8: {
-                    uint32_t value = byte;
-                    value += static_cast<uint32_t> (data.takeFirst()) << 8;
-                    value += static_cast<uint32_t> (data.takeFirst()) << 16;
-                    value += static_cast<uint32_t> (data.takeFirst()) << 24;
-                    params.security.pwdAdmin.set(value);                 
+                    if (data.size() != 8) {
+                        emit debug(msgSizeError.arg(data.size()));
+                    } else {
+                        uint8_t value[PWD_LEN];
+                        for(uint8_t i = 0; i < PWD_LEN; i++) {
+                            value[i] = data.takeFirst();
+                        }
+                        params.security.pwdAdmin.set(value);
+                    }
                 } break;
                 case 9: {
-                    uint32_t value = byte;
-                    value += static_cast<uint32_t> (data.takeFirst()) << 8;
-                    value += static_cast<uint32_t> (data.takeFirst()) << 16;
-                    value += static_cast<uint32_t> (data.takeFirst()) << 24;
-                    params.security.pwdEngineer.set(value);
+                    if (data.size() != 8) {
+                        emit debug(msgSizeError.arg(data.size()));
+                    } else {
+                        uint8_t value[PWD_LEN];
+                        for(uint8_t i = 0; i < PWD_LEN; i++) {
+                            value[i] = data.takeFirst();
+                        }
+                        params.security.pwdEngineer.set(value);
+                    }
                 } break;
                 default: qDebug("No dop byte handler: 0x%.2X", dop);
             }
@@ -602,7 +647,9 @@ void Bsp::sendToBsp(pkg_t pkg)
     if (com != GB_COM_NO) {
         procCommand(com, pkg);
 
-//        qDebug() << QString("sendToBsp: ") << showbase << hex << pkg;
+        if (com == GB_COM_SET_NET_ADR) {
+            qDebug() << QString("sendToBsp: ") << showbase << hex << pkg;
+        }
     } else {
         qWarning() << "Message check error: " << showbase << hex << pkg;
     }
