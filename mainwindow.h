@@ -41,7 +41,6 @@ private:
 
     clMenu menu;        ///< Меню.
 
-    Bsp bsp;                    ///< Блок БСП.
     uint8_t bspBuf[128];        ///< Буфер для протокола общения с БСП.
     clProtocolBspS *protBSPs;   ///< Протокол общения с БСП.
 

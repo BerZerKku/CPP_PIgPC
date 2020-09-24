@@ -38,13 +38,15 @@ MainWindow::MainWindow(QWidget *parent)
     // FIXME Разобраться почему константы именно такие
     ui->textEdit->setFixedSize(size.width() + 12, size.height()*7 + 10);
     ui->kbd->setFixedSize(ui->textEdit->width(), ui->textEdit->width());
-//    setFixedSize(sizeHint());
+    ui->debug->setFixedWidth(ui->textEdit->width());
+    ui->debug->setMinimumHeight(300);
+    setFixedSize(sizeHint());
 
     // Удаляет движение содержимого при прокрутке колесика мышки над testEdit
     ui->textEdit->verticalScrollBar()->blockSignals(true);
 
     connect(ui->kbd, &QKeyboard::debug, this, &MainWindow::printDebug);
-    connect(&bsp, &Bsp::debug, this, &MainWindow::printDebug);
+    connect(ui->bsp, &Bsp::debug, this, &MainWindow::printDebug);
 
     QTimer *timerMenu = new QTimer(this);
     connect(timerMenu, &QTimer::timeout, this, &MainWindow::cycleMenu);
@@ -83,6 +85,8 @@ bool MainWindow::eventFilter(QObject *object, QEvent *event)
 {
     if (event->type() == QEvent::KeyRelease) {
         ui->kbd->keyPressed(static_cast<QKeyEvent*>(event)->key());
+        ui->bsp->clearFocus();
+        qDebug() << event;
     }
 
     return QMainWindow::eventFilter(object, event);
@@ -117,11 +121,12 @@ void MainWindow::setBacklight(bool enable)
 void MainWindow::showEvent(QShowEvent *event)
 {
     QWidget::showEvent(event);
+    ui->bsp->initParam();
 }
 
 void MainWindow::uartRead()
 {
-    QVector<uint8_t> pkg = bsp.receiveFromBsp();
+    QVector<uint8_t> pkg = ui->bsp->receiveFromBsp();
     for(uint8_t byte: pkg) {
         protBSPs->checkByte(byte);
     }
@@ -149,7 +154,7 @@ void MainWindow::uartWrite()
             for(uint16_t i = 0; i < num; i++) {
                 pkg.append(bspBuf[i]);
             }
-            bsp.sendToBsp(pkg);
+            ui->bsp->sendToBsp(pkg);
             protBSPs->setCurrentStatus(PRTS_STATUS_NO);
         } else {
 //            qDebug() << QTime::currentTime() << __FILE__ << __FUNCTION__ << "No send package!";

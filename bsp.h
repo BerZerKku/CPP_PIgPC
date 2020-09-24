@@ -1,14 +1,17 @@
 #ifndef BSP_H
 #define BSP_H
 
+#include "PIg/src/protocols/standart/protocolBspS.h"
+#include <QComboBox>
 #include <QDateTime>
+#include <QLineEdit>
+#include <QMap>
+#include <QRegExp>
+#include <QSpinBox>
+#include <QString>
+#include <QStringList>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
-#include <QMap>
-#include <QComboBox>
-#include <QLineEdit>
-
-#include "PIg/src/protocols/standart/protocolBspS.h"
 
 typedef QVector<uint8_t> pkg_t;
 
@@ -34,6 +37,9 @@ public:
      */
     pkg_t receiveFromBsp();
 
+    /// Инициализация параметров.
+    void initParam();
+
 signals:
     void debug(QString msg);
 
@@ -43,14 +49,18 @@ private:
     stGBparam params;   ///< Параметры.
     QTextCodec *codec;  ///< Кодек.
 
+    LocalParams lp;     ///< Локальный параметр.
+
+    QRegExp pwdRegExp;
+    QRegExpValidator pwdValidator;
+
     /// Подсчет контрольной суммы.
     uint8_t calcCrc(pkg_t &pkg);
     /// Проверка пакета.
     eGB_COM checkPkg(pkg_t &pkg);
     /// Инициализация времени.
     void initClock();
-    /// Инициализация параметров.
-    void initParam();
+
     /// Обработка команды.
     void procCommand(eGB_COM com, pkg_t &data);
     /// Обработка команд чтения журналов.
@@ -69,12 +79,30 @@ private:
 
     QMap<eGB_PARAM, QComboBox*> mapCombobox;
     QMap<eGB_PARAM, QLineEdit*> mapLineEdit;
+    QMap<eGB_PARAM, QSpinBox*> mapSpinBox;
 
-    QTreeWidgetItem *crtLineEdit(eGB_PARAM param);
+    void crtTree();
+    void crtTreeUser();
+
+    void crtComboBox(eGB_PARAM param, qint16 value);
+    void crtLineEdit(eGB_PARAM param, std::string);
+    void crtSpinBox(eGB_PARAM param, qint16 value);
+
+    quint8 getComboBoxValue(eGB_PARAM param);
+    QString getLineEditValue(eGB_PARAM param);
+
+    void setComboBoxValue(eGB_PARAM param, quint8 value);
+    void setLineEditValue(eGB_PARAM param, std::string value);
+
+    QString getParamName(eGB_PARAM param);
+
+    void fillComboboxList(QComboBox *combobox, eGB_PARAM param);
+    void setComboboxValue(QComboBox *combobox, quint8 value);
+
+    void keyPressEvent(QKeyEvent *event) override;
 
 private slots:
     void updateClock();
-
 
 };
 

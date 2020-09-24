@@ -6,10 +6,19 @@ MainWindow *w;
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
+    QApplication a(argc, argv);    
 
-    qSetMessagePattern("%{if-category}%{category}: %{endif}%{message}\n   Loc: [%{file}:%{line}]");
-    qSetMessagePattern("[%{time h:mm:ss.zzz}](%{if-debug}D%{endif}%{if-info}I%{endif}%{if-warning}W%{endif}%{if-critical}C%{endif}%{if-fatal}F%{endif}): %{message}\n   Loc: [%{file}:%{line}]");
+    QString pattern = QString("%1 (%2%3%4%5%6): %{message} %7%8").
+                      arg("[%{time h:mm:ss.zzz}]").
+                      arg("%{if-debug}\033[32;1mD%{endif}").
+                      arg("%{if-info}\033[32;1mI%{endif}").
+                      arg("%{if-warning}\033[33;1mW%{endif}").
+                      arg("%{if-critical}\033[31;1mC%{endif}").
+                      arg("%{if-fatal}\033[31;1mF%{endif}").
+                      arg("%\033[0m").
+                      arg("\n   Loc: [%{file}:%{line}]");
+
+    qSetMessagePattern(pattern);
 
     w = new MainWindow();
     w->show();

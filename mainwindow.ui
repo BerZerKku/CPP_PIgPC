@@ -70,24 +70,7 @@
      </layout>
     </item>
     <item>
-     <widget class="Bsp" name="treeWidget">
-      <property name="columnCount">
-       <number>2</number>
-      </property>
-      <attribute name="headerVisible">
-       <bool>true</bool>
-      </attribute>
-      <column>
-       <property name="text">
-        <string>BSP</string>
-       </property>
-      </column>
-      <column>
-       <property name="text">
-        <string notr="true">2</string>
-       </property>
-      </column>
-     </widget>
+     <widget class="Bsp" name="bsp"/>
     </item>
    </layout>
   </widget>
@@ -97,7 +80,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>

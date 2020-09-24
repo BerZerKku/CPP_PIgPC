@@ -1,27 +1,35 @@
 #include "bsp.h"
+#include "PIg/src/flash.h"
 #include "QTextCodec"
 #include <QTimer>
 #include <QHeaderView>
 
+
 Bsp::Bsp(QWidget *parent) : QTreeWidget(parent)
 {
     codec = QTextCodec::codecForName("CP1251");
+    lp.setFlashParams(fParams);
 
-    initParam();
+    setColumnCount(2);
+    header()->setVisible(true);
+    headerItem()->setText(0, codec->toUnicode("Параметр"));
+    headerItem()->setText(1, codec->toUnicode("Значение"));
+
+    crtTree();
     initClock();
 
     QTimer *timerClock = new QTimer(this);
     connect(timerClock, &QTimer::timeout, this, &Bsp::updateClock);
     timerClock->start(1000);
 
-    QTreeWidgetItem* top = new QTreeWidgetItem();
-    insertTopLevelItem(0, top);
-    top->setText(0, "Parameters");
+    expandAll();
+    header()->resizeSections(QHeaderView::ResizeToContents);
+    header()->setSectionResizeMode(0, QHeaderView::Fixed);
+    header()->resizeSection(0, header()->sectionSize(0) + 5);
+    setFixedWidth(300);
 
-    crtLineEdit(GB_PARAM_IS_PWD_ENGINEER);
-    crtLineEdit(GB_PARAM_IS_PWD_ADMIN);
-
-    header()->setFixedWidth(500);
+    setSelectionMode(QAbstractItemView::NoSelection);
+    setFocusPolicy(Qt::NoFocus);
 }
 
 
@@ -107,8 +115,9 @@ void Bsp::initClock()
 //
 void Bsp::initParam()
 {
-    params.security.pwdAdmin.set((uint8_t *) "12345678");
-    params.security.pwdEngineer.set((uint8_t *)"87654321");
+    setLineEditValue(eGB_PARAM::GB_PARAM_IS_PWD_ENGINEER, "87654321");
+    setLineEditValue(eGB_PARAM::GB_PARAM_IS_PWD_ADMIN, "12345678");
+    setComboBoxValue(eGB_PARAM::GB_PARAM_IS_USER, TUser::USER::OPERATOR);
 
     params.Uart.Interface.set(TInterface::USB);
     params.Uart.Protocol.set(TProtocol::STANDART);
@@ -201,26 +210,209 @@ quint8 Bsp::int2bcd(quint8 val, bool &ok) const
     return bcd;
 }
 
-QTreeWidgetItem *Bsp::crtLineEdit(eGB_PARAM param)
+void Bsp::crtTree()
 {
-    QLineEdit *lineedit = new QLineEdit();
-    QTreeWidgetItem *item = new QTreeWidgetItem();
+    crtTreeUser();
+}
 
+void Bsp::crtTreeUser()
+{
+    QTreeWidgetItem* top = new QTreeWidgetItem();
+    insertTopLevelItem(topLevelItemCount(), top);
+
+    top->setText(0, codec->toUnicode("Пользователь"));
+
+    pwdRegExp.setPattern("[0-9]+");
+    pwdValidator.setRegExp(pwdRegExp);
+
+    crtComboBox(GB_PARAM_IS_USER, TUser::USER::OPERATOR);
+    crtLineEdit(GB_PARAM_IS_PWD_ENGINEER, "87657321");
+    crtLineEdit(GB_PARAM_IS_PWD_ADMIN, "12345678");
+}
+
+void Bsp::crtComboBox(eGB_PARAM param, qint16 value)
+{
+    QComboBox *combobox = new QComboBox(this);
+    QTreeWidgetItem *item = new QTreeWidgetItem();
+    QTreeWidgetItem *top = topLevelItem(topLevelItemCount()-1);
+    std::string name("Noname");
+
+    switch(param) {
+        case eGB_PARAM::GB_PARAM_IS_USER: {
+            fillComboboxList(combobox, param);
+        } break;
+
+        default: {
+            QString msg = QString("%1: Parameter '%2' not found.").
+                          arg(__FUNCTION__).arg(getParamName(param));
+            qWarning() << msg;
+        }
+    }
+
+    top->addChild(item);
+    item->setText(0, getParamName(param));
+    setItemWidget(item, 1, combobox);
+
+    mapCombobox.insert(param, combobox);
+}
+
+void Bsp::crtLineEdit(eGB_PARAM param, std::string value)
+{
+    QLineEdit *lineedit = new QLineEdit(this);
+    QTreeWidgetItem *item = new QTreeWidgetItem();
+    QTreeWidgetItem *top = topLevelItem(topLevelItemCount()-1);
 
     switch(param) {
         case eGB_PARAM::GB_PARAM_IS_PWD_ADMIN: {
-            topLevelItem(0)->addChild(item);
-            item->setText(0, codec->toUnicode("Пароль администратора"));
+            lineedit->setMaxLength(PWD_LEN);
+            lineedit->setInputMask("99999999");
+            lineedit->setValidator(&pwdValidator);
+
         } break;
 
         case eGB_PARAM::GB_PARAM_IS_PWD_ENGINEER: {
-            topLevelItem(0)->addChild(item);
-            item->setText(0, codec->toUnicode("Пароль инженера"));
-            lineedit->setText("1243121231");
+            lineedit->setMaxLength(PWD_LEN);
+            lineedit->setInputMask("99999999");
+            lineedit->setValidator(&pwdValidator);
         } break;
+
+        default: {
+            QString msg = QString("%1: Parameter '%2' not found.").
+                          arg(__FUNCTION__).arg(getParamName(param));
+            qWarning() << msg;
+        }
     }
 
+    top->addChild(item);
+    item->setText(0, getParamName(param));
     setItemWidget(item, 1, lineedit);
+
+    connect(lineedit, &QLineEdit::selectionChanged,
+            lineedit, &QLineEdit::deselect);
+    mapLineEdit.insert(param, lineedit);
+}
+
+void Bsp::crtSpinBox(eGB_PARAM param, qint16 value)
+{
+    QSpinBox *spinbox = new QSpinBox(this);
+    QTreeWidgetItem *item = new QTreeWidgetItem();
+    QTreeWidgetItem *top = topLevelItem(topLevelItemCount()-1);
+    std::string name("Noname");
+
+    switch(param) {
+
+        default: {
+            params.local.setValue(1);
+            QString msg = QString("%1: Parameter '%2' not found.").
+                          arg(__FUNCTION__).arg(getParamName(param));
+            qWarning() << msg;
+        }
+    }
+}
+
+//
+quint8 Bsp::getComboBoxValue(eGB_PARAM param)
+{
+    quint8 value = 0;
+    QComboBox *combobox = mapCombobox.value(param, nullptr);
+
+    if (combobox != nullptr) {
+        value = static_cast<quint8> (combobox->currentData().toInt());
+    } else {
+        QString msg = QString("%1: Parameter '%2' not found.").
+                      arg(__FUNCTION__).arg(getParamName(param));
+        emit debug(msg);
+    }
+
+    return value;
+}
+
+//
+QString Bsp::getLineEditValue(eGB_PARAM param)
+{
+    QString value;
+    QLineEdit *lineedit = mapLineEdit.value(param, nullptr);
+
+    if (lineedit != nullptr) {
+        value = lineedit->text();
+    } else {
+        QString msg = QString("%1: Parameter '%2' not found.").
+                      arg(__FUNCTION__).arg(getParamName(param));
+        emit debug(msg);
+    }
+
+    return value;
+}
+
+//
+void Bsp::setComboBoxValue(eGB_PARAM param, quint8 value)
+{
+    QComboBox *combobox = mapCombobox.value(param, nullptr);
+
+    if (combobox != nullptr) {
+        int index = combobox->findData(value);
+
+        if (index != -1) {
+            combobox->setCurrentIndex(index);
+        } else {
+            QString msg = QString("%1: Wrong value %1 for parameter '%2'.").
+                          arg(__FUNCTION__).arg(value).arg(getParamName(param));
+            emit debug(msg);
+        }
+    } else {
+        QString msg = QString("%1: Parameter '%2' not found.").
+                      arg(__FUNCTION__).arg(getParamName(param));
+        emit debug(msg);
+    }
+}
+
+void Bsp::setLineEditValue(eGB_PARAM param, std::string value)
+{
+    QLineEdit *lineedit = mapLineEdit.value(param, nullptr);
+
+    if (lineedit != nullptr) {
+        lineedit->setText(codec->toUnicode(value.c_str()));
+    } else {
+        QString msg = QString("%1: Parameter '%2' not found.").
+                      arg(__FUNCTION__).arg(getParamName(param));
+        emit debug(msg);
+    }
+}
+
+QString Bsp::getParamName(eGB_PARAM param)
+{
+    QString name = "Noname";
+
+    if (param < GB_PARAM_MAX) {
+        lp.clearParams();
+        lp.addParam(param);
+
+        name = codec->toUnicode(lp.getNameOfParam());
+    }
+
+    return name;
+}
+
+void Bsp::fillComboboxList(QComboBox *combobox, eGB_PARAM param)
+{
+    if (param < GB_PARAM_MAX) {
+        lp.clearParams();
+        lp.addParam(param);
+
+        if (lp.getParamType() == Param::PARAM_LIST) {
+            char const *l = lp.getListOfValues();
+            for(quint8 i = 0; i <= lp.getMax(); i++) {
+                combobox->addItem(codec->toUnicode(l), lp.getMin() + i);
+                l += STRING_LENGHT;
+            }
+        }
+    }
+}
+
+//
+void Bsp::keyPressEvent(QKeyEvent *event)
+{
+    qDebug() << event;
 }
 
 //
@@ -422,13 +614,19 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data)
             pkgTx.append(params.Uart.DataBits.get());
             pkgTx.append(params.Uart.Parity.get());
             pkgTx.append(params.Uart.StopBits.get());
-            uint8_t* val = params.security.pwdEngineer.get();
+
+            char const* val = getLineEditValue(GB_PARAM_IS_PWD_ENGINEER).
+                           toStdString().c_str();
             for(uint8_t i = 0; i < PWD_LEN; i++) {
-                pkgTx.append(*val++);
+                pkgTx.append(static_cast <uint8_t> (*val));
+                val++;
             }
-            val = params.security.pwdAdmin.get();
+
+            val = getLineEditValue(GB_PARAM_IS_PWD_ADMIN).
+                                       toStdString().c_str();
             for(uint8_t i = 0; i < PWD_LEN; i++) {
-                pkgTx.append(*val++);
+                pkgTx.append(static_cast <uint8_t> (*val));
+                val++;
             }
         } break;
 
@@ -520,9 +718,6 @@ void Bsp::procCommandWriteParam(eGB_COM com, pkg_t &data)
         } break;
 
         case GB_COM_SET_NET_ADR: {
-            qDebug() << "Com GB_COM_SET_NET_ADR package = " <<
-                        showbase << hex << data;
-
             uint8_t dop = data.takeFirst();
             switch(dop) {
                 case 1: {
@@ -552,27 +747,27 @@ void Bsp::procCommandWriteParam(eGB_COM com, pkg_t &data)
                 case 7: {
                     uint8_t byte = data.takeFirst();
                     params.Uart.StopBits.set((TStopBits::STOP_BITS) byte);
-                } break;                
+                } break;
                 case 8: {
                     if (data.size() != 8) {
                         emit debug(msgSizeError.arg(data.size()));
                     } else {
-                        uint8_t value[PWD_LEN];
+                        QString value;
                         for(uint8_t i = 0; i < PWD_LEN; i++) {
-                            value[i] = data.takeFirst();
+                            value.append(data.takeFirst());
                         }
-                        params.security.pwdAdmin.set(value);
+                        mapLineEdit.value(GB_PARAM_IS_PWD_ADMIN)->setText(value);
                     }
                 } break;
                 case 9: {
                     if (data.size() != 8) {
                         emit debug(msgSizeError.arg(data.size()));
                     } else {
-                        uint8_t value[PWD_LEN];
+                        QString value;
                         for(uint8_t i = 0; i < PWD_LEN; i++) {
-                            value[i] = data.takeFirst();
+                            value.append(data.takeFirst());
                         }
-                        params.security.pwdEngineer.set(value);
+                        mapLineEdit.value(GB_PARAM_IS_PWD_ENGINEER)->setText(value);
                     }
                 } break;
                 default: qDebug("No dop byte handler: 0x%.2X", dop);
@@ -632,7 +827,7 @@ pkg_t Bsp::receiveFromBsp()
         pkg.insert(0, 0xAA);
         pkg.insert(0, 0x55);
 
-//        qDebug() << "receiveFromBsp: " << showbase << hex << pkg;
+        //        qDebug() << "receiveFromBsp: " << showbase << hex << pkg;
     }
 
     return pkg;
@@ -647,9 +842,9 @@ void Bsp::sendToBsp(pkg_t pkg)
     if (com != GB_COM_NO) {
         procCommand(com, pkg);
 
-        if (com == GB_COM_SET_NET_ADR) {
-            qDebug() << QString("sendToBsp: ") << showbase << hex << pkg;
-        }
+//        if (com == GB_COM_SET_NET_ADR) {
+//            qDebug() << QString("sendToBsp: ") << showbase << hex << pkg;
+//        }
     } else {
         qWarning() << "Message check error: " << showbase << hex << pkg;
     }
