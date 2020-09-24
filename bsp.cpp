@@ -4,16 +4,14 @@
 #include <QTimer>
 #include <QHeaderView>
 
-
 Bsp::Bsp(QWidget *parent) : QTreeWidget(parent)
 {
     codec = QTextCodec::codecForName("CP1251");
     lp.setFlashParams(fParams);
 
-    setColumnCount(2);
-    header()->setVisible(true);
-    headerItem()->setText(0, codec->toUnicode("Параметр"));
-    headerItem()->setText(1, codec->toUnicode("Значение"));
+    // Эти строки не влияют на содержимое заголовка, но влияют на resize ниже.
+    headerItem()->setText(0, codec->toUnicode("Parameter"));
+    headerItem()->setText(1, codec->toUnicode("Value"));
 
     crtTree();
     initClock();
@@ -22,11 +20,11 @@ Bsp::Bsp(QWidget *parent) : QTreeWidget(parent)
     connect(timerClock, &QTimer::timeout, this, &Bsp::updateClock);
     timerClock->start(1000);
 
-    expandAll();
+//    expandAll();
     header()->resizeSections(QHeaderView::ResizeToContents);
     header()->setSectionResizeMode(0, QHeaderView::Fixed);
     header()->resizeSection(0, header()->sectionSize(0) + 5);
-    setFixedWidth(300);
+    setFixedWidth(1.75*header()->sectionSize(0));
 
     setSelectionMode(QAbstractItemView::NoSelection);
     setFocusPolicy(Qt::NoFocus);
@@ -119,6 +117,18 @@ void Bsp::initParam()
     setLineEditValue(eGB_PARAM::GB_PARAM_IS_PWD_ADMIN, "12345678");
     setComboBoxValue(eGB_PARAM::GB_PARAM_IS_USER, TUser::USER::OPERATOR);
 
+    setComboBoxValue(&stateGlb.regime, eGB_REGIME::GB_REGIME_ENABLED);
+    setSpinBoxValue(&stateGlb.state, 1);
+    setSpinBoxValue(&stateGlb.dopByte, 1);
+    setLineEditValue(&stateGlb.fault, "0000");
+    setLineEditValue(&stateGlb.warning, "0000");
+    setLineEditValue(&stateDef.fault, "0000");
+    setLineEditValue(&stateDef.warning, "0000");
+    setLineEditValue(&statePrm.fault, "0000");
+    setLineEditValue(&statePrm.warning, "0000");
+    setLineEditValue(&statePrd.fault, "0000");
+    setLineEditValue(&statePrd.warning, "0000");
+
     params.Uart.Interface.set(TInterface::USB);
     params.Uart.Protocol.set(TProtocol::STANDART);
     params.Uart.BaudRate.set(TBaudRate::_19200);
@@ -161,22 +171,13 @@ void Bsp::initParam()
     params.glb.setTypeOpto(TYPE_OPTO_STANDART);
 
     params.def.status.setEnable(false);
-    params.def.status.setRegime(GB_REGIME_ENABLED);
-    params.def.status.setState(1);
-    params.def.status.setDopByte(0);
     params.def.status.setFault(0);
     params.def.status.setWarning(0);
     params.def.status.setRemoteNumber(1);
 
-    params.prm.status.setRegime(GB_REGIME_ENABLED);
-    params.prm.status.setState(1);
-    params.prm.status.setDopByte(0);
     params.prm.status.setFault(0);
     params.prm.status.setWarning(0);
 
-    params.prd.status.setRegime(GB_REGIME_ENABLED);
-    params.prd.status.setState(1);
-    params.prd.status.setDopByte(0);
     params.prd.status.setFault(0);
     params.prd.status.setWarning(0);
 
@@ -192,6 +193,11 @@ void Bsp::initParam()
     params.prd.setIndCom8(1, 0);
     params.prd.setIndCom8(2, 0);
     params.prd.setIndCom8(3, 0);
+}
+
+void Bsp::setUser(int value)
+{
+    setComboBoxValue(eGB_PARAM::GB_PARAM_IS_USER, value);
 }
 
 //
@@ -212,9 +218,96 @@ quint8 Bsp::int2bcd(quint8 val, bool &ok) const
 
 void Bsp::crtTree()
 {
+    crtTreeState();
     crtTreeUser();
 }
 
+//
+void Bsp::crtTreeState()
+{
+    QTreeWidgetItem* top = new QTreeWidgetItem();
+
+    insertTopLevelItem(topLevelItemCount(), top);
+    top->setText(0, codec->toUnicode("Текущее состояние"));
+
+    errRegExp.setPattern("[0-9A-Fa-F]+");
+    errValidator.setRegExp(errRegExp);
+
+    crtTreeState(top, "Общее", stateGlb);
+    crtTreeState(top, "Защита", stateDef);
+    crtTreeState(top, "Приемник", statePrm);
+    crtTreeState(top, "Передатчик", statePrd);
+
+    connect(&stateGlb.regime, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, &Bsp::setRegime);
+
+    connect(&stateGlb.state, QOverload<int>::of(&QSpinBox::valueChanged),
+            this, &Bsp::setState);
+
+    connect(&stateGlb.dopByte, QOverload<int>::of(&QSpinBox::valueChanged),
+            this, &Bsp::setDopByte);
+
+    top->setExpanded(true);
+}
+
+//
+void Bsp::crtTreeState(QTreeWidgetItem *top, std::string name, Bsp::state_t &state)
+{
+    QTreeWidgetItem *item = nullptr;
+    QTreeWidgetItem *ltop= new QTreeWidgetItem();
+
+    ltop->setText(0, codec->toUnicode(name.c_str()));
+    top->addChild(ltop);
+
+    item = new QTreeWidgetItem();
+    item->setText(0, codec->toUnicode("Режим"));
+    ltop->addChild(item);
+    fillComboboxListRegime(&state.regime);
+    setItemWidget(item, 1, &state.regime);
+
+    item = new QTreeWidgetItem();
+    item->setText(0, codec->toUnicode("Состояние"));
+    ltop->addChild(item);
+    state.state.setRange(0, MAX_NUM_DEVICE_STATE);
+    state.state.setValue(0);
+    setItemWidget(item, 1, &state.state);
+
+    item = new QTreeWidgetItem();
+    item->setText(0, codec->toUnicode("Доп. байт"));
+    ltop->addChild(item);
+    state.dopByte.setRange(0, 255);
+    state.dopByte.setValue(0);
+    setItemWidget(item, 1, &state.dopByte);
+
+    item = new QTreeWidgetItem();
+    item->setText(0, codec->toUnicode("Неисправности"));
+    ltop->addChild(item);
+    state.fault.setMaxLength(4);
+    state.fault.setInputMask("HHHH");
+    state.fault.setValidator(&errValidator);
+    state.fault.setText("0000");
+    setItemWidget(item, 1, &state.fault);
+
+    connect(&state.fault, &QLineEdit::selectionChanged,
+            &state.fault, &QLineEdit::deselect);
+
+    item = new QTreeWidgetItem();
+    item->setText(0, codec->toUnicode("Предупреждения"));
+    ltop->addChild(item);
+    state.warning.setMaxLength(4);
+    state.warning.setInputMask("HHHH");
+    state.warning.setValidator(&errValidator);
+    state.warning.setText("0000");
+    setItemWidget(item, 1, &state.warning);
+
+    connect(&state.warning, &QLineEdit::selectionChanged,
+            &state.warning, &QLineEdit::deselect);
+
+    ltop->setExpanded(&state == &stateGlb);
+//    ltop->setExpanded(true);
+}
+
+//
 void Bsp::crtTreeUser()
 {
     QTreeWidgetItem* top = new QTreeWidgetItem();
@@ -228,6 +321,8 @@ void Bsp::crtTreeUser()
     crtComboBox(GB_PARAM_IS_USER, TUser::USER::OPERATOR);
     crtLineEdit(GB_PARAM_IS_PWD_ENGINEER, "87657321");
     crtLineEdit(GB_PARAM_IS_PWD_ADMIN, "12345678");
+
+    top->setExpanded(true);
 }
 
 void Bsp::crtComboBox(eGB_PARAM param, qint16 value)
@@ -287,8 +382,8 @@ void Bsp::crtLineEdit(eGB_PARAM param, std::string value)
     item->setText(0, getParamName(param));
     setItemWidget(item, 1, lineedit);
 
-    connect(lineedit, &QLineEdit::selectionChanged,
-            lineedit, &QLineEdit::deselect);
+//    connect(lineedit, &QLineEdit::selectionChanged,
+//            lineedit, &QLineEdit::deselect);
     mapLineEdit.insert(param, lineedit);
 }
 
@@ -302,7 +397,6 @@ void Bsp::crtSpinBox(eGB_PARAM param, qint16 value)
     switch(param) {
 
         default: {
-            params.local.setValue(1);
             QString msg = QString("%1: Parameter '%2' not found.").
                           arg(__FUNCTION__).arg(getParamName(param));
             qWarning() << msg;
@@ -311,13 +405,12 @@ void Bsp::crtSpinBox(eGB_PARAM param, qint16 value)
 }
 
 //
-quint8 Bsp::getComboBoxValue(eGB_PARAM param)
-{
+quint8 Bsp::getComboBoxValue(eGB_PARAM param) {
     quint8 value = 0;
     QComboBox *combobox = mapCombobox.value(param, nullptr);
 
     if (combobox != nullptr) {
-        value = static_cast<quint8> (combobox->currentData().toInt());
+        value = getComboBoxValue(combobox);
     } else {
         QString msg = QString("%1: Parameter '%2' not found.").
                       arg(__FUNCTION__).arg(getParamName(param));
@@ -325,6 +418,11 @@ quint8 Bsp::getComboBoxValue(eGB_PARAM param)
     }
 
     return value;
+}
+
+//
+quint8 Bsp::getComboBoxValue(QComboBox *combobox) {
+    return static_cast<quint8> (combobox->currentData().toInt());
 }
 
 //
@@ -344,17 +442,39 @@ QString Bsp::getLineEditValue(eGB_PARAM param)
     return value;
 }
 
+QString Bsp::getLineEditValue(QLineEdit *lineedit)
+{
+    return lineedit->text();
+}
+
+qint16 Bsp::getSpinBoxValue(eGB_PARAM param)
+{
+    quint16 value = 0;
+    QSpinBox *spinbox = mapSpinBox.value(param, nullptr);
+
+    if (spinbox != nullptr) {
+        value = getSpinBoxValue(spinbox);
+    } else {
+        QString msg = QString("%1: Parameter '%2' not found.").
+                      arg(__FUNCTION__).arg(getParamName(param));
+        emit debug(msg);
+    }
+
+    return value;
+}
+
+qint16 Bsp::getSpinBoxValue(QSpinBox *spinbox)
+{
+    return spinbox->value();
+}
+
 //
 void Bsp::setComboBoxValue(eGB_PARAM param, quint8 value)
 {
     QComboBox *combobox = mapCombobox.value(param, nullptr);
 
     if (combobox != nullptr) {
-        int index = combobox->findData(value);
-
-        if (index != -1) {
-            combobox->setCurrentIndex(index);
-        } else {
+        if (setComboBoxValue(combobox, value) == -1) {
             QString msg = QString("%1: Wrong value %1 for parameter '%2'.").
                           arg(__FUNCTION__).arg(value).arg(getParamName(param));
             emit debug(msg);
@@ -366,17 +486,73 @@ void Bsp::setComboBoxValue(eGB_PARAM param, quint8 value)
     }
 }
 
+//
+int Bsp::setComboBoxValue(QComboBox *combobox, quint8 value)
+{
+    int index = combobox->findData(value);
+
+    if (index != -1) {
+        combobox->setCurrentIndex(index);
+    }
+
+    return index;
+}
+
 void Bsp::setLineEditValue(eGB_PARAM param, std::string value)
 {
     QLineEdit *lineedit = mapLineEdit.value(param, nullptr);
 
     if (lineedit != nullptr) {
-        lineedit->setText(codec->toUnicode(value.c_str()));
+        if (setLineEditValue(lineedit, value) == -1 ) {
+            QString msg = QString("%1: Wrong value %1 for parameter '%2'.").
+                          arg(__FUNCTION__).arg(value.c_str()).
+                          arg(getParamName(param));
+            emit debug(msg);
+        }
     } else {
         QString msg = QString("%1: Parameter '%2' not found.").
                       arg(__FUNCTION__).arg(getParamName(param));
         emit debug(msg);
     }
+}
+
+int Bsp::setLineEditValue(QLineEdit *lineedit, std::string value)
+{
+    int index = -1;
+
+    lineedit->setText(codec->toUnicode(value.c_str()));
+    index = 0;
+    // FIXME Добавить проверку значения!
+
+    return index;
+}
+
+void Bsp::setSpinBoxValue(eGB_PARAM param, qint16 value)
+{
+    QSpinBox *spinbox = mapSpinBox.value(param, nullptr);
+
+    if (spinbox != nullptr) {
+        if (setSpinBoxValue(spinbox, value) == -1) {
+            QString msg = QString("%1: Wrong value %1 for parameter '%2'.").
+                          arg(__FUNCTION__).arg(value).arg(getParamName(param));
+            emit debug(msg);
+        }
+    } else {
+        QString msg = QString("%1: Parameter '%2' not found.").
+                      arg(__FUNCTION__).arg(getParamName(param));
+        emit debug(msg);
+    }
+}
+
+int Bsp::setSpinBoxValue(QSpinBox *spinbox, qint16 value)
+{
+    int check = -1;
+
+    if ((value >= spinbox->minimum()) && (value <= spinbox->maximum())) {
+        spinbox->setValue(value);
+    }
+
+    return check;
 }
 
 QString Bsp::getParamName(eGB_PARAM param)
@@ -405,6 +581,20 @@ void Bsp::fillComboboxList(QComboBox *combobox, eGB_PARAM param)
                 combobox->addItem(codec->toUnicode(l), lp.getMin() + i);
                 l += STRING_LENGHT;
             }
+        }
+
+        if (lp.getCom() == eGB_COM::GB_COM_NO) {
+            combobox->setEnabled(false);
+        }
+    }
+}
+
+//
+void Bsp::fillComboboxListRegime(QComboBox *combobox)
+{
+    if (combobox != nullptr) {
+        for(uint8_t i = 0; i < eGB_REGIME::GB_REGIME_MAX; i++) {
+            combobox->addItem(codec->toUnicode(fcRegime[i]), i);
         }
     }
 }
@@ -507,19 +697,19 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data)
             params.measParam.setTemperature(data.first());
 
             pkgTx.append(com);
-            pkgTx.append(params.def.status.getRegime());
-            pkgTx.append(params.def.status.getState());
-            pkgTx.append(params.def.status.getDopByte());
-            pkgTx.append(params.prm.status.getRegime());
-            pkgTx.append(params.prm.status.getState());
-            pkgTx.append(params.prm.status.getDopByte());
-            pkgTx.append(params.prd.status.getRegime());
-            pkgTx.append(params.prd.status.getState());
-            pkgTx.append(params.prd.status.getDopByte());
+            pkgTx.append(getComboBoxValue(&stateDef.regime));
+            pkgTx.append(getSpinBoxValue(&stateDef.state));
+            pkgTx.append(getSpinBoxValue(&stateDef.dopByte));
+            pkgTx.append(getComboBoxValue(&statePrm.regime));
+            pkgTx.append(getSpinBoxValue(&statePrm.state));
+            pkgTx.append(getSpinBoxValue(&statePrm.dopByte));
+            pkgTx.append(getComboBoxValue(&statePrd.regime));
+            pkgTx.append(getSpinBoxValue(&statePrd.state));
+            pkgTx.append(getSpinBoxValue(&statePrd.dopByte));
             // TODO Разобраться зачем нужен второй приемник
-            pkgTx.append(params.prm.status.getRegime());
-            pkgTx.append(params.prm.status.getState());
-            pkgTx.append(params.prm.status.getDopByte());
+            pkgTx.append(getComboBoxValue(&statePrm.regime));
+            pkgTx.append(getSpinBoxValue(&statePrd.state));
+            pkgTx.append(getSpinBoxValue(&statePrd.dopByte));
             pkgTx.append(params.prm.getIndCom8(0));
             pkgTx.append(params.prm.getIndCom8(1));
             pkgTx.append(params.prm.getIndCom8(2));
@@ -537,42 +727,45 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data)
         } break;
 
         case GB_COM_GET_FAULT: {
+            bool ok = false;
             uint16_t value = 0;
             if (!data.isEmpty()) {
                 emit debug(msgSizeError.arg(data.size()));
             }
 
+            // FIXME Если на передатчик приходит одно любое предупреждение то выводится на экран "Предупреждение".
+
             pkgTx.append(com);
-            value = params.def.status.getFaults();
+            value = getLineEditValue(&stateDef.fault).toUInt(&ok, 16);
             pkgTx.append(value >> 8);
             pkgTx.append(value);
-            value = params.def.status.getWarnings();
+            value = getLineEditValue(&stateDef.warning).toUInt(&ok, 16);
             pkgTx.append(value >> 8);
             pkgTx.append(value);
-            value = params.prm.status.getFaults();
+            value = getLineEditValue(&statePrm.fault).toUInt(&ok, 16);
             pkgTx.append(value >> 8);
             pkgTx.append(value);
-            value = params.prm.status.getWarnings();
+            value = getLineEditValue(&statePrm.warning).toUInt(&ok, 16);
             pkgTx.append(value >> 8);
             pkgTx.append(value);
-            value = params.prd.status.getFaults();
+            value = getLineEditValue(&statePrd.fault).toUInt(&ok, 16);
             pkgTx.append(value >> 8);
             pkgTx.append(value);
-            value = params.prd.status.getWarnings();
+            value = getLineEditValue(&statePrd.warning).toUInt(&ok, 16);
             pkgTx.append(value >> 8);
             pkgTx.append(value);
-            value = params.glb.status.getFaults();
+             value = getLineEditValue(&stateGlb.fault).toUInt(&ok, 16);
             pkgTx.append(value >> 8);
             pkgTx.append(value);
-            value = params.glb.status.getWarnings();
+            value = getLineEditValue(&stateGlb.warning).toUInt(&ok, 16);
             pkgTx.append(value >> 8);
             pkgTx.append(value);
 
             // TODO Разобраться зачем нужен второй приемник
-            value = params.prm.status.getFaults();
+            value = getLineEditValue(&statePrm.fault).toUInt(&ok, 16);
             pkgTx.append(value >> 8);
             pkgTx.append(value);
-            value = params.prm.status.getWarnings();
+            value = getLineEditValue(&statePrm.warning).toUInt(&ok, 16);
             pkgTx.append(value >> 8);
             pkgTx.append(value);
 
@@ -789,10 +982,7 @@ void Bsp::procCommandWriteRegime(eGB_COM com, pkg_t &data)
                 emit debug(msgSizeError.arg(data.size()));
             }
 
-            params.def.status.setRegime(GB_REGIME_DISABLED);
-            params.prd.status.setRegime(GB_REGIME_DISABLED);
-            params.prm.status.setRegime(GB_REGIME_DISABLED);
-
+            setComboBoxValue(&stateGlb.regime, eGB_REGIME::GB_REGIME_DISABLED);
             pkgTx.append(com);
         } break;
         case GB_COM_SET_REG_ENABLED: {
@@ -800,10 +990,7 @@ void Bsp::procCommandWriteRegime(eGB_COM com, pkg_t &data)
                 emit debug(msgSizeError.arg(data.size()));
             }
 
-            params.def.status.setRegime(GB_REGIME_ENABLED);
-            params.prd.status.setRegime(GB_REGIME_ENABLED);
-            params.prm.status.setRegime(GB_REGIME_ENABLED);
-
+            setComboBoxValue(&stateGlb.regime, eGB_REGIME::GB_REGIME_ENABLED);
             pkgTx.append(com);
         } break;
 
@@ -862,4 +1049,25 @@ void Bsp::updateClock()
     params.DateTime.setHour(dt.time().hour());
     params.DateTime.setMinute(dt.time().minute());
     params.DateTime.setSecond(dt.time().second());
+}
+
+void Bsp::setRegime(int index)
+{
+    stateDef.regime.setCurrentIndex(index);
+    statePrm.regime.setCurrentIndex(index);
+    statePrd.regime.setCurrentIndex(index);
+}
+
+void Bsp::setState(int index)
+{
+    stateDef.state.setValue(index);
+    statePrm.state.setValue(index);
+    statePrd.state.setValue(index);
+}
+
+void Bsp::setDopByte(int index)
+{
+    stateDef.dopByte.setValue(index);
+    statePrm.dopByte.setValue(index);
+    statePrd.dopByte.setValue(index);
 }

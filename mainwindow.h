@@ -36,6 +36,9 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+signals:
+    void userChanged(int value);
+
 private:
     Ui::MainWindow *ui;
 
@@ -44,7 +47,7 @@ private:
     uint8_t bspBuf[128];        ///< Буфер для протокола общения с БСП.
     clProtocolBspS *protBSPs;   ///< Протокол общения с БСП.
 
-    /// Инициализация меню.
+    /// Инициализация параметров.
     void initParam();
     /// Обработчик событий.
     bool eventFilter(QObject* object, QEvent* event) override;

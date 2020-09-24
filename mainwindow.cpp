@@ -47,6 +47,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(ui->kbd, &QKeyboard::debug, this, &MainWindow::printDebug);
     connect(ui->bsp, &Bsp::debug, this, &MainWindow::printDebug);
+    connect(this, &MainWindow::userChanged, ui->bsp, &Bsp::setUser);
 
     QTimer *timerMenu = new QTimer(this);
     connect(timerMenu, &QTimer::timeout, this, &MainWindow::cycleMenu);
@@ -71,6 +72,7 @@ void MainWindow::clearSelection()
 void MainWindow::cycleMenu()
 {
     static uint8_t menucnt = 0;
+    static TUser::USER user = TUser::USER::MAX;
 
     uartRead();
 
@@ -78,15 +80,21 @@ void MainWindow::cycleMenu()
     vLCDled();
 
     uartWrite();
+
+    if (user != menu.sParam.security.User.get()) {
+        user = menu.sParam.security.User.get();
+        emit userChanged(user);
+    }
 }
 
 //
 bool MainWindow::eventFilter(QObject *object, QEvent *event)
 {
     if (event->type() == QEvent::KeyRelease) {
-        ui->kbd->keyPressed(static_cast<QKeyEvent*>(event)->key());
-        ui->bsp->clearFocus();
-        qDebug() << event;
+        // У элементов созданных на вкладке Bsp имен нет.
+        if (!focusWidget()->objectName().isEmpty()) {
+            ui->kbd->keyPressed(static_cast<QKeyEvent*>(event)->key());
+        }
     }
 
     return QMainWindow::eventFilter(object, event);
@@ -95,9 +103,7 @@ bool MainWindow::eventFilter(QObject *object, QEvent *event)
 //
 void MainWindow::initParam()
 {
-    // Параметры хранящиеся во внутренней памяти МК
 
-//    menu.sParam.password.init(0000);
 }
 
 //
