@@ -60,8 +60,6 @@ private:
     stGBparam params;   ///< Параметры.
     QTextCodec *codec;  ///< Кодек.
 
-    LocalParams lp;     ///< Локальный параметр.
-
     QRegExp pwdRegExp;
     QRegExpValidator pwdValidator;
     QRegExp errRegExp;

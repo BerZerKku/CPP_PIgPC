@@ -41,9 +41,11 @@ INCLUDEPATH += \
     PIg/src/protocols \
 
 SOURCES += \
+    PIg/src/flashParam.cpp \
     PIg/src/menu/enterParam.cpp \
     PIg/src/menu/menu.cpp \
     PIg/src/parameter/LocalParams.cpp \
+    PIg/src/parameter/param.cpp \
     PIg/src/protocols/iec101/CIec101.cpp \
     PIg/src/protocols/iec101/protocolPcI.cpp \
     PIg/src/protocols/modbus/protocolModbus.cpp \

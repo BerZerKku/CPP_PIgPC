@@ -72,7 +72,7 @@ void MainWindow::clearSelection()
 void MainWindow::cycleMenu()
 {
     static uint8_t menucnt = 0;
-    static TUser::USER user = TUser::USER::MAX;
+    static TUser::user_t user = TUser::MAX;
 
     uartRead();
 

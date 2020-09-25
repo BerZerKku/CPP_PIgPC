@@ -7,7 +7,6 @@
 Bsp::Bsp(QWidget *parent) : QTreeWidget(parent)
 {
     codec = QTextCodec::codecForName("CP1251");
-    lp.setFlashParams(fParams);
 
     // Ёти строки не вли€ют на содержимое заголовка, но вли€ют на resize ниже.
     headerItem()->setText(0, codec->toUnicode("Parameter"));
@@ -114,7 +113,7 @@ void Bsp::initParam()
 {
     setLineEditValue(eGB_PARAM::GB_PARAM_IS_PWD_ENGINEER, "87654321");
     setLineEditValue(eGB_PARAM::GB_PARAM_IS_PWD_ADMIN, "12345678");
-    setComboBoxValue(eGB_PARAM::GB_PARAM_IS_USER, TUser::USER::OPERATOR);
+    setComboBoxValue(eGB_PARAM::GB_PARAM_IS_USER, TUser::OPERATOR);
     setSpinBoxValue(eGB_PARAM::GB_PARAM_IS_PWD_ENG_CNT, 0);
     setSpinBoxValue(eGB_PARAM::GB_PARAM_IS_PWD_ADM_CNT, 1);
 
@@ -321,7 +320,7 @@ void Bsp::crtTreeUser()
     pwdRegExp.setPattern("[0-9]+");
     pwdValidator.setRegExp(pwdRegExp);
 
-    crtComboBox(GB_PARAM_IS_USER, TUser::USER::OPERATOR);
+    crtComboBox(GB_PARAM_IS_USER, TUser::OPERATOR);
     crtLineEdit(GB_PARAM_IS_PWD_ENGINEER, "00000000");
     crtSpinBox(GB_PARAM_IS_PWD_ENG_CNT, 0);
     crtLineEdit(GB_PARAM_IS_PWD_ADMIN, "00000000");
@@ -583,10 +582,7 @@ QString Bsp::getParamName(eGB_PARAM param)
     QString name = "Noname";
 
     if (param < GB_PARAM_MAX) {
-        lp.clearParams();
-        lp.addParam(param);
-
-        name = codec->toUnicode(lp.getNameOfParam());
+        name = codec->toUnicode(getNameOfParam(param));
     }
 
     return name;
@@ -595,18 +591,15 @@ QString Bsp::getParamName(eGB_PARAM param)
 void Bsp::fillComboboxList(QComboBox *combobox, eGB_PARAM param)
 {
     if (param < GB_PARAM_MAX) {
-        lp.clearParams();
-        lp.addParam(param);
-
-        if (lp.getParamType() == Param::PARAM_LIST) {
-            char const *l = lp.getListOfValues();
-            for(quint8 i = 0; i <= lp.getMax(); i++) {
-                combobox->addItem(codec->toUnicode(l), lp.getMin() + i);
+        if (getParamType(param) == Param::PARAM_LIST) {
+            char const *l = getListOfValues(param);
+            for(quint8 i = 0; i <= getAbsMax(param); i++) {
+                combobox->addItem(codec->toUnicode(l), getMin(param) + i);
                 l += STRING_LENGHT;
             }
         }
 
-        if (lp.getCom() == eGB_COM::GB_COM_NO) {
+        if (getCom(param) == eGB_COM::GB_COM_NO) {
             combobox->setEnabled(false);
         }
     }
