@@ -14,7 +14,6 @@ Bsp::Bsp(QWidget *parent) : QTreeWidget(parent)
     headerItem()->setText(1, codec->toUnicode("Value"));
 
     crtTree();
-    initClock();
 
     QTimer *timerClock = new QTimer(this);
     connect(timerClock, &QTimer::timeout, this, &Bsp::updateClock);
@@ -116,6 +115,8 @@ void Bsp::initParam()
     setLineEditValue(eGB_PARAM::GB_PARAM_IS_PWD_ENGINEER, "87654321");
     setLineEditValue(eGB_PARAM::GB_PARAM_IS_PWD_ADMIN, "12345678");
     setComboBoxValue(eGB_PARAM::GB_PARAM_IS_USER, TUser::USER::OPERATOR);
+    setSpinBoxValue(eGB_PARAM::GB_PARAM_IS_PWD_ENG_CNT, 0);
+    setSpinBoxValue(eGB_PARAM::GB_PARAM_IS_PWD_ADM_CNT, 1);
 
     setComboBoxValue(&stateGlb.regime, eGB_REGIME::GB_REGIME_ENABLED);
     setSpinBoxValue(&stateGlb.state, 1);
@@ -193,6 +194,8 @@ void Bsp::initParam()
     params.prd.setIndCom8(1, 0);
     params.prd.setIndCom8(2, 0);
     params.prd.setIndCom8(3, 0);
+
+    initClock();
 }
 
 void Bsp::setUser(int value)
@@ -319,8 +322,10 @@ void Bsp::crtTreeUser()
     pwdValidator.setRegExp(pwdRegExp);
 
     crtComboBox(GB_PARAM_IS_USER, TUser::USER::OPERATOR);
-    crtLineEdit(GB_PARAM_IS_PWD_ENGINEER, "87657321");
-    crtLineEdit(GB_PARAM_IS_PWD_ADMIN, "12345678");
+    crtLineEdit(GB_PARAM_IS_PWD_ENGINEER, "00000000");
+    crtSpinBox(GB_PARAM_IS_PWD_ENG_CNT, 0);
+    crtLineEdit(GB_PARAM_IS_PWD_ADMIN, "00000000");
+    crtSpinBox(GB_PARAM_IS_PWD_ADM_CNT, 0);
 
     top->setExpanded(true);
 }
@@ -330,7 +335,6 @@ void Bsp::crtComboBox(eGB_PARAM param, qint16 value)
     QComboBox *combobox = new QComboBox(this);
     QTreeWidgetItem *item = new QTreeWidgetItem();
     QTreeWidgetItem *top = topLevelItem(topLevelItemCount()-1);
-    std::string name("Noname");
 
     switch(param) {
         case eGB_PARAM::GB_PARAM_IS_USER: {
@@ -392,9 +396,13 @@ void Bsp::crtSpinBox(eGB_PARAM param, qint16 value)
     QSpinBox *spinbox = new QSpinBox(this);
     QTreeWidgetItem *item = new QTreeWidgetItem();
     QTreeWidgetItem *top = topLevelItem(topLevelItemCount()-1);
-    std::string name("Noname");
 
     switch(param) {
+        case GB_PARAM_IS_PWD_ADM_CNT: // DOWN
+        case GB_PARAM_IS_PWD_ENG_CNT: {
+            spinbox->setRange(0, PWD_CNT_BLOCK);
+            spinbox->setValue(PWD_CNT_BLOCK);
+        } break;
 
         default: {
             QString msg = QString("%1: Parameter '%2' not found.").
@@ -402,6 +410,11 @@ void Bsp::crtSpinBox(eGB_PARAM param, qint16 value)
             qWarning() << msg;
         }
     }
+
+    top->addChild(item);
+    item->setText(0, getParamName(param));
+    setItemWidget(item, 1, spinbox);
+    mapSpinBox.insert(param, spinbox);
 }
 
 //
@@ -415,6 +428,7 @@ quint8 Bsp::getComboBoxValue(eGB_PARAM param) {
         QString msg = QString("%1: Parameter '%2' not found.").
                       arg(__FUNCTION__).arg(getParamName(param));
         emit debug(msg);
+        qWarning() << msg;
     }
 
     return value;
@@ -437,6 +451,7 @@ QString Bsp::getLineEditValue(eGB_PARAM param)
         QString msg = QString("%1: Parameter '%2' not found.").
                       arg(__FUNCTION__).arg(getParamName(param));
         emit debug(msg);
+        qWarning() << msg;
     }
 
     return value;
@@ -458,6 +473,7 @@ qint16 Bsp::getSpinBoxValue(eGB_PARAM param)
         QString msg = QString("%1: Parameter '%2' not found.").
                       arg(__FUNCTION__).arg(getParamName(param));
         emit debug(msg);
+        qWarning() << msg;
     }
 
     return value;
@@ -475,14 +491,16 @@ void Bsp::setComboBoxValue(eGB_PARAM param, quint8 value)
 
     if (combobox != nullptr) {
         if (setComboBoxValue(combobox, value) == -1) {
-            QString msg = QString("%1: Wrong value %1 for parameter '%2'.").
+            QString msg = QString("%1: Wrong value %2 for parameter '%3'.").
                           arg(__FUNCTION__).arg(value).arg(getParamName(param));
             emit debug(msg);
+            qWarning() << msg;
         }
     } else {
         QString msg = QString("%1: Parameter '%2' not found.").
                       arg(__FUNCTION__).arg(getParamName(param));
         emit debug(msg);
+        qWarning() << msg;
     }
 }
 
@@ -504,15 +522,17 @@ void Bsp::setLineEditValue(eGB_PARAM param, std::string value)
 
     if (lineedit != nullptr) {
         if (setLineEditValue(lineedit, value) == -1 ) {
-            QString msg = QString("%1: Wrong value %1 for parameter '%2'.").
+            QString msg = QString("%1: Wrong value %2 for parameter '%3'.").
                           arg(__FUNCTION__).arg(value.c_str()).
                           arg(getParamName(param));
             emit debug(msg);
+            qWarning() << msg;
         }
     } else {
         QString msg = QString("%1: Parameter '%2' not found.").
                       arg(__FUNCTION__).arg(getParamName(param));
         emit debug(msg);
+        qWarning() << msg;
     }
 }
 
@@ -533,14 +553,16 @@ void Bsp::setSpinBoxValue(eGB_PARAM param, qint16 value)
 
     if (spinbox != nullptr) {
         if (setSpinBoxValue(spinbox, value) == -1) {
-            QString msg = QString("%1: Wrong value %1 for parameter '%2'.").
+            QString msg = QString("%1: Wrong value %2 for parameter '%3'.").
                           arg(__FUNCTION__).arg(value).arg(getParamName(param));
             emit debug(msg);
+            qWarning() << msg;
         }
     } else {
         QString msg = QString("%1: Parameter '%2' not found.").
                       arg(__FUNCTION__).arg(getParamName(param));
         emit debug(msg);
+        qWarning() << msg;
     }
 }
 
@@ -550,6 +572,7 @@ int Bsp::setSpinBoxValue(QSpinBox *spinbox, qint16 value)
 
     if ((value >= spinbox->minimum()) && (value <= spinbox->maximum())) {
         spinbox->setValue(value);
+        check = 0;
     }
 
     return check;
@@ -728,7 +751,7 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data)
 
         case GB_COM_GET_FAULT: {
             bool ok = false;
-            uint16_t value = 0;
+            uint value = 0;
             if (!data.isEmpty()) {
                 emit debug(msgSizeError.arg(data.size()));
             }
@@ -737,37 +760,37 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data)
 
             pkgTx.append(com);
             value = getLineEditValue(&stateDef.fault).toUInt(&ok, 16);
-            pkgTx.append(value >> 8);
-            pkgTx.append(value);
+            pkgTx.append(static_cast<uint8_t> (value >> 8));
+            pkgTx.append(static_cast<uint8_t> (value));
             value = getLineEditValue(&stateDef.warning).toUInt(&ok, 16);
-            pkgTx.append(value >> 8);
-            pkgTx.append(value);
+            pkgTx.append(static_cast<uint8_t> (value >> 8));
+            pkgTx.append(static_cast<uint8_t> (value));
             value = getLineEditValue(&statePrm.fault).toUInt(&ok, 16);
-            pkgTx.append(value >> 8);
-            pkgTx.append(value);
+            pkgTx.append(static_cast<uint8_t> (value >> 8));
+            pkgTx.append(static_cast<uint8_t> (value));
             value = getLineEditValue(&statePrm.warning).toUInt(&ok, 16);
-            pkgTx.append(value >> 8);
-            pkgTx.append(value);
+            pkgTx.append(static_cast<uint8_t> (value >> 8));
+            pkgTx.append(static_cast<uint8_t> (value));
             value = getLineEditValue(&statePrd.fault).toUInt(&ok, 16);
-            pkgTx.append(value >> 8);
-            pkgTx.append(value);
+            pkgTx.append(static_cast<uint8_t> (value >> 8));
+            pkgTx.append(static_cast<uint8_t> (value));
             value = getLineEditValue(&statePrd.warning).toUInt(&ok, 16);
-            pkgTx.append(value >> 8);
-            pkgTx.append(value);
-             value = getLineEditValue(&stateGlb.fault).toUInt(&ok, 16);
-            pkgTx.append(value >> 8);
-            pkgTx.append(value);
+            pkgTx.append(static_cast<uint8_t> (value >> 8));
+            pkgTx.append(static_cast<uint8_t> (value));
+            value = getLineEditValue(&stateGlb.fault).toUInt(&ok, 16);
+            pkgTx.append(static_cast<uint8_t> (value >> 8));
+            pkgTx.append(static_cast<uint8_t> (value));
             value = getLineEditValue(&stateGlb.warning).toUInt(&ok, 16);
-            pkgTx.append(value >> 8);
-            pkgTx.append(value);
+            pkgTx.append(static_cast<uint8_t> (value >> 8));
+            pkgTx.append(static_cast<uint8_t> (value));
 
             // TODO Разобраться зачем нужен второй приемник
             value = getLineEditValue(&statePrm.fault).toUInt(&ok, 16);
-            pkgTx.append(value >> 8);
-            pkgTx.append(value);
+            pkgTx.append(static_cast<uint8_t> (value >> 8));
+            pkgTx.append(static_cast<uint8_t> (value));
             value = getLineEditValue(&statePrm.warning).toUInt(&ok, 16);
-            pkgTx.append(value >> 8);
-            pkgTx.append(value);
+            pkgTx.append(static_cast<uint8_t> (value >> 8));
+            pkgTx.append(static_cast<uint8_t> (value));
 
             // TODO Добавить байты данных для РЗСК
         } break;
@@ -788,8 +811,8 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data)
             pkgTx.append(int2bcd(params.DateTime.getSecond(), ok));
 
             uint16_t value = params.DateTime.getMsSecond();
-            pkgTx.append(value);
-            pkgTx.append(value >> 8);
+            pkgTx.append(static_cast<uint8_t> (value));
+            pkgTx.append(static_cast<uint8_t> (value >> 8));
 
             // TODO Добавить считывание записи журнала для АСУ ТП.
         } break;
@@ -808,19 +831,23 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data)
             pkgTx.append(params.Uart.Parity.get());
             pkgTx.append(params.Uart.StopBits.get());
 
-            char const* val = getLineEditValue(GB_PARAM_IS_PWD_ENGINEER).
+            char const* pwd = getLineEditValue(GB_PARAM_IS_PWD_ENGINEER).
                            toStdString().c_str();
             for(uint8_t i = 0; i < PWD_LEN; i++) {
-                pkgTx.append(static_cast <uint8_t> (*val));
-                val++;
+                pkgTx.append(static_cast <uint8_t> (*pwd));
+                pwd++;
             }
 
-            val = getLineEditValue(GB_PARAM_IS_PWD_ADMIN).
+            pwd = getLineEditValue(GB_PARAM_IS_PWD_ADMIN).
                                        toStdString().c_str();
             for(uint8_t i = 0; i < PWD_LEN; i++) {
-                pkgTx.append(static_cast <uint8_t> (*val));
-                val++;
+                pkgTx.append(static_cast <uint8_t> (*pwd));
+                pwd++;
             }
+
+\
+            pkgTx.append((uint8_t) getSpinBoxValue(GB_PARAM_IS_PWD_ENG_CNT));
+            pkgTx.append((uint8_t) getSpinBoxValue(GB_PARAM_IS_PWD_ADM_CNT));
         } break;
 
         case GB_COM_GET_DEVICE_NUM : {
@@ -949,7 +976,7 @@ void Bsp::procCommandWriteParam(eGB_COM com, pkg_t &data)
                         for(uint8_t i = 0; i < PWD_LEN; i++) {
                             value.append(data.takeFirst());
                         }
-                        mapLineEdit.value(GB_PARAM_IS_PWD_ADMIN)->setText(value);
+                        mapLineEdit.value(GB_PARAM_IS_PWD_ENGINEER)->setText(value);
                     }
                 } break;
                 case 9: {
@@ -960,9 +987,10 @@ void Bsp::procCommandWriteParam(eGB_COM com, pkg_t &data)
                         for(uint8_t i = 0; i < PWD_LEN; i++) {
                             value.append(data.takeFirst());
                         }
-                        mapLineEdit.value(GB_PARAM_IS_PWD_ENGINEER)->setText(value);
+                        mapLineEdit.value(GB_PARAM_IS_PWD_ADMIN)->setText(value);
                     }
                 } break;
+
                 default: qDebug("No dop byte handler: 0x%.2X", dop);
             }
         } break;
@@ -1029,9 +1057,9 @@ void Bsp::sendToBsp(pkg_t pkg)
     if (com != GB_COM_NO) {
         procCommand(com, pkg);
 
-//        if (com == GB_COM_SET_NET_ADR) {
-//            qDebug() << QString("sendToBsp: ") << showbase << hex << pkg;
-//        }
+        if (com == GB_COM_SET_NET_ADR) {
+            qDebug() << QString("sendToBsp: ") << showbase << hex << pkg;
+        }
     } else {
         qWarning() << "Message check error: " << showbase << hex << pkg;
     }

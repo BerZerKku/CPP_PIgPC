@@ -2,7 +2,7 @@
 
 #include <QApplication>
 
-MainWindow *w;
+MainWindow *w = nullptr;
 
 int main(int argc, char *argv[])
 {
@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
                       arg("%{if-warning}\033[33;1mW%{endif}").
                       arg("%{if-critical}\033[31;1mC%{endif}").
                       arg("%{if-fatal}\033[31;1mF%{endif}").
-                      arg("%\033[0m").
+                      arg("\033[0m").
                       arg("\n   Loc: [%{file}:%{line}]");
 
     qSetMessagePattern(pattern);

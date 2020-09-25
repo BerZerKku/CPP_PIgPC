@@ -4,16 +4,11 @@
 
 #include <QTextCodec>
 
-//#include "PIg/src/drivers/keyboard.h"
-//#include "PIg/src/drivers/ks0108.h"
-
-extern MainWindow *w;
 static uint16_t uLedTimeOn = LCD_TIME_LED_ON;
 static eLCD_LED eLed = LED_OFF;
 static QString text;
 
 void vKEYmain(void) {
-    qWarning("file:///%s:%i: %s", __FILE__, __LINE__, "your message");
 }
 
 void vKEYset(eGB_TYPE_DEVICE type) {

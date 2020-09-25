@@ -64,4 +64,7 @@ private slots:
     void printDebug(QString msg);
     void setBacklight(bool enable);
 };
+
+// Для использвоании в wrapper
+extern MainWindow *w;
 #endif // MAINWINDOW_H
