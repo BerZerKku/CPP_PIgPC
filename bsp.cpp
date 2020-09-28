@@ -92,20 +92,7 @@ eGB_COM Bsp::checkPkg(QVector<uint8_t> &pkg)
 //
 void Bsp::initClock()
 {
-    QDate date;
-    QTime time;
-
-    date.setDate(params.DateTime.getYear()+2000,
-                 params.DateTime.getMonth(),
-                 params.DateTime.getDay());
-
-    time.setHMS(params.DateTime.getHour(),
-                params.DateTime.getMinute(),
-                params.DateTime.getSecond());
-
-
-    dt.setDate(date);
-    dt.setTime(time);
+    dt = QDateTime::currentDateTime();
 }
 
 //
@@ -129,24 +116,16 @@ void Bsp::initParam()
     setLineEditValue(&statePrd.fault, "0000");
     setLineEditValue(&statePrd.warning, "0000");
 
-    params.Uart.Interface.set(TInterface::USB);
-    params.Uart.Protocol.set(TProtocol::STANDART);
-    params.Uart.BaudRate.set(TBaudRate::_19200);
-    params.Uart.DataBits.set(TDataBits::_8);
-    params.Uart.Parity.set(TParity::EVEN);
-    params.Uart.StopBits.set(TStopBits::ONE);
+    setComboBoxValue(GB_PARAM_COM_PRD_KEEP, 0);
+    setComboBoxValue(GB_PARAM_COM_PRM_KEEP, 0);
 
-    // Параметры получаемые из БСП
-
-    params.glb.setNetAddress(15);
-
-    params.DateTime.setYear(20);
-    params.DateTime.setMonth(9);
-    params.DateTime.setDay(9);
-    params.DateTime.setHour(22);
-    params.DateTime.setMinute(6);
-    params.DateTime.setSecond(37);
-    params.DateTime.setMsSecond(987);
+    setComboBoxValue(GB_PARAM_INTF_INTERFACE, TInterface::RS485);
+    setComboBoxValue(GB_PARAM_INTF_PROTOCOL, TProtocol::IEC_101);
+    setSpinBoxValue(GB_PARAM_NET_ADDRESS, 17);
+    setComboBoxValue(GB_PARAM_INTF_BAUDRATE, TBaudRate::_9600);
+    setComboBoxValue(GB_PARAM_INTF_DATA_BITS, TDataBits::_8);
+    setComboBoxValue(GB_PARAM_INTF_PARITY, TParity::EVEN);
+    setComboBoxValue(GB_PARAM_INTF_STOP_BITS, TStopBits::ONE);
 
     params.def.status.setEnable(false);
     params.prm.setNumCom(32);
@@ -169,20 +148,6 @@ void Bsp::initParam()
     // TypeDevice + TypeOpto = TypeDevice(AVANT_OPTO)
     params.glb.setTypeDevice(AVANT_K400);
     params.glb.setTypeOpto(TYPE_OPTO_STANDART);
-
-    params.def.status.setEnable(false);
-    params.def.status.setFault(0);
-    params.def.status.setWarning(0);
-    params.def.status.setRemoteNumber(1);
-
-    params.prm.status.setFault(0);
-    params.prm.status.setWarning(0);
-
-    params.prd.status.setFault(0);
-    params.prd.status.setWarning(0);
-
-    params.glb.status.setFault(0);
-    params.glb.status.setWarning(0);
 
     params.glb.setDInputState(0);
     params.prm.setIndCom8(0, 0);
@@ -220,8 +185,64 @@ quint8 Bsp::int2bcd(quint8 val, bool &ok) const
 
 void Bsp::crtTree()
 {
-    crtTreeState();
     crtTreeUser();
+    crtTreeState();
+    crtTreePrm();
+    crtTreePrd();
+    crtTreeGlb();
+    crtTreeInterface();
+}
+
+void Bsp::crtTreeGlb()
+{
+    QTreeWidgetItem* top = new QTreeWidgetItem();
+    insertTopLevelItem(topLevelItemCount(), top);
+
+    top->setText(0, codec->toUnicode("Общие"));
+
+    crtComboBox(GB_PARAM_COM_PRD_KEEP);
+    crtComboBox(GB_PARAM_COM_PRM_KEEP);
+
+    top->setExpanded(true);
+}
+
+void Bsp::crtTreeInterface()
+{
+    QTreeWidgetItem* top = new QTreeWidgetItem();
+    insertTopLevelItem(topLevelItemCount(), top);
+
+    top->setText(0, codec->toUnicode("Интерфейс"));
+
+    crtComboBox(GB_PARAM_INTF_INTERFACE);
+    crtComboBox(GB_PARAM_INTF_PROTOCOL);
+    crtSpinBox(GB_PARAM_NET_ADDRESS);
+    crtComboBox(GB_PARAM_INTF_BAUDRATE);
+    crtComboBox(GB_PARAM_INTF_DATA_BITS);
+    crtComboBox(GB_PARAM_INTF_PARITY);
+    crtComboBox(GB_PARAM_INTF_STOP_BITS);
+
+
+    top->setExpanded(true);
+}
+
+void Bsp::crtTreePrd()
+{
+    QTreeWidgetItem* top = new QTreeWidgetItem();
+    insertTopLevelItem(topLevelItemCount(), top);
+
+    top->setText(0, codec->toUnicode("Передатчик"));
+
+    top->setExpanded(false);
+}
+
+void Bsp::crtTreePrm()
+{
+    QTreeWidgetItem* top = new QTreeWidgetItem();
+    insertTopLevelItem(topLevelItemCount(), top);
+
+    top->setText(0, codec->toUnicode("Приемник"));
+
+    top->setExpanded(false);
 }
 
 //
@@ -320,31 +341,39 @@ void Bsp::crtTreeUser()
     pwdRegExp.setPattern("[0-9]+");
     pwdValidator.setRegExp(pwdRegExp);
 
-    crtComboBox(GB_PARAM_IS_USER, TUser::OPERATOR);
+    crtComboBox(GB_PARAM_IS_USER);
     crtLineEdit(GB_PARAM_IS_PWD_ENGINEER, "00000000");
-    crtSpinBox(GB_PARAM_IS_PWD_ENG_CNT, 0);
+    crtSpinBox(GB_PARAM_IS_PWD_ENG_CNT);
     crtLineEdit(GB_PARAM_IS_PWD_ADMIN, "00000000");
-    crtSpinBox(GB_PARAM_IS_PWD_ADM_CNT, 0);
+    crtSpinBox(GB_PARAM_IS_PWD_ADM_CNT);
+
+    mapCombobox.value(GB_PARAM_IS_USER)->setEnabled(true);
+    connect(mapCombobox.value(GB_PARAM_IS_USER),
+            QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, &Bsp::setLocalValues);
 
     top->setExpanded(true);
 }
 
-void Bsp::crtComboBox(eGB_PARAM param, qint16 value)
+//
+void Bsp::crtComboBox(eGB_PARAM param)
 {
     QComboBox *combobox = new QComboBox(this);
     QTreeWidgetItem *item = new QTreeWidgetItem();
     QTreeWidgetItem *top = topLevelItem(topLevelItemCount()-1);
 
-    switch(param) {
-        case eGB_PARAM::GB_PARAM_IS_USER: {
-            fillComboboxList(combobox, param);
-        } break;
+    if (getParamType(param) == Param::PARAM_LIST) {
+        fillComboboxList(combobox, param);
+        combobox->setCurrentIndex(0);
+    } else {
+        qCritical() << QString("Parameter %1 is not LIST!").
+                      arg(getParamName(param));
+    }
 
-        default: {
-            QString msg = QString("%1: Parameter '%2' not found.").
-                          arg(__FUNCTION__).arg(getParamName(param));
-            qWarning() << msg;
-        }
+    if (getCom(param) == eGB_COM::GB_COM_NO) {
+        QPalette pa;
+        pa.setColor(QPalette::WindowText,Qt::red);
+        item->setForeground(0, Qt::blue);
     }
 
     top->addChild(item);
@@ -354,66 +383,28 @@ void Bsp::crtComboBox(eGB_PARAM param, qint16 value)
     mapCombobox.insert(param, combobox);
 }
 
-void Bsp::crtLineEdit(eGB_PARAM param, std::string value)
+//
+void Bsp::fillComboboxList(QComboBox *combobox, eGB_PARAM param)
 {
-    QLineEdit *lineedit = new QLineEdit(this);
-    QTreeWidgetItem *item = new QTreeWidgetItem();
-    QTreeWidgetItem *top = topLevelItem(topLevelItemCount()-1);
-
-    switch(param) {
-        case eGB_PARAM::GB_PARAM_IS_PWD_ADMIN: {
-            lineedit->setMaxLength(PWD_LEN);
-            lineedit->setInputMask("99999999");
-            lineedit->setValidator(&pwdValidator);
-
-        } break;
-
-        case eGB_PARAM::GB_PARAM_IS_PWD_ENGINEER: {
-            lineedit->setMaxLength(PWD_LEN);
-            lineedit->setInputMask("99999999");
-            lineedit->setValidator(&pwdValidator);
-        } break;
-
-        default: {
-            QString msg = QString("%1: Parameter '%2' not found.").
-                          arg(__FUNCTION__).arg(getParamName(param));
-            qWarning() << msg;
+    if (param < GB_PARAM_MAX) {
+        if (getParamType(param) == Param::PARAM_LIST) {
+            char const *l = getListOfValues(param);
+            for(quint8 i = 0; i < getAbsMax(param); i++) {
+                combobox->addItem(codec->toUnicode(l), getMin(param) + i);
+                l += STRING_LENGHT;
+            }
         }
     }
-
-    top->addChild(item);
-    item->setText(0, getParamName(param));
-    setItemWidget(item, 1, lineedit);
-
-//    connect(lineedit, &QLineEdit::selectionChanged,
-//            lineedit, &QLineEdit::deselect);
-    mapLineEdit.insert(param, lineedit);
 }
 
-void Bsp::crtSpinBox(eGB_PARAM param, qint16 value)
+//
+void Bsp::fillComboboxListRegime(QComboBox *combobox)
 {
-    QSpinBox *spinbox = new QSpinBox(this);
-    QTreeWidgetItem *item = new QTreeWidgetItem();
-    QTreeWidgetItem *top = topLevelItem(topLevelItemCount()-1);
-
-    switch(param) {
-        case GB_PARAM_IS_PWD_ADM_CNT: // DOWN
-        case GB_PARAM_IS_PWD_ENG_CNT: {
-            spinbox->setRange(0, PWD_CNT_BLOCK);
-            spinbox->setValue(PWD_CNT_BLOCK);
-        } break;
-
-        default: {
-            QString msg = QString("%1: Parameter '%2' not found.").
-                          arg(__FUNCTION__).arg(getParamName(param));
-            qWarning() << msg;
+    if (combobox != nullptr) {
+        for(uint8_t i = 0; i < eGB_REGIME::GB_REGIME_MAX; i++) {
+            combobox->addItem(codec->toUnicode(fcRegime[i]), i);
         }
     }
-
-    top->addChild(item);
-    item->setText(0, getParamName(param));
-    setItemWidget(item, 1, spinbox);
-    mapSpinBox.insert(param, spinbox);
 }
 
 //
@@ -436,51 +427,6 @@ quint8 Bsp::getComboBoxValue(eGB_PARAM param) {
 //
 quint8 Bsp::getComboBoxValue(QComboBox *combobox) {
     return static_cast<quint8> (combobox->currentData().toInt());
-}
-
-//
-QString Bsp::getLineEditValue(eGB_PARAM param)
-{
-    QString value;
-    QLineEdit *lineedit = mapLineEdit.value(param, nullptr);
-
-    if (lineedit != nullptr) {
-        value = lineedit->text();
-    } else {
-        QString msg = QString("%1: Parameter '%2' not found.").
-                      arg(__FUNCTION__).arg(getParamName(param));
-        emit debug(msg);
-        qWarning() << msg;
-    }
-
-    return value;
-}
-
-QString Bsp::getLineEditValue(QLineEdit *lineedit)
-{
-    return lineedit->text();
-}
-
-qint16 Bsp::getSpinBoxValue(eGB_PARAM param)
-{
-    quint16 value = 0;
-    QSpinBox *spinbox = mapSpinBox.value(param, nullptr);
-
-    if (spinbox != nullptr) {
-        value = getSpinBoxValue(spinbox);
-    } else {
-        QString msg = QString("%1: Parameter '%2' not found.").
-                      arg(__FUNCTION__).arg(getParamName(param));
-        emit debug(msg);
-        qWarning() << msg;
-    }
-
-    return value;
-}
-
-qint16 Bsp::getSpinBoxValue(QSpinBox *spinbox)
-{
-    return spinbox->value();
 }
 
 //
@@ -515,6 +461,60 @@ int Bsp::setComboBoxValue(QComboBox *combobox, quint8 value)
     return index;
 }
 
+//
+void Bsp::crtLineEdit(eGB_PARAM param, std::string value)
+{
+    QLineEdit *lineedit = new QLineEdit(this);
+    QTreeWidgetItem *item = new QTreeWidgetItem();
+    QTreeWidgetItem *top = topLevelItem(topLevelItemCount()-1);
+
+    if (getParamType(param) == Param::PARAM_PWD) {
+        lineedit->setMaxLength(PWD_LEN);
+        lineedit->setInputMask("99999999");
+        lineedit->setValidator(&pwdValidator);;
+    } else {
+        qCritical() << QString("Parameter %1 is not PWD!").
+                      arg(getParamName(param));
+    }
+
+    if (getCom(param) == eGB_COM::GB_COM_NO) {
+        QPalette pa;
+        pa.setColor(QPalette::WindowText,Qt::red);
+        item->setForeground(0, Qt::blue);
+    }
+
+    top->addChild(item);
+    item->setText(0, getParamName(param));
+    setItemWidget(item, 1, lineedit);
+
+    mapLineEdit.insert(param, lineedit);
+}
+
+//
+QString Bsp::getLineEditValue(eGB_PARAM param)
+{
+    QString value;
+    QLineEdit *lineedit = mapLineEdit.value(param, nullptr);
+
+    if (lineedit != nullptr) {
+        value = lineedit->text();
+    } else {
+        QString msg = QString("%1: Parameter '%2' not found.").
+                      arg(__FUNCTION__).arg(getParamName(param));
+        emit debug(msg);
+        qWarning() << msg;
+    }
+
+    return value;
+}
+
+//
+QString Bsp::getLineEditValue(QLineEdit *lineedit)
+{
+    return lineedit->text();
+}
+
+//
 void Bsp::setLineEditValue(eGB_PARAM param, std::string value)
 {
     QLineEdit *lineedit = mapLineEdit.value(param, nullptr);
@@ -535,6 +535,7 @@ void Bsp::setLineEditValue(eGB_PARAM param, std::string value)
     }
 }
 
+//
 int Bsp::setLineEditValue(QLineEdit *lineedit, std::string value)
 {
     int index = -1;
@@ -546,6 +547,58 @@ int Bsp::setLineEditValue(QLineEdit *lineedit, std::string value)
     return index;
 }
 
+//
+void Bsp::crtSpinBox(eGB_PARAM param)
+{
+    QSpinBox *spinbox = new QSpinBox(this);
+    QTreeWidgetItem *item = new QTreeWidgetItem();
+    QTreeWidgetItem *top = topLevelItem(topLevelItemCount()-1);
+
+    if (getParamType(param) == Param::PARAM_INT) {
+        spinbox->setRange(getMin(param), getAbsMax(param));
+        spinbox->setValue(getMin(param));
+    } else {
+        qCritical() << QString("Parameter %1 is not INT!").
+                      arg(getParamName(param));
+    }
+
+    if (getCom(param) == eGB_COM::GB_COM_NO) {
+        QPalette pa;
+        pa.setColor(QPalette::WindowText,Qt::red);
+        item->setForeground(0, Qt::blue);
+    }
+
+    top->addChild(item);
+    item->setText(0, getParamName(param));
+    setItemWidget(item, 1, spinbox);
+    mapSpinBox.insert(param, spinbox);
+}
+
+//
+qint16 Bsp::getSpinBoxValue(eGB_PARAM param)
+{
+    qint16 value = 0;
+    QSpinBox *spinbox = mapSpinBox.value(param, nullptr);
+
+    if (spinbox != nullptr) {
+        value = getSpinBoxValue(spinbox);
+    } else {
+        QString msg = QString("%1: Parameter '%2' not found.").
+                      arg(__FUNCTION__).arg(getParamName(param));
+        emit debug(msg);
+        qWarning() << msg;
+    }
+
+    return value;
+}
+
+//
+qint16 Bsp::getSpinBoxValue(QSpinBox *spinbox)
+{
+    return static_cast<qint16> (spinbox->value());
+}
+
+//
 void Bsp::setSpinBoxValue(eGB_PARAM param, qint16 value)
 {
     QSpinBox *spinbox = mapSpinBox.value(param, nullptr);
@@ -565,6 +618,7 @@ void Bsp::setSpinBoxValue(eGB_PARAM param, qint16 value)
     }
 }
 
+//
 int Bsp::setSpinBoxValue(QSpinBox *spinbox, qint16 value)
 {
     int check = -1;
@@ -588,37 +642,10 @@ QString Bsp::getParamName(eGB_PARAM param)
     return name;
 }
 
-void Bsp::fillComboboxList(QComboBox *combobox, eGB_PARAM param)
-{
-    if (param < GB_PARAM_MAX) {
-        if (getParamType(param) == Param::PARAM_LIST) {
-            char const *l = getListOfValues(param);
-            for(quint8 i = 0; i <= getAbsMax(param); i++) {
-                combobox->addItem(codec->toUnicode(l), getMin(param) + i);
-                l += STRING_LENGHT;
-            }
-        }
-
-        if (getCom(param) == eGB_COM::GB_COM_NO) {
-            combobox->setEnabled(false);
-        }
-    }
-}
-
-//
-void Bsp::fillComboboxListRegime(QComboBox *combobox)
-{
-    if (combobox != nullptr) {
-        for(uint8_t i = 0; i < eGB_REGIME::GB_REGIME_MAX; i++) {
-            combobox->addItem(codec->toUnicode(fcRegime[i]), i);
-        }
-    }
-}
-
 //
 void Bsp::keyPressEvent(QKeyEvent *event)
 {
-    qDebug() << event;
+    return;
 }
 
 //
@@ -699,7 +726,7 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data)
 
         case GB_COM_DEF_GET_LINE_TYPE: {
             if (!data.isEmpty()) {
-                emit debug(msgSizeError.arg(data.size()));
+                emit debug(msgSizeError.arg(com, 2, 16).arg(data.size()));
             }
             //
             pkgTx.append(com);
@@ -708,7 +735,7 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data)
 
         case GB_COM_GET_SOST: {
             if (data.size() != 1) {
-                emit debug(msgSizeError.arg(data.size()));
+                emit debug(msgSizeError.arg(com, 2, 16).arg(data.size()));
             }
             params.measParam.setTemperature(data.first());
 
@@ -746,7 +773,7 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data)
             bool ok = false;
             uint value = 0;
             if (!data.isEmpty()) {
-                emit debug(msgSizeError.arg(data.size()));
+                emit debug(msgSizeError.arg(com, 2, 16).arg(data.size()));
             }
 
             // FIXME Если на передатчик приходит одно любое предупреждение то выводится на экран "Предупреждение".
@@ -791,7 +818,7 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data)
         case GB_COM_GET_TIME: {
             // TODO Добавить обработку флага новой записи журнала
             if (data.size() != 1) {
-                emit debug(msgSizeError.arg(data.size()));
+                emit debug(msgSizeError.arg(com, 2, 16).arg(data.size()));
             }
 
             bool ok;
@@ -810,19 +837,40 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data)
             // TODO Добавить считывание записи журнала для АСУ ТП.
         } break;
 
-        case GB_COM_GET_NET_ADR: {
-            if (!data.isEmpty()) {
-                emit debug(msgSizeError.arg(data.size()));
+        case GB_COM_GET_COM_PRM_KEEP: {
+            if (data.size() != 0) {
+                emit debug(msgSizeError.arg(com, 2, 16).arg(data.size()));
             }
             //
             pkgTx.append(com);
-            pkgTx.append(params.glb.getNetAddress());
-            pkgTx.append(params.Uart.Interface.get());
-            pkgTx.append(params.Uart.Protocol.get());
-            pkgTx.append(params.Uart.BaudRate.get());
-            pkgTx.append(params.Uart.DataBits.get());
-            pkgTx.append(params.Uart.Parity.get());
-            pkgTx.append(params.Uart.StopBits.get());
+            // FIXME Может быть еще Uвых номинальное!
+            pkgTx.append(getComboBoxValue(GB_PARAM_COM_PRM_KEEP));
+        } break;
+
+        case GB_COM_GET_COM_PRD_KEEP: {
+            if (data.size() != 0) {
+                emit debug(msgSizeError.arg(com, 2, 16).arg(data.size()));
+            }
+            //
+            // FIXME Добавить остальные параметры для К400. Учесть что в Р400 только совместимость!.
+            pkgTx.append(com);
+            pkgTx.append(getComboBoxValue(GB_PARAM_COM_PRD_KEEP));
+        } break;
+
+        case GB_COM_GET_NET_ADR: {
+            if (data.size() != 0) {
+                emit debug(msgSizeError.arg(com, 2, 16).arg(data.size()));
+            }
+            //
+            pkgTx.append(com);
+            qint16 value = getSpinBoxValue(GB_PARAM_NET_ADDRESS);
+            pkgTx.append(static_cast<uint8_t> (value));
+            pkgTx.append(getComboBoxValue(GB_PARAM_INTF_INTERFACE));
+            pkgTx.append(getComboBoxValue(GB_PARAM_INTF_PROTOCOL));
+            pkgTx.append(getComboBoxValue(GB_PARAM_INTF_BAUDRATE));
+            pkgTx.append(getComboBoxValue(GB_PARAM_INTF_DATA_BITS));
+            pkgTx.append(getComboBoxValue(GB_PARAM_INTF_PARITY));
+            pkgTx.append(getComboBoxValue(GB_PARAM_INTF_STOP_BITS));
 
             char const* pwd = getLineEditValue(GB_PARAM_IS_PWD_ENGINEER).
                            toStdString().c_str();
@@ -845,7 +893,7 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data)
 
         case GB_COM_GET_DEVICE_NUM : {
             if (!data.isEmpty()) {
-                emit debug(msgSizeError.arg(data.size()));
+                emit debug(msgSizeError.arg(com, 2, 16).arg(data.size()));
             }
             //
             pkgTx.append(com);
@@ -908,7 +956,7 @@ void Bsp::procCommandWriteParam(eGB_COM com, pkg_t &data)
     switch(com) {
         case GB_COM_SET_TIME: {
             if (data.size() != 9) {
-                emit debug(msgSizeError.arg(data.size()));
+                emit debug(msgSizeError.arg(com, 2, 16).arg(data.size()));
             } else {
                 bool ok = false;
                 params.DateTime.setYear(bcd2int(data.takeFirst(), ok));
@@ -930,36 +978,61 @@ void Bsp::procCommandWriteParam(eGB_COM com, pkg_t &data)
             }
         } break;
 
+        case GB_COM_SET_COM_PRM_KEEP: {
+            if (data.size() != 1) {
+                emit debug(msgSizeError.arg(com, 2, 16).arg(data.size()));
+            } else {
+                uint8_t value = data.takeFirst();
+                // FIXME Может быть Uвых номинальное.
+                setComboBoxValue(GB_PARAM_COM_PRM_KEEP, value);
+            }
+        } break;
+
+        case GB_COM_SET_COM_PRD_KEEP: {
+            uint8_t value = data.takeFirst();
+            uint8_t dop = data.takeFirst();
+            // FIXME Добавить остальные параметры для К400.
+            // Учесть что в Р400 только один байт "Совместимость".
+            switch(dop) {
+                case 1: {
+                    setComboBoxValue(GB_PARAM_COM_PRD_KEEP, value);
+                } break;
+
+                default: qDebug("No dop byte handler: 0x%.2X", dop);
+            }
+        } break;
+
         case GB_COM_SET_NET_ADR: {
             uint8_t dop = data.takeFirst();
+            pkgTx.append(com);
             switch(dop) {
                 case 1: {
                     uint8_t byte = data.takeFirst();
-                    params.glb.setNetAddress(byte);
+                    setSpinBoxValue(GB_PARAM_NET_ADDRESS, byte);
                 } break;
                 case 2: {
                     uint8_t byte = data.takeFirst();
-                    params.Uart.Interface.set((TInterface::INTERFACE) byte);
+                    setComboBoxValue(GB_PARAM_INTF_INTERFACE, byte);
                 } break;
                 case 3: {
                     uint8_t byte = data.takeFirst();
-                    params.Uart.Protocol.set((TProtocol::PROTOCOL) byte);
+                    setComboBoxValue(GB_PARAM_INTF_PROTOCOL, byte);
                 } break;
                 case 4: {
                     uint8_t byte = data.takeFirst();
-                    params.Uart.BaudRate.set((TBaudRate::BAUD_RATE) byte);
+                    setComboBoxValue(GB_PARAM_INTF_BAUDRATE, byte);
                 } break;
                 case 5: {
                     uint8_t byte = data.takeFirst();
-                    params.Uart.DataBits.set((TDataBits::DATA_BITS) byte);
+                    setComboBoxValue(GB_PARAM_INTF_DATA_BITS, byte);
                 } break;
                 case 6: {
-                    uint8_t byte = data.takeFirst();
-                    params.Uart.Parity.set((TParity::PARITY) byte);
+                    uint8_t byte = data.takeFirst();                    
+                    setComboBoxValue(GB_PARAM_INTF_PARITY, byte);
                 } break;
                 case 7: {
                     uint8_t byte = data.takeFirst();
-                    params.Uart.StopBits.set((TStopBits::STOP_BITS) byte);
+                    setComboBoxValue(GB_PARAM_INTF_STOP_BITS, byte);
                 } break;
                 case 8: {
                     if (data.size() != 8) {
@@ -974,7 +1047,7 @@ void Bsp::procCommandWriteParam(eGB_COM com, pkg_t &data)
                 } break;
                 case 9: {
                     if (data.size() != 8) {
-                        emit debug(msgSizeError.arg(data.size()));
+                        emit debug(msgSizeError.arg(com, 2, 16).arg(data.size()));
                     } else {
                         QString value;
                         for(uint8_t i = 0; i < PWD_LEN; i++) {
@@ -1091,4 +1164,10 @@ void Bsp::setDopByte(int index)
     stateDef.dopByte.setValue(index);
     statePrm.dopByte.setValue(index);
     statePrd.dopByte.setValue(index);
+}
+
+void Bsp::setLocalValues(int value)
+{
+    // FIXME Сейчас используется только для роли пользователя. Сделать для любого!
+    emit userChanged(value);
 }

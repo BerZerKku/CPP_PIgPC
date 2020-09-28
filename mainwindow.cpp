@@ -48,6 +48,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->kbd, &QKeyboard::debug, this, &MainWindow::printDebug);
     connect(ui->bsp, &Bsp::debug, this, &MainWindow::printDebug);
     connect(this, &MainWindow::userChanged, ui->bsp, &Bsp::setUser);
+    connect(ui->bsp, &Bsp::userChanged, this, &MainWindow::setUser);
 
     QTimer *timerMenu = new QTimer(this);
     connect(timerMenu, &QTimer::timeout, this, &MainWindow::cycleMenu);
@@ -121,6 +122,11 @@ void MainWindow::setBacklight(bool enable)
         QString qss = QString("background-color: %1").arg(color.name());
         ui->textEdit->setStyleSheet(qss);
     }
+}
+
+void MainWindow::setUser(int value)
+{
+    menu.sParam.security.User.set(static_cast<TUser::user_t> (value));
 }
 
 //

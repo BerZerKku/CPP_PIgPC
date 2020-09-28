@@ -63,6 +63,7 @@ private slots:
     void clearSelection();  ///< Очистка выделения в textEdit.
     void printDebug(QString msg);
     void setBacklight(bool enable);
+    void setUser(int value);
 };
 
 // Для использвоании в wrapper

@@ -19,7 +19,7 @@ class Bsp : public QTreeWidget
 {
     Q_OBJECT
 
-    const QString msgSizeError = "Wrong size of data: %1";
+    const QString msgSizeError = "Wrong size of data in command %1: %2";
     const QString msgTimeSourceError = "Wrong source of time: %1";
 
     struct state_t {
@@ -53,6 +53,7 @@ public slots:
 
 signals:
     void debug(QString msg);
+    void userChanged(int value);
 
 private:
     pkg_t pkgTx;        ///< Данные для передачи.
@@ -100,33 +101,35 @@ private:
     quint8 int2bcd(quint8 val, bool &ok) const;
 
     void crtTree();
+    void crtTreeGlb();
+    void crtTreeInterface();
+    void crtTreePrd();
+    void crtTreePrm();
     void crtTreeState();
     void crtTreeState(QTreeWidgetItem *top, std::string name, state_t &state);
     void crtTreeUser();
 
-    void crtComboBox(eGB_PARAM param, qint16 value);
-    void crtLineEdit(eGB_PARAM param, std::string);
-    void crtSpinBox(eGB_PARAM param, qint16 value);
-
+    void crtComboBox(eGB_PARAM param);
+    void fillComboboxList(QComboBox *combobox, eGB_PARAM param);
+    void fillComboboxListRegime(QComboBox *combobox);
     quint8 getComboBoxValue(eGB_PARAM param);
     quint8 getComboBoxValue(QComboBox *combobox);
-    QString getLineEditValue(eGB_PARAM param);
-    QString getLineEditValue(QLineEdit *lineedit);
-    qint16 getSpinBoxValue(eGB_PARAM param);
-    qint16 getSpinBoxValue(QSpinBox *spinbox);
-
     void setComboBoxValue(eGB_PARAM param, quint8 value);
     int setComboBoxValue(QComboBox *combobox, quint8 value);
+
+    void crtLineEdit(eGB_PARAM param, std::string);
+    QString getLineEditValue(eGB_PARAM param);
+    QString getLineEditValue(QLineEdit *lineedit);
     void setLineEditValue(eGB_PARAM param, std::string value);
     int setLineEditValue(QLineEdit *lineedit, std::string value);
+
+    void crtSpinBox(eGB_PARAM param);
+    qint16 getSpinBoxValue(eGB_PARAM param);
+    qint16 getSpinBoxValue(QSpinBox *spinbox);
     void setSpinBoxValue(eGB_PARAM param, qint16 value);
     int setSpinBoxValue(QSpinBox *spinbox, qint16 value);
 
     QString getParamName(eGB_PARAM param);
-
-    void fillComboboxList(QComboBox *combobox, eGB_PARAM param);
-    void fillComboboxListRegime(QComboBox *combobox);
-    void fillComboboxListState(QComboBox *combobox, const char *list);
 
     void keyPressEvent(QKeyEvent *event) override;
 
@@ -135,6 +138,7 @@ private slots:
     void setRegime(int index);
     void setState(int index);
     void setDopByte(int index);
+    void setLocalValues(int value);
 };
 
 #endif // BSP_H
