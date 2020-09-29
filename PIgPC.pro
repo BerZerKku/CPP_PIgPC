@@ -60,6 +60,7 @@ SOURCES += \
     wrapper.cpp
 
 HEADERS += \
+    PIg/src/avr.h \
     PIg/src/drivers/keyboard.h \
     PIg/src/drivers/ks0108.h \
     PIg/src/drivers/tmp75.h \
@@ -86,8 +87,6 @@ HEADERS += \
     PIg/src/protocols/standart/protocolBspS.h \
     PIg/src/protocols/standart/protocolPcS.h \
     PIg/src/protocols/standart/protocolS.h \
-    avr/io.h \
-    avr/pgmspace.h \
     bsp.h \
     mainwindow.h \
     qkeyboard.h \

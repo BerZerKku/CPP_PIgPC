@@ -66,9 +66,9 @@ private:
     QRegExp errRegExp;
     QRegExpValidator errValidator;
 
-    QMap<eGB_PARAM, QComboBox*> mapCombobox;
+    QMap<eGB_PARAM, QVector<QComboBox*>> mapCombobox;
     QMap<eGB_PARAM, QLineEdit*> mapLineEdit;
-    QMap<eGB_PARAM, QSpinBox*> mapSpinBox;
+    QMap<eGB_PARAM, QVector<QSpinBox*>> mapSpinBox;
 
     state_t stateDef;
     state_t stateGlb;
@@ -112,9 +112,10 @@ private:
     void crtComboBox(eGB_PARAM param);
     void fillComboboxList(QComboBox *combobox, eGB_PARAM param);
     void fillComboboxListRegime(QComboBox *combobox);
-    quint8 getComboBoxValue(eGB_PARAM param);
+    quint8 getComboBoxValue(eGB_PARAM param, uint8_t number=1);
     quint8 getComboBoxValue(QComboBox *combobox);
-    void setComboBoxValue(eGB_PARAM param, quint8 value);
+    void setComboBoxValue(eGB_PARAM param, quint8 value, uint8_t number=1);
+    void setComboBoxValueBits(eGB_PARAM param, quint8 value, uint8_t number=1);
     int setComboBoxValue(QComboBox *combobox, quint8 value);
 
     void crtLineEdit(eGB_PARAM param, std::string);
@@ -124,9 +125,9 @@ private:
     int setLineEditValue(QLineEdit *lineedit, std::string value);
 
     void crtSpinBox(eGB_PARAM param);
-    qint16 getSpinBoxValue(eGB_PARAM param);
+    qint16 getSpinBoxValue(eGB_PARAM param, uint8_t number=1);
     qint16 getSpinBoxValue(QSpinBox *spinbox);
-    void setSpinBoxValue(eGB_PARAM param, qint16 value);
+    void setSpinBoxValue(eGB_PARAM param, qint16 value, uint8_t number=1);
     int setSpinBoxValue(QSpinBox *spinbox, qint16 value);
 
     QString getParamName(eGB_PARAM param);

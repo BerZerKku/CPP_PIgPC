@@ -2,11 +2,16 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include "PIg/src/drivers/keyboard.h"
+#include "PIg/src/drivers/ks0108.h"
+
 #include <QTextCodec>
 
 static uint16_t uLedTimeOn = LCD_TIME_LED_ON;
 static eLCD_LED eLed = LED_OFF;
 static QString text;
+
+
 
 void vKEYmain(void) {
 }
