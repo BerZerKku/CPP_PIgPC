@@ -1115,22 +1115,28 @@ void Bsp::procCommandWriteParam(eGB_COM com, pkg_t &data) {
                 emit debug(msgSizeError.arg(com, 2, 16).arg(data.size()));
             } else {
                 bool ok = false;
-                params.DateTime.setYear(bcd2int(data.takeFirst(), ok));
-                params.DateTime.setMonth(bcd2int(data.takeFirst(), ok));
-                params.DateTime.setDay(bcd2int(data.takeFirst(), ok));
-                params.DateTime.setHour(bcd2int(data.takeFirst(), ok));
-                params.DateTime.setMinute(bcd2int(data.takeFirst(), ok));
-                params.DateTime.setSecond(bcd2int(data.takeFirst(), ok));
+                quint16 year = bcd2int(data.takeFirst(), ok) + 2000;
+                quint8 month = bcd2int(data.takeFirst(), ok);
+                quint8 day = bcd2int(data.takeFirst(), ok);
+                dt.setDate(QDate(year, month, day));
+
+                quint8 hour = bcd2int(data.takeFirst(), ok);
+                quint8 minute = bcd2int(data.takeFirst(), ok);
+                quint8 second = bcd2int(data.takeFirst(), ok);
+                dt.setTime(QTime(hour, minute, second));
 
                 quint16 ms = data.takeFirst();
-                ms += data.takeFirst() << 8;
-                params.DateTime.setMsSecond(ms);
-
-                if (data.first() != 0) {
-                    emit debug(msgTimeSourceError.arg(data.first()));
+                ms += static_cast<quint16> (data.takeFirst()) << 8;
+                if (ms != 0) {
+                    qWarning() << codec->toUnicode("Milliseconds is not 0.");
                 }
-                data.removeFirst();
-                initClock();
+
+                quint8 source = data.takeFirst();
+                if (source != 0) {
+                    emit debug(msgTimeSourceError.arg(source));
+                }
+
+
             }
         } break;
 
@@ -1159,8 +1165,8 @@ void Bsp::procCommandWriteParam(eGB_COM com, pkg_t &data) {
         } break;
 
         case GB_COM_SET_NET_ADR: {
+            qDebug() << hex << data;
             uint8_t dop = data.takeFirst();
-            pkgTx.append(com);
             switch(dop) {
                 case 1: {
                     uint8_t byte = data.takeFirst();
@@ -1210,6 +1216,22 @@ void Bsp::procCommandWriteParam(eGB_COM com, pkg_t &data) {
                             value.append(data.takeFirst());
                         }
                         mapLineEdit.value(GB_PARAM_IS_PWD_ADMIN)->setText(value);
+                    }
+                } break;
+                case 10: {
+                    if (data.size() != 1) {
+                        emit debug(msgSizeError.arg(data.size()));
+                    } else {
+                        uint8_t byte = data.takeFirst();
+                        setSpinBoxValue(GB_PARAM_IS_PWD_ENG_CNT, byte);
+                    }
+                } break;
+                case 11: {
+                    if (data.size() != 1) {
+                        emit debug(msgSizeError.arg(data.size()));
+                    } else {
+                        uint8_t byte = data.takeFirst();
+                        setSpinBoxValue(GB_PARAM_IS_PWD_ADM_CNT, byte);
                     }
                 } break;
 
