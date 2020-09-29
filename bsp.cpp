@@ -123,7 +123,7 @@ void Bsp::initParam() {
     setComboBoxValue(GB_PARAM_INTF_PARITY, TParity::EVEN);
     setComboBoxValue(GB_PARAM_INTF_STOP_BITS, TStopBits::ONE);
 
-    setSpinBoxValue(GB_PARAM_PRM_TIME_ON_K400, 5);
+    setSpinBoxValue(GB_PARAM_PRM_TIME_ON, 5);
     setComboBoxValueBits(GB_PARAM_PRM_COM_BLOCK, 0x01, 1);
     setComboBoxValueBits(GB_PARAM_PRM_COM_BLOCK, 0x02, 2);
     setComboBoxValueBits(GB_PARAM_PRM_COM_BLOCK, 0x03, 3);
@@ -208,7 +208,7 @@ void Bsp::crtTreeGlb() {
     crtComboBox(GB_PARAM_COM_PRD_KEEP);
     crtComboBox(GB_PARAM_COM_PRM_KEEP);
 
-    top->setExpanded(true);
+    top->setExpanded(false);
 }
 
 void Bsp::crtTreeInterface() {
@@ -245,7 +245,7 @@ void Bsp::crtTreePrm() {
     top->setText(0, codec->toUnicode("Приемник"));
 
     // FIXME Есть два вида задержки на фиксацию команды!
-    crtSpinBox(GB_PARAM_PRM_TIME_ON_K400);
+    crtSpinBox(GB_PARAM_PRM_TIME_ON);
     crtComboBox(GB_PARAM_PRM_COM_BLOCK);
     crtSpinBox(GB_PARAM_PRM_TIME_OFF);
 //    crtComboBox(GB_PARAM_PRD_DR_ENABLE);
@@ -639,9 +639,12 @@ void Bsp::crtSpinBox(eGB_PARAM param) {
             vspinbox.append(spinbox);
 
             if (getParamType(param) == Param::PARAM_INT) {
-                spinbox->setRange(getMin(param), getAbsMax(param));
+                qint16 min = getMin(param);
+                qint16 max = getAbsMax(param);
+                spinbox->setRange(min, max);
                 spinbox->setSingleStep(getDisc(param));
                 spinbox->setValue(getMin(param));
+                spinbox->setToolTip(QString("%1 - %2").arg(min).arg(max));
             } else {
                 qCritical() << QString("Parameter %1 is not INT!").
                                arg(getParamName(param));
@@ -828,7 +831,7 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data) {
             //
             pkgTx.append(com);
             // FIXME Есть два разных параметра "Задержка на фиксацию команды"
-            pkgTx.append(getSpinBoxValue(GB_PARAM_PRM_TIME_ON_K400));
+            pkgTx.append(getSpinBoxValue(GB_PARAM_PRM_TIME_ON));
         } break;
 
         case GB_COM_PRM_GET_TIME_OFF: {
@@ -1081,7 +1084,7 @@ void Bsp::procCommandWriteParam(eGB_COM com, pkg_t &data) {
             } else {
                 uint8_t value = data.takeFirst();
                 // FIXME Есть два разных параметра "Задержка на фиксацию команды"
-                setSpinBoxValue(GB_PARAM_PRM_TIME_ON_K400, value);
+                setSpinBoxValue(GB_PARAM_PRM_TIME_ON, value);
             }
         } break;
 
