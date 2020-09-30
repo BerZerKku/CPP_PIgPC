@@ -1165,7 +1165,6 @@ void Bsp::procCommandWriteParam(eGB_COM com, pkg_t &data) {
         } break;
 
         case GB_COM_SET_NET_ADR: {
-            qDebug() << hex << data;
             uint8_t dop = data.takeFirst();
             switch(dop) {
                 case 1: {
@@ -1296,11 +1295,12 @@ void Bsp::sendToBsp(pkg_t pkg) {
 
     pkgTx.clear();
     if (com != GB_COM_NO) {
-        procCommand(com, pkg);
-
-        if (com == GB_COM_SET_NET_ADR) {
-            qDebug() << QString("sendToBsp: ") << showbase << hex << pkg;
+        if ((com == GB_COM_SET_NET_ADR) || (com == GB_COM_GET_NET_ADR)) {
+            qDebug() << QString("sendToBsp command ") << showbase << hex <<
+                        com << QString(" with data: ") << pkg;
         }
+
+        procCommand(com, pkg);
     } else {
         qWarning() << "Message check error: " << showbase << hex << pkg;
     }

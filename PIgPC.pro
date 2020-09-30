@@ -61,6 +61,7 @@ SOURCES += \
 
 HEADERS += \
     PIg/src/avr.h \
+    PIg/src/debug/debug.hpp \
     PIg/src/drivers/keyboard.h \
     PIg/src/drivers/ks0108.h \
     PIg/src/drivers/tmp75.h \
