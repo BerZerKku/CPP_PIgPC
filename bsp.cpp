@@ -25,6 +25,8 @@ Bsp::Bsp(QWidget *parent) : QTreeWidget(parent) {
 
     setSelectionMode(QAbstractItemView::NoSelection);
     setFocusPolicy(Qt::NoFocus);
+
+    initDebug();
 }
 
 
@@ -90,15 +92,19 @@ void Bsp::initClock() {
     dt = QDateTime::currentDateTime();
 }
 
+void Bsp::initDebug() {
+//    viewCom.append(GB_COM_GET_TIME);
+}
+
 //
 void Bsp::initParam() {
     eGB_PARAM param = GB_PARAM_NULL_PARAM;
 
-    setLineEditValue(eGB_PARAM::GB_PARAM_IS_PWD_ENGINEER, "87654321");
-    setLineEditValue(eGB_PARAM::GB_PARAM_IS_PWD_ADMIN, "12345678");
+    setLineEditValue(eGB_PARAM::GB_PARAM_IS_PWD_ENGINEER, "00000001");
+    setLineEditValue(eGB_PARAM::GB_PARAM_IS_PWD_ADMIN, "00000002");
     setComboBoxValue(eGB_PARAM::GB_PARAM_IS_USER, TUser::OPERATOR);
     setSpinBoxValue(eGB_PARAM::GB_PARAM_IS_PWD_ENG_CNT, 0);
-    setSpinBoxValue(eGB_PARAM::GB_PARAM_IS_PWD_ADM_CNT, 1);
+    setSpinBoxValue(eGB_PARAM::GB_PARAM_IS_PWD_ADM_CNT, 3);
 
     setComboBoxValue(&stateGlb.regime, eGB_REGIME::GB_REGIME_ENABLED);
     setSpinBoxValue(&stateGlb.state, 1);
@@ -983,37 +989,7 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data) {
         } break;
 
         case GB_COM_GET_NET_ADR: {
-            if (data.size() != 0) {
-                emit debug(msgSizeError.arg(com, 2, 16).arg(data.size()));
-            }
-            //
-            pkgTx.append(com);
-            qint16 value = getSpinBoxValue(GB_PARAM_NET_ADDRESS);
-            pkgTx.append(static_cast<uint8_t> (value));
-            pkgTx.append(getComboBoxValue(GB_PARAM_INTF_INTERFACE));
-            pkgTx.append(getComboBoxValue(GB_PARAM_INTF_PROTOCOL));
-            pkgTx.append(getComboBoxValue(GB_PARAM_INTF_BAUDRATE));
-            pkgTx.append(getComboBoxValue(GB_PARAM_INTF_DATA_BITS));
-            pkgTx.append(getComboBoxValue(GB_PARAM_INTF_PARITY));
-            pkgTx.append(getComboBoxValue(GB_PARAM_INTF_STOP_BITS));
-
-            char const* pwd = getLineEditValue(GB_PARAM_IS_PWD_ENGINEER).
-                           toStdString().c_str();
-            for(uint8_t i = 0; i < PWD_LEN; i++) {
-                pkgTx.append(static_cast <uint8_t> (*pwd));
-                pwd++;
-            }
-
-            pwd = getLineEditValue(GB_PARAM_IS_PWD_ADMIN).
-                                       toStdString().c_str();
-            for(uint8_t i = 0; i < PWD_LEN; i++) {
-                pkgTx.append(static_cast <uint8_t> (*pwd));
-                pwd++;
-            }
-
-\
-            pkgTx.append((uint8_t) getSpinBoxValue(GB_PARAM_IS_PWD_ENG_CNT));
-            pkgTx.append((uint8_t) getSpinBoxValue(GB_PARAM_IS_PWD_ADM_CNT));
+            hdlrComNetAdrGet(com, data);
         } break;
 
         case GB_COM_GET_DEVICE_NUM : {
@@ -1135,8 +1111,6 @@ void Bsp::procCommandWriteParam(eGB_COM com, pkg_t &data) {
                 if (source != 0) {
                     emit debug(msgTimeSourceError.arg(source));
                 }
-
-
             }
         } break;
 
@@ -1165,77 +1139,7 @@ void Bsp::procCommandWriteParam(eGB_COM com, pkg_t &data) {
         } break;
 
         case GB_COM_SET_NET_ADR: {
-            uint8_t dop = data.takeFirst();
-            switch(dop) {
-                case 1: {
-                    uint8_t byte = data.takeFirst();
-                    setSpinBoxValue(GB_PARAM_NET_ADDRESS, byte);
-                } break;
-                case 2: {
-                    uint8_t byte = data.takeFirst();
-                    setComboBoxValue(GB_PARAM_INTF_INTERFACE, byte);
-                } break;
-                case 3: {
-                    uint8_t byte = data.takeFirst();
-                    setComboBoxValue(GB_PARAM_INTF_PROTOCOL, byte);
-                } break;
-                case 4: {
-                    uint8_t byte = data.takeFirst();
-                    setComboBoxValue(GB_PARAM_INTF_BAUDRATE, byte);
-                } break;
-                case 5: {
-                    uint8_t byte = data.takeFirst();
-                    setComboBoxValue(GB_PARAM_INTF_DATA_BITS, byte);
-                } break;
-                case 6: {
-                    uint8_t byte = data.takeFirst();                    
-                    setComboBoxValue(GB_PARAM_INTF_PARITY, byte);
-                } break;
-                case 7: {
-                    uint8_t byte = data.takeFirst();
-                    setComboBoxValue(GB_PARAM_INTF_STOP_BITS, byte);
-                } break;
-                case 8: {
-                    if (data.size() != 8) {
-                        emit debug(msgSizeError.arg(data.size()));
-                    } else {
-                        QString value;
-                        for(uint8_t i = 0; i < PWD_LEN; i++) {
-                            value.append(data.takeFirst());
-                        }
-                        mapLineEdit.value(GB_PARAM_IS_PWD_ENGINEER)->setText(value);
-                    }
-                } break;
-                case 9: {
-                    if (data.size() != 8) {
-                        emit debug(msgSizeError.arg(com, 2, 16).arg(data.size()));
-                    } else {
-                        QString value;
-                        for(uint8_t i = 0; i < PWD_LEN; i++) {
-                            value.append(data.takeFirst());
-                        }
-                        mapLineEdit.value(GB_PARAM_IS_PWD_ADMIN)->setText(value);
-                    }
-                } break;
-                case 10: {
-                    if (data.size() != 1) {
-                        emit debug(msgSizeError.arg(data.size()));
-                    } else {
-                        uint8_t byte = data.takeFirst();
-                        setSpinBoxValue(GB_PARAM_IS_PWD_ENG_CNT, byte);
-                    }
-                } break;
-                case 11: {
-                    if (data.size() != 1) {
-                        emit debug(msgSizeError.arg(data.size()));
-                    } else {
-                        uint8_t byte = data.takeFirst();
-                        setSpinBoxValue(GB_PARAM_IS_PWD_ADM_CNT, byte);
-                    }
-                } break;
-
-                default: qDebug("No dop byte handler: 0x%.2X", dop);
-            }
+            hdlrComNetAdrSet(com, data);
         } break;
 
         default: {
@@ -1283,7 +1187,13 @@ pkg_t Bsp::receiveFromBsp() {
         pkg.insert(0, 0xAA);
         pkg.insert(0, 0x55);
 
-        //        qDebug() << "receiveFromBsp: " << showbase << hex << pkg;
+        eGB_COM com = static_cast<eGB_COM> (pkg.at(2));
+
+        if (viewCom.contains(com)) {
+            qDebug() << showbase << hex <<
+                        QString("receiveFromBsp command ") << com <<
+                        QString(" with data: ") << pkg;
+        }
     }
 
     return pkg;
@@ -1295,14 +1205,15 @@ void Bsp::sendToBsp(pkg_t pkg) {
 
     pkgTx.clear();
     if (com != GB_COM_NO) {
-        if ((com == GB_COM_SET_NET_ADR) || (com == GB_COM_GET_NET_ADR)) {
-            qDebug() << QString("sendToBsp command ") << showbase << hex <<
-                        com << QString(" with data: ") << pkg;
-        }
-
         procCommand(com, pkg);
     } else {
         qWarning() << "Message check error: " << showbase << hex << pkg;
+    }
+
+    if (viewCom.contains(com)) {
+        qDebug() << showbase << hex <<
+                    QString("sendToBsp command ") << com <<
+                    QString(" with data: ") << pkg;
     }
 }
 
@@ -1340,4 +1251,117 @@ void Bsp::setDopByte(int index) {
 void Bsp::setLocalValues(int value) {
     // FIXME Сейчас используется только для роли пользователя. Сделать для любого!
     emit userChanged(value);
+}
+
+//
+void Bsp::hdlrComNetAdrGet(eGB_COM com, pkg_t data) {
+    if (data.size() != 0) {
+        emit debug(msgSizeError.arg(com, 2, 16).arg(data.size()));
+    }
+    //
+    pkgTx.append(com);
+    qint16 value = getSpinBoxValue(GB_PARAM_NET_ADDRESS);
+    pkgTx.append(static_cast<uint8_t> (value));
+    pkgTx.append(getComboBoxValue(GB_PARAM_INTF_INTERFACE));
+    pkgTx.append(getComboBoxValue(GB_PARAM_INTF_PROTOCOL));
+    pkgTx.append(getComboBoxValue(GB_PARAM_INTF_BAUDRATE));
+    pkgTx.append(getComboBoxValue(GB_PARAM_INTF_DATA_BITS));
+    pkgTx.append(getComboBoxValue(GB_PARAM_INTF_PARITY));
+    pkgTx.append(getComboBoxValue(GB_PARAM_INTF_STOP_BITS));
+
+    char const* pwd = getLineEditValue(GB_PARAM_IS_PWD_ENGINEER).
+                   toStdString().c_str();
+    for(uint8_t i = 0; i < PWD_LEN; i++) {
+        pkgTx.append(static_cast <uint8_t> (*pwd));
+        pwd++;
+    }
+
+    pwd = getLineEditValue(GB_PARAM_IS_PWD_ADMIN).
+                               toStdString().c_str();
+    for(uint8_t i = 0; i < PWD_LEN; i++) {
+        pkgTx.append(static_cast <uint8_t> (*pwd));
+        pwd++;
+    }
+
+    pkgTx.append((uint8_t) getSpinBoxValue(GB_PARAM_IS_PWD_ENG_CNT));
+    pkgTx.append((uint8_t) getSpinBoxValue(GB_PARAM_IS_PWD_ADM_CNT));
+}
+
+//
+void Bsp::hdlrComNetAdrSet(eGB_COM com, pkg_t data)
+{
+    uint8_t dop = data.takeFirst();
+    switch(dop) {
+        case 1: {
+            uint8_t byte = data.takeFirst();
+            setSpinBoxValue(GB_PARAM_NET_ADDRESS, byte);
+        } break;
+        case 2: {
+            uint8_t byte = data.takeFirst();
+            setComboBoxValue(GB_PARAM_INTF_INTERFACE, byte);
+        } break;
+        case 3: {
+            uint8_t byte = data.takeFirst();
+            setComboBoxValue(GB_PARAM_INTF_PROTOCOL, byte);
+        } break;
+        case 4: {
+            uint8_t byte = data.takeFirst();
+            setComboBoxValue(GB_PARAM_INTF_BAUDRATE, byte);
+        } break;
+        case 5: {
+            uint8_t byte = data.takeFirst();
+            setComboBoxValue(GB_PARAM_INTF_DATA_BITS, byte);
+        } break;
+        case 6: {
+            uint8_t byte = data.takeFirst();
+            setComboBoxValue(GB_PARAM_INTF_PARITY, byte);
+        } break;
+        case 7: {
+            uint8_t byte = data.takeFirst();
+            setComboBoxValue(GB_PARAM_INTF_STOP_BITS, byte);
+        } break;
+        case 8: {
+            if (data.size() != 8) {
+                emit debug(msgSizeError.arg(data.size()));
+            } else {
+                QString value;
+                for(uint8_t i = 0; i < PWD_LEN; i++) {
+                    value.append(data.takeFirst());
+                }
+                mapLineEdit.value(GB_PARAM_IS_PWD_ENGINEER)->setText(value);
+            }
+        } break;
+        case 9: {
+            if (data.size() != 8) {
+                emit debug(msgSizeError.arg(com, 2, 16).arg(data.size()));
+            } else {
+                QString value;
+                for(uint8_t i = 0; i < PWD_LEN; i++) {
+                    value.append(data.takeFirst());
+                }
+                mapLineEdit.value(GB_PARAM_IS_PWD_ADMIN)->setText(value);
+            }
+        } break;
+        case 10: {
+            if (data.size() != 1) {
+                emit debug(msgSizeError.arg(data.size()));
+            } else {
+                uint8_t byte = data.takeFirst();
+                setSpinBoxValue(GB_PARAM_IS_PWD_ENG_CNT, byte);
+            }
+        } break;
+        case 11: {
+            if (data.size() != 1) {
+                emit debug(msgSizeError.arg(data.size()));
+            } else {
+                uint8_t byte = data.takeFirst();
+                setSpinBoxValue(GB_PARAM_IS_PWD_ADM_CNT, byte);
+            }
+        } break;
+
+        default: qDebug("No dop byte handler: 0x%.2X", dop);
+    }
+
+    data.clear();
+    hdlrComNetAdrGet(GB_COM_GET_NET_ADR, data);
 }

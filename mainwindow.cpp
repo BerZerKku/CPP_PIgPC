@@ -150,8 +150,7 @@ void MainWindow::uartRead()
             protBSPs->getData(false);
         }
     } else {
-        // TODO –азобратьс€ почему иногда нет команды на передачу!
-//        qDebug() << QTime::currentTime() << __FILE__ << __FUNCTION__ << "Read packet error!";
+        qWarning() << "Read packet error!";
     }
 }
 
@@ -169,7 +168,7 @@ void MainWindow::uartWrite()
             ui->bsp->sendToBsp(pkg);
             protBSPs->setCurrentStatus(PRTS_STATUS_NO);
         } else {
-//            qDebug() << QTime::currentTime() << __FILE__ << __FUNCTION__ << "No send package!";
+            qWarning() << "No send package!";
         }
     }
 }

@@ -75,6 +75,8 @@ private:
     state_t statePrm;
     state_t statePrd;
 
+    QVector<eGB_COM> viewCom;
+
     QComboBox regime;
 
     /// Подсчет контрольной суммы.
@@ -83,6 +85,8 @@ private:
     eGB_COM checkPkg(pkg_t &pkg);
     /// Инициализация времени.
     void initClock();
+    /// Инициализация отладки.
+    void initDebug();
 
     /// Обработка команды.
     void procCommand(eGB_COM com, pkg_t &data);
@@ -140,6 +144,9 @@ private slots:
     void setState(int index);
     void setDopByte(int index);
     void setLocalValues(int value);
+
+    void hdlrComNetAdrGet(eGB_COM com, pkg_t data);
+    void hdlrComNetAdrSet(eGB_COM com, pkg_t data);
 };
 
 #endif // BSP_H
