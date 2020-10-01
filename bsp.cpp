@@ -7,6 +7,8 @@
 Bsp::Bsp(QWidget *parent) : QTreeWidget(parent) {
     codec = QTextCodec::codecForName("CP1251");
 
+    COMPILE_TIME_ASSERT(MAX_NUM_COM_SEND_IN_CYLCE == (MAX_NUM_COM_BUF2 + 3));
+
     // Ёти строки не вли€ют на содержимое заголовка, но вли€ют на resize ниже.
     headerItem()->setText(0, codec->toUnicode("Parameter"));
     headerItem()->setText(1, codec->toUnicode("Value"));
@@ -93,7 +95,7 @@ void Bsp::initClock() {
 }
 
 void Bsp::initDebug() {
-//    viewCom.append(GB_COM_GET_TIME);
+    viewCom.append(GB_COM_SET_TIME);
 }
 
 //
@@ -103,7 +105,7 @@ void Bsp::initParam() {
     setLineEditValue(eGB_PARAM::GB_PARAM_IS_PWD_ENGINEER, "00000001");
     setLineEditValue(eGB_PARAM::GB_PARAM_IS_PWD_ADMIN, "00000002");
     setComboBoxValue(eGB_PARAM::GB_PARAM_IS_USER, TUser::OPERATOR);
-    setSpinBoxValue(eGB_PARAM::GB_PARAM_IS_PWD_ENG_CNT, 0);
+    setSpinBoxValue(eGB_PARAM::GB_PARAM_IS_PWD_ENG_CNT, 2);
     setSpinBoxValue(eGB_PARAM::GB_PARAM_IS_PWD_ADM_CNT, 3);
 
     setComboBoxValue(&stateGlb.regime, eGB_REGIME::GB_REGIME_ENABLED);
@@ -1090,6 +1092,9 @@ void Bsp::procCommandWriteParam(eGB_COM com, pkg_t &data) {
             if (data.size() != 9) {
                 emit debug(msgSizeError.arg(com, 2, 16).arg(data.size()));
             } else {
+                pkgTx.append(com);
+                pkgTx.append(data);
+
                 bool ok = false;
                 quint16 year = bcd2int(data.takeFirst(), ok) + 2000;
                 quint8 month = bcd2int(data.takeFirst(), ok);
@@ -1182,18 +1187,19 @@ pkg_t Bsp::receiveFromBsp() {
         pkg = pkgTx;
         pkgTx.clear();
 
-        pkg.insert(1, pkg.size() - 1);
+        eGB_COM com = static_cast<eGB_COM> (pkg.first());
+        if (viewCom.contains(com)) {
+
+            qDebug() << showbase << hex <<
+                        QString("receiveFromBsp: ") << pkg;
+        }
+
+        pkg.insert(1, static_cast<uint8_t> (pkg.size() - 1));
         pkg.append(calcCrc(pkg));
         pkg.insert(0, 0xAA);
         pkg.insert(0, 0x55);
 
-        eGB_COM com = static_cast<eGB_COM> (pkg.at(2));
 
-        if (viewCom.contains(com)) {
-            qDebug() << showbase << hex <<
-                        QString("receiveFromBsp command ") << com <<
-                        QString(" with data: ") << pkg;
-        }
     }
 
     return pkg;
@@ -1203,6 +1209,12 @@ pkg_t Bsp::receiveFromBsp() {
 void Bsp::sendToBsp(pkg_t pkg) {
     eGB_COM com = checkPkg(pkg);
 
+    if (viewCom.contains(com)) {
+        qDebug() << showbase << hex <<
+                    QString("sendToBsp command ") << com <<
+                    QString(" with data: ") << pkg;
+    }
+
     pkgTx.clear();
     if (com != GB_COM_NO) {
         procCommand(com, pkg);
@@ -1210,11 +1222,7 @@ void Bsp::sendToBsp(pkg_t pkg) {
         qWarning() << "Message check error: " << showbase << hex << pkg;
     }
 
-    if (viewCom.contains(com)) {
-        qDebug() << showbase << hex <<
-                    QString("sendToBsp command ") << com <<
-                    QString(" with data: ") << pkg;
-    }
+
 }
 
 //
