@@ -42,8 +42,11 @@ INCLUDEPATH += \
 
 SOURCES += \
     PIg/src/flashParam.cpp \
+    PIg/src/menu/dateTime.cpp \
     PIg/src/menu/enterParam.cpp \
     PIg/src/menu/menu.cpp \
+    PIg/src/menu/txCom.cpp \
+    PIg/src/paramGlb.cpp \
     PIg/src/parameter/LocalParams.cpp \
     PIg/src/parameter/param.cpp \
     PIg/src/protocols/iec101/CIec101.cpp \
@@ -69,9 +72,14 @@ HEADERS += \
     PIg/src/flash.h \
     PIg/src/flashParams.h \
     PIg/src/glbDefine.h \
+    PIg/src/menu/dateTime.hpp \
+    PIg/src/menu/deviceStatus.hpp \
     PIg/src/menu/enterParam.h \
+    PIg/src/menu/journalEntry.hpp \
+    PIg/src/menu/jrnScada.hpp \
     PIg/src/menu/menu.h \
     PIg/src/menu/menuPunkt.h \
+    PIg/src/menu/txCom.hpp \
     PIg/src/paramBsp.h \
     PIg/src/paramDef.h \
     PIg/src/paramGlb.h \
