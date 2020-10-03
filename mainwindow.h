@@ -3,8 +3,11 @@
 
 #include <QDateTime>
 #include <QMainWindow>
+#include <QPointer>
+#include <QTimer>
+#include <QThread>
 #include "wrapper.hpp"
-#include "bsp.h"
+#include "serialport.h"
 
 #include "PIg/src/drivers/ks0108.h"
 #include "PIg/src/menu/menu.h"
@@ -38,14 +41,16 @@ public:
 
 signals:
     void userChanged(int value);
+    void writeByte(int value);
 
 private:
     Ui::MainWindow *ui;
-
-    clMenu menu;        ///< Меню.
-
+    clMenu menu;                ///< Меню.
     uint8_t bspBuf[128];        ///< Буфер для протокола общения с БСП.
     clProtocolBspS *protBSPs;   ///< Протокол общения с БСП.
+    QPointer<SerialPort> port;
+    QPointer<QThread> thread;
+    QTimer timer;
 
     /// Инициализация параметров.
     void initParam();
@@ -61,9 +66,12 @@ private:
 private slots:
     void cycleMenu();  ///< Цикл 200 мс.
     void clearSelection();  ///< Очистка выделения в textEdit.
-    void printDebug(QString msg);
     void setBacklight(bool enable);
     void setUser(int value);
+    void refreshPortList();
+    void connectSerialPort();
+    void closeSerialPort();
+    void readByte(int value);
 };
 
 // Для использвоании в wrapper

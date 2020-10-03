@@ -1,5 +1,4 @@
-QT       += core gui
-
+QT       += core gui serialport testlib
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++11
@@ -56,10 +55,10 @@ SOURCES += \
     PIg/src/protocols/standart/protocolBspS.cpp \
     PIg/src/protocols/standart/protocolPcS.cpp \
     PIg/src/protocols/standart/protocolS.cpp \
-    bsp.cpp \
     main.cpp \
     mainwindow.cpp \
     qkeyboard.cpp \
+    serialport.cpp \
     wrapper.cpp
 
 HEADERS += \
@@ -96,9 +95,9 @@ HEADERS += \
     PIg/src/protocols/standart/protocolBspS.h \
     PIg/src/protocols/standart/protocolPcS.h \
     PIg/src/protocols/standart/protocolS.h \
-    bsp.h \
     mainwindow.h \
     qkeyboard.h \
+    serialport.h \
     wrapper.hpp
 
 FORMS += \

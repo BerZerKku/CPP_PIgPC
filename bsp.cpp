@@ -1,4 +1,4 @@
-#include "bsp.h"
+
 #include "PIg/src/flash.h"
 #include "QTextCodec"
 #include <QTimer>
