@@ -1,5 +1,5 @@
 #include "mainwindow.h"
-#include "ui_mainwindow.h"
+//#include "ui_mainwindow.h"
 
 #include <QDebug>
 #include <QFontMetrics>
@@ -7,169 +7,125 @@
 #include <QTimer>
 #include <QScrollBar>
 #include <QTextCodec>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
+#include "PIg/src/parameter/param.h"
 
-MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
-{
-    ui->setupUi(this);
-
+MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("Windows-1251"));
 
-    connect(ui->textEdit, &QTextEdit::selectionChanged,
-            this, &MainWindow::clearSelection);
+    QHBoxLayout *l = new QHBoxLayout(this);  
 
-    initParam();
+    l->addWidget(&glb);
+    l->addWidget(&oth);
 
-    protBSPs = new clProtocolBspS(bspBuf, sizeof(bspBuf), &menu.sParam);
-    protBSPs->setEnable(PRTS_STATUS_NO);
 
-    installEventFilter(this);
-    ui->textEdit->installEventFilter(this);
+    glb.crtTreeUser();
+    glb.crtTreeState();
+    glb.crtTreeInterface();
 
-    QFont font("Monospace");
-    font.setStyleHint(QFont::TypeWriter);
-    font.setPointSize(20);
-    ui->textEdit->setFont(font);
+    oth.crtTreePrm();
+    oth.crtTreePrd();
+    oth.crtTreeGlb();
 
-    QFontMetrics mfont(font);
-    QSize size = mfont.size(Qt::TextSingleLine, "12345678901234567890");
+    glb.initParam();
 
-    // FIXME –азобратьс€ почему константы именно такие
-    ui->textEdit->setFixedSize(size.width() + 12, size.height()*7 + 10);
-    ui->kbd->setFixedSize(ui->textEdit->width(), ui->textEdit->width());
-    ui->debug->setFixedWidth(ui->textEdit->width());
-    ui->debug->setMinimumHeight(300);
-    setFixedSize(sizeHint());
-
-    // ”дал€ет движение содержимого при прокрутке колесика мышки над testEdit
-    ui->textEdit->verticalScrollBar()->blockSignals(true);
-
-    connect(ui->kbd, &QKeyboard::debug, this, &MainWindow::printDebug);
-    connect(ui->bsp, &Bsp::debug, this, &MainWindow::printDebug);
-    connect(this, &MainWindow::userChanged, ui->bsp, &Bsp::setUser);
-    connect(ui->bsp, &Bsp::userChanged, this, &MainWindow::setUser);
-
-    QTimer *timerMenu = new QTimer(this);
-    connect(timerMenu, &QTimer::timeout, this, &MainWindow::cycleMenu);
-    timerMenu->start(100);
+    Bsp::initClock();
 }
 
 //
-MainWindow::~MainWindow()
-{
-    delete ui;
+MainWindow::~MainWindow() {
+//    delete ui;
 }
 
 //
-void MainWindow::clearSelection()
-{
-    QTextCursor c = ui->textEdit->textCursor();
-    c.clearSelection();
-    ui->textEdit->setTextCursor(c);
-}
-
-//
-void MainWindow::cycleMenu()
-{
-    static uint8_t menucnt = 0;
-    static TUser::user_t user = TUser::MAX;
-
-    uartRead();
-
-    menucnt = (menucnt >= 2) ? (menu.proc(), 0) : menucnt + 1;
-    vLCDled();
-
-    uartWrite();
-
-    if (user != menu.sParam.security.User.get()) {
-        user = menu.sParam.security.User.get();
-        emit userChanged(user);
-    }
-}
-
-//
-bool MainWindow::eventFilter(QObject *object, QEvent *event)
-{
-    if (event->type() == QEvent::KeyRelease) {
-        // ” элементов созданных на вкладке Bsp имен нет.
-        if (!focusWidget()->objectName().isEmpty()) {
-            ui->kbd->keyPressed(static_cast<QKeyEvent*>(event)->key());
-        }
-    }
-
-    return QMainWindow::eventFilter(object, event);
-}
-
-//
-void MainWindow::initParam()
-{
-
-}
-
-//
-void MainWindow::printDebug(QString msg)
-{
-    ui->debug->append(msg);
-}
-
-//
-void MainWindow::setBacklight(bool enable)
-{
-    QColor color = enable ? Qt::green : Qt::gray;
-
-    if (color.isValid()) {
-        QString qss = QString("background-color: %1").arg(color.name());
-        ui->textEdit->setStyleSheet(qss);
-    }
-}
-
-void MainWindow::setUser(int value)
-{
-    menu.sParam.security.User.set(static_cast<TUser::user_t> (value));
-}
-
-//
-void MainWindow::showEvent(QShowEvent *event)
-{
+void MainWindow::showEvent(QShowEvent *event) {
     QWidget::showEvent(event);
-    ui->bsp->initParam();
+
+    setMinimumHeight(750);
+    resize(sizeHint());
 }
 
-void MainWindow::uartRead()
-{
-    QVector<uint8_t> pkg = ui->bsp->receiveFromBsp();
+//
+uint8_t MainWindow::calcCrc(QVector<uint8_t> &pkg) {
+    uint8_t crc = 0;
+
     for(uint8_t byte: pkg) {
-        protBSPs->checkByte(byte);
+        crc += byte;
     }
 
-    protBSPs->checkStat();
-    if (protBSPs->getCurrentStatus() == PRTS_STATUS_READ_OK) {
-        menu.setConnectionBsp(true);
-        if (protBSPs->checkReadData()) {
-            protBSPs->getData(false);
+    return crc;
+}
+
+//
+eGB_COM MainWindow::checkPkg(QVector<uint8_t> &pkg) {
+    eGB_COM com = GB_COM_NO;
+
+    uint8_t byte;
+
+    byte = pkg.takeFirst();
+    if (byte != 0x55) {
+        return GB_COM_NO;
+    }
+
+    byte = pkg.takeFirst();
+    if (byte != 0xAA) {
+        return GB_COM_NO;
+    }
+
+    byte = pkg.takeLast();
+    if (byte != calcCrc(pkg)) {
+        return GB_COM_NO;
+    }
+
+    com = static_cast<eGB_COM> (pkg.takeFirst());
+
+    byte = pkg.takeFirst();
+    if (byte != pkg.size()) {
+        return GB_COM_NO;
+    }
+
+    return com;
+}
+
+//
+pkg_t MainWindow::receiveFromBsp() {
+    pkg_t pkg;
+
+    if (!Bsp::pkgTx.isEmpty()) {
+        pkg = Bsp::pkgTx;
+        Bsp::pkgTx.clear();
+
+        eGB_COM com = static_cast<eGB_COM> (pkg.first());
+        if (Bsp::viewCom.contains(com)) {
+
+            qDebug() << showbase << hex <<
+                QString("receiveFromBsp: ") << pkg;
         }
+
+        pkg.insert(1, static_cast<uint8_t> (pkg.size() - 1));
+        pkg.append(calcCrc(pkg));
+        pkg.insert(0, 0xAA);
+        pkg.insert(0, 0x55);
+    }
+
+    return pkg;
+}
+
+//
+void MainWindow::sendToBsp(pkg_t pkg) {
+    eGB_COM com = checkPkg(pkg);
+
+    if (Bsp::viewCom.contains(com)) {
+        qDebug() << showbase << hex <<
+            QString("sendToBsp command ") << com <<
+            QString(" with data: ") << pkg;
+    }
+
+    Bsp::pkgTx.clear();
+    if (com != GB_COM_NO) {
+        Bsp::procCommand(com, pkg);
     } else {
-        qWarning() << "Read packet error!";
+        qWarning() << "Message check error: " << showbase << hex << pkg;
     }
 }
-
-void MainWindow::uartWrite()
-{
-    protBSPs->checkStat();
-    if (protBSPs->getCurrentStatus() == PRTS_STATUS_NO) {
-        eGB_COM com = menu.getTxCommand();
-        if (com != GB_COM_NO) {
-            uint16_t num = protBSPs->sendData(com);
-            QVector<uint8_t> pkg;
-            for(uint16_t i = 0; i < num; i++) {
-                pkg.append(bspBuf[i]);
-            }
-            ui->bsp->sendToBsp(pkg);
-            protBSPs->setCurrentStatus(PRTS_STATUS_NO);
-        } else {
-            qWarning() << "No send package!";
-        }
-    }
-}
-

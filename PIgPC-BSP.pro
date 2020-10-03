@@ -1,4 +1,4 @@
-QT       += core gui
+QT       += core gui serialport
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -35,75 +35,33 @@ INCLUDEPATH += \
     PIg/ \
     PIg/src \
     PIg/src/debug \
-    PIg/src/drivers \
-    PIg/src/menu \
     PIg/src/parameter \
-    PIg/src/protocols \
+    PIg/src/menu
 
 SOURCES += \
     PIg/src/flashParam.cpp \
-    PIg/src/menu/dateTime.cpp \
-    PIg/src/menu/enterParam.cpp \
-    PIg/src/menu/menu.cpp \
-    PIg/src/menu/txCom.cpp \
-    PIg/src/paramGlb.cpp \
-    PIg/src/parameter/LocalParams.cpp \
     PIg/src/parameter/param.cpp \
-    PIg/src/protocols/iec101/CIec101.cpp \
-    PIg/src/protocols/iec101/protocolPcI.cpp \
-    PIg/src/protocols/modbus/protocolModbus.cpp \
-    PIg/src/protocols/modbus/protocolPcM.cpp \
-    PIg/src/protocols/standart/protocolBspS.cpp \
-    PIg/src/protocols/standart/protocolPcS.cpp \
-    PIg/src/protocols/standart/protocolS.cpp \
     bsp.cpp \
     main.cpp \
     mainwindow.cpp \
-    qkeyboard.cpp \
     wrapper.cpp
 
 HEADERS += \
     PIg/src/avr.h \
     PIg/src/debug/debug.hpp \
-    PIg/src/drivers/keyboard.h \
-    PIg/src/drivers/ks0108.h \
-    PIg/src/drivers/tmp75.h \
-    PIg/src/drivers/uart.h \
     PIg/src/flash.h \
     PIg/src/flashParams.h \
     PIg/src/glbDefine.h \
-    PIg/src/menu/dateTime.hpp \
     PIg/src/menu/deviceStatus.hpp \
-    PIg/src/menu/enterParam.h \
-    PIg/src/menu/journalEntry.hpp \
-    PIg/src/menu/jrnScada.hpp \
-    PIg/src/menu/menu.h \
-    PIg/src/menu/menuPunkt.h \
-    PIg/src/menu/txCom.hpp \
-    PIg/src/paramBsp.h \
-    PIg/src/paramDef.h \
-    PIg/src/paramGlb.h \
     PIg/src/paramIS.h \
-    PIg/src/paramPrd.h \
-    PIg/src/paramPrm.h \
     PIg/src/paramUart.h \
-    PIg/src/parameter/LocalParams.h \
     PIg/src/parameter/param.h \
-    PIg/src/protocols/iec101/CIec101.h \
-    PIg/src/protocols/iec101/protocolPcI.h \
-    PIg/src/protocols/modbus/protocolModbus.h \
-    PIg/src/protocols/modbus/protocolPcM.h \
-    PIg/src/protocols/standart/protocolBspS.h \
-    PIg/src/protocols/standart/protocolPcS.h \
-    PIg/src/protocols/standart/protocolS.h \
     bsp.h \
     mainwindow.h \
-    qkeyboard.h \
     wrapper.hpp
 
 FORMS += \
-    mainwindow.ui \
-    qkeyboard.ui
+    mainwindow.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

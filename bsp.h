@@ -1,8 +1,8 @@
 #ifndef BSP_H
 #define BSP_H
 
-#include "PIg/src/protocols/standart/protocolBspS.h"
 #include <QComboBox>
+
 #include <QDateTime>
 #include <QLineEdit>
 #include <QMap>
@@ -12,6 +12,7 @@
 #include <QStringList>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
+#include "glbDefine.h"
 
 typedef QVector<uint8_t> pkg_t;
 
@@ -19,92 +20,25 @@ class Bsp : public QTreeWidget
 {
     Q_OBJECT
 
-    const QString msgSizeError = "Wrong size of data in command %1: %2";
-    const QString msgTimeSourceError = "Wrong source of time: %1";
+    static const QString msgSizeError;
+    static const QString msgTimeSourceError;
 
     struct state_t {
-        QComboBox regime;
-        QSpinBox state;
-        QSpinBox dopByte;
-        QLineEdit warning;
-        QLineEdit fault;
+        QComboBox *regime = nullptr;
+        QSpinBox *state = nullptr;
+        QSpinBox *dopByte = nullptr;
+        QLineEdit *warning = nullptr;
+        QLineEdit *fault = nullptr;
     };
 
 public:
     explicit Bsp(QWidget *parent = nullptr);
 
-    /** Передает пакет данных в БСП.
-     *
-     *  @param[in] pkg Данные.
-     */
-    void sendToBsp(pkg_t pkg);
-
-    /** Получает пакет данных из БСП
-     *
-     *  @return Данные.
-     */
-    pkg_t receiveFromBsp();
-
     /// Инициализация параметров.
     void initParam();
-
-public slots:
-    void setUser(int value);
-
-signals:
-    void debug(QString msg);
-    void userChanged(int value);
-
-private:
-    pkg_t pkgTx;        ///< Данные для передачи.
-    QDateTime dt;       ///< Дата и время.
-    stGBparam params;   ///< Параметры.
-    QTextCodec *codec;  ///< Кодек.
-
-    QRegExp pwdRegExp;
-    QRegExpValidator pwdValidator;
-    QRegExp errRegExp;
-    QRegExpValidator errValidator;
-
-    QMap<eGB_PARAM, QVector<QComboBox*>> mapCombobox;
-    QMap<eGB_PARAM, QLineEdit*> mapLineEdit;
-    QMap<eGB_PARAM, QVector<QSpinBox*>> mapSpinBox;
-
-    state_t stateDef;
-    state_t stateGlb;
-    state_t statePrm;
-    state_t statePrd;
-
-    QVector<eGB_COM> viewCom;
-
-    QComboBox regime;
-
-    /// Подсчет контрольной суммы.
-    uint8_t calcCrc(pkg_t &pkg);
-    /// Проверка пакета.
-    eGB_COM checkPkg(pkg_t &pkg);
     /// Инициализация времени.
-    void initClock();
-    /// Инициализация отладки.
-    void initDebug();
+    static void initClock();
 
-    /// Обработка команды.
-    void procCommand(eGB_COM com, pkg_t &data);
-    /// Обработка команд чтения журналов.
-    void procCommandReadJournal(eGB_COM com, pkg_t &data);
-    /// Обработка команд чтения параметров.
-    void procCommandReadParam(eGB_COM com, pkg_t &data);
-    /// Обработка команд записи параметров.
-    void procCommandWriteParam(eGB_COM com, pkg_t &data);
-    /// Обработка команд записи режима.
-    void procCommandWriteRegime(eGB_COM com, pkg_t &data);
-
-    /// Преобразование bcd кода в целое.
-    quint8 bcd2int(quint8 bcd, bool &ok) const;
-    /// Преобразование целого числа в bcd код.
-    quint8 int2bcd(quint8 val, bool &ok) const;
-
-    void crtTree();
     void crtTreeGlb();
     void crtTreeInterface();
     void crtTreePrd();
@@ -113,40 +47,86 @@ private:
     void crtTreeState(QTreeWidgetItem *top, std::string name, state_t &state);
     void crtTreeUser();
 
+    static QMap<eGB_PARAM, QVector<QComboBox*>> mapCombobox;
+    static QMap<eGB_PARAM, QLineEdit*> mapLineEdit;
+    static QMap<eGB_PARAM, QVector<QSpinBox*>> mapSpinBox;
+
+    static QTextCodec *codec;  ///< Кодек.
+    static QString getParamName(eGB_PARAM param);
+
+    static pkg_t pkgTx;    ///< Данные для передачи.
+    static QVector<eGB_COM> viewCom;   ///< Команды для вывода в консоль.
+
+    static quint8 getComboBoxValue(eGB_PARAM param, uint8_t number=1);
+    static quint8 getComboBoxValue(QComboBox *combobox);
+    static void setComboBoxValue(eGB_PARAM param, quint8 value, uint8_t number=1);
+    static void setComboBoxValueBits(eGB_PARAM param, quint8 value, uint8_t number=1);
+    static int setComboBoxValue(QComboBox *combobox, quint8 value);
+
+    static QString getLineEditValue(eGB_PARAM param);
+    static QString getLineEditValue(QLineEdit *lineedit);
+    static void setLineEditValue(eGB_PARAM param, std::string value);
+    static int setLineEditValue(QLineEdit *lineedit, std::string value);
+
+    static qint16 getSpinBoxValue(eGB_PARAM param, uint8_t number=1);
+    static qint16 getSpinBoxValue(QSpinBox *spinbox);
+    static void setSpinBoxValue(eGB_PARAM param, qint16 value, uint8_t number=1);
+    static int setSpinBoxValue(QSpinBox *spinbox, qint16 value);
+
+    static state_t stateDef;
+    static state_t stateGlb;
+    static state_t statePrm;
+    static state_t statePrd;
+
+    /// Обработка команды.
+    static void procCommand(eGB_COM com, pkg_t &data);
+
+public slots:
+
+
+private:
+    static QDateTime *dt;   ///< Дата и время.
+
+    QRegExp pwdRegExp;
+    QRegExpValidator pwdValidator;
+    QRegExp errRegExp;
+    QRegExpValidator errValidator;
+
+    /// Инициализация отладки.
+    void initDebug();
+
     void crtComboBox(eGB_PARAM param);
     void fillComboboxList(QComboBox *combobox, eGB_PARAM param);
     void fillComboboxListRegime(QComboBox *combobox);
-    quint8 getComboBoxValue(eGB_PARAM param, uint8_t number=1);
-    quint8 getComboBoxValue(QComboBox *combobox);
-    void setComboBoxValue(eGB_PARAM param, quint8 value, uint8_t number=1);
-    void setComboBoxValueBits(eGB_PARAM param, quint8 value, uint8_t number=1);
-    int setComboBoxValue(QComboBox *combobox, quint8 value);
 
     void crtLineEdit(eGB_PARAM param, std::string);
-    QString getLineEditValue(eGB_PARAM param);
-    QString getLineEditValue(QLineEdit *lineedit);
-    void setLineEditValue(eGB_PARAM param, std::string value);
-    int setLineEditValue(QLineEdit *lineedit, std::string value);
 
     void crtSpinBox(eGB_PARAM param);
-    qint16 getSpinBoxValue(eGB_PARAM param, uint8_t number=1);
-    qint16 getSpinBoxValue(QSpinBox *spinbox);
-    void setSpinBoxValue(eGB_PARAM param, qint16 value, uint8_t number=1);
-    int setSpinBoxValue(QSpinBox *spinbox, qint16 value);
-
-    QString getParamName(eGB_PARAM param);
 
     void keyPressEvent(QKeyEvent *event) override;
 
-private slots:
-    void updateClock();
-    void setRegime(int index);
-    void setState(int index);
-    void setDopByte(int index);
-    void setLocalValues(int value);
+    /// Преобразование bcd кода в целое.
+    static quint8 bcd2int(quint8 bcd, bool &ok);
+    /// Преобразование целого числа в bcd код.
+    static quint8 int2bcd(quint8 val, bool &ok);
 
-    void hdlrComNetAdrGet(eGB_COM com, pkg_t data);
-    void hdlrComNetAdrSet(eGB_COM com, pkg_t data);
+    /// Обработка команд чтения журналов.
+    static void procCommandReadJournal(eGB_COM com, pkg_t &data);
+    /// Обработка команд чтения параметров.
+    static void procCommandReadParam(eGB_COM com, pkg_t &data);
+    /// Обработка команд записи параметров.
+    static void procCommandWriteParam(eGB_COM com, pkg_t &data);
+    /// Обработка команд записи режима.
+    static void procCommandWriteRegime(eGB_COM com, pkg_t &data);
+
+    static void hdlrComNetAdrGet(eGB_COM com, pkg_t data);
+    static void hdlrComNetAdrSet(eGB_COM com, pkg_t data);
+
+private slots:
+    static void setRegime(int index);
+    static void setState(int index);
+    static void setDopByte(int index);
+    static void updateClock();
 };
 
 #endif // BSP_H

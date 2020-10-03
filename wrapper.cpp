@@ -17,21 +17,17 @@ void vKEYmain(void) {
 }
 
 void vKEYset(eGB_TYPE_DEVICE type) {
-    w->ui->kbd->setType(type);
 }
 
 eKEY eKEYget(void) {
-    return w->ui->kbd->getKey();
+
 }
 
 uint8_t timePressKey() {
-    // FIXME В оригинале имеется еще обработка длительного нажатия кнопки.
-    return 0;
 }
 
 void vLCDclear(void) {
-    text.clear();
-    w->ui->textEdit->clear();
+
 }
 
 void vLCDinit(void) {
@@ -43,8 +39,7 @@ void vLCDmain(void) {
 }
 
 void vLCDrefresh(void) {
-    w->ui->textEdit->clear();
-    w->ui->textEdit->setText(text);
+
 }
 
 bool vLCDdrawBoard(uint8_t num) {
@@ -52,42 +47,13 @@ bool vLCDdrawBoard(uint8_t num) {
 }
 
 bool vLCDputchar(const char* buf, uint8_t num) {
-    QTextCodec *codec = QTextCodec::codecForName("CP1251");
 
-    text.clear();
-    for(quint8 row = 0; row < 7; row++) {
-        for(quint16 col = 0; col < 20; col++) {
-            char symbol = (row == num) ? '=' : *buf++;
-            if (symbol == '\0') {
-                symbol = ' ';
-            }
-            text += codec->toUnicode(&symbol, 1);
-        }
-        if (row != 6) {
-            text += "\n";
-        }
-    }
-
-    return true;
 }
 
 void vLCDsetLed(eLCD_LED val) {
-    if (val == LED_SWITCH)
-        uLedTimeOn = LCD_TIME_LED_ON;
-    else
-        eLed = val;
+
 }
 
 void vLCDled() {
-    const uint16_t step = 20; // период вызова/10мс
-    bool enable = false;
 
-    if (eLed == LED_ON) {
-        enable = true;
-    } else if (uLedTimeOn > 0) {
-       uLedTimeOn = (uLedTimeOn > step) ? uLedTimeOn - step : 0;
-       enable = uLedTimeOn > 0;
-    }
-
-    w->setBacklight(enable);
 }

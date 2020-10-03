@@ -2,70 +2,42 @@
 #define MAINWINDOW_H
 
 #include <QDateTime>
-#include <QMainWindow>
-#include "wrapper.hpp"
+#include <QWidget>
 #include "bsp.h"
 
-#include "PIg/src/drivers/ks0108.h"
-#include "PIg/src/menu/menu.h"
-#include "PIg/src/protocols/standart/protocolBspS.h"
-
-
-QT_BEGIN_NAMESPACE
-namespace Ui { class MainWindow; }
-QT_END_NAMESPACE
-
-class MainWindow : public QMainWindow
-{
+class MainWindow : public QWidget {
     Q_OBJECT
-
-    friend void vKEYmain(void);
-    friend void vKEYset(eGB_TYPE_DEVICE type);
-    friend eKEY eKEYget(void);
-    friend uint8_t timePressKey();
-    friend void vLCDclear(void);
-    friend void vLCDinit(void);
-    friend void vLCDmain(void);
-    friend void vLCDrefresh(void);
-    friend bool vLCDdrawBoard(uint8_t num);
-    friend bool vLCDputchar(const char* buf, uint8_t num);
-    friend void vLCDsetLed(eLCD_LED val);
-    friend void vLCDled();
 
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-signals:
-    void userChanged(int value);
-
 private:
-    Ui::MainWindow *ui;
+    Bsp glb;
+    Bsp oth;
 
-    clMenu menu;        ///< Меню.
-
-    uint8_t bspBuf[128];        ///< Буфер для протокола общения с БСП.
-    clProtocolBspS *protBSPs;   ///< Протокол общения с БСП.
-
-    /// Инициализация параметров.
-    void initParam();
-    /// Обработчик событий.
-    bool eventFilter(QObject* object, QEvent* event) override;
     /// Обработчик события после отображения формы.
     void showEvent( QShowEvent* event ) override;
-    /// Обработка принятых сообщений из БСП
-    void uartRead();
-    /// Передача сообщений в БСП.
-    void uartWrite();
+
+    /// Подсчет контрольной суммы.
+    uint8_t calcCrc(pkg_t &pkg);
+    /// Проверка пакета.
+    eGB_COM checkPkg(pkg_t &pkg); 
+
+    /** Получает пакет данных из БСП
+     *
+     *  @return Данные.
+     */
+    pkg_t receiveFromBsp();
+
+    /** Передает пакет данных в БСП.
+     *
+     *  @param[in] pkg Данные.
+     */
+    void sendToBsp(pkg_t pkg);
 
 private slots:
-    void cycleMenu();  ///< Цикл 200 мс.
-    void clearSelection();  ///< Очистка выделения в textEdit.
-    void printDebug(QString msg);
-    void setBacklight(bool enable);
-    void setUser(int value);
-};
 
-// Для использвоании в wrapper
-extern MainWindow *w;
+
+};
 #endif // MAINWINDOW_H
