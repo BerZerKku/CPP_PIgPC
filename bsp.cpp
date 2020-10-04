@@ -15,6 +15,7 @@ QMap<eGB_PARAM, QVector<QSpinBox*>> Bsp::mapSpinBox;
 
 QTextCodec *Bsp::codec = QTextCodec::codecForName("CP1251");
 
+Bsp::device_t Bsp::device;
 Bsp::state_t Bsp::stateDef;
 Bsp::state_t Bsp::stateGlb;
 Bsp::state_t Bsp::statePrm;
@@ -22,6 +23,7 @@ Bsp::state_t Bsp::statePrd;
 
 QDateTime *Bsp::dt = nullptr;
 pkg_t Bsp::pkgTx;
+pkg_t Bsp::pkgRx;
 
 QVector<eGB_COM> Bsp::viewCom;
 
@@ -61,7 +63,6 @@ void Bsp::initParam() {
 
     setLineEditValue(eGB_PARAM::GB_PARAM_IS_PWD_ENGINEER, "00000001");
     setLineEditValue(eGB_PARAM::GB_PARAM_IS_PWD_ADMIN, "00000002");
-    setComboBoxValue(eGB_PARAM::GB_PARAM_IS_USER, TUser::OPERATOR);
     setSpinBoxValue(eGB_PARAM::GB_PARAM_IS_PWD_ENG_CNT, 2);
     setSpinBoxValue(eGB_PARAM::GB_PARAM_IS_PWD_ADM_CNT, 3);
 
@@ -101,27 +102,14 @@ void Bsp::initParam() {
         setSpinBoxValue(GB_PARAM_PRM_TIME_OFF, value / getFract(param), i);
     }
 
-//    params.def.status.setEnable(false);
-//    params.prm.setNumCom(32);
-//    params.prd.setNumCom(32);
-//    params.glb.setNumDevices(GB_NUM_DEVICES_2);
-//    params.glb.setDeviceNum(2);
-//    params.glb.setTypeLine(GB_TYPE_LINE_OPTO);
-//    params.glb.setVersProgIC16(0x1112, GB_IC_BSP_MCU);
-//    params.glb.setVersProgIC16(0x2122, GB_IC_BSP_DSP);
-//    params.glb.setVersProgIC16(0x3132, GB_IC_PI_MCU);
-//    params.glb.setVersProgIC16(0x4142, GB_IC_BSP_DSP_PLIS);
-//    params.glb.setVersProgIC8(0x51, GB_IC_BSK_PLIS_PRD1);
-//    params.glb.setVersProgIC8(0x61, GB_IC_BSK_PLIS_PRD2);
-//    params.glb.setVersProgIC8(0x71, GB_IC_BSK_PLIS_PRM1);
-//    params.glb.setVersProgIC8(0x81, GB_IC_BSK_PLIS_PRM2);
-//    params.glb.setVersProgIC8(0x91, GB_IC_BSZ_PLIS);
-//    params.glb.setCompatibility(GB_COMPATIBILITY_AVANT);
-//    params.glb.setCompK400(GB_COMP_K400_AVANT);
-
-    // TypeDevice + TypeOpto = TypeDevice(AVANT_OPTO)
-//    params.glb.setTypeDevice(AVANT_K400);
-//    params.glb.setTypeOpto(TYPE_OPTO_STANDART);
+    setComboBoxValue(device.isDef, 0);
+    setSpinBoxValue(GB_PARAM_PRM_COM_NUMS, 32);
+    setSpinBoxValue(GB_PARAM_PRD_COM_NUMS, 32);
+    setComboBoxValue(GB_PARAM_NUM_OF_DEVICES, GB_NUM_DEVICES_2);
+    setComboBoxValue(device.typeLine, GB_TYPE_LINE_OPTO);
+    setComboBoxValue(GB_PARAM_COMP_K400, 0);
+    setComboBoxValue(device.typeDevice, AVANT_K400);
+    setComboBoxValue(device.typeOpto, TYPE_OPTO_STANDART);
 
 //    params.glb.setDInputState(0);
 //    params.prm.setIndCom8(0, 0);
@@ -143,6 +131,93 @@ void Bsp::initClock() {
         QObject::connect(timerClock, &QTimer::timeout, &Bsp::updateClock);
         timerClock->start(1000);
     }
+}
+
+//
+uint8_t Bsp::calcCrc(QVector<uint8_t> &pkg) {
+    uint8_t crc = 0;
+
+    for(uint8_t byte: pkg) {
+        crc += byte;
+    }
+
+    return crc;
+}
+
+//
+eGB_COM Bsp::checkPkg(QVector<uint8_t> &pkg) {
+    eGB_COM com = GB_COM_NO;
+
+    uint8_t byte;
+
+    byte = pkg.takeFirst();
+    if (byte != 0x55) {
+        return GB_COM_NO;
+    }
+
+    byte = pkg.takeFirst();
+    if (byte != 0xAA) {
+        return GB_COM_NO;
+    }
+
+    byte = pkg.takeLast();
+    if (byte != calcCrc(pkg)) {
+        return GB_COM_NO;
+    }
+
+    com = static_cast<eGB_COM> (pkg.takeFirst());
+
+    byte = pkg.takeFirst();
+    if (byte != pkg.size()) {
+        return GB_COM_NO;
+    }
+
+    return com;
+}
+
+void Bsp::crtTreeDevice() {
+    QTreeWidgetItem* top = new QTreeWidgetItem();
+    insertTopLevelItem(topLevelItemCount(), top);
+    top->setText(0, codec->toUnicode("Устройство"));
+
+    QTreeWidgetItem *item = nullptr;
+
+    item = new QTreeWidgetItem();
+    device.isDef = new QComboBox();
+    item->setText(0, codec->toUnicode("Защита"));
+    top->addChild(item);
+    fillComboboxListOnOff(device.isDef);
+    setItemWidget(item, 1, device.isDef);
+
+    crtSpinBox(GB_PARAM_PRM_COM_NUMS);
+    crtSpinBox(GB_PARAM_PRD_COM_NUMS);
+    crtComboBox(GB_PARAM_NUM_OF_DEVICES);
+
+    item = new QTreeWidgetItem();
+    device.typeLine = new QComboBox();
+    item->setText(0, codec->toUnicode("Тип линии"));
+    top->addChild(item);
+    fillComboboxListTypeLine(device.typeLine);
+    setItemWidget(item, 1, device.typeLine);
+
+    // FIXME Может быть еще Р400
+    crtComboBox(GB_PARAM_COMP_K400);
+
+    item = new QTreeWidgetItem();
+    device.typeDevice = new QComboBox();
+    item->setText(0, codec->toUnicode("Тип аппарата"));
+    top->addChild(item);
+    fillComboboxListTypeDevice(device.typeDevice);
+    setItemWidget(item, 1, device.typeDevice);
+
+    item = new QTreeWidgetItem();
+    device.typeOpto = new QComboBox();
+    item->setText(0, codec->toUnicode("Тип оптики"));
+    top->addChild(item);
+    fillComboboxListTypeOpto(device.typeOpto);
+    setItemWidget(item, 1, device.typeOpto);
+
+    top->setExpanded(true);
 }
 
 void Bsp::crtTreeGlb() {
@@ -302,13 +377,11 @@ void Bsp::crtTreeUser() {
     pwdRegExp.setPattern("[0-9]+");
     pwdValidator.setRegExp(pwdRegExp);
 
-    crtComboBox(GB_PARAM_IS_USER);
+//    crtComboBox(GB_PARAM_IS_USER);
     crtLineEdit(GB_PARAM_IS_PWD_ENGINEER, "00000000");
     crtSpinBox(GB_PARAM_IS_PWD_ENG_CNT);
     crtLineEdit(GB_PARAM_IS_PWD_ADMIN, "00000000");
     crtSpinBox(GB_PARAM_IS_PWD_ADM_CNT);
-
-    mapCombobox.value(GB_PARAM_IS_USER).at(0)->setEnabled(true);
 
     top->setExpanded(true);
 }
@@ -382,11 +455,48 @@ void Bsp::fillComboboxList(QComboBox *combobox, eGB_PARAM param) {
 }
 
 //
+void Bsp::fillComboboxListOnOff(QComboBox *combobox) {
+    if (combobox != nullptr) {
+        for(uint8_t i = 0; i < SIZE_OF(fcOnOff); i++) {
+            combobox->addItem(codec->toUnicode(fcOnOff[i]), i);
+        }
+    }
+}
+
+//
 void Bsp::fillComboboxListRegime(QComboBox *combobox) {
     if (combobox != nullptr) {
         for(uint8_t i = 0; i < eGB_REGIME::GB_REGIME_MAX; i++) {
             combobox->addItem(codec->toUnicode(fcRegime[i]), i);
         }
+    }
+}
+
+//
+void Bsp::fillComboboxListTypeDevice(QComboBox *combobox) {
+    if (combobox != nullptr) {
+        combobox->addItem(codec->toUnicode("Р400"), AVANT_R400);
+        combobox->addItem(codec->toUnicode("РЗСК"), AVANT_RZSK);
+        combobox->addItem(codec->toUnicode("К400"), AVANT_K400);
+        combobox->addItem(codec->toUnicode("Р400М"), AVANT_R400M);
+    }
+}
+
+//
+void Bsp::fillComboboxListTypeLine(QComboBox *combobox) {
+    if (combobox != nullptr) {
+        combobox->addItem(codec->toUnicode("ВЧ"), GB_TYPE_LINE_UM);
+        combobox->addItem(codec->toUnicode("ВОЛС"), GB_TYPE_LINE_OPTO);
+        combobox->addItem(codec->toUnicode("Е1"), GB_TYPE_LINE_E1);
+    }
+}
+
+//
+void Bsp::fillComboboxListTypeOpto(QComboBox *combobox) {
+    if (combobox != nullptr) {
+        combobox->addItem(codec->toUnicode("Стандартная"), TYPE_OPTO_STANDART);
+        combobox->addItem(codec->toUnicode("Кольцо"), TYPE_OPTO_RING_UNI);
+        combobox->addItem(codec->toUnicode("Двунапр. кольцо"), TYPE_OPTO_RING_BI);
     }
 }
 
@@ -526,7 +636,7 @@ void Bsp::setComboBoxValue(eGB_PARAM param, quint8 value, uint8_t number) {
         }
     } else {
         QString msg = QString("%1: Parameter '%2' (%3) not found.").
-                      arg(__FUNCTION__).arg(getParamName(param)).arg(number);
+                      arg(__FUNCTION__).arg(param).arg(number);
         qWarning() << msg;
     }
 }
@@ -670,6 +780,8 @@ int Bsp::setSpinBoxValue(QSpinBox *spinbox, qint16 value) {
 
 //
 void Bsp::procCommand(eGB_COM com, pkg_t &data) {
+    qDebug() << "com = " << hex << com;
+
     switch(com & GB_COM_MASK_GROUP) {
     case GB_COM_MASK_GROUP_READ_PARAM: {
         procCommandReadParam(com, data);
@@ -965,47 +1077,7 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data) {
     } break;
 
     case GB_COM_GET_VERS: {
-        uint16_t vers = 0;
-
-        //            pkgTx.append(com);
-        //            pkgTx.append(params.def.status.isEnable() ? 1 : 0);
-        //            pkgTx.append(params.prm.getNumCom() / 4); // прм1
-        //            pkgTx.append(params.prm.getNumCom() / 4); // прм2
-        //            pkgTx.append(params.prd.getNumCom() / 4);
-        //            pkgTx.append(params.glb.getNumDevices());
-        //            pkgTx.append(params.glb.getTypeLine());
-
-        //            vers = params.glb.getVersProgIC(GB_IC_BSP_MCU);
-        //            pkgTx.append(vers >> 8);
-        //            pkgTx.append(vers);
-        //            vers = params.glb.getVersProgIC(GB_IC_BSP_DSP);
-        //            pkgTx.append(vers >> 8);
-        //            pkgTx.append(vers);
-
-        //            pkgTx.append(params.glb.getCompatibility());
-
-        //            vers = params.glb.getVersProgIC(GB_IC_BSK_PLIS_PRD1);
-        //            pkgTx.append((vers >> 4) + vers);
-        //            vers = params.glb.getVersProgIC(GB_IC_BSK_PLIS_PRD2);
-        //            pkgTx.append((vers >> 4) + vers);
-        //            vers = params.glb.getVersProgIC(GB_IC_BSK_PLIS_PRM1);
-        //            pkgTx.append((vers >> 4) + vers);
-        //            vers = params.glb.getVersProgIC(GB_IC_BSK_PLIS_PRM2);
-        //            pkgTx.append((vers >> 4) + vers);
-        //            vers = params.glb.getVersProgIC(GB_IC_BSZ_PLIS);
-        //            pkgTx.append((vers >> 4) + vers);
-
-        //            pkgTx.append(params.glb.getTypeDevice());
-
-        //            vers = params.glb.getVersProgIC(GB_IC_PI_MCU);
-        //            pkgTx.append(vers >> 8);
-        //            pkgTx.append(vers);
-
-        //            pkgTx.append(params.glb.getTypeOpto());
-
-        //            vers = params.glb.getVersProgIC(GB_IC_BSP_DSP);
-        //            pkgTx.append(vers >> 8);
-        //            pkgTx.append(vers);
+        hdlrComGetVers(com, data);
     } break;
 
     default: {
@@ -1140,11 +1212,56 @@ void Bsp::procCommandWriteRegime(eGB_COM com, pkg_t &data) {
     }
 }
 
-//
-void  Bsp::hdlrComNetAdrGet(eGB_COM com, pkg_t data) {
+void Bsp::hdlrComGetVers(eGB_COM com, pkg_t data) {
+    uint16_t vers = 0;
+
     if (data.size() != 0) {
         qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
     }
+    //
+    pkgTx.append(com);
+    pkgTx.append(getComboBoxValue(device.isDef) ? 1 : 0);
+    pkgTx.append(getSpinBoxValue(GB_PARAM_PRM_COM_NUMS) / 4); // прм1
+    pkgTx.append(getSpinBoxValue(GB_PARAM_PRM_COM_NUMS) / 4); // прм2
+    pkgTx.append(getSpinBoxValue(GB_PARAM_PRD_COM_NUMS) / 4);
+    pkgTx.append(getComboBoxValue(GB_PARAM_NUM_OF_DEVICES));
+    pkgTx.append(getComboBoxValue(device.typeLine));
+
+    vers = 0x1001;  // GB_IC_BSP_MCU
+    pkgTx.append(vers >> 8);
+    pkgTx.append(vers);
+    vers = 0x2002;  // GB_IC_BSP_DSP
+
+    // FIXME В Р400 отдельная
+    pkgTx.append(getComboBoxValue(GB_PARAM_COMP_K400));
+
+    vers = 0x33;    // GB_IC_BSK_PLIS_PRD1
+    pkgTx.append(vers);
+    vers = 0x44;    // GB_IC_BSK_PLIS_PRD2
+    pkgTx.append(vers);
+    vers = 0x55;    // GB_IC_BSK_PLIS_PRM1
+    pkgTx.append(vers);
+    vers = 0x66;    // GB_IC_BSK_PLIS_PRM2
+    pkgTx.append(vers);
+    vers = 0x77;    // GB_IC_BSZ_PLIS
+    pkgTx.append(vers);
+
+    pkgTx.append(getComboBoxValue(device.typeDevice));
+
+    vers = 0x8008;  // GB_IC_PI_MCU
+    pkgTx.append(vers >> 8);
+    pkgTx.append(vers);
+
+    pkgTx.append(getComboBoxValue(device.typeOpto));
+
+    vers = 0x9009;  // GB_IC_BSP_DSP
+    pkgTx.append(vers >> 8);
+    pkgTx.append(vers);
+}
+
+//
+void  Bsp::hdlrComNetAdrGet(eGB_COM com, pkg_t data) {
+
     //
     pkgTx.append(com);
     qint16 value = getSpinBoxValue(GB_PARAM_NET_ADDRESS);
@@ -1250,7 +1367,7 @@ void  Bsp::hdlrComNetAdrSet(eGB_COM com, pkg_t data)
     }
 
     data.clear();
-    hdlrComNetAdrGet(GB_COM_GET_NET_ADR, data);
+    hdlrComNetAdrGet(com, data);
 }
 
 //
@@ -1277,5 +1394,4 @@ void Bsp::setDopByte(int index) {
 //
 void Bsp::updateClock() {
     *dt = dt->addSecs(1);
-    qDebug() << *dt;
 }

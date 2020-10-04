@@ -44,6 +44,7 @@ SOURCES += \
     bsp.cpp \
     main.cpp \
     mainwindow.cpp \
+    serialport.cpp \
     wrapper.cpp
 
 HEADERS += \
@@ -58,6 +59,7 @@ HEADERS += \
     PIg/src/parameter/param.h \
     bsp.h \
     mainwindow.h \
+    serialport.h \
     wrapper.hpp
 
 FORMS += \

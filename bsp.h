@@ -31,6 +31,13 @@ class Bsp : public QTreeWidget
         QLineEdit *fault = nullptr;
     };
 
+    struct device_t {
+        QComboBox *isDef = nullptr;
+        QComboBox *typeDevice = nullptr;
+        QComboBox *typeLine = nullptr;
+        QComboBox *typeOpto = nullptr;
+    };
+
 public:
     explicit Bsp(QWidget *parent = nullptr);
 
@@ -39,6 +46,12 @@ public:
     /// Инициализация времени.
     static void initClock();
 
+    /// Подсчет контрольной суммы.
+    static uint8_t calcCrc(pkg_t &pkg);
+    /// Проверка пакета.
+    static eGB_COM checkPkg(pkg_t &pkg);
+
+    void crtTreeDevice();
     void crtTreeGlb();
     void crtTreeInterface();
     void crtTreePrd();
@@ -54,7 +67,8 @@ public:
     static QTextCodec *codec;  ///< Кодек.
     static QString getParamName(eGB_PARAM param);
 
-    static pkg_t pkgTx;    ///< Данные для передачи.
+    static pkg_t pkgRx; ///< Данные на приеме.
+    static pkg_t pkgTx; ///< Данные для передачи.
     static QVector<eGB_COM> viewCom;   ///< Команды для вывода в консоль.
 
     static quint8 getComboBoxValue(eGB_PARAM param, uint8_t number=1);
@@ -73,16 +87,20 @@ public:
     static void setSpinBoxValue(eGB_PARAM param, qint16 value, uint8_t number=1);
     static int setSpinBoxValue(QSpinBox *spinbox, qint16 value);
 
+    static device_t device;
     static state_t stateDef;
     static state_t stateGlb;
     static state_t statePrm;
     static state_t statePrd;
+
 
     /// Обработка команды.
     static void procCommand(eGB_COM com, pkg_t &data);
 
 public slots:
 
+signals:
+    void writeByte(int value);
 
 private:
     static QDateTime *dt;   ///< Дата и время.
@@ -97,7 +115,11 @@ private:
 
     void crtComboBox(eGB_PARAM param);
     void fillComboboxList(QComboBox *combobox, eGB_PARAM param);
+    void fillComboboxListOnOff(QComboBox *combobox);
     void fillComboboxListRegime(QComboBox *combobox);
+    void fillComboboxListTypeDevice(QComboBox *combobox);
+    void fillComboboxListTypeLine(QComboBox *combobox);
+    void fillComboboxListTypeOpto(QComboBox *combobox);
 
     void crtLineEdit(eGB_PARAM param, std::string);
 
@@ -119,6 +141,7 @@ private:
     /// Обработка команд записи режима.
     static void procCommandWriteRegime(eGB_COM com, pkg_t &data);
 
+    static void hdlrComGetVers(eGB_COM com, pkg_t data);
     static void hdlrComNetAdrGet(eGB_COM com, pkg_t data);
     static void hdlrComNetAdrSet(eGB_COM com, pkg_t data);
 

@@ -1,9 +1,17 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QDateTime>
-#include <QWidget>
 #include "bsp.h"
+#include <QDateTime>
+#include <QPointer>
+#include <QPushButton>
+#include <QSerialPort>
+#include <QSerialPortInfo>
+#include <QTimer>
+#include <QThread>
+#include <QWidget>
+#include <serialport.h>
+
 
 class MainWindow : public QWidget {
     Q_OBJECT
@@ -12,17 +20,23 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+signals:
+    void writeByte(int value);
+
 private:
     Bsp glb;
     Bsp oth;
 
+    QComboBox *cmbPort;
+    QPushButton *pbRefresh;
+    QPushButton *pbPort;
+
+    QPointer<SerialPort> port;
+    QPointer<QThread> thread;
+    QTimer timer;
+
     /// Обработчик события после отображения формы.
     void showEvent( QShowEvent* event ) override;
-
-    /// Подсчет контрольной суммы.
-    uint8_t calcCrc(pkg_t &pkg);
-    /// Проверка пакета.
-    eGB_COM checkPkg(pkg_t &pkg); 
 
     /** Получает пакет данных из БСП
      *
@@ -37,7 +51,9 @@ private:
     void sendToBsp(pkg_t pkg);
 
 private slots:
-
-
+    void refreshPortList();
+    void connectSerialPort();
+    void closeSerialPort();
+    void readByte(int value);
 };
 #endif // MAINWINDOW_H

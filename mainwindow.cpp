@@ -4,9 +4,10 @@
 #include <QDebug>
 #include <QFontMetrics>
 #include <QKeyEvent>
-#include <QTimer>
+#include <QLabel>
 #include <QScrollBar>
 #include <QTextCodec>
+#include <QTimer>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include "PIg/src/parameter/param.h"
@@ -14,15 +15,36 @@
 MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("Windows-1251"));
 
-    QHBoxLayout *l = new QHBoxLayout(this);  
+    setWindowTitle("BSP");
 
-    l->addWidget(&glb);
-    l->addWidget(&oth);
+    QHBoxLayout *hl = new QHBoxLayout(this);
 
+    QLabel *lport = new QLabel("Port:");
+
+    cmbPort = new QComboBox();
+    QSizePolicy sizePolicy2(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    sizePolicy2.setHorizontalStretch(1);
+    sizePolicy2.setVerticalStretch(0);
+    cmbPort->setSizePolicy(sizePolicy2);
+    pbRefresh = new QPushButton("Refresh");
+    pbPort = new QPushButton("Open");
+    QHBoxLayout *hlport = new QHBoxLayout();
+    hlport->addWidget(lport);
+    hlport->addWidget(cmbPort);
+    hlport->addWidget(pbRefresh);
+    hlport->addWidget(pbPort);
+
+    QVBoxLayout *vl = new QVBoxLayout();
+    vl->addLayout(hlport);
+    vl->addWidget(&glb);
+
+    hl->addLayout(vl);
+    hl->addWidget(&oth);
 
     glb.crtTreeUser();
     glb.crtTreeState();
     glb.crtTreeInterface();
+    glb.crtTreeDevice();
 
     oth.crtTreePrm();
     oth.crtTreePrd();
@@ -31,11 +53,17 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     glb.initParam();
 
     Bsp::initClock();
+
+    refreshPortList();
+    connect(pbRefresh, &QPushButton::clicked,
+            this, &MainWindow::refreshPortList);
+    connect(pbPort, &QPushButton::clicked,
+            this, &MainWindow::connectSerialPort);
 }
 
 //
 MainWindow::~MainWindow() {
-//    delete ui;
+    //    delete ui;
 }
 
 //
@@ -43,89 +71,125 @@ void MainWindow::showEvent(QShowEvent *event) {
     QWidget::showEvent(event);
 
     setMinimumHeight(750);
+    setFixedWidth(width());
     resize(sizeHint());
 }
 
 //
-uint8_t MainWindow::calcCrc(QVector<uint8_t> &pkg) {
-    uint8_t crc = 0;
+void MainWindow::refreshPortList() {
+    QString portname = cmbPort->currentText();
+    QList<QSerialPortInfo> infos = QSerialPortInfo::availablePorts();
 
-    for(uint8_t byte: pkg) {
-        crc += byte;
+    cmbPort->clear();
+    for (const QSerialPortInfo &info :infos) {
+        QString portname = info.portName();
+        cmbPort->addItem(portname);
     }
 
-    return crc;
+    if (portname.isEmpty()) {
+        portname = "tnt1";
+    }
+    cmbPort->setCurrentText(portname);
+    pbPort->setEnabled(cmbPort->count() != 0);
 }
 
 //
-eGB_COM MainWindow::checkPkg(QVector<uint8_t> &pkg) {
-    eGB_COM com = GB_COM_NO;
+void MainWindow::connectSerialPort() {
+    qDebug() << "";
 
-    uint8_t byte;
+    if (port.isNull() && thread.isNull()) {
 
-    byte = pkg.takeFirst();
-    if (byte != 0x55) {
-        return GB_COM_NO;
-    }
+        port = new SerialPort(cmbPort->currentText());
+        thread = new QThread(this);
 
-    byte = pkg.takeFirst();
-    if (byte != 0xAA) {
-        return GB_COM_NO;
-    }
+        connect(thread, &QThread::started, port, &SerialPort::start);
+        connect(thread, &QThread::finished, port, &SerialPort::stop);
+        connect(thread, &QThread::finished, thread, &QThread::deleteLater);
 
-    byte = pkg.takeLast();
-    if (byte != calcCrc(pkg)) {
-        return GB_COM_NO;
-    }
+        connect(port, &SerialPort::finished, this, &MainWindow::closeSerialPort);
 
-    com = static_cast<eGB_COM> (pkg.takeFirst());
+        connect(port, &SerialPort::finished, thread, &QThread::quit);
+        connect(port, &SerialPort::finished, &timer, &QTimer::stop);
+        connect(port, &SerialPort::finished, port, &SerialPort::deleteLater);
 
-    byte = pkg.takeFirst();
-    if (byte != pkg.size()) {
-        return GB_COM_NO;
-    }
+        connect(this, &MainWindow::writeByte, port, &SerialPort::writeByte);
+        connect(port, &SerialPort::readByte, this, &MainWindow::readByte);
 
-    return com;
-}
+        disconnect(pbPort, &QPushButton::clicked,
+                   this, &MainWindow::connectSerialPort);
+        connect(pbPort, &QPushButton::clicked, port, &SerialPort::stop);
 
-//
-pkg_t MainWindow::receiveFromBsp() {
-    pkg_t pkg;
+        cmbPort->setEnabled(false);
+        pbPort->setText("Close");
+        pbRefresh->setEnabled(false);
 
-    if (!Bsp::pkgTx.isEmpty()) {
-        pkg = Bsp::pkgTx;
-        Bsp::pkgTx.clear();
+        port->moveToThread(thread);
+        thread->start();
 
-        eGB_COM com = static_cast<eGB_COM> (pkg.first());
-        if (Bsp::viewCom.contains(com)) {
-
-            qDebug() << showbase << hex <<
-                QString("receiveFromBsp: ") << pkg;
-        }
-
-        pkg.insert(1, static_cast<uint8_t> (pkg.size() - 1));
-        pkg.append(calcCrc(pkg));
-        pkg.insert(0, 0xAA);
-        pkg.insert(0, 0x55);
-    }
-
-    return pkg;
-}
-
-//
-void MainWindow::sendToBsp(pkg_t pkg) {
-    eGB_COM com = checkPkg(pkg);
-
-    if (Bsp::viewCom.contains(com)) {
-        qDebug() << showbase << hex <<
-            QString("sendToBsp command ") << com <<
-            QString(" with data: ") << pkg;
-    }
-
-    Bsp::pkgTx.clear();
-    if (com != GB_COM_NO) {
-        Bsp::procCommand(com, pkg);
+        QObject::connect(&timer, &QTimer::timeout, port, &SerialPort::proc);
+        timer.start(5);
     } else {
-        qWarning() << "Message check error: " << showbase << hex << pkg;
+        qDebug() << "";
+    }
+}
+
+void MainWindow::closeSerialPort() {
+    connect(pbPort, &QPushButton::clicked,
+            this, &MainWindow::connectSerialPort);
+
+    cmbPort->setEnabled(true);
+    pbPort->setText("Open");
+    pbPort->setEnabled(true);
+    pbRefresh->setEnabled(true);
+}
+
+void MainWindow::readByte(int value) {
+    static pkg_t rx;
+    static uint8_t len = 0;
+
+    switch(rx.size()) {
+    case 0: {
+        if (value == 0x55) {
+            rx.clear();
+            rx.append(value);
+        }
+    } break;
+    case 1: {
+        if (value == 0xAA) {
+            rx.append(value);
+        } else {
+            rx.clear();
+        }
+    }break;
+    case 2: {
+        rx.append(value);
+    } break;
+    case 3: {
+        rx.append(value);
+        len = value;
+    } break;
+    default: {
+        rx.append(value);
+        if (len == 0) {
+            eGB_COM com = Bsp::checkPkg(rx);
+            if (com != GB_COM_NO) {
+                Bsp::procCommand(com, rx);
+                if (!Bsp::pkgTx.isEmpty()) {
+                    Bsp::pkgTx.insert(1, Bsp::pkgTx.size() - 1);
+                    Bsp::pkgTx.append(Bsp::calcCrc(Bsp::pkgTx));
+                    Bsp::pkgTx.insert(0, 0x55);
+                    Bsp::pkgTx.insert(1, 0xAA);
+                    qDebug() << hex << Bsp::pkgTx;
+                    for(uint8_t byte: Bsp::pkgTx) {
+                        emit writeByte(byte);
+                    }
+                    Bsp::pkgTx.clear();
+                }
+            }
+            rx.clear();
+        } else {
+            len--;
+        }
+    }
     }
 }
