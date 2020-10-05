@@ -39,8 +39,8 @@ void SerialPort::start() {
     if (port->open(QSerialPort::ReadWrite)) {
         connect(port, &QSerialPort::errorOccurred, this, &SerialPort::error);
         connect(port, &QSerialPort::readyRead, this, &SerialPort::readyReadSlot);
-        m_send = false;
         m_timeToFinishSendMs = 0.0;
+        bufTx.clear();
         m_byteSendMs = calcOneByteSendTime();
         qDebug() << "m_byteSendMs = " << m_byteSendMs;
         port->clear();
@@ -58,12 +58,12 @@ void SerialPort::stop() {
 
 //
 void SerialPort::writeByte(int byte) {
-    const char b = static_cast<char> (byte);
+//    const char b = static_cast<char> (byte);
 
-    if (port->isOpen()) {
-        port->write(&b, 1);
-        m_timeToFinishSendMs += m_byteSendMs;
+    if (port->isOpen()) {        
+        bufTx.append(byte);
         if (!timer->isActive()) {
+            m_timeToFinishSendMs = 0.0;
             timer->start();
         }
     } else {
@@ -74,20 +74,25 @@ void SerialPort::writeByte(int byte) {
 //
 void SerialPort::readyReadSlot() {
     for(auto &byte: port->readAll()) {
+        qDebug() << showbase << hex << byte;
         emit readByte(static_cast<uint8_t> (byte));
     }
 }
 
 //
 void SerialPort::timeoutSlot() {
-    if (m_timeToFinishSendMs > 0) {
-        m_timeToFinishSendMs -= 1.0;
-    }
+    m_timeToFinishSendMs += 1.0;    // 1.0 шаг таймера
 
-    if ((port->bytesToWrite() == 0) && (m_timeToFinishSendMs <= 0)) {
-        m_timeToFinishSendMs = 0.0;
-        timer->stop();
-        emit sendFinished();
+    while(m_timeToFinishSendMs >= m_byteSendMs) {
+        if (bufTx.isEmpty()) {
+            timer->stop();
+            emit sendFinished();
+            break;
+        }
+
+        char byte = bufTx.takeFirst();
+        qDebug() << showbase << hex << byte;
+        port->write(&byte, 1);
     }
 }
 

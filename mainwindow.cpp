@@ -61,6 +61,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->pbPortPc, &QPushButton::clicked,
             this, &MainWindow::connectSerialPortPc);
 
+    ui->lPortBsp->setFixedWidth(ui->lPortBsp->sizeHint().width());
+    ui->lPortPc->setFixedWidth(ui->lPortBsp->width());
+
     QTimer *timerMenu = new QTimer(this);
     connect(timerMenu, &QTimer::timeout, this, &MainWindow::cycleMenu);
     timerMenu->start(100);
@@ -105,8 +108,9 @@ bool MainWindow::uartRead() {
     protBSPs->checkStat();
     // Проверка наличия сообщения с БСП и ее обработка
     if (protBSPs->getCurrentStatus() == PRTS_STATUS_READ_OK) {
+        qDebug() << "getPackage";
         // проверка контрольной суммы полученного сообщения и
-        // обработка данных если она соответствует полученной
+        // обработка данных если она соответствует полученной        
         if (protBSPs->checkReadData()) {
             // обработка принятого сообщения
             protBSPs->getData(lastPcCom == protBSPs->getCurrentCom());
@@ -219,7 +223,7 @@ bool MainWindow::uartWrite() {
         for(uint8_t i = 0; i < len; i++) {
             pkg.append(bspBuf[i]);
         }
-        qDebug() << "Send from PC to BSP: " << showbase << hex << pkg;
+//        qDebug() << "Send from PC to BSP: " << showbase << hex << pkg;
     } else if (stat == PRTS_STATUS_NO) {
         // отправка запроса БСП
         eGB_COM com = menu.getTxCommand();
@@ -236,6 +240,7 @@ bool MainWindow::uartWrite() {
             emit  writeByteToBsp(bspBuf[i]);
         }
     }
+    qDebug() << "Send to BSP: " << showbase << hex << pkg;
 
     return true;
 }

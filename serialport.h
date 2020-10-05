@@ -32,10 +32,11 @@ private:
     qint32 m_baudrate = 0;
     QSerialPort *port = nullptr;
     QString m_portName;
-    bool m_send = false;
     QPointer<QTimer> timer;
     double m_timeToFinishSendMs = 0.0;
     double m_byteSendMs = 0.0;
+
+    QVector<uint8_t> bufTx;
 
     double calcOneByteSendTime() const;
 };
