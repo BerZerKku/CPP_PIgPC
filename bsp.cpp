@@ -103,8 +103,8 @@ void Bsp::initParam() {
     }
 
     setComboBoxValue(device.isDef, 0);
-    setSpinBoxValue(GB_PARAM_PRM_COM_NUMS, 32);
-    setSpinBoxValue(GB_PARAM_PRD_COM_NUMS, 32);
+    setSpinBoxValue(GB_PARAM_PRM_COM_NUMS, 8);  // количество команд = num*4
+    setSpinBoxValue(GB_PARAM_PRD_COM_NUMS, 8);  // количество команд = num*4
     setComboBoxValue(GB_PARAM_NUM_OF_DEVICES, GB_NUM_DEVICES_2);
     setComboBoxValue(device.typeLine, GB_TYPE_LINE_OPTO);
     setComboBoxValue(GB_PARAM_COMP_K400, 0);
@@ -756,12 +756,12 @@ void Bsp::setSpinBoxValue(eGB_PARAM param, qint16 value, uint8_t number) {
         spinbox = mapSpinBox.value(param).at(number-1);
         if (setSpinBoxValue(spinbox, value) == -1) {
             QString msg = QString("%1: Wrong value %2 for parameter '%3'.").
-                          arg(__FUNCTION__).arg(value).arg(getParamName(param));
+                          arg(__FUNCTION__).arg(value).arg(param);
             qWarning() << msg;
         }
     } else {
         QString msg = QString("%1: Parameter '%2' not found.").
-                      arg(__FUNCTION__).arg(getParamName(param));
+                      arg(__FUNCTION__).arg(param);
         qWarning() << msg;
     }
 }
@@ -951,29 +951,20 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data) {
         }
         //
         pkgTx.append(com);
-        //        pkgTx.append(getComboBoxValue(&stateDef.regime));
-        //        pkgTx.append(getSpinBoxValue(&stateDef.state));
-        //        pkgTx.append(getSpinBoxValue(&stateDef.dopByte));
-        //        pkgTx.append(getComboBoxValue(&statePrm.regime));
-        //        pkgTx.append(getSpinBoxValue(&statePrm.state));
-        //        pkgTx.append(getSpinBoxValue(&statePrm.dopByte));
-        //        pkgTx.append(getComboBoxValue(&statePrd.regime));
-        //        pkgTx.append(getSpinBoxValue(&statePrd.state));
-        //        pkgTx.append(getSpinBoxValue(&statePrd.dopByte));
-        //        // TODO Разобраться зачем нужен второй приемник
-        //        pkgTx.append(getComboBoxValue(&statePrm.regime));
-        //        pkgTx.append(getSpinBoxValue(&statePrd.state));
-        //        pkgTx.append(getSpinBoxValue(&statePrd.dopByte));
-        // FIXME Добавить параметры
-        pkgTx.append(0x11);
-        pkgTx.append(0x22);
-        pkgTx.append(0x33);
-        pkgTx.append(0x44);
-        pkgTx.append(0x55);
-        pkgTx.append(0x66);
-        pkgTx.append(0x77);
-        pkgTx.append(0x88);
-        pkgTx.append(0x07);
+        pkgTx.append(getComboBoxValue(stateDef.regime));
+        pkgTx.append(getSpinBoxValue(stateDef.state));
+        pkgTx.append(getSpinBoxValue(stateDef.dopByte));
+        pkgTx.append(getComboBoxValue(statePrm.regime));
+        pkgTx.append(getSpinBoxValue(statePrm.state));
+        pkgTx.append(getSpinBoxValue(statePrm.dopByte));
+        pkgTx.append(getComboBoxValue(statePrd.regime));
+        pkgTx.append(getSpinBoxValue(statePrd.state));
+        pkgTx.append(getSpinBoxValue(statePrd.dopByte));
+        // TODO Разобраться зачем нужен второй приемник
+        pkgTx.append(getComboBoxValue(statePrm.regime));
+        pkgTx.append(getSpinBoxValue(statePrd.state));
+        pkgTx.append(getSpinBoxValue(statePrd.dopByte));
+        // FIXME Добавить состояние индикации
     } break;
 
     case GB_COM_GET_FAULT: {
@@ -982,40 +973,41 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data) {
         if (!data.isEmpty()) {
             qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
         }
-        // FIXME Если на передатчик приходит одно любое предупреждение то выводится на экран "Предупреждение".
-        //        pkgTx.append(com);
-        //        value = getLineEditValue(&stateDef.fault).toUInt(&ok, 16);
-        //        pkgTx.append(static_cast<uint8_t> (value >> 8));
-        //        pkgTx.append(static_cast<uint8_t> (value));
-        //        value = getLineEditValue(&stateDef.warning).toUInt(&ok, 16);
-        //        pkgTx.append(static_cast<uint8_t> (value >> 8));
-        //        pkgTx.append(static_cast<uint8_t> (value));
-        //        value = getLineEditValue(&statePrm.fault).toUInt(&ok, 16);
-        //        pkgTx.append(static_cast<uint8_t> (value >> 8));
-        //        pkgTx.append(static_cast<uint8_t> (value));
-        //        value = getLineEditValue(&statePrm.warning).toUInt(&ok, 16);
-        //        pkgTx.append(static_cast<uint8_t> (value >> 8));
-        //        pkgTx.append(static_cast<uint8_t> (value));
-        //        value = getLineEditValue(&statePrd.fault).toUInt(&ok, 16);
-        //        pkgTx.append(static_cast<uint8_t> (value >> 8));
-        //        pkgTx.append(static_cast<uint8_t> (value));
-        //        value = getLineEditValue(&statePrd.warning).toUInt(&ok, 16);
-        //        pkgTx.append(static_cast<uint8_t> (value >> 8));
-        //        pkgTx.append(static_cast<uint8_t> (value));
-        //        value = getLineEditValue(&stateGlb.fault).toUInt(&ok, 16);
-        //        pkgTx.append(static_cast<uint8_t> (value >> 8));
-        //        pkgTx.append(static_cast<uint8_t> (value));
-        //        value = getLineEditValue(&stateGlb.warning).toUInt(&ok, 16);
-        //        pkgTx.append(static_cast<uint8_t> (value >> 8));
-        //        pkgTx.append(static_cast<uint8_t> (value));
+        // FIXME Если на передатчик приходит одно любое предупреждение то
+        // выводится на экран "Предупреждение", при этом код не известен.
+        pkgTx.append(com);
+        value = getLineEditValue(stateDef.fault).toUInt(&ok, 16);
+        pkgTx.append(static_cast<uint8_t> (value >> 8));
+        pkgTx.append(static_cast<uint8_t> (value));
+        value = getLineEditValue(stateDef.warning).toUInt(&ok, 16);
+        pkgTx.append(static_cast<uint8_t> (value >> 8));
+        pkgTx.append(static_cast<uint8_t> (value));
+        value = getLineEditValue(statePrm.fault).toUInt(&ok, 16);
+        pkgTx.append(static_cast<uint8_t> (value >> 8));
+        pkgTx.append(static_cast<uint8_t> (value));
+        value = getLineEditValue(statePrm.warning).toUInt(&ok, 16);
+        pkgTx.append(static_cast<uint8_t> (value >> 8));
+        pkgTx.append(static_cast<uint8_t> (value));
+        value = getLineEditValue(statePrd.fault).toUInt(&ok, 16);
+        pkgTx.append(static_cast<uint8_t> (value >> 8));
+        pkgTx.append(static_cast<uint8_t> (value));
+        value = getLineEditValue(statePrd.warning).toUInt(&ok, 16);
+        pkgTx.append(static_cast<uint8_t> (value >> 8));
+        pkgTx.append(static_cast<uint8_t> (value));
+        value = getLineEditValue(stateGlb.fault).toUInt(&ok, 16);
+        pkgTx.append(static_cast<uint8_t> (value >> 8));
+        pkgTx.append(static_cast<uint8_t> (value));
+        value = getLineEditValue(stateGlb.warning).toUInt(&ok, 16);
+        pkgTx.append(static_cast<uint8_t> (value >> 8));
+        pkgTx.append(static_cast<uint8_t> (value));
 
-        //        // TODO Разобраться зачем нужен второй приемник
-        //        value = getLineEditValue(&statePrm.fault).toUInt(&ok, 16);
-        //        pkgTx.append(static_cast<uint8_t> (value >> 8));
-        //        pkgTx.append(static_cast<uint8_t> (value));
-        //        value = getLineEditValue(&statePrm.warning).toUInt(&ok, 16);
-        //        pkgTx.append(static_cast<uint8_t> (value >> 8));
-        //        pkgTx.append(static_cast<uint8_t> (value));
+        // TODO Разобраться зачем нужен второй приемник
+        value = getLineEditValue(statePrm.fault).toUInt(&ok, 16);
+        pkgTx.append(static_cast<uint8_t> (value >> 8));
+        pkgTx.append(static_cast<uint8_t> (value));
+        value = getLineEditValue(statePrm.warning).toUInt(&ok, 16);
+        pkgTx.append(static_cast<uint8_t> (value >> 8));
+        pkgTx.append(static_cast<uint8_t> (value));
 
         // TODO Добавить байты данных для РЗСК
     } break;

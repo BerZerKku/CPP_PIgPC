@@ -100,7 +100,6 @@ void MainWindow::connectSerialPort() {
     qDebug() << "";
 
     if (port.isNull() && thread.isNull()) {
-
         port = new SerialPort(cmbPort->currentText());
         thread = new QThread(this);
 
