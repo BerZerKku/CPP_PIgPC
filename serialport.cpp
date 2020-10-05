@@ -14,7 +14,7 @@ SerialPort::~SerialPort() {
 void SerialPort::start() {
     if (port == nullptr) {
         port = new QSerialPort(m_portName);
-        if (!port->setBaudRate(19200)) {
+        if (!port->setBaudRate(4800)) {
             emit finished();
         }
     }

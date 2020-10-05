@@ -87,9 +87,11 @@ void MainWindow::refreshPortList() {
     }
 
     if (portname.isEmpty()) {
-        portname = "tnt1";
+        cmbPort->setCurrentText("COM21");
+        cmbPort->setCurrentText("tnt1");
+    } else {
+        cmbPort->setCurrentText(portname);
     }
-    cmbPort->setCurrentText(portname);
     pbPort->setEnabled(cmbPort->count() != 0);
 }
 
