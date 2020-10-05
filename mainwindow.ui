@@ -26,7 +26,7 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
-         <widget class="QLabel" name="lPort">
+         <widget class="QLabel" name="lPortBsp">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -34,12 +34,12 @@
            </sizepolicy>
           </property>
           <property name="text">
-           <string>Port:</string>
+           <string>Port BSP:</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QComboBox" name="cmbPort">
+         <widget class="QComboBox" name="cmbPortBsp">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
             <horstretch>1</horstretch>
@@ -49,14 +49,49 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pbRefresh">
+         <widget class="QPushButton" name="pbRefreshBsp">
           <property name="text">
            <string>Refresh</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pbPort">
+         <widget class="QPushButton" name="pbPortBsp">
+          <property name="text">
+           <string>Open</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <widget class="QLabel" name="lPortPc">
+          <property name="text">
+           <string>Port PC:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="cmbPortPc">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>1</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pbRefreshPc">
+          <property name="text">
+           <string>Refresh</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pbPortPc">
           <property name="text">
            <string>Open</string>
           </property>
@@ -139,7 +174,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>

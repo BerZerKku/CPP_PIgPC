@@ -15,6 +15,8 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow) {
     ui->setupUi(this);
 
+    setWindowTitle("BSP-PI");
+
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("Windows-1251"));
 
     connect(ui->textEdit, &QTextEdit::selectionChanged,
@@ -22,8 +24,11 @@ MainWindow::MainWindow(QWidget *parent)
 
     initParam();
 
-    protBSPs = new clProtocolBspS(bspBuf, sizeof(bspBuf), &menu.sParam);
+    protBSPs = new clProtocolBspS(bspBuf, SIZE_OF(bspBuf), &menu.sParam);
     protBSPs->setEnable(PRTS_STATUS_NO);
+
+    protPCs = new clProtocolPcS(pcBuf, SIZE_OF(pcBuf), &menu.sParam);
+    protPCs->setEnable(PRTS_STATUS_NO); // FIXME При работе других протоколов надо отключить!
 
     installEventFilter(this);
     ui->textEdit->installEventFilter(this);
@@ -44,12 +49,17 @@ MainWindow::MainWindow(QWidget *parent)
     // Удаляет движение содержимого при прокрутке колесика мышки над testEdit
     ui->textEdit->verticalScrollBar()->blockSignals(true);
 
-    refreshPortList();
+    refreshPortListBsp();
+    connect(ui->pbRefreshBsp, &QPushButton::clicked,
+            this, &MainWindow::refreshPortListBsp);
+    connect(ui->pbPortBsp, &QPushButton::clicked,
+            this, &MainWindow::connectSerialPortBSP);
 
-    connect(ui->pbRefresh, &QPushButton::clicked,
-            this, &MainWindow::refreshPortList);
-    connect(ui->pbPort, &QPushButton::clicked,
-            this, &MainWindow::connectSerialPort);
+    refreshPortListPc();
+    connect(ui->pbRefreshPc, &QPushButton::clicked,
+            this, &MainWindow::refreshPortListPc);
+    connect(ui->pbPortPc, &QPushButton::clicked,
+            this, &MainWindow::connectSerialPortPc);
 
     QTimer *timerMenu = new QTimer(this);
     connect(timerMenu, &QTimer::timeout, this, &MainWindow::cycleMenu);
@@ -84,51 +94,176 @@ void MainWindow::showEvent(QShowEvent *event) {
 }
 
 //
-void MainWindow::uartRead() {
+bool MainWindow::uartRead() {
+    bool stat = true;
+    // код запрашиваемой с ПК команды
+    static uint8_t lastPcCom = 0;
+    // кол-во неполученных сообщений с БСП
+    static uint8_t cntLostCom = 0;
+
+    // перед приемом проверим статус на залипание
     protBSPs->checkStat();
+    // Проверка наличия сообщения с БСП и ее обработка
     if (protBSPs->getCurrentStatus() == PRTS_STATUS_READ_OK) {
-        menu.setConnectionBsp(true);
+        // проверка контрольной суммы полученного сообщения и
+        // обработка данных если она соответствует полученной
         if (protBSPs->checkReadData()) {
-            protBSPs->getData(false);
+            // обработка принятого сообщения
+            protBSPs->getData(lastPcCom == protBSPs->getCurrentCom());
+
+            // проверка соответствия команды запрошенной с ПК и команды
+            // полученной от БСП и если совпадают пересылка сообщения на ПК
+            // для команды GB_COM_GET_VERS происходит добавление версии БСП-ПИ
+            if (lastPcCom == protBSPs->getCurrentCom()) {
+                if (protPCs->isEnable()) {
+                    if (protPCs->copyCommandFrom(protBSPs->buf)) {
+                        protPCs->modifyVersionCom();
+                    }
+                }
+            }
         }
+
+        // после принятия и обработки сообщения сбросим код предыдущей
+        // запрашиваемой команды
+        lastPcCom = 0;
+        // сброс счетчика потерянных сообщений с БСП
+        cntLostCom = 0;
     } else {
-//        qWarning() << "Read packet error!";
+        // в случае превышения порога потерянных сообщений при обмене с БСП
+        // флаг состояния сбрасывается в False
+        if (cntLostCom < MAX_LOST_COM_FROM_BSP)
+            cntLostCom++;
+        else
+            stat = false;
     }
+
+    if (protPCs->isEnable()) {
+        // перед приемом проверим статус на залипание
+        protPCs->checkStat();
+        // проверка наличия команды с ПК и ее обработка
+        if (protPCs->getCurrentStatus() == PRTS_STATUS_READ_OK) {
+            // проверка контрольной суммы полученного сообщения и
+            // обработка данных если она соответствует полученной
+            if (protPCs->checkReadData()) {
+                // обработка принятого сообщения
+                // если сообщение небыло обработано, перешлем его в БСП
+                // (т.е. если это не запрос/изменение пароля)
+                if (!protPCs->getData()) {
+                    etimer.start();
+                    // сохранение запрашиваемой ПК команды
+                    lastPcCom = protPCs->getCurrentCom();
+                   // пересылка сообщения в БСП
+                    if (protBSPs->getCurrentStatus() == PRTS_STATUS_NO) {
+                        protBSPs->copyCommandFrom(protPCs->buf);
+                        protPCs->setCurrentStatus(PRTS_STATUS_WAIT_ANSWER);
+                    }
+                }
+            }
+        }
+    }
+    //        else if (protPCm.isEnable()) {
+    //            if (protPCm.isReadData()) {
+    //                protPCm.readData();
+    //            }
+    //        } else if (protPCi.isEnable()) {
+    //            if (protPCi.isReadData()) {
+    //                protPCi.readData();
+    //            }
+    //        }
+
+    return stat;
 }
 
 //
-void MainWindow::uartWrite() {
-    protBSPs->checkStat();
-    if (protBSPs->getCurrentStatus() == PRTS_STATUS_NO) {
-        eGB_COM com = menu.getTxCommand();
-        if (com != GB_COM_NO) {
-            uint16_t num = protBSPs->sendData(com);
-            for(uint16_t i = 0; i < num; i++) {
-                emit  writeByte(bspBuf[i]);
-            }
-            protBSPs->setCurrentStatus(PRTS_STATUS_NO);
-        } else {
-            qWarning() << "No send package!";
+bool MainWindow::uartWrite() {
+    QVector<uint8_t> pkg;
+    uint8_t len = 0;
+
+    if (protPCs->isEnable()) {
+        // Перед передачей проверим статус протокола на залипание.
+        protPCs->checkStat();
+        // проверка необходимости передачи команды на ПК и ее отправка
+        ePRTS_STATUS stat = protPCs->getCurrentStatus();
+        if (stat == PRTS_STATUS_WRITE_PC) {            
+            // пересылка ответа БСП
+            len = protPCs->trCom();            
+        } else if (stat == PRTS_STATUS_WRITE) {
+            // отправка ответа ПИ
+            len = protPCs->trCom();
         }
     }
+//    else if (protPCm.isEnable()) {
+//        uartPC.trData(protPCm.sendData());
+//    } else if (protPCi.isEnable()) {
+//        uartPC.trData(protPCi.sendData());
+//    }
+    pkg.clear();
+    if (len > 0) {
+        for(uint8_t i = 0; i < len; i++) {
+            pkg.append(pcBuf[i]);
+            emit writeByteToPc(pcBuf[i]);
+        }
+        qDebug() << "Send from BSP to PC: " << showbase << hex << pkg;
+    }
+
+    // Перед передачей проверим статус протокола на залипание.
+    len = 0;
+    protBSPs->checkStat();
+    // проверим нет ли необходимости передачи команды с ПК
+    // если нет, то возьмем команду с МЕНЮ
+    ePRTS_STATUS stat = protBSPs->getCurrentStatus();
+    if (stat == PRTS_STATUS_WRITE_PC) {
+        // пересылка запроса ПК
+        len = protBSPs->trCom();
+        pkg.clear();
+        for(uint8_t i = 0; i < len; i++) {
+            pkg.append(bspBuf[i]);
+        }
+        qDebug() << "Send from PC to BSP: " << showbase << hex << pkg;
+    } else if (stat == PRTS_STATUS_NO) {
+        // отправка запроса БСП
+        eGB_COM com = menu.getTxCommand();
+        // если есть команда, отправляем ее в БСП
+        if (com != GB_COM_NO) {
+            len = protBSPs->sendData(com);
+        }
+    }
+
+    pkg.clear();
+    if (len > 0) {
+        for(uint16_t i = 0; i < len; i++) {
+            pkg.append(bspBuf[i]);
+            emit  writeByteToBsp(bspBuf[i]);
+        }
+    }
+
+    return true;
 }
 
 //
 void MainWindow::cycleMenu() {
-    static uint8_t menucnt = 0;
     static TUser::user_t user = TUser::MAX;
+    static uint8_t cnt_lcd = 0;
 
-    uartRead();
+    bool connect = uartRead();
+    menu.setConnectionBsp(connect);
 
-    menucnt = (menucnt >= 2) ? (menu.proc(), 0) : menucnt + 1;
-    vLCDled();
+    // обновление экрана
+    // где 100 - время рабочего цикла
+    if (++cnt_lcd >= (MENU_TIME_CYLCE / TIME_CYLCE)) {
+        cnt_lcd = 0;
+        menu.proc();
+    }
 
+    // отправка сообщений в БСП/ПК
     uartWrite();
 
-    if (user != menu.sParam.security.User.get()) {
-        user = menu.sParam.security.User.get();
-        emit userChanged(user);
-    }
+    vLCDled();
+
+//    if (user != menu.sParam.security.User.get()) {
+//        user = menu.sParam.security.User.get();
+//        emit userChanged(user);
+//    }
 }
 
 //
@@ -154,75 +289,163 @@ void MainWindow::setUser(int value) {
 }
 
 //
-void MainWindow::refreshPortList() {
-    QString portname = ui->cmbPort->currentText();
+void MainWindow::refreshPortListBsp() {
+    QString portname;
     QList<QSerialPortInfo> infos = QSerialPortInfo::availablePorts();
 
-    ui->cmbPort->clear();
-    for (const QSerialPortInfo &info :infos) {
-        QString portname = info.portName();
-        ui->cmbPort->addItem(portname);
-    }
+    if (ui->cmbPortBsp->isEnabled()) {
+        portname = ui->cmbPortBsp->currentText();
+        ui->cmbPortBsp->clear();
 
-    if (portname.isEmpty()) {
-        portname = "tnt0";
+        for (const QSerialPortInfo &info :infos) {
+            QString portname = info.portName();
+            ui->cmbPortBsp->addItem(portname);
+        }
+
+        if (portname.isEmpty()) {
+            ui->cmbPortBsp->setCurrentText("COM6");
+            ui->cmbPortBsp->setCurrentText("tnt0");
+        } else {
+            ui->cmbPortBsp->setCurrentText(portname);
+        }
+        ui->pbPortBsp->setEnabled(ui->cmbPortBsp->count() != 0);
     }
-    ui->cmbPort->setCurrentText(portname);
-    ui->pbPort->setEnabled(ui->cmbPort->count() != 0);
 }
 
 //
-void MainWindow::connectSerialPort() {
-    qDebug() << "";
+void MainWindow::connectSerialPortBSP() {
+    if (portBSP.isNull() && threadBSP.isNull()) {
+        portBSP = new SerialPort(ui->cmbPortBsp->currentText(), 4800);
+        threadBSP = new QThread(this);
 
-    if (port.isNull() && thread.isNull()) {
+        connect(threadBSP, &QThread::started, portBSP, &SerialPort::start);
+        connect(threadBSP, &QThread::finished, portBSP, &SerialPort::stop);
+        connect(threadBSP, &QThread::finished, threadBSP, &QThread::deleteLater);
 
-        port = new SerialPort(ui->cmbPort->currentText());
-        thread = new QThread(this);
+        connect(portBSP, &SerialPort::finished, this, &MainWindow::closeSerialPortBSP);
+        connect(portBSP, &SerialPort::finished, threadBSP, &QThread::quit);
+        connect(portBSP, &SerialPort::finished, portBSP, &SerialPort::deleteLater);
 
-        connect(thread, &QThread::started, port, &SerialPort::start);
-        connect(thread, &QThread::finished, port, &SerialPort::stop);
-        connect(thread, &QThread::finished, thread, &QThread::deleteLater);
+        connect(this, &MainWindow::writeByteToBsp, portBSP, &SerialPort::writeByte);
+        connect(portBSP, &SerialPort::readByte, this, &MainWindow::readByteFromBsp);
+        connect(portBSP, &SerialPort::sendFinished, this, &MainWindow::resetStatusBSP);
 
-        connect(port, &SerialPort::finished, this, &MainWindow::closeSerialPort);
+        disconnect(ui->pbPortBsp, &QPushButton::clicked,
+                this, &MainWindow::connectSerialPortBSP);
+        connect(ui->pbPortBsp, &QPushButton::clicked, portBSP, &SerialPort::stop);
 
-        connect(port, &SerialPort::finished, thread, &QThread::quit);
-        connect(port, &SerialPort::finished, &timer, &QTimer::stop);
-        connect(port, &SerialPort::finished, port, &SerialPort::deleteLater);
+        ui->cmbPortBsp->setEnabled(false);
+        ui->pbPortBsp->setText("Close");
+        ui->pbRefreshBsp->setEnabled(false);
 
-        connect(this, &MainWindow::writeByte, port, &SerialPort::writeByte);
-        connect(port, &SerialPort::readByte, this, &MainWindow::readByte);
+        portBSP->moveToThread(threadBSP);
+        threadBSP->start();
+    } else {
+        qDebug() << "portBSP.isNull() && threadBSP.isNull()";
+    }
+}
 
-        disconnect(ui->pbPort, &QPushButton::clicked,
-                this, &MainWindow::connectSerialPort);
-        connect(ui->pbPort, &QPushButton::clicked, port, &SerialPort::stop);
+//
+void MainWindow::closeSerialPortBSP() {
+    connect(ui->pbPortBsp, &QPushButton::clicked,
+            this, &MainWindow::connectSerialPortBSP);
 
-        ui->cmbPort->setEnabled(false);
-        ui->pbPort->setText("Close");
-        ui->pbRefresh->setEnabled(false);
+    refreshPortListBsp();
+    ui->cmbPortBsp->setEnabled(true);
+    ui->pbPortBsp->setText("Open");
+    ui->pbPortBsp->setEnabled(true);
+    ui->pbRefreshBsp->setEnabled(true);
+}
 
-        port->moveToThread(thread);
-        thread->start();
+//
+void MainWindow::readByteFromBsp(int value) {
+    protBSPs->checkByte(static_cast<uint8_t> (value));
+}
 
-        QObject::connect(&timer, &QTimer::timeout, port, &SerialPort::proc);
-        timer.start(5);
+//
+void MainWindow::resetStatusBSP() {
+//    qDebug() << "time send package to BSP (mcs): " <<
+//                etimerBSP.nsecsElapsed() / 1000;
+    protBSPs->setCurrentStatus(PRTS_STATUS_NO);
+}
+
+//
+void MainWindow::refreshPortListPc() {
+    QString portname;
+    QList<QSerialPortInfo> infos = QSerialPortInfo::availablePorts();
+
+    if (ui->cmbPortPc->isEnabled()) {
+        portname = ui->cmbPortPc->currentText();
+        ui->cmbPortPc->clear();
+
+        for (const QSerialPortInfo &info :infos) {
+            QString portname = info.portName();
+            ui->cmbPortPc->addItem(portname);
+        }
+
+        if (portname.isEmpty()) {
+            ui->cmbPortPc->setCurrentText("COM12");
+            ui->cmbPortPc->setCurrentText("tnt2");
+        } else {
+            ui->cmbPortPc->setCurrentText(portname);
+        }
+        ui->pbPortPc->setEnabled(ui->cmbPortPc->count() != 0);
+    }
+}
+
+//
+void MainWindow::connectSerialPortPc() {
+    if (portPC.isNull() && threadPC.isNull()) {
+        portPC = new SerialPort(ui->cmbPortPc->currentText(), 19200);
+        threadPC = new QThread(this);
+
+        connect(threadPC, &QThread::started, portPC, &SerialPort::start);
+        connect(threadPC, &QThread::finished, portPC, &SerialPort::stop);
+        connect(threadPC, &QThread::finished, threadPC, &QThread::deleteLater);
+
+        connect(portPC, &SerialPort::finished, this, &MainWindow::closeSerialPortPc);
+        connect(portPC, &SerialPort::finished, threadPC, &QThread::quit);
+        connect(portPC, &SerialPort::finished, portPC, &SerialPort::deleteLater);
+
+        connect(this, &MainWindow::writeByteToPc, portPC, &SerialPort::writeByte);
+        connect(portPC, &SerialPort::readByte, this, &MainWindow::readByteFromPc);
+        connect(portPC, &SerialPort::sendFinished, this, &MainWindow::resetStatusPc);
+
+        disconnect(ui->pbPortPc, &QPushButton::clicked,
+                this, &MainWindow::connectSerialPortPc);
+        connect(ui->pbPortPc, &QPushButton::clicked, portPC, &SerialPort::stop);
+
+        ui->cmbPortPc->setEnabled(false);
+        ui->pbPortPc->setText("Close");
+        ui->pbRefreshPc->setEnabled(false);
+
+        portPC->moveToThread(threadPC);
+        threadPC->start();
     } else {
         qDebug() << "";
     }
 }
 
-void MainWindow::closeSerialPort() {
-    connect(ui->pbPort, &QPushButton::clicked,
-            this, &MainWindow::connectSerialPort);
+//
+void MainWindow::closeSerialPortPc() {
+    connect(ui->pbPortPc, &QPushButton::clicked,
+            this, &MainWindow::connectSerialPortPc);
 
-    ui->cmbPort->setEnabled(true);
-    ui->pbPort->setText("Open");
-    ui->pbPort->setEnabled(true);
-    ui->pbRefresh->setEnabled(true);
+    refreshPortListPc();
+    ui->cmbPortPc->setEnabled(true);
+    ui->pbPortPc->setText("Open");
+    ui->pbPortPc->setEnabled(true);
+    ui->pbRefreshPc->setEnabled(true);
 }
 
-void MainWindow::readByte(int value) {
-    qDebug() << "12";
-    protBSPs->checkByte(static_cast<uint8_t> (value));
+//
+void MainWindow::readByteFromPc(int value) {
+    protPCs->checkByte(static_cast<uint8_t> (value));
+}
+
+//
+void MainWindow::resetStatusPc() {
+    qDebug() << "Time from read PC package to end answer: " << etimer.elapsed();
+    protPCs->setCurrentStatus(PRTS_STATUS_NO);
 }
 

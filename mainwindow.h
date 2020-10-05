@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QDateTime>
+#include <QElapsedTimer>
 #include <QMainWindow>
 #include <QPointer>
 #include <QTimer>
@@ -12,11 +13,24 @@
 #include "PIg/src/drivers/ks0108.h"
 #include "PIg/src/menu/menu.h"
 #include "PIg/src/protocols/standart/protocolBspS.h"
+#include "PIg/src/protocols/standart/protocolPcS.h"
 
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
+
+/// Период вызова cycleMenu()
+#define TIME_CYLCE 100
+
+/// Максимальное кол-во неполученных сообщений от БСП для ошибки связи
+#define MAX_LOST_COM_FROM_BSP 10
+
+/// Размер буфера для общения с БСП
+#define BUFF_SIZE_BSP 128
+
+/// Размер буфера для общения с ПК
+#define BUFF_SIZE_PC 128
 
 class MainWindow : public QMainWindow
 {
@@ -37,20 +51,28 @@ class MainWindow : public QMainWindow
 
 public:
     MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
+    ~MainWindow() override;
 
 signals:
     void userChanged(int value);
-    void writeByte(int value);
+    void writeByteToBsp(int value);
+    void writeByteToPc(int value);
 
 private:
     Ui::MainWindow *ui;
     clMenu menu;                ///< Меню.
-    uint8_t bspBuf[128];        ///< Буфер для протокола общения с БСП.
+    uint8_t bspBuf[BUFF_SIZE_BSP];        ///< Буфер для протокола общения с БСП.
     clProtocolBspS *protBSPs;   ///< Протокол общения с БСП.
-    QPointer<SerialPort> port;
-    QPointer<QThread> thread;
-    QTimer timer;
+    uint8_t pcBuf[BUFF_SIZE_PC];        ///< Буфер для протокола общения с БСП.
+    clProtocolPcS *protPCs;   ///< Протокол общения с БСП.
+
+    QPointer<SerialPort> portBSP;
+    QPointer<QThread> threadBSP;
+
+    QPointer<SerialPort> portPC;
+    QPointer<QThread> threadPC;
+
+    QElapsedTimer etimer;
 
     /// Инициализация параметров.
     void initParam();
@@ -58,20 +80,28 @@ private:
     bool eventFilter(QObject* object, QEvent* event) override;
     /// Обработчик события после отображения формы.
     void showEvent( QShowEvent* event ) override;
-    /// Обработка принятых сообщений из БСП
-    void uartRead();
-    /// Передача сообщений в БСП.
-    void uartWrite();
+    /// Обработка принятых сообщений.
+    bool uartRead();
+    /// Передача сообщений.
+    bool uartWrite();
 
 private slots:
     void cycleMenu();  ///< Цикл 200 мс.
     void clearSelection();  ///< Очистка выделения в textEdit.
     void setBacklight(bool enable);
     void setUser(int value);
-    void refreshPortList();
-    void connectSerialPort();
-    void closeSerialPort();
-    void readByte(int value);
+
+    void refreshPortListBsp();
+    void connectSerialPortBSP();
+    void closeSerialPortBSP();
+    void readByteFromBsp(int value);
+    void resetStatusBSP();
+
+    void refreshPortListPc();
+    void connectSerialPortPc();
+    void closeSerialPortPc();
+    void readByteFromPc(int value);
+    void resetStatusPc();
 };
 
 // Для использвоании в wrapper
