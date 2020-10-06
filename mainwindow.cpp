@@ -4,10 +4,12 @@
 #include <QDebug>
 #include <QFontMetrics>
 #include <QKeyEvent>
-#include <QTimer>
 #include <QScrollBar>
-#include <QTextCodec>
 #include <QSerialPortInfo>
+#include <QTimer>
+
+#include "PIg/src/flashParams.h"
+
 
 //
 MainWindow::MainWindow(QWidget *parent)
@@ -19,10 +21,12 @@ MainWindow::MainWindow(QWidget *parent)
 
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("Windows-1251"));
 
+
+    codec = QTextCodec::codecForName("CP1251");
     connect(ui->textEdit, &QTextEdit::selectionChanged,
             this, &MainWindow::clearSelection);
 
-    initParam();
+    initView();
 
     protBSPs = new clProtocolBspS(bspBuf, SIZE_OF(bspBuf), &menu.sParam);
     protBSPs->setEnable(PRTS_STATUS_NO);
@@ -81,8 +85,60 @@ MainWindow::~MainWindow() {
 }
 
 //
-void MainWindow::initParam() {
+void MainWindow::initView() {
+    QTreeWidgetItem *top = nullptr;
+    QTreeWidgetItem *item = nullptr;
 
+    ui->treeWidget->header()->setSectionResizeMode(0, QHeaderView::Fixed);
+    ui->treeWidget->header()->resizeSection(0, 150);
+    ui->treeWidget->setFixedWidth(300);
+    ui->treeWidget->setSelectionMode(QAbstractItemView::NoSelection);
+    ui->treeWidget->setFocusPolicy(Qt::NoFocus);
+
+    top = new QTreeWidgetItem();
+    ui->treeWidget->addTopLevelItem(top);
+    top->setText(0, codec->toUnicode("Пользователь"));
+    addViewItem(top, "Роль", &view.user);
+    addViewItem(top, "Счетчик инж.", &view.engCounter);
+    addViewItem(top, "Счетчик адм.", &view.admCounter);
+
+    ui->treeWidget->expandAll();
+}
+
+//
+void MainWindow::hdlrView() {
+    quint8 value  = 0;
+    quint16 time = 0;
+
+    value = menu.sParam.security.User.get();
+    view.user.setText(codec->toUnicode(fcUser[value]));
+
+    value = menu.sParam.security.pwdEngineer.getCounter();
+    time = menu.sParam.security.pwdEngineer.getTicksToDecrement();
+    view.engCounter.setText(QString("%1 / %2").
+                            arg(value, 2, 16, QLatin1Char('0')).
+                            arg(time)); //QString::number(value, 16));
+
+
+    value = menu.sParam.security.pwdAdmin.getCounter();
+    time = menu.sParam.security.pwdAdmin.getTicksToDecrement();
+    view.admCounter.setText(QString("%1 / %2").
+                            arg(value, 2, 16, QLatin1Char('0')).
+                            arg(time)); //QString::number(value, 16));
+}
+
+//
+void MainWindow::addViewItem(QTreeWidgetItem *top, std::string name,
+                             QLineEdit *lineedit) {
+    QTreeWidgetItem *item = new QTreeWidgetItem();
+    top->addChild(item);
+
+    item->setText(0, codec->toUnicode(name.c_str()));
+    ui->treeWidget->setItemWidget(item, 1, lineedit);
+    lineedit->setReadOnly(true);
+    lineedit->setFocusPolicy(Qt::NoFocus);
+    connect(lineedit, &QLineEdit::selectionChanged,
+            lineedit, &QLineEdit::deselect);
 }
 
 //
@@ -281,6 +337,8 @@ void MainWindow::cycleMenu() {
         cntsendtobsp = 0;
         cnt1s = 0;
     }
+
+    hdlrView();
 }
 
 //

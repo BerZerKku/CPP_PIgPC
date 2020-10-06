@@ -3,10 +3,13 @@
 
 #include <QDateTime>
 #include <QElapsedTimer>
+#include <QLineEdit>
 #include <QMainWindow>
 #include <QPointer>
+#include <QTextCodec>
 #include <QTimer>
 #include <QThread>
+#include <QTreeWidgetItem>
 #include "wrapper.hpp"
 #include "serialport.h"
 
@@ -51,6 +54,12 @@ class MainWindow : public QMainWindow
     friend void vLCDsetLed(eLCD_LED val);
     friend void vLCDled();
 
+    struct view_t {
+        QLineEdit user;
+        QLineEdit engCounter;
+        QLineEdit admCounter;
+    } view;
+
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow() override;
@@ -69,6 +78,7 @@ private:
     clProtocolPcS *protPCs; ///< Протокол общения с ПК - Стандартный.
     TProtocolPcM *protPCm;  ///< Протокол общения с ПК - Modbus.
     TProtocolPcI *protPCi;  ///< Протокол общения с ПК - МЭК-101.
+    QTextCodec *codec;
 
     QPointer<SerialPort> portBSP;
     QPointer<QThread> threadBSP;
@@ -79,7 +89,11 @@ private:
     QElapsedTimer etimer;
 
     /// Инициализация параметров.
-    void initParam();
+    void initView();
+    /// Отображение параметров.
+    void hdlrView();
+    /// Настраивает элемент отображаемых параметров.
+    void addViewItem(QTreeWidgetItem *top, std::string name, QLineEdit *lineedit);
     /// Обработчик событий.
     bool eventFilter(QObject* object, QEvent* event) override;
     /// Обработчик события после отображения формы.
