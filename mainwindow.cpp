@@ -30,6 +30,12 @@ MainWindow::MainWindow(QWidget *parent)
     protPCs = new clProtocolPcS(pcBuf, SIZE_OF(pcBuf), &menu.sParam);
     protPCs->setEnable(PRTS_STATUS_NO); // FIXME При работе других протоколов надо отключить!
 
+    protPCi = new TProtocolPcI(&menu.sParam, pcBuf, SIZE_OF(pcBuf));
+    protPCi->setDisable();
+
+    protPCm = new TProtocolPcM(&menu.sParam, pcBuf, SIZE_OF(pcBuf));
+    protPCm->setDisable();
+
     installEventFilter(this);
     ui->textEdit->installEventFilter(this);
 
@@ -108,7 +114,6 @@ bool MainWindow::uartRead() {
     protBSPs->checkStat();
     // Проверка наличия сообщения с БСП и ее обработка
     if (protBSPs->getCurrentStatus() == PRTS_STATUS_READ_OK) {
-        qDebug() << "getPackage";
         // проверка контрольной суммы полученного сообщения и
         // обработка данных если она соответствует полученной        
         if (protBSPs->checkReadData()) {
@@ -164,19 +169,20 @@ bool MainWindow::uartRead() {
                 }
             }
         }
+    } else if (protPCm->isEnable()) {
+        if (protPCm->isReadData()) {
+            protPCm->readData();
+        }
+    } else if (protPCi->isEnable()) {
+        if (protPCi->isReadData()) {
+            protPCi->readData();
+        }
     }
-    //        else if (protPCm.isEnable()) {
-    //            if (protPCm.isReadData()) {
-    //                protPCm.readData();
-    //            }
-    //        } else if (protPCi.isEnable()) {
-    //            if (protPCi.isReadData()) {
-    //                protPCi.readData();
-    //            }
-    //        }
 
     return stat;
 }
+
+uint8_t cntsendtobsp = 0;
 
 //
 bool MainWindow::uartWrite() {
@@ -195,19 +201,16 @@ bool MainWindow::uartWrite() {
             // отправка ответа ПИ
             len = protPCs->trCom();
         }
+    } else if (protPCm->isEnable()) {
+        len = protPCm->sendData();
+    } else if (protPCi->isEnable()) {
+        len = protPCi->sendData();
     }
-//    else if (protPCm.isEnable()) {
-//        uartPC.trData(protPCm.sendData());
-//    } else if (protPCi.isEnable()) {
-//        uartPC.trData(protPCi.sendData());
-//    }
+
     pkg.clear();
-    if (len > 0) {
-        for(uint8_t i = 0; i < len; i++) {
-            pkg.append(pcBuf[i]);
-            emit writeByteToPc(pcBuf[i]);
-        }
-        qDebug() << "Send from BSP to PC: " << showbase << hex << pkg;
+    for(uint8_t i = 0; i < len; i++) {
+        pkg.append(pcBuf[i]);
+        emit writeByteToPc(pcBuf[i]);
     }
 
     // Перед передачей проверим статус протокола на залипание.
@@ -223,7 +226,6 @@ bool MainWindow::uartWrite() {
         for(uint8_t i = 0; i < len; i++) {
             pkg.append(bspBuf[i]);
         }
-//        qDebug() << "Send from PC to BSP: " << showbase << hex << pkg;
     } else if (stat == PRTS_STATUS_NO) {
         // отправка запроса БСП
         eGB_COM com = menu.getTxCommand();
@@ -233,14 +235,16 @@ bool MainWindow::uartWrite() {
         }
     }
 
-    pkg.clear();
     if (len > 0) {
-        for(uint16_t i = 0; i < len; i++) {
-            pkg.append(bspBuf[i]);
-            emit  writeByteToBsp(bspBuf[i]);
-        }
+        cntsendtobsp++;
     }
-    qDebug() << "Send to BSP: " << showbase << hex << pkg;
+
+    pkg.clear();
+    for(uint16_t i = 0; i < len; i++) {
+        pkg.append(bspBuf[i]);
+        emit  writeByteToBsp(bspBuf[i]);
+    }
+//    qDebug() << "Send to BSP: " << showbase << hex << pkg;
 
     return true;
 }
@@ -249,6 +253,7 @@ bool MainWindow::uartWrite() {
 void MainWindow::cycleMenu() {
     static TUser::user_t user = TUser::MAX;
     static uint8_t cnt_lcd = 0;
+    static uint8_t cnt1s = 0;
 
     bool connect = uartRead();
     menu.setConnectionBsp(connect);
@@ -269,6 +274,13 @@ void MainWindow::cycleMenu() {
 //        user = menu.sParam.security.User.get();
 //        emit userChanged(user);
 //    }
+
+    cnt1s++;
+    if (cnt1s >= 10) {
+        qDebug() << "Send " << cntsendtobsp << " packet to BSP per second.";
+        cntsendtobsp = 0;
+        cnt1s = 0;
+    }
 }
 
 //
@@ -369,8 +381,6 @@ void MainWindow::readByteFromBsp(int value) {
 
 //
 void MainWindow::resetStatusBSP() {
-//    qDebug() << "time send package to BSP (mcs): " <<
-//                etimerBSP.nsecsElapsed() / 1000;
     protBSPs->setCurrentStatus(PRTS_STATUS_NO);
 }
 
@@ -445,12 +455,26 @@ void MainWindow::closeSerialPortPc() {
 
 //
 void MainWindow::readByteFromPc(int value) {
-    protPCs->checkByte(static_cast<uint8_t> (value));
+    uint8_t byte = static_cast<uint8_t> (value);
+    if (protPCs->isEnable()) {
+        // протокол "Стандартный"
+        protPCs->checkByte(byte);
+    } else if (protPCm->isEnable()) {
+        // протокол MODBUS
+        protPCm->push(byte);
+    } else if (protPCi->isEnable()) {
+        protPCi->push(byte);
+    }
 }
 
 //
 void MainWindow::resetStatusPc() {
-    qDebug() << "Time from read PC package to end answer: " << etimer.elapsed();
-    protPCs->setCurrentStatus(PRTS_STATUS_NO);
+    if (protPCs->isEnable()) {
+        protPCs->setCurrentStatus(PRTS_STATUS_NO);
+    } else if (protPCm->isEnable()) {
+        protPCm->setReadState();
+    } else if (protPCi->isEnable()) {
+        protPCi->setReadState();
+    }
 }
 

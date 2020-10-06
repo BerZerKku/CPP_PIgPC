@@ -74,7 +74,6 @@ void SerialPort::writeByte(int byte) {
 //
 void SerialPort::readyReadSlot() {
     for(auto &byte: port->readAll()) {
-        qDebug() << showbase << hex << byte;
         emit readByte(static_cast<uint8_t> (byte));
     }
 }
@@ -91,7 +90,6 @@ void SerialPort::timeoutSlot() {
         }
 
         char byte = bufTx.takeFirst();
-        qDebug() << showbase << hex << byte;
         port->write(&byte, 1);
     }
 }

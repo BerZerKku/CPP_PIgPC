@@ -14,6 +14,8 @@
 #include "PIg/src/menu/menu.h"
 #include "PIg/src/protocols/standart/protocolBspS.h"
 #include "PIg/src/protocols/standart/protocolPcS.h"
+#include "PIg/src/protocols/modbus/protocolPcM.h"
+#include "PIg/src/protocols/iec101/protocolPcI.h"
 
 
 QT_BEGIN_NAMESPACE
@@ -63,8 +65,10 @@ private:
     clMenu menu;                ///< Меню.
     uint8_t bspBuf[BUFF_SIZE_BSP];        ///< Буфер для протокола общения с БСП.
     clProtocolBspS *protBSPs;   ///< Протокол общения с БСП.
-    uint8_t pcBuf[BUFF_SIZE_PC];        ///< Буфер для протокола общения с БСП.
-    clProtocolPcS *protPCs;   ///< Протокол общения с БСП.
+    uint8_t pcBuf[BUFF_SIZE_PC];        ///< Буфер для протокола общения с ПК.
+    clProtocolPcS *protPCs; ///< Протокол общения с ПК - Стандартный.
+    TProtocolPcM *protPCm;  ///< Протокол общения с ПК - Modbus.
+    TProtocolPcI *protPCi;  ///< Протокол общения с ПК - МЭК-101.
 
     QPointer<SerialPort> portBSP;
     QPointer<QThread> threadBSP;
