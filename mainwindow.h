@@ -55,7 +55,8 @@ class MainWindow : public QMainWindow
     friend void vLCDled();
 
     struct view_t {
-        QLineEdit user;
+        QLineEdit userPi;
+        QLineEdit userPc;
         QLineEdit engCounter;
         QLineEdit admCounter;
     } view;
@@ -71,13 +72,6 @@ signals:
 
 private:
     Ui::MainWindow *ui;
-    clMenu menu;                ///< Меню.
-    uint8_t bspBuf[BUFF_SIZE_BSP];        ///< Буфер для протокола общения с БСП.
-    clProtocolBspS *protBSPs;   ///< Протокол общения с БСП.
-    uint8_t pcBuf[BUFF_SIZE_PC];        ///< Буфер для протокола общения с ПК.
-    clProtocolPcS *protPCs; ///< Протокол общения с ПК - Стандартный.
-    TProtocolPcM *protPCm;  ///< Протокол общения с ПК - Modbus.
-    TProtocolPcI *protPCi;  ///< Протокол общения с ПК - МЭК-101.
     QTextCodec *codec;
 
     QPointer<SerialPort> portBSP;
@@ -90,6 +84,8 @@ private:
 
     /// Инициализация параметров.
     void initView();
+    /// Настройка тестовых кнопок.
+    void setupTestButtons();
     /// Отображение параметров.
     void hdlrView();
     /// Настраивает элемент отображаемых параметров.
@@ -98,16 +94,11 @@ private:
     bool eventFilter(QObject* object, QEvent* event) override;
     /// Обработчик события после отображения формы.
     void showEvent( QShowEvent* event ) override;
-    /// Обработка принятых сообщений.
-    bool uartRead();
-    /// Передача сообщений.
-    bool uartWrite();
 
 private slots:
     void cycleMenu();  ///< Цикл 200 мс.
     void clearSelection();  ///< Очистка выделения в textEdit.
     void setBacklight(bool enable);
-    void setUser(int value);
 
     void refreshPortListBsp();
     void connectSerialPortBSP();
@@ -120,6 +111,11 @@ private slots:
     void closeSerialPortPc();
     void readByteFromPc(int value);
     void resetStatusPc();
+
+    void test1();
+    void test2();
+    void test3();
+    void test4();
 };
 
 // Для использвоании в wrapper

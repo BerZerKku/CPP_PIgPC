@@ -136,6 +136,38 @@
       <item>
        <widget class="QKeyboard" name="kbd" native="true"/>
       </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <item>
+         <widget class="QPushButton" name="pbTest1">
+          <property name="text">
+           <string>Test1</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pbTest2">
+          <property name="text">
+           <string>Test2</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pbTest3">
+          <property name="text">
+           <string>Test3</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pbTest4">
+          <property name="text">
+           <string>Test4</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
      </layout>
     </item>
     <item>

@@ -37,15 +37,17 @@ INCLUDEPATH += \
     PIg/src/drivers \
     PIg/src/menu \
     PIg/src/parameter \
-    PIg/src/protocols \
+    PIg/src/protocols
 
 SOURCES += \
     PIg/src/flashParam.cpp \
+    PIg/src/menu/base.cpp \
     PIg/src/menu/dateTime.cpp \
     PIg/src/menu/enterParam.cpp \
     PIg/src/menu/menu.cpp \
     PIg/src/menu/txCom.cpp \
     PIg/src/paramGlb.cpp \
+    PIg/src/paramIS.cpp \
     PIg/src/parameter/LocalParams.cpp \
     PIg/src/parameter/param.cpp \
     PIg/src/protocols/iec101/CIec101.cpp \
@@ -71,6 +73,7 @@ HEADERS += \
     PIg/src/flash.h \
     PIg/src/flashParams.h \
     PIg/src/glbDefine.h \
+    PIg/src/menu/base.hpp \
     PIg/src/menu/dateTime.hpp \
     PIg/src/menu/deviceStatus.hpp \
     PIg/src/menu/enterParam.h \

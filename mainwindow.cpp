@@ -9,6 +9,7 @@
 #include <QTimer>
 
 #include "PIg/src/flashParams.h"
+#include "PIg/src/menu/base.hpp"
 
 
 //
@@ -27,18 +28,6 @@ MainWindow::MainWindow(QWidget *parent)
             this, &MainWindow::clearSelection);
 
     initView();
-
-    protBSPs = new clProtocolBspS(bspBuf, SIZE_OF(bspBuf), &menu.sParam);
-    protBSPs->setEnable(PRTS_STATUS_NO);
-
-    protPCs = new clProtocolPcS(pcBuf, SIZE_OF(pcBuf), &menu.sParam);
-    protPCs->setEnable(PRTS_STATUS_NO); // FIXME При работе других протоколов надо отключить!
-
-    protPCi = new TProtocolPcI(&menu.sParam, pcBuf, SIZE_OF(pcBuf));
-    protPCi->setDisable();
-
-    protPCm = new TProtocolPcM(&menu.sParam, pcBuf, SIZE_OF(pcBuf));
-    protPCm->setDisable();
 
     installEventFilter(this);
     ui->textEdit->installEventFilter(this);
@@ -98,7 +87,8 @@ void MainWindow::initView() {
     top = new QTreeWidgetItem();
     ui->treeWidget->addTopLevelItem(top);
     top->setText(0, codec->toUnicode("Пользователь"));
-    addViewItem(top, "Роль", &view.user);
+    addViewItem(top, "Роль ПИ", &view.userPi);
+    addViewItem(top, "Роль ПК", &view.userPc);
     addViewItem(top, "Счетчик инж.", &view.engCounter);
     addViewItem(top, "Счетчик адм.", &view.admCounter);
 
@@ -106,39 +96,80 @@ void MainWindow::initView() {
 }
 
 //
+void MainWindow::setupTestButtons() {
+    ui->pbTest1->setText("Engeneer PC");
+    connect(ui->pbTest1, &QPushButton::clicked, this, &MainWindow::test1);
+
+    connect(ui->pbTest2, &QPushButton::clicked, this, &MainWindow::test2);
+
+    connect(ui->pbTest3, &QPushButton::clicked, this, &MainWindow::test3);
+
+    connect(ui->pbTest4, &QPushButton::clicked, this, &MainWindow::test4);
+}
+
+//
 void MainWindow::hdlrView() {
+    bool locked = false;
     quint8 value  = 0;
     quint16 time = 0;
 
-    value = menu.sParam.security.User.get();
-    view.user.setText(codec->toUnicode(fcUser[value]));
+    QPalette pred = view.engCounter.palette();
+    pred.setColor(QPalette::Text, Qt::red);
+    QPalette pblue = view.engCounter.palette();
+    pblue.setColor(QPalette::Text, Qt::blue);
+
+    value = menu.sParam.security.UserPi.get();
+    time = menu.sParam.security.UserPi.getTimer();
+    time = (time * MENU_TIME_CYLCE) / 1000;
+    view.userPi.setText(QString("%1 / %2c").
+                            arg(codec->toUnicode(fcUser[value])).
+                            arg(time));
+
+    value = menu.sParam.security.UserPc.get();
+    time = menu.sParam.security.UserPc.getTimer();
+    time = (time * MENU_TIME_CYLCE) / 1000;
+    view.userPc.setText(QString("%1 / %2c").
+                            arg(codec->toUnicode(fcUser[value])).
+                            arg(time));
+
+    value = menu.sParam.security.UserPi.get();
+    time = menu.sParam.security.UserPi.getTimer();
+    time = (time * MENU_TIME_CYLCE) / 1000;
+    view.userPi.setText(QString("%1 / %2c").
+                            arg(codec->toUnicode(fcUser[value])).
+                            arg(time));
 
     value = menu.sParam.security.pwdEngineer.getCounter();
     time = menu.sParam.security.pwdEngineer.getTicksToDecrement();
-    view.engCounter.setText(QString("%1 / %2").
+    time = (time * MENU_TIME_CYLCE) / 1000;
+    locked = menu.sParam.security.pwdEngineer.isLock();
+    view.engCounter.setText(QString("%1 / %2c").
                             arg(value, 2, 16, QLatin1Char('0')).
-                            arg(time)); //QString::number(value, 16));
-
+                            arg(time));
+    view.engCounter.setPalette(locked ? pred : pblue);
 
     value = menu.sParam.security.pwdAdmin.getCounter();
     time = menu.sParam.security.pwdAdmin.getTicksToDecrement();
-    view.admCounter.setText(QString("%1 / %2").
+    time = (time * MENU_TIME_CYLCE) / 1000;
+    locked = menu.sParam.security.pwdAdmin.isLock();
+    view.admCounter.setText(QString("%1 / %2c").
                             arg(value, 2, 16, QLatin1Char('0')).
                             arg(time)); //QString::number(value, 16));
+    view.admCounter.setPalette(locked ? pred : pblue);
 }
 
 //
 void MainWindow::addViewItem(QTreeWidgetItem *top, std::string name,
                              QLineEdit *lineedit) {
     QTreeWidgetItem *item = new QTreeWidgetItem();
-    top->addChild(item);
 
+    top->addChild(item);
     item->setText(0, codec->toUnicode(name.c_str()));
     ui->treeWidget->setItemWidget(item, 1, lineedit);
     lineedit->setReadOnly(true);
     lineedit->setFocusPolicy(Qt::NoFocus);
     connect(lineedit, &QLineEdit::selectionChanged,
-            lineedit, &QLineEdit::deselect);
+            lineedit, &QLineEdit::deselect); 
 }
 
 //
@@ -156,184 +187,51 @@ bool MainWindow::eventFilter(QObject *object, QEvent *event) {
 //
 void MainWindow::showEvent(QShowEvent *event) {
     QWidget::showEvent(event);
-}
 
-//
-bool MainWindow::uartRead() {
-    bool stat = true;
-    // код запрашиваемой с ПК команды
-    static uint8_t lastPcCom = 0;
-    // кол-во неполученных сообщений с БСП
-    static uint8_t cntLostCom = 0;
-
-    // перед приемом проверим статус на залипание
-    protBSPs->checkStat();
-    // Проверка наличия сообщения с БСП и ее обработка
-    if (protBSPs->getCurrentStatus() == PRTS_STATUS_READ_OK) {
-        // проверка контрольной суммы полученного сообщения и
-        // обработка данных если она соответствует полученной        
-        if (protBSPs->checkReadData()) {
-            // обработка принятого сообщения
-            protBSPs->getData(lastPcCom == protBSPs->getCurrentCom());
-
-            // проверка соответствия команды запрошенной с ПК и команды
-            // полученной от БСП и если совпадают пересылка сообщения на ПК
-            // для команды GB_COM_GET_VERS происходит добавление версии БСП-ПИ
-            if (lastPcCom == protBSPs->getCurrentCom()) {
-                if (protPCs->isEnable()) {
-                    if (protPCs->copyCommandFrom(protBSPs->buf)) {
-                        protPCs->modifyVersionCom();
-                    }
-                }
-            }
-        }
-
-        // после принятия и обработки сообщения сбросим код предыдущей
-        // запрашиваемой команды
-        lastPcCom = 0;
-        // сброс счетчика потерянных сообщений с БСП
-        cntLostCom = 0;
-    } else {
-        // в случае превышения порога потерянных сообщений при обмене с БСП
-        // флаг состояния сбрасывается в False
-        if (cntLostCom < MAX_LOST_COM_FROM_BSP)
-            cntLostCom++;
-        else
-            stat = false;
-    }
-
-    if (protPCs->isEnable()) {
-        // перед приемом проверим статус на залипание
-        protPCs->checkStat();
-        // проверка наличия команды с ПК и ее обработка
-        if (protPCs->getCurrentStatus() == PRTS_STATUS_READ_OK) {
-            // проверка контрольной суммы полученного сообщения и
-            // обработка данных если она соответствует полученной
-            if (protPCs->checkReadData()) {
-                // обработка принятого сообщения
-                // если сообщение небыло обработано, перешлем его в БСП
-                // (т.е. если это не запрос/изменение пароля)
-                if (!protPCs->getData()) {
-                    etimer.start();
-                    // сохранение запрашиваемой ПК команды
-                    lastPcCom = protPCs->getCurrentCom();
-                   // пересылка сообщения в БСП
-                    if (protBSPs->getCurrentStatus() == PRTS_STATUS_NO) {
-                        protBSPs->copyCommandFrom(protPCs->buf);
-                        protPCs->setCurrentStatus(PRTS_STATUS_WAIT_ANSWER);
-                    }
-                }
-            }
-        }
-    } else if (protPCm->isEnable()) {
-        if (protPCm->isReadData()) {
-            protPCm->readData();
-        }
-    } else if (protPCi->isEnable()) {
-        if (protPCi->isReadData()) {
-            protPCi->readData();
-        }
-    }
-
-    return stat;
-}
-
-uint8_t cntsendtobsp = 0;
-
-//
-bool MainWindow::uartWrite() {
-    QVector<uint8_t> pkg;
-    uint8_t len = 0;
-
-    if (protPCs->isEnable()) {
-        // Перед передачей проверим статус протокола на залипание.
-        protPCs->checkStat();
-        // проверка необходимости передачи команды на ПК и ее отправка
-        ePRTS_STATUS stat = protPCs->getCurrentStatus();
-        if (stat == PRTS_STATUS_WRITE_PC) {            
-            // пересылка ответа БСП
-            len = protPCs->trCom();            
-        } else if (stat == PRTS_STATUS_WRITE) {
-            // отправка ответа ПИ
-            len = protPCs->trCom();
-        }
-    } else if (protPCm->isEnable()) {
-        len = protPCm->sendData();
-    } else if (protPCi->isEnable()) {
-        len = protPCi->sendData();
-    }
-
-    pkg.clear();
-    for(uint8_t i = 0; i < len; i++) {
-        pkg.append(pcBuf[i]);
-        emit writeByteToPc(pcBuf[i]);
-    }
-
-    // Перед передачей проверим статус протокола на залипание.
-    len = 0;
-    protBSPs->checkStat();
-    // проверим нет ли необходимости передачи команды с ПК
-    // если нет, то возьмем команду с МЕНЮ
-    ePRTS_STATUS stat = protBSPs->getCurrentStatus();
-    if (stat == PRTS_STATUS_WRITE_PC) {
-        // пересылка запроса ПК
-        len = protBSPs->trCom();
-        pkg.clear();
-        for(uint8_t i = 0; i < len; i++) {
-            pkg.append(bspBuf[i]);
-        }
-    } else if (stat == PRTS_STATUS_NO) {
-        // отправка запроса БСП
-        eGB_COM com = menu.getTxCommand();
-        // если есть команда, отправляем ее в БСП
-        if (com != GB_COM_NO) {
-            len = protBSPs->sendData(com);
-        }
-    }
-
-    if (len > 0) {
-        cntsendtobsp++;
-    }
-
-    pkg.clear();
-    for(uint16_t i = 0; i < len; i++) {
-        pkg.append(bspBuf[i]);
-        emit  writeByteToBsp(bspBuf[i]);
-    }
-//    qDebug() << "Send to BSP: " << showbase << hex << pkg;
-
-    return true;
+    mainInit();
 }
 
 //
 void MainWindow::cycleMenu() {
-    static TUser::user_t user = TUser::MAX;
-    static uint8_t cnt_lcd = 0;
+    uint8_t len = 0;
+
     static uint8_t cnt1s = 0;
-
-    bool connect = uartRead();
-    menu.setConnectionBsp(connect);
-
-    // обновление экрана
-    // где 100 - время рабочего цикла
-    if (++cnt_lcd >= (MENU_TIME_CYLCE / TIME_CYLCE)) {
-        cnt_lcd = 0;
-        menu.proc();
-    }
-
-    // отправка сообщений в БСП/ПК
-    uartWrite();
+    static uint8_t cntsendtobsp = 0;
+    QVector<uint8_t> pkg;
 
     vLCDled();
 
-//    if (user != menu.sParam.security.User.get()) {
-//        user = menu.sParam.security.User.get();
-//        emit userChanged(user);
-//    }
+    bspRead();
+    pcRead();
+
+    mainCycle();
+
+    pkg.clear();
+    len = pcWrite();
+    for(uint8_t i = 0; i < len; i++) {
+        pkg.append(uBufUartPc[i]);
+        emit writeByteToPc(uBufUartPc[i]);
+    }
+
+    if (len > 0) {
+//        qDebug() << "Pkg to PC: " << showbase << hex << pkg;
+    }
+
+    pkg.clear();
+    len = bspWrite();
+    for(uint8_t i = 0; i < len; i++) {
+        pkg.append(uBufUartBsp[i]);
+        emit writeByteToBsp(uBufUartBsp[i]);
+    }
+
+    if (len > 0) {
+        cntsendtobsp++;
+//        qDebug() << "Pkg to BSP: " << showbase << hex << pkg;
+    }
 
     cnt1s++;
     if (cnt1s >= 10) {
-        qDebug() << "Send " << cntsendtobsp << " packet to BSP per second.";
+//        qDebug() << "Send " << cntsendtobsp << " packet to BSP per second.";
         cntsendtobsp = 0;
         cnt1s = 0;
     }
@@ -356,11 +254,6 @@ void MainWindow::setBacklight(bool enable) {
         QString qss = QString("background-color: %1").arg(color.name());
         ui->textEdit->setStyleSheet(qss);
     }
-}
-
-//
-void MainWindow::setUser(int value) {
-    menu.sParam.security.User.set(static_cast<TUser::user_t> (value));
 }
 
 //
@@ -434,12 +327,13 @@ void MainWindow::closeSerialPortBSP() {
 
 //
 void MainWindow::readByteFromBsp(int value) {
-    protBSPs->checkByte(static_cast<uint8_t> (value));
+    uint8_t byte = static_cast<uint8_t> (value);
+    bspPushByteFrom(byte, false);
 }
 
 //
 void MainWindow::resetStatusBSP() {
-    protBSPs->setCurrentStatus(PRTS_STATUS_NO);
+    bspTxEnd();
 }
 
 //
@@ -514,25 +408,27 @@ void MainWindow::closeSerialPortPc() {
 //
 void MainWindow::readByteFromPc(int value) {
     uint8_t byte = static_cast<uint8_t> (value);
-    if (protPCs->isEnable()) {
-        // протокол "Стандартный"
-        protPCs->checkByte(byte);
-    } else if (protPCm->isEnable()) {
-        // протокол MODBUS
-        protPCm->push(byte);
-    } else if (protPCi->isEnable()) {
-        protPCi->push(byte);
-    }
+    pcPushByteFrom(byte, false);
 }
 
 //
 void MainWindow::resetStatusPc() {
-    if (protPCs->isEnable()) {
-        protPCs->setCurrentStatus(PRTS_STATUS_NO);
-    } else if (protPCm->isEnable()) {
-        protPCm->setReadState();
-    } else if (protPCi->isEnable()) {
-        protPCi->setReadState();
-    }
+    pcTxEnd();
+}
+
+void MainWindow::test1() {
+    menu.sParam.security.UserPc.set(TUser::ENGINEER);
+}
+
+void MainWindow::test2() {
+
+}
+
+void MainWindow::test3() {
+
+}
+
+void MainWindow::test4() {
+
 }
 
