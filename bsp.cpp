@@ -1216,13 +1216,15 @@ void Bsp::hdlrComGetVers(eGB_COM com, pkg_t data) {
     pkgTx.append(getSpinBoxValue(GB_PARAM_PRM_COM_NUMS) / 4); // прм1
     pkgTx.append(getSpinBoxValue(GB_PARAM_PRM_COM_NUMS) / 4); // прм2
     pkgTx.append(getSpinBoxValue(GB_PARAM_PRD_COM_NUMS) / 4);
-    pkgTx.append(getComboBoxValue(GB_PARAM_NUM_OF_DEVICES));
+    pkgTx.append(getComboBoxValue(GB_PARAM_NUM_OF_DEVICES)+1);
     pkgTx.append(getComboBoxValue(device.typeLine));
 
-    vers = 0x1001;  // GB_IC_BSP_MCU
+    vers = 0x0111;  // GB_IC_BSP_MCU
     pkgTx.append(vers >> 8);
     pkgTx.append(vers);
     vers = 0x2002;  // GB_IC_BSP_DSP
+    pkgTx.append(vers >> 8);
+    pkgTx.append(vers);
 
     // FIXME В Р400 отдельная
     pkgTx.append(getComboBoxValue(GB_PARAM_COMP_K400));
@@ -1240,7 +1242,7 @@ void Bsp::hdlrComGetVers(eGB_COM com, pkg_t data) {
 
     pkgTx.append(getComboBoxValue(device.typeDevice));
 
-    vers = 0x8008;  // GB_IC_PI_MCU
+    vers = 0x0128;  // GB_IC_PI_MCU
     pkgTx.append(vers >> 8);
     pkgTx.append(vers);
 
