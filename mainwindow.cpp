@@ -63,6 +63,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->lPortBsp->setFixedWidth(ui->lPortBsp->sizeHint().width());
     ui->lPortPc->setFixedWidth(ui->lPortBsp->width());
 
+    setupTestButtons();
+
     QTimer *timerMenu = new QTimer(this);
     connect(timerMenu, &QTimer::timeout, this, &MainWindow::cycleMenu);
     timerMenu->start(100);
@@ -112,6 +114,7 @@ void MainWindow::hdlrView() {
     bool locked = false;
     quint8 value  = 0;
     quint16 time = 0;
+    TUser::user_t user;
 
     QPalette pred = view.engCounter.palette();
     pred.setColor(QPalette::Text, Qt::red);
@@ -120,41 +123,39 @@ void MainWindow::hdlrView() {
 
     value = menu.sParam.security.UserPi.get();
     time = menu.sParam.security.UserPi.getTimer();
-    time = (time * MENU_TIME_CYLCE) / 1000;
     view.userPi.setText(QString("%1 / %2c").
                             arg(codec->toUnicode(fcUser[value])).
-                            arg(time));
+                            arg((time * MENU_TIME_CYLCE) / 1000));
 
     value = menu.sParam.security.UserPc.get();
     time = menu.sParam.security.UserPc.getTimer();
-    time = (time * MENU_TIME_CYLCE) / 1000;
     view.userPc.setText(QString("%1 / %2c").
-                            arg(codec->toUnicode(fcUser[value])).
-                            arg(time));
+                        arg(codec->toUnicode(fcUser[value])).
+                        arg((time * MENU_TIME_CYLCE) / 1000));
 
     value = menu.sParam.security.UserPi.get();
     time = menu.sParam.security.UserPi.getTimer();
-    time = (time * MENU_TIME_CYLCE) / 1000;
     view.userPi.setText(QString("%1 / %2c").
                             arg(codec->toUnicode(fcUser[value])).
-                            arg(time));
+                            arg((time * MENU_TIME_CYLCE) / 1000));
 
-    value = menu.sParam.security.pwdEngineer.getCounter();
-    time = menu.sParam.security.pwdEngineer.getTicksToDecrement();
-    time = (time * MENU_TIME_CYLCE) / 1000;
-    locked = menu.sParam.security.pwdEngineer.isLock();
+
+    user = TUser::ENGINEER;
+    value = menu.sParam.security.pwd.getCounter(user);
+    time = menu.sParam.security.pwd.getLockTime(user);
+    locked = menu.sParam.security.pwd.isLocked(user);
     view.engCounter.setText(QString("%1 / %2c").
                             arg(value, 2, 16, QLatin1Char('0')).
                             arg(time));
-    view.engCounter.setPalette(locked ? pred : pblue);
+    view.engCounter.setPalette(locked > 0 ? pred : pblue);
 
-    value = menu.sParam.security.pwdAdmin.getCounter();
-    time = menu.sParam.security.pwdAdmin.getTicksToDecrement();
-    time = (time * MENU_TIME_CYLCE) / 1000;
-    locked = menu.sParam.security.pwdAdmin.isLock();
+    user = TUser::ADMIN;
+    value = menu.sParam.security.pwd.getCounter(user);
+    time = menu.sParam.security.pwd.getLockTime(user);
+    locked = menu.sParam.security.pwd.isLocked(user);
     view.admCounter.setText(QString("%1 / %2c").
                             arg(value, 2, 16, QLatin1Char('0')).
-                            arg(time)); //QString::number(value, 16));
+                            arg(time));
     view.admCounter.setPalette(locked ? pred : pblue);
 }
 
@@ -271,7 +272,7 @@ void MainWindow::refreshPortListBsp() {
         }
 
         if (portname.isEmpty()) {
-            ui->cmbPortBsp->setCurrentText("COM6");
+            ui->cmbPortBsp->setCurrentText("COM20");
             ui->cmbPortBsp->setCurrentText("tnt0");
         } else {
             ui->cmbPortBsp->setCurrentText(portname);
@@ -351,7 +352,7 @@ void MainWindow::refreshPortListPc() {
         }
 
         if (portname.isEmpty()) {
-            ui->cmbPortPc->setCurrentText("COM12");
+            ui->cmbPortPc->setCurrentText("COM8");
             ui->cmbPortPc->setCurrentText("tnt2");
         } else {
             ui->cmbPortPc->setCurrentText(portname);
@@ -416,18 +417,23 @@ void MainWindow::resetStatusPc() {
     pcTxEnd();
 }
 
+//
 void MainWindow::test1() {
+    qDebug() << "Set user ENGINEER for pc";
     menu.sParam.security.UserPc.set(TUser::ENGINEER);
 }
 
+//
 void MainWindow::test2() {
 
 }
 
+//
 void MainWindow::test3() {
 
 }
 
+//
 void MainWindow::test4() {
 
 }
