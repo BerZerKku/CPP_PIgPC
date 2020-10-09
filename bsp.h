@@ -141,9 +141,9 @@ private:
     /// Обработка команд записи режима.
     static void procCommandWriteRegime(eGB_COM com, pkg_t &data);
 
-    static void hdlrComGetVers(eGB_COM com, pkg_t data);
-    static void hdlrComNetAdrGet(eGB_COM com, pkg_t data);
-    static void hdlrComNetAdrSet(eGB_COM com, pkg_t data);
+    static void hdlrComGetVers(eGB_COM com, pkg_t &data);
+    static void hdlrComNetAdrGet(eGB_COM com, pkg_t &data);
+    static void hdlrComNetAdrSet(eGB_COM com, pkg_t &data);
 
 private slots:
     static void setRegime(int index);

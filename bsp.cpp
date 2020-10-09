@@ -782,19 +782,20 @@ int Bsp::setSpinBoxValue(QSpinBox *spinbox, qint16 value) {
 void Bsp::procCommand(eGB_COM com, pkg_t &data) {
     qDebug() << "com = " << hex << com;
 
+    pkgTx.clear();
     switch(com & GB_COM_MASK_GROUP) {
-    case GB_COM_MASK_GROUP_READ_PARAM: {
-        procCommandReadParam(com, data);
-    } break;
-    case GB_COM_MASK_GROUP_WRITE_REGIME: {
-        procCommandWriteRegime(com, data);
-    } break;
-    case GB_COM_MASK_GROUP_WRITE_PARAM: {
-        procCommandWriteParam(com, data);
-    } break;
-    case GB_COM_MASK_GROUP_READ_JOURNAL: {
-        procCommandReadJournal(com, data);
-    }break;
+        case GB_COM_MASK_GROUP_READ_PARAM: {
+            procCommandReadParam(com, data);
+        } break;
+        case GB_COM_MASK_GROUP_WRITE_REGIME: {
+            procCommandWriteRegime(com, data);
+        } break;
+        case GB_COM_MASK_GROUP_WRITE_PARAM: {
+            procCommandWriteParam(com, data);
+        } break;
+        case GB_COM_MASK_GROUP_READ_JOURNAL: {
+            procCommandReadJournal(com, data);
+        }break;
     }
 }
 
@@ -1080,101 +1081,101 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data) {
 
 //
 void Bsp::procCommandWriteParam(eGB_COM com, pkg_t &data) {
+    pkgTx.append(com);
+    pkgTx.append(data);
+
     switch(com) {
-    case GB_COM_PRM_SET_TIME_ON: {
-        if (data.size() != 1) {
-            qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
-        } else {
-            uint8_t value = data.takeFirst();
-            // FIXME Есть два разных параметра "Задержка на фиксацию команды"
-            Bsp::setSpinBoxValue(GB_PARAM_PRM_TIME_ON, value);
-        }
-    } break;
-
-    case GB_COM_PRM_SET_TIME_OFF: {
-        if (data.size() != 2) {
-            qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
-        } else {
-            uint8_t number = data.takeFirst();
-            uint8_t value = data.takeFirst();
-            // FIXME Есть два разных параметра "Задержка на фиксацию команды"
-            Bsp::setSpinBoxValue(GB_PARAM_PRM_TIME_OFF, value, number);
-        }
-    } break;
-
-    case GB_COM_PRM_SET_BLOCK_COM: {
-        if (data.size() != 2) {
-            qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
-        } else {
-            uint8_t number = data.takeFirst();
-            uint8_t value = data.takeFirst();
-            // FIXME Есть два разных параметра "Задержка на фиксацию команды"
-            Bsp::setComboBoxValueBits(GB_PARAM_PRM_COM_BLOCK, value, number);
-        }
-    } break;
-
-    case GB_COM_SET_TIME: {
-        if (data.size() != 9) {
-            qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
-        } else {
-            pkgTx.append(com);
-            pkgTx.append(data);
-
-            bool ok = false;
-            quint16 year = bcd2int(data.takeFirst(), ok) + 2000;
-            quint8 month = bcd2int(data.takeFirst(), ok);
-            quint8 day = bcd2int(data.takeFirst(), ok);
-            dt->setDate(QDate(year, month, day));
-
-            quint8 hour = bcd2int(data.takeFirst(), ok);
-            quint8 minute = bcd2int(data.takeFirst(), ok);
-            quint8 second = bcd2int(data.takeFirst(), ok);
-            dt->setTime(QTime(hour, minute, second));
-
-            quint16 ms = data.takeFirst();
-            ms += static_cast<quint16> (data.takeFirst()) << 8;
-            if (ms != 0) {
-                qWarning() << Bsp::codec->toUnicode("Milliseconds is not 0.");
+        case GB_COM_PRM_SET_TIME_ON: {
+            if (data.size() != 1) {
+                qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
+            } else {
+                uint8_t value = data.takeFirst();
+                // FIXME Есть два разных параметра "Задержка на фиксацию команды"
+                Bsp::setSpinBoxValue(GB_PARAM_PRM_TIME_ON, value);
             }
-
-            quint8 source = data.takeFirst();
-            if (source != 0) {
-                qWarning() << msgTimeSourceError.arg(source);
-            }
-        }
-    } break;
-
-    case GB_COM_SET_COM_PRM_KEEP: {
-        if (data.size() != 1) {
-            qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
-        } else {
-            uint8_t value = data.takeFirst();
-            // FIXME Может быть Uвых номинальное.
-            Bsp::setComboBoxValue(GB_PARAM_COM_PRM_KEEP, value);
-        }
-    } break;
-
-    case GB_COM_SET_COM_PRD_KEEP: {
-        uint8_t value = data.takeFirst();
-        uint8_t dop = data.takeFirst();
-        // FIXME Добавить остальные параметры для К400.
-        // Учесть что в Р400 только один байт "Совместимость".
-        switch(dop) {
-        case 1: {
-            Bsp::setComboBoxValue(GB_PARAM_COM_PRD_KEEP, value);
         } break;
 
-        default: qDebug("No dop byte handler: 0x%.2X", dop);
+        case GB_COM_PRM_SET_TIME_OFF: {
+            if (data.size() != 2) {
+                qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
+            } else {
+                uint8_t number = data.takeFirst();
+                uint8_t value = data.takeFirst();
+                // FIXME Есть два разных параметра "Задержка на фиксацию команды"
+                Bsp::setSpinBoxValue(GB_PARAM_PRM_TIME_OFF, value, number);
+            }
+        } break;
+
+        case GB_COM_PRM_SET_BLOCK_COM: {
+            if (data.size() != 2) {
+                qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
+            } else {
+                uint8_t number = data.takeFirst();
+                uint8_t value = data.takeFirst();
+                // FIXME Есть два разных параметра "Задержка на фиксацию команды"
+                Bsp::setComboBoxValueBits(GB_PARAM_PRM_COM_BLOCK, value, number);
+            }
+        } break;
+
+        case GB_COM_SET_TIME: {
+            if (data.size() != 9) {
+                qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
+            } else {
+                bool ok = false;
+                quint16 year = bcd2int(data.takeFirst(), ok) + 2000;
+                quint8 month = bcd2int(data.takeFirst(), ok);
+                quint8 day = bcd2int(data.takeFirst(), ok);
+                dt->setDate(QDate(year, month, day));
+
+                quint8 hour = bcd2int(data.takeFirst(), ok);
+                quint8 minute = bcd2int(data.takeFirst(), ok);
+                quint8 second = bcd2int(data.takeFirst(), ok);
+                dt->setTime(QTime(hour, minute, second));
+
+                quint16 ms = data.takeFirst();
+                ms += static_cast<quint16> (data.takeFirst()) << 8;
+                if (ms != 0) {
+                    qWarning() << Bsp::codec->toUnicode("Milliseconds is not 0.");
+                }
+
+                quint8 source = data.takeFirst();
+                if (source != 0) {
+                    qWarning() << msgTimeSourceError.arg(source);
+                }
+            }
+        } break;
+
+        case GB_COM_SET_COM_PRM_KEEP: {
+            if (data.size() != 1) {
+                qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
+            } else {
+                uint8_t value = data.takeFirst();
+                // FIXME Может быть Uвых номинальное.
+                Bsp::setComboBoxValue(GB_PARAM_COM_PRM_KEEP, value);
+            }
+        } break;
+
+        case GB_COM_SET_COM_PRD_KEEP: {
+            uint8_t value = data.takeFirst();
+            uint8_t dop = data.takeFirst();
+            // FIXME Добавить остальные параметры для К400.
+            // Учесть что в Р400 только один байт "Совместимость".
+            switch(dop) {
+                case 1: {
+                    Bsp::setComboBoxValue(GB_PARAM_COM_PRD_KEEP, value);
+                } break;
+
+                default: qDebug("No dop byte handler: 0x%.2X", dop);
+            }
+        } break;
+
+        case GB_COM_SET_NET_ADR: {
+            hdlrComNetAdrSet(com, data);
+        } break;
+
+        default: {
+            qWarning("No command handler: 0x%.2X", com);
         }
-    } break;
-
-    case GB_COM_SET_NET_ADR: {
-        hdlrComNetAdrSet(com, data);
-    } break;
-
-    default: {
-        qWarning("No command handler: 0x%.2X", com);
-    }
     }
 }
 
@@ -1204,7 +1205,7 @@ void Bsp::procCommandWriteRegime(eGB_COM com, pkg_t &data) {
     }
 }
 
-void Bsp::hdlrComGetVers(eGB_COM com, pkg_t data) {
+void Bsp::hdlrComGetVers(eGB_COM com, pkg_t &data) {
     uint16_t vers = 0;
 
     if (data.size() != 0) {
@@ -1254,7 +1255,7 @@ void Bsp::hdlrComGetVers(eGB_COM com, pkg_t data) {
 }
 
 //
-void  Bsp::hdlrComNetAdrGet(eGB_COM com, pkg_t data) {
+void  Bsp::hdlrComNetAdrGet(eGB_COM com, pkg_t &data) {
 
     //
     pkgTx.append(com);
@@ -1286,39 +1287,38 @@ void  Bsp::hdlrComNetAdrGet(eGB_COM com, pkg_t data) {
 }
 
 //
-void  Bsp::hdlrComNetAdrSet(eGB_COM com, pkg_t data)
-{
+void  Bsp::hdlrComNetAdrSet(eGB_COM com, pkg_t &data) {
     uint8_t dop = data.takeFirst();
     switch(dop) {
-    case 1: {
+    case POS_COM_NET_ADR_netAdr: {
         uint8_t byte = data.takeFirst();
         setSpinBoxValue(GB_PARAM_NET_ADDRESS, byte);
     } break;
-    case 2: {
+    case POS_COM_NET_ADR_interface: {
         uint8_t byte = data.takeFirst();
         setComboBoxValue(GB_PARAM_INTF_INTERFACE, byte);
     } break;
-    case 3: {
+    case POS_COM_NET_ADR_protocol: {
         uint8_t byte = data.takeFirst();
         setComboBoxValue(GB_PARAM_INTF_PROTOCOL, byte);
     } break;
-    case 4: {
+    case POS_COM_NET_ADR_baudrate: {
         uint8_t byte = data.takeFirst();
         setComboBoxValue(GB_PARAM_INTF_BAUDRATE, byte);
     } break;
-    case 5: {
+    case POS_COM_NET_ADR_dataBits: {
         uint8_t byte = data.takeFirst();
         setComboBoxValue(GB_PARAM_INTF_DATA_BITS, byte);
     } break;
-    case 6: {
+    case POS_COM_NET_ADR_parity: {
         uint8_t byte = data.takeFirst();
         setComboBoxValue(GB_PARAM_INTF_PARITY, byte);
     } break;
-    case 7: {
+    case POS_COM_NET_ADR_stopBits: {
         uint8_t byte = data.takeFirst();
         setComboBoxValue(GB_PARAM_INTF_STOP_BITS, byte);
     } break;
-    case 8: {
+    case POS_COM_NET_ADR_pwdEngineer: {
         if (data.size() != 8) {
             qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
         } else {
@@ -1329,7 +1329,7 @@ void  Bsp::hdlrComNetAdrSet(eGB_COM com, pkg_t data)
             mapLineEdit.value(GB_PARAM_IS_PWD_ENGINEER)->setText(value);
         }
     } break;
-    case 9: {
+    case POS_COM_NET_ADR_pwdAdmin: {
         if (data.size() != 8) {
             qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
         } else {
@@ -1340,7 +1340,7 @@ void  Bsp::hdlrComNetAdrSet(eGB_COM com, pkg_t data)
             mapLineEdit.value(GB_PARAM_IS_PWD_ADMIN)->setText(value);
         }
     } break;
-    case 10: {
+    case POS_COM_NET_ADR_cntEngineer: {
         if (data.size() != 1) {
             qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
         } else {
@@ -1348,7 +1348,7 @@ void  Bsp::hdlrComNetAdrSet(eGB_COM com, pkg_t data)
             setSpinBoxValue(GB_PARAM_IS_PWD_ENG_CNT, byte);
         }
     } break;
-    case 11: {
+    case POS_COM_NET_ADR_cntAdmin: {
         if (data.size() != 1) {
             qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
         } else {
@@ -1359,9 +1359,6 @@ void  Bsp::hdlrComNetAdrSet(eGB_COM com, pkg_t data)
 
     default: qDebug("No dop byte handler: 0x%.2X", dop);
     }
-
-    data.clear();
-    hdlrComNetAdrGet(com, data);
 }
 
 //
