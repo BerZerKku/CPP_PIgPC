@@ -57,6 +57,8 @@ class MainWindow : public QMainWindow
     struct view_t {
         QLineEdit userPi;
         QLineEdit userPc;
+        QLineEdit engPwd;
+        QLineEdit admPwd;
         QLineEdit engCounter;
         QLineEdit admCounter;
     } view;
@@ -111,6 +113,8 @@ private slots:
     void closeSerialPortPc();
     void readByteFromPc(int value);
     void resetStatusPc();
+
+    QString pwdToString(uint8_t *pwd);
 
     void test1();
     void test2();

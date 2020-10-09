@@ -91,6 +91,8 @@ void MainWindow::initView() {
     top->setText(0, codec->toUnicode("Пользователь"));
     addViewItem(top, "Роль ПИ", &view.userPi);
     addViewItem(top, "Роль ПК", &view.userPc);
+    addViewItem(top, "Пароль инженера", &view.engPwd);
+    addViewItem(top, "Пароль админисратора", &view.admPwd);
     addViewItem(top, "Счетчик инж.", &view.engCounter);
     addViewItem(top, "Счетчик адм.", &view.admCounter);
 
@@ -102,6 +104,7 @@ void MainWindow::setupTestButtons() {
     ui->pbTest1->setText("Engeneer PC");
     connect(ui->pbTest1, &QPushButton::clicked, this, &MainWindow::test1);
 
+    ui->pbTest2->setText("Admin PI");
     connect(ui->pbTest2, &QPushButton::clicked, this, &MainWindow::test2);
 
     connect(ui->pbTest3, &QPushButton::clicked, this, &MainWindow::test3);
@@ -140,7 +143,9 @@ void MainWindow::hdlrView() {
                             arg((time * MENU_TIME_CYLCE) / 1000));
 
 
+
     user = TUser::ENGINEER;
+    view.engPwd.setText(pwdToString(menu.sParam.security.pwd.getPwd(user)));
     value = menu.sParam.security.pwd.getCounter(user);
     time = menu.sParam.security.pwd.getLockTime(user);
     locked = menu.sParam.security.pwd.isLocked(user);
@@ -150,6 +155,7 @@ void MainWindow::hdlrView() {
     view.engCounter.setPalette(locked > 0 ? pred : pblue);
 
     user = TUser::ADMIN;
+    view.admPwd.setText(pwdToString(menu.sParam.security.pwd.getPwd(user)));
     value = menu.sParam.security.pwd.getCounter(user);
     time = menu.sParam.security.pwd.getLockTime(user);
     locked = menu.sParam.security.pwd.isLocked(user);
@@ -418,14 +424,32 @@ void MainWindow::resetStatusPc() {
 }
 
 //
+QString MainWindow::pwdToString(uint8_t *pwd) {
+    QString password;
+    for(uint8_t i = 0; i < PWD_LEN; i++) {
+        uint8_t ch = pwd[i];
+        if ((ch < '0') || (ch > '9')) {
+            if (!password.isEmpty() && (password.back() != ' ')) {
+                password += " ";
+            }
+            password += QString("%1 ").arg(ch, 2, 16, QLatin1Char('0'));
+        } else {
+            password += QChar(pwd[i]);
+        }
+    }
+    return password;
+}
+
+//
 void MainWindow::test1() {
-    qDebug() << "Set user ENGINEER for pc";
+    qDebug() << "Set user ENGINEER for PC";
     menu.sParam.security.UserPc.set(TUser::ENGINEER);
 }
 
 //
 void MainWindow::test2() {
-
+    qDebug() << "Set user ADMIN for PI";
+    menu.sParam.security.UserPi.set(TUser::ADMIN);
 }
 
 //
