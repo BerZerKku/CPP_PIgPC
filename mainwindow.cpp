@@ -117,7 +117,7 @@ void MainWindow::hdlrView() {
     bool locked = false;
     quint8 value  = 0;
     quint16 time = 0;
-    TUser::user_t user;
+    user_t user;
 
     QPalette pred = view.engCounter.palette();
     pred.setColor(QPalette::Text, Qt::red);
@@ -144,7 +144,7 @@ void MainWindow::hdlrView() {
 
 
 
-    user = TUser::ENGINEER;
+    user = USER_engineer;
     view.engPwd.setText(pwdToString(menu.sParam.security.pwd.getPwd(user)));
     value = menu.sParam.security.pwd.getCounter(user);
     time = menu.sParam.security.pwd.getLockTime(user);
@@ -154,7 +154,7 @@ void MainWindow::hdlrView() {
                             arg(time));
     view.engCounter.setPalette(locked > 0 ? pred : pblue);
 
-    user = TUser::ADMIN;
+    user = USER_admin;
     view.admPwd.setText(pwdToString(menu.sParam.security.pwd.getPwd(user)));
     value = menu.sParam.security.pwd.getCounter(user);
     time = menu.sParam.security.pwd.getLockTime(user);
@@ -415,6 +415,7 @@ void MainWindow::closeSerialPortPc() {
 //
 void MainWindow::readByteFromPc(int value) {
     uint8_t byte = static_cast<uint8_t> (value);
+
     pcPushByteFrom(byte, false);
 }
 
@@ -443,13 +444,13 @@ QString MainWindow::pwdToString(uint8_t *pwd) {
 //
 void MainWindow::test1() {
     qDebug() << "Set user ENGINEER for PC";
-    menu.sParam.security.UserPc.set(TUser::ENGINEER);
+    menu.sParam.security.UserPc.set(USER_engineer);
 }
 
 //
 void MainWindow::test2() {
     qDebug() << "Set user ADMIN for PI";
-    menu.sParam.security.UserPi.set(TUser::ADMIN);
+    menu.sParam.security.UserPi.set(USER_admin);
 }
 
 //
