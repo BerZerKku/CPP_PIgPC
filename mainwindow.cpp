@@ -233,7 +233,6 @@ void MainWindow::cycleMenu() {
 
     if (len > 0) {
         cntsendtobsp++;
-//        qDebug() << "Pkg to BSP: " << showbase << hex << pkg;
     }
 
     cnt1s++;
