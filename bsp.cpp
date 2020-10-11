@@ -1187,7 +1187,7 @@ void Bsp::procCommandWriteRegime(eGB_COM com, pkg_t &data) {
             qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
         }
 
-        //        setComboBoxValue(&stateGlb.regime, eGB_REGIME::GB_REGIME_DISABLED);
+        setComboBoxValue(stateGlb.regime, eGB_REGIME::GB_REGIME_DISABLED);
         pkgTx.append(com);
     } break;
     case GB_COM_SET_REG_ENABLED: {
@@ -1195,7 +1195,7 @@ void Bsp::procCommandWriteRegime(eGB_COM com, pkg_t &data) {
             qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
         }
 
-        //        setComboBoxValue(&stateGlb.regime, eGB_REGIME::GB_REGIME_ENABLED);
+        setComboBoxValue(stateGlb.regime, eGB_REGIME::GB_REGIME_ENABLED);
         pkgTx.append(com);
     } break;
 
