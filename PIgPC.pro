@@ -37,7 +37,8 @@ INCLUDEPATH += \
     PIg/src/drivers \
     PIg/src/menu \
     PIg/src/parameter \
-    PIg/src/protocols
+    PIg/src/protocols \
+    PIg/src/security
 
 SOURCES += \
     PIg/src/flashParam.cpp \
@@ -47,7 +48,6 @@ SOURCES += \
     PIg/src/menu/menu.cpp \
     PIg/src/menu/txCom.cpp \
     PIg/src/paramGlb.cpp \
-    PIg/src/paramIS.cpp \
     PIg/src/parameter/LocalParams.cpp \
     PIg/src/parameter/param.cpp \
     PIg/src/protocols/iec101/CIec101.cpp \
@@ -57,6 +57,10 @@ SOURCES += \
     PIg/src/protocols/standart/protocolBspS.cpp \
     PIg/src/protocols/standart/protocolPcS.cpp \
     PIg/src/protocols/standart/protocolS.cpp \
+    PIg/src/security/infosecurity.cpp \
+    PIg/src/security/isevent.cpp \
+    PIg/src/security/pwd.cpp \
+    PIg/src/security/user.cpp \
     main.cpp \
     mainwindow.cpp \
     qkeyboard.cpp \
@@ -85,7 +89,6 @@ HEADERS += \
     PIg/src/paramBsp.h \
     PIg/src/paramDef.h \
     PIg/src/paramGlb.h \
-    PIg/src/paramIS.h \
     PIg/src/paramPrd.h \
     PIg/src/paramPrm.h \
     PIg/src/paramUart.h \
@@ -98,6 +101,10 @@ HEADERS += \
     PIg/src/protocols/standart/protocolBspS.h \
     PIg/src/protocols/standart/protocolPcS.h \
     PIg/src/protocols/standart/protocolS.h \
+    PIg/src/security/infosecurity.h \
+    PIg/src/security/isevent.h \
+    PIg/src/security/pwd.h \
+    PIg/src/security/user.h \
     mainwindow.h \
     qkeyboard.h \
     serialport.h \

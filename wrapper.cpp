@@ -1,9 +1,11 @@
+#include "base.hpp"
 #include "wrapper.hpp"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
 #include "PIg/src/drivers/keyboard.h"
 #include "PIg/src/drivers/ks0108.h"
+#include "PIg/src/paramUart.h"
 
 #include <QTextCodec>
 
@@ -88,4 +90,15 @@ void vLCDled() {
     }
 
     w->setBacklight(enable);
+}
+
+void setupUart(TInterface::INTERFACE intf, uint16_t baudrate,
+               TDataBits::DATA_BITS dbits, TParity::PARITY parity,
+               TStopBits::STOP_BITS sbits) {
+
+    qDebug() << "interface = " << intf <<
+        ", baudrate = " << baudrate <<
+        ", databits = " << dbits <<
+        ", parity = " << parity <<
+        ", stopbits = " << sbits;
 }

@@ -96,6 +96,11 @@ void MainWindow::initView() {
     addViewItem(top, "Счетчик инж.", &view.engCounter);
     addViewItem(top, "Счетчик адм.", &view.admCounter);
 
+    top = new QTreeWidgetItem();
+    ui->treeWidget->addTopLevelItem(top);
+    top->setText(0, codec->toUnicode("Сетевые настройки"));
+    addViewItem(top, "Интерфейс", &view.interface);
+
     ui->treeWidget->expandAll();
 }
 
@@ -163,6 +168,9 @@ void MainWindow::hdlrView() {
                             arg(value, 2, 16, QLatin1Char('0')).
                             arg(time));
     view.admCounter.setPalette(locked ? pred : pblue);
+
+    value = menu.sParam.Uart.Interface.get();
+    view.interface.setText(codec->toUnicode(fcInterface[value]));
 }
 
 //

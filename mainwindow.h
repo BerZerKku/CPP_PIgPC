@@ -61,6 +61,7 @@ class MainWindow : public QMainWindow
         QLineEdit admPwd;
         QLineEdit engCounter;
         QLineEdit admCounter;
+        QLineEdit interface;
     } view;
 
 public:
