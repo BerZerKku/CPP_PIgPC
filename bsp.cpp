@@ -82,7 +82,7 @@ void Bsp::initParam() {
     setComboBoxValue(GB_PARAM_COM_PRM_KEEP, 0);
     setComboBoxValue(GB_PARAM_TIME_SYNCH, 0);
 
-    setComboBoxValue(GB_PARAM_INTF_INTERFACE, TInterface::RS485);
+    setComboBoxValue(GB_PARAM_INTF_INTERFACE, TInterface::USB);
     setComboBoxValue(GB_PARAM_INTF_PROTOCOL, TProtocol::IEC_101);
     setSpinBoxValue(GB_PARAM_NET_ADDRESS, 17);
     setComboBoxValue(GB_PARAM_INTF_BAUDRATE, TBaudRate::_9600);
