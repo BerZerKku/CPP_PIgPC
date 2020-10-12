@@ -36,7 +36,8 @@ INCLUDEPATH += \
     PIg/src \
     PIg/src/debug \
     PIg/src/parameter \
-    PIg/src/menu
+    PIg/src/menu \
+    PIg/src/security
 
 SOURCES += \
     PIg/src/flashParam.cpp \

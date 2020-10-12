@@ -80,6 +80,7 @@ void Bsp::initParam() {
 
     setComboBoxValue(GB_PARAM_COM_PRD_KEEP, 0);
     setComboBoxValue(GB_PARAM_COM_PRM_KEEP, 0);
+    setComboBoxValue(GB_PARAM_TIME_SYNCH, 0);
 
     setComboBoxValue(GB_PARAM_INTF_INTERFACE, TInterface::RS485);
     setComboBoxValue(GB_PARAM_INTF_PROTOCOL, TProtocol::IEC_101);
@@ -228,6 +229,7 @@ void Bsp::crtTreeGlb() {
 
     crtComboBox(GB_PARAM_COM_PRD_KEEP);
     crtComboBox(GB_PARAM_COM_PRM_KEEP);
+    crtComboBox(GB_PARAM_TIME_SYNCH);
 
     top->setExpanded(false);
 }
@@ -1035,6 +1037,16 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data) {
         // TODO Добавить считывание записи журнала для АСУ ТП.
     } break;
 
+    case GB_COM_GET_TIME_SINCHR : {
+        if (data.size() != 0) {
+            qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
+        }
+        //
+        pkgTx.append(com);
+        pkgTx.append(Bsp::getComboBoxValue(GB_PARAM_TIME_SYNCH));
+        // TODO В РЗСК второй байт "Тип детектора"
+    } break;
+
     case GB_COM_GET_COM_PRM_KEEP: {
         if (data.size() != 0) {
             qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
@@ -1142,6 +1154,16 @@ void Bsp::procCommandWriteParam(eGB_COM com, pkg_t &data) {
                 if (source != 0) {
                     qWarning() << msgTimeSourceError.arg(source);
                 }
+            }
+        } break;
+
+        case GB_COM_SET_TIME_SINCHR:{
+            // TODO В РЗСК два байта, т.к. может быть два параметра
+            if (data.size() != 2) {
+                qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
+            } else {
+                uint8_t value = data.takeFirst();
+                Bsp::setComboBoxValue(GB_PARAM_TIME_SYNCH, value);
             }
         } break;
 
