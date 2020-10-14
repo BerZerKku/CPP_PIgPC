@@ -58,8 +58,8 @@ SOURCES += \
     PIg/src/protocols/standart/protocolPcS.cpp \
     PIg/src/protocols/standart/protocolS.cpp \
     PIg/src/security/infosecurity.cpp \
-    PIg/src/security/isevent.cpp \
     PIg/src/security/pwd.cpp \
+    PIg/src/security/securityevent.cpp \
     PIg/src/security/user.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -74,6 +74,7 @@ HEADERS += \
     PIg/src/drivers/ks0108.h \
     PIg/src/drivers/tmp75.h \
     PIg/src/drivers/uart.h \
+    PIg/src/fifo.h \
     PIg/src/flash.h \
     PIg/src/flashParams.h \
     PIg/src/glbDefine.h \
@@ -102,8 +103,8 @@ HEADERS += \
     PIg/src/protocols/standart/protocolPcS.h \
     PIg/src/protocols/standart/protocolS.h \
     PIg/src/security/infosecurity.h \
-    PIg/src/security/isevent.h \
     PIg/src/security/pwd.h \
+    PIg/src/security/securityevent.h \
     PIg/src/security/user.h \
     mainwindow.h \
     qkeyboard.h \
