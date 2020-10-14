@@ -1,6 +1,7 @@
 #include "bsp.h"
 #include "PIg/src/flash.h"
 #include "PIg/src/parameter/param.h"
+#include "PIg/src/menu/txCom.hpp"
 #include <QDebug>
 #include "QTextCodec"
 #include <QTimer>
@@ -28,7 +29,7 @@ pkg_t Bsp::pkgRx;
 QVector<eGB_COM> Bsp::viewCom;
 
 Bsp::Bsp(QWidget *parent) : QTreeWidget(parent) {
-    COMPILE_TIME_ASSERT(MAX_NUM_COM_SEND_IN_CYLCE == (MAX_NUM_COM_BUF2 + 3));
+    COMPILE_TIME_ASSERT(MAX_NUM_COM_SEND_IN_CYLCE == (MAX_NUM_COM_BUF2 + 4));
 
     // Ёти строки не вли€ют на содержимое заголовка, но вли€ют на resize ниже.
     headerItem()->setText(0, codec->toUnicode("Parameter"));
@@ -51,10 +52,10 @@ Bsp::Bsp(QWidget *parent) : QTreeWidget(parent) {
 }
 
 void Bsp::initDebug() {
-    eGB_COM com = GB_COM_SET_TIME;
-    if (viewCom.count(com) == 0) {
-        viewCom.append(GB_COM_SET_TIME);
-    }
+    viewCom.append((eGB_COM) 0xF3);
+    viewCom.append((eGB_COM) 0xF4);
+    viewCom.append((eGB_COM) 0xF5);
+    viewCom.append((eGB_COM) 0xF6);
 }
 
 //
@@ -782,7 +783,9 @@ int Bsp::setSpinBoxValue(QSpinBox *spinbox, qint16 value) {
 
 //
 void Bsp::procCommand(eGB_COM com, pkg_t &data) {
-    qDebug() << "com = " << hex << com;
+    if (viewCom.count(com) != 0) {
+        qDebug() << "comRx = " << showbase << hex << com;
+    }
 
     pkgTx.clear();
     switch(com & GB_COM_MASK_GROUP) {

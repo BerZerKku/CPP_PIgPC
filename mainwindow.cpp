@@ -97,8 +97,6 @@ void MainWindow::refreshPortList() {
 
 //
 void MainWindow::connectSerialPort() {
-    qDebug() << "";
-
     if (port.isNull() && thread.isNull()) {
         port = new SerialPort(cmbPort->currentText());
         thread = new QThread(this);
@@ -180,7 +178,11 @@ void MainWindow::readByte(int value) {
                     Bsp::pkgTx.append(Bsp::calcCrc(Bsp::pkgTx));
                     Bsp::pkgTx.insert(0, 0x55);
                     Bsp::pkgTx.insert(1, 0xAA);
-                    qDebug() << hex << Bsp::pkgTx;
+
+                    if (Bsp::viewCom.count(com) != 0) {
+                        qDebug() << "comTx = " << showbase << hex << Bsp::pkgTx;
+                    }
+
                     for(uint8_t byte: Bsp::pkgTx) {
                         emit writeByte(byte);
                     }
