@@ -129,14 +129,14 @@ void MainWindow::hdlrView() {
     QPalette pblue = view.engCounter.palette();
     pblue.setColor(QPalette::Text, Qt::blue);
 
-    value = menu.sParam.security.usr.get(USER_SOURCE_pi);
-    time = menu.sParam.security.usr.getTimer(USER_SOURCE_pi);
+    value = menu.sParam.security.getUser(USER_SOURCE_pi);
+    time = menu.sParam.security.getUserTime(USER_SOURCE_pi);
     view.userPi.setText(QString("%1 / %2c").
                         arg(codec->toUnicode(fcUser[value])).
                         arg(time));
 
-    value = menu.sParam.security.usr.get(USER_SOURCE_pc);
-    time = menu.sParam.security.usr.getTimer(USER_SOURCE_pc);
+    value = menu.sParam.security.getUser(USER_SOURCE_pc);
+    time = menu.sParam.security.getUserTime(USER_SOURCE_pc);
     view.userPc.setText(QString("%1 / %2c").
                         arg(codec->toUnicode(fcUser[value])).
                         arg(time));
@@ -233,7 +233,7 @@ void MainWindow::cycleMenu() {
     }
 
     if (len > 0) {
-        if (pkg.at(2) > 0xF1) {
+        if ((pkg.at(2) > 0xF1) || (pkg.at(2) == 0xb8)) {
             qDebug() << "Pkg to BSP: " << showbase << hex << pkg;
         }
         cntsendtobsp++;
@@ -447,13 +447,13 @@ QString MainWindow::pwdToString(uint8_t *pwd) {
 //
 void MainWindow::test1() {
     qDebug() << "Set user ENGINEER for PC";
-    menu.sParam.security.usr.set(USER_SOURCE_pc, USER_engineer);
+    menu.sParam.security.setUser(USER_engineer, USER_SOURCE_pc);
 }
 
 //
 void MainWindow::test2() {
     qDebug() << "Set user ADMIN for PI";
-    menu.sParam.security.usr.set(USER_SOURCE_pi,USER_admin);
+    menu.sParam.security.setUser(USER_admin, USER_SOURCE_pi);
 }
 
 //

@@ -19,6 +19,7 @@
 #include "PIg/src/protocols/standart/protocolPcS.h"
 #include "PIg/src/protocols/modbus/protocolPcM.h"
 #include "PIg/src/protocols/iec101/protocolPcI.h"
+#include "PIg/src/security/user.h"
 
 
 QT_BEGIN_NAMESPACE
