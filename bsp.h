@@ -13,6 +13,8 @@
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 #include "glbDefine.h"
+#include "PIg/src/security/user.h"
+#include "PIg/src/security/securityevent.h"
 
 typedef QVector<uint8_t> pkg_t;
 
@@ -38,6 +40,13 @@ class Bsp : public QTreeWidget
         QComboBox *typeOpto = nullptr;
     };
 
+    struct jrn_t {
+        quint16 posSecurity = 0;
+        QTreeWidgetItem *security = nullptr;
+    };
+
+    static const QString kTimeFormat;
+
 public:
     explicit Bsp(QWidget *parent = nullptr);
 
@@ -59,6 +68,7 @@ public:
     void crtTreeState();
     void crtTreeState(QTreeWidgetItem *top, std::string name, state_t &state);
     void crtTreeUser();
+    void crtJournals();
 
     static QMap<eGB_PARAM, QVector<QComboBox*>> mapCombobox;
     static QMap<eGB_PARAM, QLineEdit*> mapLineEdit;
@@ -69,7 +79,6 @@ public:
 
     static pkg_t pkgRx; ///< Данные на приеме.
     static pkg_t pkgTx; ///< Данные для передачи.
-    static QVector<eGB_COM> viewCom;   ///< Команды для вывода в консоль.
 
     static quint8 getComboBoxValue(eGB_PARAM param, uint8_t number=1);
     static quint8 getComboBoxValue(QComboBox *combobox);
@@ -92,7 +101,7 @@ public:
     static state_t stateGlb;
     static state_t statePrm;
     static state_t statePrd;
-
+    static jrn_t journals;
 
     /// Обработка команды.
     static void procCommand(eGB_COM com, pkg_t &data);
@@ -110,8 +119,7 @@ private:
     QRegExp errRegExp;
     QRegExpValidator errValidator;
 
-    /// Инициализация отладки.
-    void initDebug();
+    static void addJSEntry(user_t user, userSrc_t src, TSecurityEvent::event_t event);
 
     void crtComboBox(eGB_PARAM param);
     void fillComboboxList(QComboBox *combobox, eGB_PARAM param);

@@ -42,6 +42,10 @@ INCLUDEPATH += \
 SOURCES += \
     PIg/src/flashParam.cpp \
     PIg/src/parameter/param.cpp \
+    PIg/src/security/infosecurity.cpp \
+    PIg/src/security/pwd.cpp \
+    PIg/src/security/securityevent.cpp \
+    PIg/src/security/user.cpp \
     bsp.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -58,6 +62,13 @@ HEADERS += \
     PIg/src/paramIS.h \
     PIg/src/paramUart.h \
     PIg/src/parameter/param.h \
+    PIg/src/protocols/standart/protocolBspS.h \
+    PIg/src/protocols/standart/protocolPcS.h \
+    PIg/src/protocols/standart/protocolS.h \
+    PIg/src/security/infosecurity.h \
+    PIg/src/security/pwd.h \
+    PIg/src/security/securityevent.h \
+    PIg/src/security/user.h \
     bsp.h \
     mainwindow.h \
     serialport.h \

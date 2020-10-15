@@ -26,6 +26,8 @@ signals:
 private:
     Bsp glb;
     Bsp oth;
+    Bsp jrn;
+    QVector<eGB_COM> viewCom;
 
     QComboBox *cmbPort;
     QPushButton *pbRefresh;
@@ -49,6 +51,9 @@ private:
      *  @param[in] pkg Данные.
      */
     void sendToBsp(pkg_t pkg);
+
+    /// Установка команд для наблюдения.
+    void initViewCommands();
 
 private slots:
     void refreshPortList();

@@ -28,18 +28,13 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     cmbPort->setSizePolicy(sizePolicy2);
     pbRefresh = new QPushButton("Refresh");
     pbPort = new QPushButton("Open");
+
     QHBoxLayout *hlport = new QHBoxLayout();
     hlport->addWidget(lport);
     hlport->addWidget(cmbPort);
     hlport->addWidget(pbRefresh);
     hlport->addWidget(pbPort);
-
     QVBoxLayout *vl = new QVBoxLayout();
-    vl->addLayout(hlport);
-    vl->addWidget(&glb);
-
-    hl->addLayout(vl);
-    hl->addWidget(&oth);
 
     glb.crtTreeUser();
     glb.crtTreeState();
@@ -50,9 +45,19 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     oth.crtTreePrd();
     oth.crtTreeGlb();
 
+    vl->addLayout(hlport);
+    vl->addWidget(&glb);
+
+    hl->addLayout(vl);
+    hl->addWidget(&oth);
+    hl->addWidget(&jrn);
+
+    jrn.crtJournals();
+
     glb.initParam();
 
     Bsp::initClock();
+    initViewCommands();
 
     refreshPortList();
     connect(pbRefresh, &QPushButton::clicked,
@@ -73,6 +78,15 @@ void MainWindow::showEvent(QShowEvent *event) {
     setMinimumHeight(750);
     setFixedWidth(width());
     resize(sizeHint());
+}
+
+//
+void
+MainWindow::initViewCommands() {
+    viewCom.append((eGB_COM) 0xF3);
+    viewCom.append((eGB_COM) 0xF4);
+    viewCom.append((eGB_COM) 0xF5);
+    viewCom.append((eGB_COM) 0xF6);
 }
 
 //
@@ -143,43 +157,49 @@ void MainWindow::closeSerialPort() {
 }
 
 void MainWindow::readByte(int value) {
-    static pkg_t rx;
+    static pkg_t pkgrx;
     static uint8_t len = 0;
 
-    switch(rx.size()) {
+    switch(pkgrx.size()) {
     case 0: {
         if (value == 0x55) {
-            rx.clear();
-            rx.append(value);
+            pkgrx.clear();
+            pkgrx.append(value);
         }
     } break;
     case 1: {
         if (value == 0xAA) {
-            rx.append(value);
+            pkgrx.append(value);
         } else {
-            rx.clear();
+            pkgrx.clear();
         }
     }break;
     case 2: {
-        rx.append(value);
+        pkgrx.append(value);
     } break;
     case 3: {
-        rx.append(value);
+        pkgrx.append(value);
         len = value;
     } break;
     default: {
-        rx.append(value);
+        pkgrx.append(value);
         if (len == 0) {
-            eGB_COM com = Bsp::checkPkg(rx);
+            eGB_COM com = Bsp::checkPkg(pkgrx);
             if (com != GB_COM_NO) {
-                Bsp::procCommand(com, rx);
+                Bsp::procCommand(com, pkgrx);
+
+                if (viewCom.count(com) != 0) {
+                    qDebug() << "comRx = " << showbase << hex << pkgrx;
+                }
+
                 if (!Bsp::pkgTx.isEmpty()) {
                     Bsp::pkgTx.insert(1, Bsp::pkgTx.size() - 1);
                     Bsp::pkgTx.append(Bsp::calcCrc(Bsp::pkgTx));
                     Bsp::pkgTx.insert(0, 0x55);
                     Bsp::pkgTx.insert(1, 0xAA);
 
-                    if (Bsp::viewCom.count(com) != 0) {
+                    com = static_cast<eGB_COM> (Bsp::pkgTx.at(2));
+                    if (viewCom.count(com) != 0) {
                         qDebug() << "comTx = " << showbase << hex << Bsp::pkgTx;
                     }
 
@@ -189,7 +209,7 @@ void MainWindow::readByte(int value) {
                     Bsp::pkgTx.clear();
                 }
             }
-            rx.clear();
+            pkgrx.clear();
         } else {
             len--;
         }

@@ -15,18 +15,18 @@ QMap<eGB_PARAM, QLineEdit*> Bsp::mapLineEdit;
 QMap<eGB_PARAM, QVector<QSpinBox*>> Bsp::mapSpinBox;
 
 QTextCodec *Bsp::codec = QTextCodec::codecForName("CP1251");
+const QString Bsp::kTimeFormat = "dd.MM.yyyy hh:mm:ss.zzz";
 
 Bsp::device_t Bsp::device;
 Bsp::state_t Bsp::stateDef;
 Bsp::state_t Bsp::stateGlb;
 Bsp::state_t Bsp::statePrm;
 Bsp::state_t Bsp::statePrd;
+Bsp::jrn_t Bsp::journals;
 
 QDateTime *Bsp::dt = nullptr;
 pkg_t Bsp::pkgTx;
 pkg_t Bsp::pkgRx;
-
-QVector<eGB_COM> Bsp::viewCom;
 
 Bsp::Bsp(QWidget *parent) : QTreeWidget(parent) {
     COMPILE_TIME_ASSERT(MAX_NUM_COM_SEND_IN_CYLCE == (MAX_NUM_COM_BUF2 + 4));
@@ -45,17 +45,8 @@ Bsp::Bsp(QWidget *parent) : QTreeWidget(parent) {
     header()->resizeSection(0, 220);
     setFixedWidth(400);
 
-    initDebug();
-
     setSelectionMode(QAbstractItemView::NoSelection);
     setFocusPolicy(Qt::NoFocus);
-}
-
-void Bsp::initDebug() {
-    viewCom.append((eGB_COM) 0xF3);
-    viewCom.append((eGB_COM) 0xF4);
-    viewCom.append((eGB_COM) 0xF5);
-    viewCom.append((eGB_COM) 0xF6);
 }
 
 //
@@ -387,6 +378,21 @@ void Bsp::crtTreeUser() {
     crtSpinBox(GB_PARAM_IS_PWD_ADM_CNT);
 
     top->setExpanded(true);
+}
+
+void Bsp::crtJournals() {
+    QTreeWidgetItem* top = new QTreeWidgetItem();
+    insertTopLevelItem(topLevelItemCount(), top);
+    top->setText(0, codec->toUnicode("Журналы"));
+
+    journals.security = new QTreeWidgetItem();
+    top->addChild(journals.security);
+    journals.security->setText(0, codec->toUnicode("Безопасность"));
+    addJSEntry(USER_admin, USER_SOURCE_pc, TSecurityEvent::EVENT_blkAdmin);
+    addJSEntry(USER_operator, USER_SOURCE_pi, TSecurityEvent::EVENT_MAX);
+    expandItem(journals.security);
+
+    expandItem(top);
 }
 
 //
@@ -783,10 +789,6 @@ int Bsp::setSpinBoxValue(QSpinBox *spinbox, qint16 value) {
 
 //
 void Bsp::procCommand(eGB_COM com, pkg_t &data) {
-    if (viewCom.count(com) != 0) {
-        qDebug() << "comRx = " << showbase << hex << com;
-    }
-
     pkgTx.clear();
     switch(com & GB_COM_MASK_GROUP) {
         case GB_COM_MASK_GROUP_READ_PARAM: {
@@ -802,6 +804,53 @@ void Bsp::procCommand(eGB_COM com, pkg_t &data) {
             procCommandReadJournal(com, data);
         }break;
     }
+}
+
+void Bsp::addJSEntry(user_t user, userSrc_t src, TSecurityEvent::event_t event) {
+    if (journals.security->childCount() < SIZE_OF_SECURITY_JRN) {
+        // FIXME Заменить кол-во записей журанала дейфайном из основного проекта
+        QTreeWidgetItem *entry = new QTreeWidgetItem();
+
+        QTreeWidgetItem *u = new QTreeWidgetItem();
+        std::string ustr;
+        if (user < USER_MAX) {
+            ustr = fcUser[user];
+        } else {
+            ustr = std::to_string(user);
+        }
+        u->setText(0, codec->toUnicode("Пользователь"));
+        u->setText(1, codec->toUnicode(ustr.c_str()));
+
+        // FIXME брать строки из основного проекта.
+        QTreeWidgetItem *s = new QTreeWidgetItem();
+        std::string sstr = TSecurityEvent::getUserSourceString(src);
+        s->setText(0, codec->toUnicode("Доступ"));
+        s->setText(1, codec->toUnicode(sstr.c_str()));
+
+        QTreeWidgetItem *e = new QTreeWidgetItem();
+        std::string estr = TSecurityEvent::getEventString(event);
+        estr += " (" + std::to_string(event) + ")";
+        e->setText(0, codec->toUnicode("Событие"));
+        e->setText(1, codec->toUnicode(estr.c_str()));
+
+        QTreeWidgetItem *d = new QTreeWidgetItem();
+        d->setText(0, codec->toUnicode("Время"));
+        d->setText(1, QDateTime::currentDateTime().toString(kTimeFormat));
+
+        entry->addChild(u);
+        entry->addChild(s);
+        entry->addChild(e);
+        entry->addChild(d);
+
+        journals.security->addChild(entry);
+        std::string name = "Запись ";
+        name += std::to_string(journals.security->childCount());
+        entry->setText(0, codec->toUnicode(name.c_str()));
+    }
+
+
+
+    journals.posSecurity = (journals.posSecurity + 1) % SIZE_OF_SECURITY_JRN;
 }
 
 //
@@ -853,49 +902,94 @@ quint8 Bsp::int2bcd(quint8 val, bool &ok) {
 //
 void Bsp::procCommandReadJournal(eGB_COM com, pkg_t &data) {
     switch(com) {
-    case GB_COM_DEF_GET_JRN_CNT: {
-        if (!data.isEmpty()) {
-            qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
-        }
-        // TODO Обработчик для команды чтения количества записей журнала.
-        pkgTx.append(com);
-        pkgTx.append(0);
-        pkgTx.append(0);
-    } break;
+        case GB_COM_DEF_GET_JRN_CNT: {
+            if (!data.isEmpty()) {
+                qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
+            }
+            // TODO Обработчик для команды чтения количества записей журнала.
+            pkgTx.append(com);
+            pkgTx.append(0);
+            pkgTx.append(0);
+        } break;
 
-    case GB_COM_PRM_GET_JRN_CNT: {
-        if (!data.isEmpty()) {
-            qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
-        }
-        // TODO Обработчик для команды чтения количества записей журнала.
-        pkgTx.append(com);
-        pkgTx.append(0);
-        pkgTx.append(0);
-    } break;
+        case GB_COM_PRM_GET_JRN_CNT: {
+            if (!data.isEmpty()) {
+                qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
+            }
+            // TODO Обработчик для команды чтения количества записей журнала.
+            pkgTx.append(com);
+            pkgTx.append(0);
+            pkgTx.append(0);
+        } break;
 
-    case GB_COM_PRD_GET_JRN_CNT: {
-        if (!data.isEmpty()) {
-            qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
-        }
-        // TODO Обработчик для команды чтения количества записей журнала.
-        pkgTx.append(com);
-        pkgTx.append(0);
-        pkgTx.append(0);
-    } break;
+        case GB_COM_PRD_GET_JRN_CNT: {
+            if (!data.isEmpty()) {
+                qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
+            }
+            // TODO Обработчик для команды чтения количества записей журнала.
+            pkgTx.append(com);
+            pkgTx.append(0);
+            pkgTx.append(0);
+        } break;
 
-    case GB_COM_GET_JRN_CNT : {
-        if (!data.isEmpty()) {
-            qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
-        }
-        // TODO Обработчик для команды чтения количества записей журнала.
-        pkgTx.append(com);
-        pkgTx.append(0);
-        pkgTx.append(0);
-    } break;
+        case GB_COM_GET_JRN_CNT : {
+            if (!data.isEmpty()) {
+                qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
+            }
+            // TODO Обработчик для команды чтения количества записей журнала.
+            pkgTx.append(com);
+            pkgTx.append(0);
+            pkgTx.append(0);
+        } break;
 
-    default: {
-        qWarning("No command handler: 0x%.2X", com);
-    }
+        case GB_COM_GET_JRN_IS_CNT: {
+            if (!data.isEmpty()) {
+                qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
+            }
+
+            uint16_t num = journals.security->childCount();
+            if (num >= SIZE_OF_SECURITY_JRN) {
+                num |= 0xC000;
+            }
+
+            pkgTx.append(com);
+            pkgTx.append(num);
+            pkgTx.append(num >> 8);
+        } break;
+
+        case GB_COM_GET_JRN_IS_ENTRY: {
+            if (data.count() != 2) {
+                qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
+            } else {
+                uint16_t num = data.takeFirst();
+                num += ((uint16_t) data.takeFirst()) << 8;
+
+                if (num > SIZE_OF_SECURITY_JRN) {
+                    qWarning() << "Number of entry is too big!";
+                }
+
+
+            }
+        } break;
+
+        case GB_COM_JRN_IS_SET_ENTRY: {
+            pkgTx.append(com);
+            pkgTx.append(data);
+
+            if (data.count() != 3) {
+                qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
+            } else {
+                user_t user = static_cast<user_t> (data.takeFirst());
+                userSrc_t src = static_cast<userSrc_t> (data.takeFirst());
+                TSecurityEvent::event_t event;
+                event = static_cast<TSecurityEvent::event_t>(data.takeFirst());
+                addJSEntry(user, src, event);
+            }
+        } break;
+
+        default: {
+            qWarning("No command handler: 0x%.2X", com);
+        }
     }
 }
 
