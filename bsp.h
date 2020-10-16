@@ -41,8 +41,10 @@ class Bsp : public QTreeWidget
     };
 
     struct jrn_t {
-        quint16 posSecurity = 0;
+        quint16 cntSecurity = 0;
+        quint16 posSecurity = SIZE_OF_SECURITY_JRN - 1;
         QTreeWidgetItem *security = nullptr;
+        QTreeWidget *securityTw = nullptr;
     };
 
     static const QString kTimeFormat;
@@ -120,6 +122,7 @@ private:
     QRegExpValidator errValidator;
 
     static void addJSEntry(user_t user, userSrc_t src, TSecurityEvent::event_t event);
+    QTreeWidgetItem* crtJSEntry(quint16 index);
 
     void crtComboBox(eGB_PARAM param);
     void fillComboboxList(QComboBox *combobox, eGB_PARAM param);
@@ -152,6 +155,11 @@ private:
     static void hdlrComGetVers(eGB_COM com, pkg_t &data);
     static void hdlrComNetAdrGet(eGB_COM com, pkg_t &data);
     static void hdlrComNetAdrSet(eGB_COM com, pkg_t &data);
+
+    static void hdlrComJrnIsClr(eGB_COM com, pkg_t &data);
+    static void hdlrComGetJrnIsCnt(eGB_COM com, pkg_t &data);
+    static void hdlrComGetJrnIsEntry(eGB_COM com, pkg_t &data);
+    static void hdlrComGetJrnIsSetEntry(eGB_COM com, pkg_t &data);
 
 private slots:
     static void setRegime(int index);

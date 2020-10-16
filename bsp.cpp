@@ -113,6 +113,10 @@ void Bsp::initParam() {
 //    params.prd.setIndCom8(1, 0);
 //    params.prd.setIndCom8(2, 0);
     //    params.prd.setIndCom8(3, 0);
+
+
+    addJSEntry(USER_admin, USER_SOURCE_pc, TSecurityEvent::EVENT_blkAdmin);
+    addJSEntry(USER_operator, USER_SOURCE_pi, TSecurityEvent::EVENT_MAX);
 }
 
 void Bsp::initClock() {
@@ -388,10 +392,14 @@ void Bsp::crtJournals() {
     journals.security = new QTreeWidgetItem();
     top->addChild(journals.security);
     journals.security->setText(0, codec->toUnicode("Безопасность"));
-    addJSEntry(USER_admin, USER_SOURCE_pc, TSecurityEvent::EVENT_blkAdmin);
-    addJSEntry(USER_operator, USER_SOURCE_pi, TSecurityEvent::EVENT_MAX);
-    expandItem(journals.security);
 
+    for(quint16 i = 0 ; i < SIZE_OF_SECURITY_JRN; i++) {
+        journals.security->addChild(crtJSEntry(i));
+    }
+
+    journals.securityTw = this;
+
+    expandItem(journals.security);
     expandItem(top);
 }
 
@@ -807,50 +815,100 @@ void Bsp::procCommand(eGB_COM com, pkg_t &data) {
 }
 
 void Bsp::addJSEntry(user_t user, userSrc_t src, TSecurityEvent::event_t event) {
-    if (journals.security->childCount() < SIZE_OF_SECURITY_JRN) {
-        // FIXME Заменить кол-во записей журанала дейфайном из основного проекта
-        QTreeWidgetItem *entry = new QTreeWidgetItem();
+    QTreeWidget *tw = journals.securityTw;
+    QTreeWidgetItem *item;
+    QComboBox *combobox;
 
-        QTreeWidgetItem *u = new QTreeWidgetItem();
-        std::string ustr;
-        if (user < USER_MAX) {
-            ustr = fcUser[user];
-        } else {
-            ustr = std::to_string(user);
-        }
-        u->setText(0, codec->toUnicode("Пользователь"));
-        u->setText(1, codec->toUnicode(ustr.c_str()));
-
-        // FIXME брать строки из основного проекта.
-        QTreeWidgetItem *s = new QTreeWidgetItem();
-        std::string sstr = TSecurityEvent::getUserSourceString(src);
-        s->setText(0, codec->toUnicode("Доступ"));
-        s->setText(1, codec->toUnicode(sstr.c_str()));
-
-        QTreeWidgetItem *e = new QTreeWidgetItem();
-        std::string estr = TSecurityEvent::getEventString(event);
-        estr += " (" + std::to_string(event) + ")";
-        e->setText(0, codec->toUnicode("Событие"));
-        e->setText(1, codec->toUnicode(estr.c_str()));
-
-        QTreeWidgetItem *d = new QTreeWidgetItem();
-        d->setText(0, codec->toUnicode("Время"));
-        d->setText(1, QDateTime::currentDateTime().toString(kTimeFormat));
-
-        entry->addChild(u);
-        entry->addChild(s);
-        entry->addChild(e);
-        entry->addChild(d);
-
-        journals.security->addChild(entry);
-        std::string name = "Запись ";
-        name += std::to_string(journals.security->childCount());
-        entry->setText(0, codec->toUnicode(name.c_str()));
+    if (tw == nullptr) {
+        return;
     }
 
+    if (journals.cntSecurity != 0) {
+        item = journals.security->child(journals.posSecurity);
+        item->setForeground(0, Qt::black);
+        journals.posSecurity = (journals.posSecurity + 1) % SIZE_OF_SECURITY_JRN;
+    } else {
+        journals.posSecurity = 0;
+    }
 
+    item = journals.security->child(journals.posSecurity);
 
-    journals.posSecurity = (journals.posSecurity + 1) % SIZE_OF_SECURITY_JRN;
+    combobox = static_cast<QComboBox*> (tw->itemWidget(item->child(0), 1));
+    std::string ustr = (user < USER_MAX) ? fcUser[user] : std::to_string(user);
+    combobox->clear();
+    combobox->addItem(codec->toUnicode(ustr.c_str()), user);
+
+    combobox = static_cast<QComboBox*> (tw->itemWidget(item->child(1), 1));
+    std::string sstr = TSecurityEvent::getUserSourceString(src);
+    combobox->clear();
+    combobox->addItem(codec->toUnicode(sstr.c_str()), src);
+
+    combobox = static_cast<QComboBox*> (tw->itemWidget(item->child(2), 1));
+    std::string estr = TSecurityEvent::getEventString(event);
+    estr += " (" + std::to_string(event) + ")";
+    combobox->clear();
+    combobox->addItem(codec->toUnicode(estr.c_str()), event);
+
+    combobox = static_cast<QComboBox*> (tw->itemWidget(item->child(3), 1));
+    combobox->clear();
+    combobox->addItem(QDateTime::currentDateTime().toString(kTimeFormat));
+
+    if (journals.cntSecurity <  SIZE_OF_SECURITY_JRN) {
+        journals.cntSecurity++;
+    }
+
+    item->setForeground(0, Qt::blue);
+    item->setHidden(false);
+}
+
+//
+QTreeWidgetItem* Bsp::crtJSEntry(quint16 index) {
+    QTreeWidgetItem *item;
+    QComboBox *combobox;
+
+    item = new QTreeWidgetItem();
+    QTreeWidgetItem *subitem;
+
+    subitem = new QTreeWidgetItem();
+    subitem->setText(0, codec->toUnicode("Пользователь"));
+    combobox = new QComboBox();
+    combobox->setEditable(false);
+    combobox->setFocusPolicy(Qt::FocusPolicy::NoFocus);
+    item->addChild(subitem);
+    setItemWidget(subitem, 1, combobox);
+
+    // FIXME брать строки из основного проекта.
+    subitem = new QTreeWidgetItem();
+    subitem->setText(0, codec->toUnicode("Доступ"));
+    combobox = new QComboBox();
+    combobox->setEditable(false);
+    combobox->setFocusPolicy(Qt::FocusPolicy::NoFocus);
+    item->addChild(subitem);
+    setItemWidget(subitem, 1, combobox);
+
+    subitem = new QTreeWidgetItem();
+    subitem->setText(0, codec->toUnicode("Событие"));
+    combobox = new QComboBox();
+    combobox->setEditable(false);
+    combobox->setFocusPolicy(Qt::FocusPolicy::NoFocus);
+    item->addChild(subitem);
+    setItemWidget(subitem, 1, combobox);
+
+    subitem = new QTreeWidgetItem();
+    subitem->setText(0, codec->toUnicode("Время"));
+    combobox = new QComboBox();
+    combobox->setEditable(false);
+    combobox->setFocusPolicy(Qt::FocusPolicy::NoFocus);
+    item->addChild(subitem);
+    setItemWidget(subitem, 1, combobox);
+
+    journals.security->addChild(item);
+    std::string name = "Запись ";
+    name += std::to_string(index);
+    item->setText(0, codec->toUnicode(name.c_str()));
+    item->setHidden(true);
+
+    return item;
 }
 
 //
@@ -943,48 +1001,19 @@ void Bsp::procCommandReadJournal(eGB_COM com, pkg_t &data) {
         } break;
 
         case GB_COM_GET_JRN_IS_CNT: {
-            if (!data.isEmpty()) {
-                qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
-            }
-
-            uint16_t num = journals.security->childCount();
-            if (num >= SIZE_OF_SECURITY_JRN) {
-                num |= 0xC000;
-            }
-
-            pkgTx.append(com);
-            pkgTx.append(num);
-            pkgTx.append(num >> 8);
+            hdlrComGetJrnIsCnt(com, data);
         } break;
 
         case GB_COM_GET_JRN_IS_ENTRY: {
-            if (data.count() != 2) {
-                qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
-            } else {
-                uint16_t num = data.takeFirst();
-                num += ((uint16_t) data.takeFirst()) << 8;
+            hdlrComGetJrnIsEntry(com, data);
+        } break;
 
-                if (num > SIZE_OF_SECURITY_JRN) {
-                    qWarning() << "Number of entry is too big!";
-                }
-
-
-            }
+        case GB_COM_JRN_IS_CLR: {
+            hdlrComJrnIsClr(com, data);
         } break;
 
         case GB_COM_JRN_IS_SET_ENTRY: {
-            pkgTx.append(com);
-            pkgTx.append(data);
-
-            if (data.count() != 3) {
-                qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
-            } else {
-                user_t user = static_cast<user_t> (data.takeFirst());
-                userSrc_t src = static_cast<userSrc_t> (data.takeFirst());
-                TSecurityEvent::event_t event;
-                event = static_cast<TSecurityEvent::event_t>(data.takeFirst());
-                addJSEntry(user, src, event);
-            }
+            hdlrComGetJrnIsSetEntry(com, data);
         } break;
 
         default: {
@@ -1478,6 +1507,119 @@ void  Bsp::hdlrComNetAdrSet(eGB_COM com, pkg_t &data) {
 
     default: qDebug("No dop byte handler: 0x%.2X", dop);
     }
+}
+
+//
+void
+Bsp::hdlrComJrnIsClr(eGB_COM com, pkg_t &data) {
+    if (!data.isEmpty()) {
+        qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
+        return;
+    }
+
+    journals.cntSecurity = 0;
+    journals.posSecurity = 0;
+
+    for(quint16 i = 0; i < journals.security->childCount(); i++) {
+        journals.security->child(i)->setHidden(0);
+    }
+
+}
+
+//
+void
+Bsp::hdlrComGetJrnIsCnt(eGB_COM com, pkg_t &data) {
+    uint16_t num;
+
+    if (!data.isEmpty()) {
+        qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
+        return;
+    }
+
+    num = journals.security->childCount();
+    if (num >= SIZE_OF_SECURITY_JRN) {
+        num |= 0xC000;
+    }
+
+    pkgTx.append(com);
+    pkgTx.append(num);
+    pkgTx.append(num >> 8);
+}
+
+//
+void
+Bsp::hdlrComGetJrnIsEntry(eGB_COM com, pkg_t &data) {
+    QComboBox *combobox;
+    QTreeWidgetItem *item;
+    QTreeWidget *tw;
+
+    if (data.count() != 2) {
+        qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
+        return;
+    }
+
+    uint16_t num = data.takeFirst();
+    num += ((uint16_t) data.takeFirst()) << 8;
+
+    if (num >= journals.cntSecurity) {
+        qWarning() << "Number of entry is too big! num = " << num <<
+            ", cntSecurity = " << journals.cntSecurity;
+        return;
+    }
+
+    pkgTx.append(com);
+
+    tw = journals.securityTw;
+    item = journals.security->child(num);
+
+    // User
+    combobox = static_cast<QComboBox*> (tw->itemWidget(item->child(0), 1));
+    pkgTx.append(combobox->currentData().toUInt());
+
+    // Source
+    combobox = static_cast<QComboBox*> (tw->itemWidget(item->child(1), 1));
+    pkgTx.append(combobox->currentData().toUInt());
+
+    // Event
+    combobox = static_cast<QComboBox*> (tw->itemWidget(item->child(2), 1));
+    pkgTx.append(combobox->currentData().toUInt());
+
+    pkgTx.append(0); // резерв
+
+    combobox = static_cast<QComboBox*> (tw->itemWidget(item->child(3), 1));
+    bool ok;
+    QDateTime dt;
+    dt.fromString(combobox->currentText(), kTimeFormat);
+    uint16_t ms = dt.time().msec();
+
+    pkgTx.append(ms);
+    pkgTx.append(ms >> 8);
+    pkgTx.append(int2bcd(dt.time().second(), ok));
+    pkgTx.append(int2bcd(dt.time().minute(), ok));
+    pkgTx.append(int2bcd(dt.time().hour(), ok));
+
+    pkgTx.append(int2bcd(dt.date().day(), ok));
+    pkgTx.append(int2bcd(dt.date().month(), ok));
+    pkgTx.append(int2bcd(dt.date().year() - 2000, ok));
+}
+
+//
+void
+Bsp::hdlrComGetJrnIsSetEntry(eGB_COM com, pkg_t &data) {
+    pkgTx.append(com);
+    pkgTx.append(data);
+
+    if (data.count() != 3) {
+        qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
+        return;
+    }
+
+    user_t user = static_cast<user_t> (data.takeFirst());
+    userSrc_t src = static_cast<userSrc_t> (data.takeFirst());
+    TSecurityEvent::event_t event;
+    event = static_cast<TSecurityEvent::event_t>(data.takeFirst());
+    addJSEntry(user, src, event);
+
 }
 
 //
