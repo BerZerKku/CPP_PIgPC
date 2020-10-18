@@ -1529,26 +1529,31 @@ Bsp::hdlrComJrnIsClr(eGB_COM com, pkg_t &data) {
 //
 void
 Bsp::hdlrComGetJrnIsCnt(eGB_COM com, pkg_t &data) {
-    uint16_t num;
+    uint16_t len;
 
     if (!data.isEmpty()) {
         qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
         return;
     }
 
-    num = journals.security->childCount();
-    if (num >= SIZE_OF_SECURITY_JRN) {
-        num |= 0xC000;
+    if (journals.cntSecurity == 0) {
+        len = 0;
+    } else if (journals.cntSecurity < SIZE_OF_SECURITY_JRN) {
+        len = journals.cntSecurity;
+    } else {
+        len = journals.posSecurity;
+        len |= 0xC000;
     }
 
     pkgTx.append(com);
-    pkgTx.append(num);
-    pkgTx.append(num >> 8);
+    pkgTx.append(len);
+    pkgTx.append(len >> 8);
 }
 
 //
 void
 Bsp::hdlrComGetJrnIsEntry(eGB_COM com, pkg_t &data) {
+    bool ok;
     QComboBox *combobox;
     QTreeWidgetItem *item;
     QTreeWidget *tw;
@@ -1558,8 +1563,9 @@ Bsp::hdlrComGetJrnIsEntry(eGB_COM com, pkg_t &data) {
         return;
     }
 
+    // FIXME Порядок байт в запросе Р400м отличается от других (перевернут)
     uint16_t num = data.takeFirst();
-    num += ((uint16_t) data.takeFirst()) << 8;
+    num = (num << 8) + data.takeFirst();
 
     if (num >= journals.cntSecurity) {
         qWarning() << "Number of entry is too big! num = " << num <<
@@ -1584,23 +1590,18 @@ Bsp::hdlrComGetJrnIsEntry(eGB_COM com, pkg_t &data) {
     combobox = static_cast<QComboBox*> (tw->itemWidget(item->child(2), 1));
     pkgTx.append(combobox->currentData().toUInt());
 
-    pkgTx.append(0); // резерв
-
     combobox = static_cast<QComboBox*> (tw->itemWidget(item->child(3), 1));
-    bool ok;
-    QDateTime dt;
-    dt.fromString(combobox->currentText(), kTimeFormat);
-    uint16_t ms = dt.time().msec();
+    QDateTime dt = QDateTime::fromString(combobox->currentText(), kTimeFormat);
 
+    uint16_t ms = dt.time().msec();
+    pkgTx.append(int2bcd(dt.date().year() - 2000, ok));
+    pkgTx.append(int2bcd(dt.date().month(), ok));
+    pkgTx.append(int2bcd(dt.date().day(), ok));
+    pkgTx.append(int2bcd(dt.time().hour(), ok));
+    pkgTx.append(int2bcd(dt.time().minute(), ok));
+    pkgTx.append(int2bcd(dt.time().second(), ok));
     pkgTx.append(ms);
     pkgTx.append(ms >> 8);
-    pkgTx.append(int2bcd(dt.time().second(), ok));
-    pkgTx.append(int2bcd(dt.time().minute(), ok));
-    pkgTx.append(int2bcd(dt.time().hour(), ok));
-
-    pkgTx.append(int2bcd(dt.date().day(), ok));
-    pkgTx.append(int2bcd(dt.date().month(), ok));
-    pkgTx.append(int2bcd(dt.date().year() - 2000, ok));
 }
 
 //
