@@ -1600,8 +1600,8 @@ Bsp::hdlrComGetJrnIsEntry(eGB_COM com, pkg_t &data) {
     pkgTx.append(int2bcd(dt.time().hour(), ok));
     pkgTx.append(int2bcd(dt.time().minute(), ok));
     pkgTx.append(int2bcd(dt.time().second(), ok));
-    pkgTx.append(ms);
     pkgTx.append(ms >> 8);
+    pkgTx.append(ms);
 }
 
 //
