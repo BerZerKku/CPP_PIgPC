@@ -234,7 +234,7 @@ void MainWindow::cycleMenu() {
 
     if (len > 0) {
         if ((pkg.at(2) > 0xF1) || (pkg.at(2) == 0xb8)) {
-            qDebug() << "Pkg to BSP: " << showbase << hex << pkg;
+//            qDebug() << "Pkg to BSP: " << showbase << hex << pkg;
         }
         cntsendtobsp++;
     }
