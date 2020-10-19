@@ -83,10 +83,11 @@ void MainWindow::showEvent(QShowEvent *event) {
 //
 void
 MainWindow::initViewCommands() {
-    viewCom.append(GB_COM_GET_JRN_IS_CNT);
-    viewCom.append(GB_COM_GET_JRN_IS_ENTRY);
-    viewCom.append(GB_COM_JRN_IS_CLR);
-    viewCom.append(GB_COM_JRN_IS_SET_ENTRY);
+//    viewCom.append(GB_COM_GET_JRN_IS_CNT);
+//    viewCom.append(GB_COM_GET_JRN_IS_ENTRY);
+//    viewCom.append(GB_COM_JRN_IS_CLR);
+//    viewCom.append(GB_COM_JRN_IS_SET_ENTRY);
+    viewCom.append(GB_COM_NO);
 }
 
 //
@@ -185,8 +186,8 @@ void MainWindow::readByte(int value) {
         pkgrx.append(value);
         if (len == 0) {
             pkg_t temprx = pkgrx;
-            eGB_COM com = Bsp::checkPkg(pkgrx);
-            if (com != GB_COM_NO) {
+            eGB_COM com;
+            if (Bsp::checkPkg(pkgrx, com)) {
                 if (viewCom.count(com) != 0) {
                     qDebug() << "comRx <<< " << showbase << hex << temprx;
                 }

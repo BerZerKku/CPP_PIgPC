@@ -60,7 +60,7 @@ public:
     /// Подсчет контрольной суммы.
     static uint8_t calcCrc(pkg_t &pkg);
     /// Проверка пакета.
-    static eGB_COM checkPkg(pkg_t &pkg);
+    static bool checkPkg(pkg_t &pkg, eGB_COM &com);
 
     void crtTreeDevice();
     void crtTreeGlb();

@@ -142,34 +142,32 @@ uint8_t Bsp::calcCrc(QVector<uint8_t> &pkg) {
 }
 
 //
-eGB_COM Bsp::checkPkg(QVector<uint8_t> &pkg) {
-    eGB_COM com = GB_COM_NO;
-
+bool Bsp::checkPkg(QVector<uint8_t> &pkg, eGB_COM &com) {
     uint8_t byte;
 
     byte = pkg.takeFirst();
     if (byte != 0x55) {
-        return GB_COM_NO;
+        return false;
     }
 
     byte = pkg.takeFirst();
     if (byte != 0xAA) {
-        return GB_COM_NO;
+        return false;
     }
 
     byte = pkg.takeLast();
     if (byte != calcCrc(pkg)) {
-        return GB_COM_NO;
+        return false;
     }
 
     com = static_cast<eGB_COM> (pkg.takeFirst());
 
     byte = pkg.takeFirst();
     if (byte != pkg.size()) {
-        return GB_COM_NO;
+        return false;
     }
 
-    return com;
+    return true;
 }
 
 void Bsp::crtTreeDevice() {
@@ -1025,195 +1023,202 @@ void Bsp::procCommandReadJournal(eGB_COM com, pkg_t &data) {
 //
 void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data) {
     switch(com) {
-    case GB_COM_NO: {
-    } break;
+        case GB_COM_NO: {
+            if (data.size() != 0) {
+                qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
+            }
+            pkgTx.append(com);
+            pkgTx.append(1);
+            pkgTx.append(2);
+            pkgTx.append(3);
+        } break;
 
-    case GB_COM_DEF_GET_LINE_TYPE: {
-        if (data.size() != 0) {
-            qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
+        case GB_COM_DEF_GET_LINE_TYPE: {
+            if (data.size() != 0) {
+                qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
+            }
+            //
+            pkgTx.append(com);
+            // FIXME Добавить параметр
+            pkgTx.append(0x01);
+        } break;
+
+        case GB_COM_PRM_GET_TIME_ON: {
+            if (data.size() != 0) {
+                qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
+            }
+            //
+            pkgTx.append(com);
+            // FIXME Есть два разных параметра "Задержка на фиксацию команды"
+            pkgTx.append(Bsp::getSpinBoxValue(GB_PARAM_PRM_TIME_ON));
+        } break;
+
+        case GB_COM_PRM_GET_TIME_OFF: {
+            if (data.size() != 0) {
+                qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
+            }
+            //
+            pkgTx.append(com);
+            // FIXME Сделать зависимость от количества команд.
+            uint8_t number = getAbsMaxNumOfSameParams(GB_PARAM_PRM_TIME_OFF);
+            for(uint8_t i = 1; i <= number; i++) {
+                qint16 value = Bsp::getSpinBoxValue(GB_PARAM_PRM_TIME_OFF, i);
+                pkgTx.append(static_cast<quint8> (value));
+            }
+        } break;
+
+        case GB_COM_PRM_GET_BLOCK_COM: {
+            if (data.size() != 0) {
+                qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
+            }
+            //
+            pkgTx.append(com);
+            pkgTx.append(Bsp::getComboBoxValue(GB_PARAM_PRM_COM_BLOCK, 1));
+            pkgTx.append(Bsp::getComboBoxValue(GB_PARAM_PRM_COM_BLOCK, 9));
+            pkgTx.append(Bsp::getComboBoxValue(GB_PARAM_PRM_COM_BLOCK, 17));
+            pkgTx.append(Bsp::getComboBoxValue(GB_PARAM_PRM_COM_BLOCK, 25));
+        } break;
+
+        case GB_COM_GET_SOST: {
+            if (data.size() != 1) {
+                qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
+            }
+            //
+            pkgTx.append(com);
+            pkgTx.append(getComboBoxValue(stateDef.regime));
+            pkgTx.append(getSpinBoxValue(stateDef.state));
+            pkgTx.append(getSpinBoxValue(stateDef.dopByte));
+            pkgTx.append(getComboBoxValue(statePrm.regime));
+            pkgTx.append(getSpinBoxValue(statePrm.state));
+            pkgTx.append(getSpinBoxValue(statePrm.dopByte));
+            pkgTx.append(getComboBoxValue(statePrd.regime));
+            pkgTx.append(getSpinBoxValue(statePrd.state));
+            pkgTx.append(getSpinBoxValue(statePrd.dopByte));
+            // TODO Разобраться зачем нужен второй приемник
+            pkgTx.append(getComboBoxValue(statePrm.regime));
+            pkgTx.append(getSpinBoxValue(statePrd.state));
+            pkgTx.append(getSpinBoxValue(statePrd.dopByte));
+            // FIXME Добавить состояние индикации
+        } break;
+
+        case GB_COM_GET_FAULT: {
+            bool ok = false;
+            uint value = 0;
+            if (!data.isEmpty()) {
+                qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
+            }
+            // FIXME Если на передатчик приходит одно любое предупреждение то
+            // выводится на экран "Предупреждение", при этом код не известен.
+            pkgTx.append(com);
+            value = getLineEditValue(stateDef.fault).toUInt(&ok, 16);
+            pkgTx.append(static_cast<uint8_t> (value >> 8));
+            pkgTx.append(static_cast<uint8_t> (value));
+            value = getLineEditValue(stateDef.warning).toUInt(&ok, 16);
+            pkgTx.append(static_cast<uint8_t> (value >> 8));
+            pkgTx.append(static_cast<uint8_t> (value));
+            value = getLineEditValue(statePrm.fault).toUInt(&ok, 16);
+            pkgTx.append(static_cast<uint8_t> (value >> 8));
+            pkgTx.append(static_cast<uint8_t> (value));
+            value = getLineEditValue(statePrm.warning).toUInt(&ok, 16);
+            pkgTx.append(static_cast<uint8_t> (value >> 8));
+            pkgTx.append(static_cast<uint8_t> (value));
+            value = getLineEditValue(statePrd.fault).toUInt(&ok, 16);
+            pkgTx.append(static_cast<uint8_t> (value >> 8));
+            pkgTx.append(static_cast<uint8_t> (value));
+            value = getLineEditValue(statePrd.warning).toUInt(&ok, 16);
+            pkgTx.append(static_cast<uint8_t> (value >> 8));
+            pkgTx.append(static_cast<uint8_t> (value));
+            value = getLineEditValue(stateGlb.fault).toUInt(&ok, 16);
+            pkgTx.append(static_cast<uint8_t> (value >> 8));
+            pkgTx.append(static_cast<uint8_t> (value));
+            value = getLineEditValue(stateGlb.warning).toUInt(&ok, 16);
+            pkgTx.append(static_cast<uint8_t> (value >> 8));
+            pkgTx.append(static_cast<uint8_t> (value));
+
+            // TODO Разобраться зачем нужен второй приемник
+            value = getLineEditValue(statePrm.fault).toUInt(&ok, 16);
+            pkgTx.append(static_cast<uint8_t> (value >> 8));
+            pkgTx.append(static_cast<uint8_t> (value));
+            value = getLineEditValue(statePrm.warning).toUInt(&ok, 16);
+            pkgTx.append(static_cast<uint8_t> (value >> 8));
+            pkgTx.append(static_cast<uint8_t> (value));
+
+            // TODO Добавить байты данных для РЗСК
+        } break;
+
+        case GB_COM_GET_TIME: {
+            // TODO Добавить обработку флага новой записи журнала
+            if (data.size() != 1) {
+                qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
+            }
+            //
+            bool ok;
+            pkgTx.append(com);
+            pkgTx.append(int2bcd(dt->date().year() - 2000, ok));
+            pkgTx.append(int2bcd(dt->date().month(), ok));
+            pkgTx.append(int2bcd(dt->date().day(), ok));
+            pkgTx.append(int2bcd(dt->time().hour(), ok));
+            pkgTx.append(int2bcd(dt->time().minute(), ok));
+            pkgTx.append(int2bcd(dt->time().second(), ok));
+
+            uint16_t value = dt->time().msec();
+            pkgTx.append(static_cast<uint8_t> (value));
+            pkgTx.append(static_cast<uint8_t> (value >> 8));
+
+            // TODO Добавить считывание записи журнала для АСУ ТП.
+        } break;
+
+        case GB_COM_GET_TIME_SINCHR : {
+            if (data.size() != 0) {
+                qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
+            }
+            //
+            pkgTx.append(com);
+            pkgTx.append(Bsp::getComboBoxValue(GB_PARAM_TIME_SYNCH));
+            // TODO В РЗСК второй байт "Тип детектора"
+        } break;
+
+        case GB_COM_GET_COM_PRM_KEEP: {
+            if (data.size() != 0) {
+                qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
+            }
+            //
+            pkgTx.append(com);
+            // FIXME Может быть еще Uвых номинальное!
+            pkgTx.append(Bsp::getComboBoxValue(GB_PARAM_COM_PRM_KEEP));
+        } break;
+
+        case GB_COM_GET_COM_PRD_KEEP: {
+            if (data.size() != 0) {
+                qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
+            }
+            //
+            // FIXME Добавить остальные параметры для К400. Учесть что в Р400 только совместимость!.
+            pkgTx.append(com);
+            pkgTx.append(Bsp::getComboBoxValue(GB_PARAM_COM_PRD_KEEP));
+        } break;
+
+        case GB_COM_GET_NET_ADR: {
+            hdlrComNetAdrGet(com, data);
+        } break;
+
+        case GB_COM_GET_DEVICE_NUM : {
+            if (!data.isEmpty()) {
+                qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
+            }
+            //
+            pkgTx.append(com);
+            // FIXME Добавить параметр.
+            pkgTx.append(0x02);
+        } break;
+
+        case GB_COM_GET_VERS: {
+            hdlrComGetVers(com, data);
+        } break;
+
+        default: {
+            qWarning("No command handler: 0x%.2X", com);
         }
-        //
-        pkgTx.append(com);
-        // FIXME Добавить параметр
-        pkgTx.append(0x01);
-    } break;
-
-    case GB_COM_PRM_GET_TIME_ON: {
-        if (data.size() != 0) {
-            qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
-        }
-        //
-        pkgTx.append(com);
-        // FIXME Есть два разных параметра "Задержка на фиксацию команды"
-        pkgTx.append(Bsp::getSpinBoxValue(GB_PARAM_PRM_TIME_ON));
-    } break;
-
-    case GB_COM_PRM_GET_TIME_OFF: {
-        if (data.size() != 0) {
-            qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
-        }
-        //
-        pkgTx.append(com);
-        // FIXME Сделать зависимость от количества команд.
-        uint8_t number = getAbsMaxNumOfSameParams(GB_PARAM_PRM_TIME_OFF);
-        for(uint8_t i = 1; i <= number; i++) {
-            qint16 value = Bsp::getSpinBoxValue(GB_PARAM_PRM_TIME_OFF, i);
-            pkgTx.append(static_cast<quint8> (value));
-        }
-    } break;
-
-    case GB_COM_PRM_GET_BLOCK_COM: {
-        if (data.size() != 0) {
-            qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
-        }
-        //
-        pkgTx.append(com);
-        pkgTx.append(Bsp::getComboBoxValue(GB_PARAM_PRM_COM_BLOCK, 1));
-        pkgTx.append(Bsp::getComboBoxValue(GB_PARAM_PRM_COM_BLOCK, 9));
-        pkgTx.append(Bsp::getComboBoxValue(GB_PARAM_PRM_COM_BLOCK, 17));
-        pkgTx.append(Bsp::getComboBoxValue(GB_PARAM_PRM_COM_BLOCK, 25));
-    } break;
-
-    case GB_COM_GET_SOST: {
-        if (data.size() != 1) {
-            qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
-        }
-        //
-        pkgTx.append(com);
-        pkgTx.append(getComboBoxValue(stateDef.regime));
-        pkgTx.append(getSpinBoxValue(stateDef.state));
-        pkgTx.append(getSpinBoxValue(stateDef.dopByte));
-        pkgTx.append(getComboBoxValue(statePrm.regime));
-        pkgTx.append(getSpinBoxValue(statePrm.state));
-        pkgTx.append(getSpinBoxValue(statePrm.dopByte));
-        pkgTx.append(getComboBoxValue(statePrd.regime));
-        pkgTx.append(getSpinBoxValue(statePrd.state));
-        pkgTx.append(getSpinBoxValue(statePrd.dopByte));
-        // TODO Разобраться зачем нужен второй приемник
-        pkgTx.append(getComboBoxValue(statePrm.regime));
-        pkgTx.append(getSpinBoxValue(statePrd.state));
-        pkgTx.append(getSpinBoxValue(statePrd.dopByte));
-        // FIXME Добавить состояние индикации
-    } break;
-
-    case GB_COM_GET_FAULT: {
-        bool ok = false;
-        uint value = 0;
-        if (!data.isEmpty()) {
-            qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
-        }
-        // FIXME Если на передатчик приходит одно любое предупреждение то
-        // выводится на экран "Предупреждение", при этом код не известен.
-        pkgTx.append(com);
-        value = getLineEditValue(stateDef.fault).toUInt(&ok, 16);
-        pkgTx.append(static_cast<uint8_t> (value >> 8));
-        pkgTx.append(static_cast<uint8_t> (value));
-        value = getLineEditValue(stateDef.warning).toUInt(&ok, 16);
-        pkgTx.append(static_cast<uint8_t> (value >> 8));
-        pkgTx.append(static_cast<uint8_t> (value));
-        value = getLineEditValue(statePrm.fault).toUInt(&ok, 16);
-        pkgTx.append(static_cast<uint8_t> (value >> 8));
-        pkgTx.append(static_cast<uint8_t> (value));
-        value = getLineEditValue(statePrm.warning).toUInt(&ok, 16);
-        pkgTx.append(static_cast<uint8_t> (value >> 8));
-        pkgTx.append(static_cast<uint8_t> (value));
-        value = getLineEditValue(statePrd.fault).toUInt(&ok, 16);
-        pkgTx.append(static_cast<uint8_t> (value >> 8));
-        pkgTx.append(static_cast<uint8_t> (value));
-        value = getLineEditValue(statePrd.warning).toUInt(&ok, 16);
-        pkgTx.append(static_cast<uint8_t> (value >> 8));
-        pkgTx.append(static_cast<uint8_t> (value));
-        value = getLineEditValue(stateGlb.fault).toUInt(&ok, 16);
-        pkgTx.append(static_cast<uint8_t> (value >> 8));
-        pkgTx.append(static_cast<uint8_t> (value));
-        value = getLineEditValue(stateGlb.warning).toUInt(&ok, 16);
-        pkgTx.append(static_cast<uint8_t> (value >> 8));
-        pkgTx.append(static_cast<uint8_t> (value));
-
-        // TODO Разобраться зачем нужен второй приемник
-        value = getLineEditValue(statePrm.fault).toUInt(&ok, 16);
-        pkgTx.append(static_cast<uint8_t> (value >> 8));
-        pkgTx.append(static_cast<uint8_t> (value));
-        value = getLineEditValue(statePrm.warning).toUInt(&ok, 16);
-        pkgTx.append(static_cast<uint8_t> (value >> 8));
-        pkgTx.append(static_cast<uint8_t> (value));
-
-        // TODO Добавить байты данных для РЗСК
-    } break;
-
-    case GB_COM_GET_TIME: {
-        // TODO Добавить обработку флага новой записи журнала
-        if (data.size() != 1) {
-            qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
-        }
-        //
-        bool ok;
-        pkgTx.append(com);
-        pkgTx.append(int2bcd(dt->date().year() - 2000, ok));
-        pkgTx.append(int2bcd(dt->date().month(), ok));
-        pkgTx.append(int2bcd(dt->date().day(), ok));
-        pkgTx.append(int2bcd(dt->time().hour(), ok));
-        pkgTx.append(int2bcd(dt->time().minute(), ok));
-        pkgTx.append(int2bcd(dt->time().second(), ok));
-
-        uint16_t value = dt->time().msec();
-        pkgTx.append(static_cast<uint8_t> (value));
-        pkgTx.append(static_cast<uint8_t> (value >> 8));
-
-        // TODO Добавить считывание записи журнала для АСУ ТП.
-    } break;
-
-    case GB_COM_GET_TIME_SINCHR : {
-        if (data.size() != 0) {
-            qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
-        }
-        //
-        pkgTx.append(com);
-        pkgTx.append(Bsp::getComboBoxValue(GB_PARAM_TIME_SYNCH));
-        // TODO В РЗСК второй байт "Тип детектора"
-    } break;
-
-    case GB_COM_GET_COM_PRM_KEEP: {
-        if (data.size() != 0) {
-            qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
-        }
-        //
-        pkgTx.append(com);
-        // FIXME Может быть еще Uвых номинальное!
-        pkgTx.append(Bsp::getComboBoxValue(GB_PARAM_COM_PRM_KEEP));
-    } break;
-
-    case GB_COM_GET_COM_PRD_KEEP: {
-        if (data.size() != 0) {
-            qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
-        }
-        //
-        // FIXME Добавить остальные параметры для К400. Учесть что в Р400 только совместимость!.
-        pkgTx.append(com);
-        pkgTx.append(Bsp::getComboBoxValue(GB_PARAM_COM_PRD_KEEP));
-    } break;
-
-    case GB_COM_GET_NET_ADR: {
-        hdlrComNetAdrGet(com, data);
-    } break;
-
-    case GB_COM_GET_DEVICE_NUM : {
-        if (!data.isEmpty()) {
-            qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
-        }
-        //
-        pkgTx.append(com);
-        // FIXME Добавить параметр.
-        pkgTx.append(0x02);
-    } break;
-
-    case GB_COM_GET_VERS: {
-        hdlrComGetVers(com, data);
-    } break;
-
-    default: {
-        qWarning("No command handler: 0x%.2X", com);
-    }
     }
 }
 
