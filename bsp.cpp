@@ -1569,6 +1569,7 @@ Bsp::hdlrComGetJrnIsEntry(eGB_COM com, pkg_t &data) {
     }
 
     // FIXME Порядок байт в запросе Р400м отличается от других (перевернут)
+    // Но безопасность всегда одинаково, старшим байтом вперед!
     uint16_t num = data.takeFirst();
     num = (num << 8) + data.takeFirst();
 
@@ -1598,15 +1599,21 @@ Bsp::hdlrComGetJrnIsEntry(eGB_COM com, pkg_t &data) {
     combobox = static_cast<QComboBox*> (tw->itemWidget(item->child(3), 1));
     QDateTime dt = QDateTime::fromString(combobox->currentText(), kTimeFormat);
 
+    pkgTx.append(0);
+    pkgTx.append(0);
+    pkgTx.append(0);
+    pkgTx.append(0);
+
     uint16_t ms = dt.time().msec();
-    pkgTx.append(int2bcd(dt.date().year() - 2000, ok));
-    pkgTx.append(int2bcd(dt.date().month(), ok));
-    pkgTx.append(int2bcd(dt.date().day(), ok));
-    pkgTx.append(int2bcd(dt.time().hour(), ok));
-    pkgTx.append(int2bcd(dt.time().minute(), ok));
-    pkgTx.append(int2bcd(dt.time().second(), ok));
-    pkgTx.append(ms >> 8);
     pkgTx.append(ms);
+    pkgTx.append(ms >> 8);
+    pkgTx.append(int2bcd(dt.time().second(), ok));
+    pkgTx.append(int2bcd(dt.time().minute(), ok));
+    pkgTx.append(int2bcd(dt.time().hour(), ok));
+    pkgTx.append(0); // день недели
+    pkgTx.append(int2bcd(dt.date().day(), ok));
+    pkgTx.append(int2bcd(dt.date().month(), ok));
+    pkgTx.append(int2bcd(dt.date().year() - 2000, ok));
 }
 
 //
