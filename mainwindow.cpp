@@ -112,6 +112,7 @@ void MainWindow::setupTestButtons() {
     ui->pbTest2->setText("Admin PI");
     connect(ui->pbTest2, &QPushButton::clicked, this, &MainWindow::test2);
 
+    ui->pbTest3->setText("Clear logs");
     connect(ui->pbTest3, &QPushButton::clicked, this, &MainWindow::test3);
 
     connect(ui->pbTest4, &QPushButton::clicked, this, &MainWindow::test4);
@@ -458,7 +459,8 @@ void MainWindow::test2() {
 
 //
 void MainWindow::test3() {
-
+    qDebug() << "Clear Security logs";
+    menu.sParam.txComBuf.addFastCom(GB_COM_JRN_IS_CLR, GB_SEND_NO_DATA);
 }
 
 //
