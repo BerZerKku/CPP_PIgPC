@@ -10,7 +10,7 @@
 #include <QTimer>
 #include <QThread>
 #include <QWidget>
-#include <serialport.h>
+#include <serial.h>
 
 
 class MainWindow : public QWidget {
@@ -33,7 +33,7 @@ private:
     QPushButton *pbRefresh;
     QPushButton *pbPort;
 
-    QPointer<SerialPort> port;
+    QPointer<TSerial> port;
     QPointer<QThread> thread;
     QTimer timer;
 

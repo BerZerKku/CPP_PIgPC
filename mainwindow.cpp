@@ -18,23 +18,15 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     setWindowTitle("BSP");
 
     QHBoxLayout *hl = new QHBoxLayout(this);
-
-    QLabel *lport = new QLabel("Port:");
-
-    cmbPort = new QComboBox();
-    QSizePolicy sizePolicy2(QSizePolicy::Preferred, QSizePolicy::Fixed);
-    sizePolicy2.setHorizontalStretch(1);
-    sizePolicy2.setVerticalStretch(0);
-    cmbPort->setSizePolicy(sizePolicy2);
-    pbRefresh = new QPushButton("Refresh");
-    pbPort = new QPushButton("Open");
-
-    QHBoxLayout *hlport = new QHBoxLayout();
-    hlport->addWidget(lport);
-    hlport->addWidget(cmbPort);
-    hlport->addWidget(pbRefresh);
-    hlport->addWidget(pbPort);
     QVBoxLayout *vl = new QVBoxLayout();
+
+    port = new TSerial();
+    port->setup(4800, QSerialPort::NoParity, QSerialPort::TwoStop);
+    port->addDefaultPort("COM21");
+    port->addDefaultPort("tnt1");
+
+    connect(port, &TSerial::read, this, &MainWindow::readByte);
+    connect(this, &MainWindow::writeByte, port, &TSerial::write);
 
     glb.crtTreeUser();
     glb.crtTreeState();
@@ -45,7 +37,7 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     oth.crtTreePrd();
     oth.crtTreeGlb();
 
-    vl->addLayout(hlport);
+    vl->addWidget(port);
     vl->addWidget(&glb);
 
     hl->addLayout(vl);
@@ -59,11 +51,7 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     Bsp::initClock();
     initViewCommands();
 
-    refreshPortList();
-    connect(pbRefresh, &QPushButton::clicked,
-            this, &MainWindow::refreshPortList);
-    connect(pbPort, &QPushButton::clicked,
-            this, &MainWindow::connectSerialPort);
+    QTimer
 }
 
 //
@@ -72,7 +60,8 @@ MainWindow::~MainWindow() {
 }
 
 //
-void MainWindow::showEvent(QShowEvent *event) {
+void
+MainWindow::showEvent(QShowEvent *event) {
     QWidget::showEvent(event);
 
     setMinimumHeight(750);
@@ -91,73 +80,8 @@ MainWindow::initViewCommands() {
 }
 
 //
-void MainWindow::refreshPortList() {
-    QString portname = cmbPort->currentText();
-    QList<QSerialPortInfo> infos = QSerialPortInfo::availablePorts();
-
-    cmbPort->clear();
-    for (const QSerialPortInfo &info :infos) {
-        QString portname = info.portName();
-        cmbPort->addItem(portname);
-    }
-
-    if (portname.isEmpty()) {
-        cmbPort->setCurrentText("COM21");
-        cmbPort->setCurrentText("tnt1");
-    } else {
-        cmbPort->setCurrentText(portname);
-    }
-    pbPort->setEnabled(cmbPort->count() != 0);
-}
-
-//
-void MainWindow::connectSerialPort() {
-    if (port.isNull() && thread.isNull()) {
-        port = new SerialPort(cmbPort->currentText());
-        thread = new QThread(this);
-
-        connect(thread, &QThread::started, port, &SerialPort::start);
-        connect(thread, &QThread::finished, port, &SerialPort::stop);
-        connect(thread, &QThread::finished, thread, &QThread::deleteLater);
-
-        connect(port, &SerialPort::finished, this, &MainWindow::closeSerialPort);
-
-        connect(port, &SerialPort::finished, thread, &QThread::quit);
-        connect(port, &SerialPort::finished, &timer, &QTimer::stop);
-        connect(port, &SerialPort::finished, port, &SerialPort::deleteLater);
-
-        connect(this, &MainWindow::writeByte, port, &SerialPort::writeByte);
-        connect(port, &SerialPort::readByte, this, &MainWindow::readByte);
-
-        disconnect(pbPort, &QPushButton::clicked,
-                   this, &MainWindow::connectSerialPort);
-        connect(pbPort, &QPushButton::clicked, port, &SerialPort::stop);
-
-        cmbPort->setEnabled(false);
-        pbPort->setText("Close");
-        pbRefresh->setEnabled(false);
-
-        port->moveToThread(thread);
-        thread->start();
-
-        QObject::connect(&timer, &QTimer::timeout, port, &SerialPort::proc);
-        timer.start(5);
-    } else {
-        qDebug() << "";
-    }
-}
-
-void MainWindow::closeSerialPort() {
-    connect(pbPort, &QPushButton::clicked,
-            this, &MainWindow::connectSerialPort);
-
-    cmbPort->setEnabled(true);
-    pbPort->setText("Open");
-    pbPort->setEnabled(true);
-    pbRefresh->setEnabled(true);
-}
-
-void MainWindow::readByte(int value) {
+void
+MainWindow::readByte(int value) {
     static pkg_t pkgrx;
     static uint8_t len = 0;
 

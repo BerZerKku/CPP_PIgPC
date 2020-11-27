@@ -49,7 +49,11 @@ SOURCES += \
     bsp.cpp \
     main.cpp \
     mainwindow.cpp \
-    serialport.cpp \
+    serial.cpp \
+    serial/serialport.cpp \
+    widget/combobox.cpp \
+    widget/qledindicator.cpp \
+    widget/qpush1.cpp \
     wrapper.cpp
 
 HEADERS += \
@@ -71,11 +75,16 @@ HEADERS += \
     PIg/src/security/user.h \
     bsp.h \
     mainwindow.h \
-    serialport.h \
+    serial.h \
+    serial/serialport.h \
+    widget/combobox.h \
+    widget/qledindicator.h \
+    widget/qpush1.h \
     wrapper.hpp
 
 FORMS += \
-    mainwindow.ui
+    mainwindow.ui \
+    serial.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
