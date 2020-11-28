@@ -2,20 +2,6 @@
 <ui version="4.0">
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>800</width>
-    <height>600</height>
-   </rect>
-  </property>
-  <property name="sizePolicy">
-   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-    <horstretch>0</horstretch>
-    <verstretch>0</verstretch>
-   </sizepolicy>
-  </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
@@ -24,80 +10,10 @@
     <item>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
-        <item>
-         <widget class="QLabel" name="lPortBsp">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>Port BSP:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QComboBox" name="cmbPortBsp">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-            <horstretch>1</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pbRefreshBsp">
-          <property name="text">
-           <string>Refresh</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pbPortBsp">
-          <property name="text">
-           <string>Open</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
+       <widget class="TSerial" name="serialBsp" native="true"/>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_3">
-        <item>
-         <widget class="QLabel" name="lPortPc">
-          <property name="text">
-           <string>Port PC:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QComboBox" name="cmbPortPc">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-            <horstretch>1</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pbRefreshPc">
-          <property name="text">
-           <string>Refresh</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pbPortPc">
-          <property name="text">
-           <string>Open</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
+       <widget class="TSerial" name="serialPc" native="true"/>
       </item>
       <item>
        <widget class="QTextEdit" name="textEdit">
@@ -137,7 +53,7 @@
        <widget class="QKeyboard" name="kbd" native="true"/>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_4">
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
          <widget class="QPushButton" name="pbTest1">
           <property name="text">
@@ -205,8 +121,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
-     <height>21</height>
+     <width>624</width>
+     <height>22</height>
     </rect>
    </property>
   </widget>
@@ -228,6 +144,12 @@
    <class>QKeyboard</class>
    <extends>QWidget</extends>
    <header>qkeyboard.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>TSerial</class>
+   <extends>QWidget</extends>
+   <header>serial.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

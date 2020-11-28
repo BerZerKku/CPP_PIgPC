@@ -11,7 +11,6 @@
 #include <QThread>
 #include <QTreeWidgetItem>
 #include "wrapper.hpp"
-#include "serialport.h"
 
 #include "PIg/src/drivers/ks0108.h"
 #include "PIg/src/menu/menu.h"
@@ -63,6 +62,9 @@ class MainWindow : public QMainWindow
         QLineEdit engCounter;
         QLineEdit admCounter;
         QLineEdit interface;
+        QLineEdit regimeDef;
+        QLineEdit regimePrm;
+        QLineEdit regimePrd;
     } view;
 
 public:
@@ -77,12 +79,6 @@ signals:
 private:
     Ui::MainWindow *ui;
     QTextCodec *codec;
-
-    QPointer<SerialPort> portBSP;
-    QPointer<QThread> threadBSP;
-
-    QPointer<SerialPort> portPC;
-    QPointer<QThread> threadPC;
 
     QElapsedTimer etimer;
 
@@ -103,18 +99,6 @@ private slots:
     void cycleMenu();  ///< Цикл 200 мс.
     void clearSelection();  ///< Очистка выделения в textEdit.
     void setBacklight(bool enable);
-
-    void refreshPortListBsp();
-    void connectSerialPortBSP();
-    void closeSerialPortBSP();
-    void readByteFromBsp(int value);
-    void resetStatusBSP();
-
-    void refreshPortListPc();
-    void connectSerialPortPc();
-    void closeSerialPortPc();
-    void readByteFromPc(int value);
-    void resetStatusPc();
 
     QString pwdToString(uint8_t *pwd);
 

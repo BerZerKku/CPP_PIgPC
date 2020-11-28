@@ -8,20 +8,46 @@
 #include <QSerialPortInfo>
 #include <QTimer>
 
-#include "PIg/src/flashParams.h"
+#include "PIg/src/flash.h"
+//#include "PIg/src/flashParams.h"
 #include "PIg/src/menu/base.hpp"
 
 
 //
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
-    , ui(new Ui::MainWindow) {
+      , ui(new Ui::MainWindow) {
     ui->setupUi(this);
 
     setWindowTitle("BSP-PI");
 
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("Windows-1251"));
 
+    ui->verticalLayout->setAlignment(ui->kbd, Qt::AlignHCenter);
+    ui->verticalLayout->setAlignment(ui->textEdit, Qt::AlignHCenter);
+
+    ui->serialBsp->setFixedWidth(ui->serialBsp->sizeHint().width());
+    ui->serialPc->setFixedWidth(ui->serialBsp->width());
+
+    ui->serialBsp->setLabelText("Port BSP:");
+    ui->serialBsp->setup(4800, QSerialPort::NoParity, QSerialPort::TwoStop);
+    ui->serialBsp->addDefaultPort("COM20");
+    ui->serialBsp->addDefaultPort("tnt0");
+
+    connect(ui->serialBsp, &TSerial::read,
+            [=](int byte) {bspPushByteFrom(byte, false);});
+    connect(this, &MainWindow::writeByteToBsp, ui->serialBsp, &TSerial::write);
+    connect(ui->serialBsp, &TSerial::sendFinished, [=]() {bspTxEnd();} );
+
+    ui->serialPc->setLabelText("Port PC:");
+    ui->serialPc->setup(19200, QSerialPort::NoParity, QSerialPort::TwoStop);
+    ui->serialPc->addDefaultPort("COM8");
+    ui->serialPc->addDefaultPort("tnt2");
+
+    connect(ui->serialPc, &TSerial::read,
+            [=](int byte) {pcPushByteFrom(byte, false);});
+    connect(this, &MainWindow::writeByteToPc, ui->serialPc, &TSerial::write);
+    connect(ui->serialPc, &TSerial::sendFinished, [=]() {pcTxEnd();} );
 
     codec = QTextCodec::codecForName("CP1251");
     connect(ui->textEdit, &QTextEdit::selectionChanged,
@@ -43,25 +69,9 @@ MainWindow::MainWindow(QWidget *parent)
     // FIXME Разобраться почему константы именно такие
     ui->textEdit->setFixedSize(size.width() + 12, size.height()*7 + 10);
     ui->kbd->setFixedSize(ui->textEdit->width(), ui->textEdit->width());
-    setFixedSize(sizeHint());
 
     // Удаляет движение содержимого при прокрутке колесика мышки над testEdit
     ui->textEdit->verticalScrollBar()->blockSignals(true);
-
-    refreshPortListBsp();
-    connect(ui->pbRefreshBsp, &QPushButton::clicked,
-            this, &MainWindow::refreshPortListBsp);
-    connect(ui->pbPortBsp, &QPushButton::clicked,
-            this, &MainWindow::connectSerialPortBSP);
-
-    refreshPortListPc();
-    connect(ui->pbRefreshPc, &QPushButton::clicked,
-            this, &MainWindow::refreshPortListPc);
-    connect(ui->pbPortPc, &QPushButton::clicked,
-            this, &MainWindow::connectSerialPortPc);
-
-    ui->lPortBsp->setFixedWidth(ui->lPortBsp->sizeHint().width());
-    ui->lPortPc->setFixedWidth(ui->lPortBsp->width());
 
     setupTestButtons();
 
@@ -101,7 +111,16 @@ void MainWindow::initView() {
     top->setText(0, codec->toUnicode("Сетевые настройки"));
     addViewItem(top, "Интерфейс", &view.interface);
 
+    top = new QTreeWidgetItem();
+    ui->treeWidget->addTopLevelItem(top);
+    top->setText(0, codec->toUnicode("Текущее состояние"));
+    addViewItem(top, "Режим ЗАЩ", &view.regimeDef);
+    addViewItem(top, "Режим ПРМ", &view.regimePrm);
+    addViewItem(top, "Режим ПРД", &view.regimePrd);
+
     ui->treeWidget->expandAll();
+    ui->treeWidget->resizeColumnToContents(0);
+    ui->treeWidget->resizeColumnToContents(1);
 }
 
 //
@@ -115,6 +134,7 @@ void MainWindow::setupTestButtons() {
     ui->pbTest3->setText("Clear logs");
     connect(ui->pbTest3, &QPushButton::clicked, this, &MainWindow::test3);
 
+    ui->pbTest4->setText("Disable");
     connect(ui->pbTest4, &QPushButton::clicked, this, &MainWindow::test4);
 }
 
@@ -165,6 +185,13 @@ void MainWindow::hdlrView() {
 
     value = menu.sParam.Uart.Interface.get();
     view.interface.setText(codec->toUnicode(fcInterface[value]));
+
+    value = menu.sParam.def.status.getRegime();
+    view.regimeDef.setText(codec->toUnicode(fcRegime[value]));
+    value = menu.sParam.prm.status.getRegime();
+    view.regimePrm.setText(codec->toUnicode(fcRegime[value]));
+    value = menu.sParam.prd.status.getRegime();
+    view.regimePrd.setText(codec->toUnicode(fcRegime[value]));
 }
 
 //
@@ -178,7 +205,7 @@ void MainWindow::addViewItem(QTreeWidgetItem *top, std::string name,
     lineedit->setReadOnly(true);
     lineedit->setFocusPolicy(Qt::NoFocus);
     connect(lineedit, &QLineEdit::selectionChanged,
-            lineedit, &QLineEdit::deselect); 
+            lineedit, &QLineEdit::deselect);
 }
 
 //
@@ -198,6 +225,8 @@ void MainWindow::showEvent(QShowEvent *event) {
     QWidget::showEvent(event);
 
     mainInit();
+    ui->treeWidget->setFixedWidth(ui->treeWidget->columnWidth(0)*2.2);
+    setFixedSize(sizeHint());
 }
 
 //
@@ -206,6 +235,7 @@ void MainWindow::cycleMenu() {
 
     static uint8_t cnt1s = 0;
     static uint8_t cntsendtobsp = 0;
+    static uint8_t cntsendtopc = 0;
     QVector<uint8_t> pkg;
 
     vLCDled();
@@ -223,7 +253,8 @@ void MainWindow::cycleMenu() {
     }
 
     if (len > 0) {
-//        qDebug() << "Pkg to PC: " << showbase << hex << pkg;
+//        qDebug() << "Pkg to PC: " << Qt::showbase << Qt::hex << pkg;
+        cntsendtopc++;
     }
 
     pkg.clear();
@@ -234,8 +265,8 @@ void MainWindow::cycleMenu() {
     }
 
     if (len > 0) {
-        if ((pkg.at(2) > 0xF1) || (pkg.at(2) == 0xb8)) {
-//            qDebug() << "Pkg to BSP: " << showbase << hex << pkg;
+        if ((pkg.at(2) == 0xF3) || (pkg.at(2) == 0xF4)) {
+            qDebug() << "Pkg to BSP: " << Qt::showbase << Qt::hex << pkg;
         }
         cntsendtobsp++;
     }
@@ -243,11 +274,16 @@ void MainWindow::cycleMenu() {
     cnt1s++;
     if (cnt1s >= 10) {
 //        qDebug() << "Send " << cntsendtobsp << " packet to BSP per second.";
+//        qDebug() << "Send " << cntsendtopc << " packet to PC per second.";
+        cntsendtopc = 0;
         cntsendtobsp = 0;
         cnt1s = 0;
     }
 
     hdlrView();
+
+    ui->serialBsp->setLedLink(menu.isConnectionBsp());
+    ui->serialPc->setLedLink(menu.isConnectionPc());
 }
 
 //
@@ -265,167 +301,6 @@ void MainWindow::setBacklight(bool enable) {
         QString qss = QString("background-color: %1").arg(color.name());
         ui->textEdit->setStyleSheet(qss);
     }
-}
-
-//
-void MainWindow::refreshPortListBsp() {
-    QString portname;
-    QList<QSerialPortInfo> infos = QSerialPortInfo::availablePorts();
-
-    if (ui->cmbPortBsp->isEnabled()) {
-        portname = ui->cmbPortBsp->currentText();
-        ui->cmbPortBsp->clear();
-
-        for (const QSerialPortInfo &info :infos) {
-            QString portname = info.portName();
-            ui->cmbPortBsp->addItem(portname);
-        }
-
-        if (portname.isEmpty()) {
-            ui->cmbPortBsp->setCurrentText("COM20");
-            ui->cmbPortBsp->setCurrentText("tnt0");
-        } else {
-            ui->cmbPortBsp->setCurrentText(portname);
-        }
-        ui->pbPortBsp->setEnabled(ui->cmbPortBsp->count() != 0);
-    }
-}
-
-//
-void MainWindow::connectSerialPortBSP() {
-    if (portBSP.isNull() && threadBSP.isNull()) {
-        portBSP = new SerialPort(ui->cmbPortBsp->currentText(), 4800);
-        threadBSP = new QThread(this);
-
-        connect(threadBSP, &QThread::started, portBSP, &SerialPort::start);
-        connect(threadBSP, &QThread::finished, portBSP, &SerialPort::stop);
-        connect(threadBSP, &QThread::finished, threadBSP, &QThread::deleteLater);
-
-        connect(portBSP, &SerialPort::finished, this, &MainWindow::closeSerialPortBSP);
-        connect(portBSP, &SerialPort::finished, threadBSP, &QThread::quit);
-        connect(portBSP, &SerialPort::finished, portBSP, &SerialPort::deleteLater);
-
-        connect(this, &MainWindow::writeByteToBsp, portBSP, &SerialPort::writeByte);
-        connect(portBSP, &SerialPort::readByte, this, &MainWindow::readByteFromBsp);
-        connect(portBSP, &SerialPort::sendFinished, this, &MainWindow::resetStatusBSP);
-
-        disconnect(ui->pbPortBsp, &QPushButton::clicked,
-                this, &MainWindow::connectSerialPortBSP);
-        connect(ui->pbPortBsp, &QPushButton::clicked, portBSP, &SerialPort::stop);
-
-        ui->cmbPortBsp->setEnabled(false);
-        ui->pbPortBsp->setText("Close");
-        ui->pbRefreshBsp->setEnabled(false);
-
-        portBSP->moveToThread(threadBSP);
-        threadBSP->start();
-    } else {
-        qDebug() << "portBSP.isNull() && threadBSP.isNull()";
-    }
-}
-
-//
-void MainWindow::closeSerialPortBSP() {
-    connect(ui->pbPortBsp, &QPushButton::clicked,
-            this, &MainWindow::connectSerialPortBSP);
-
-    refreshPortListBsp();
-    ui->cmbPortBsp->setEnabled(true);
-    ui->pbPortBsp->setText("Open");
-    ui->pbPortBsp->setEnabled(true);
-    ui->pbRefreshBsp->setEnabled(true);
-}
-
-//
-void MainWindow::readByteFromBsp(int value) {
-    uint8_t byte = static_cast<uint8_t> (value);
-    bspPushByteFrom(byte, false);
-}
-
-//
-void MainWindow::resetStatusBSP() {
-    bspTxEnd();
-}
-
-//
-void MainWindow::refreshPortListPc() {
-    QString portname;
-    QList<QSerialPortInfo> infos = QSerialPortInfo::availablePorts();
-
-    if (ui->cmbPortPc->isEnabled()) {
-        portname = ui->cmbPortPc->currentText();
-        ui->cmbPortPc->clear();
-
-        for (const QSerialPortInfo &info :infos) {
-            QString portname = info.portName();
-            ui->cmbPortPc->addItem(portname);
-        }
-
-        if (portname.isEmpty()) {
-            ui->cmbPortPc->setCurrentText("COM8");
-            ui->cmbPortPc->setCurrentText("tnt2");
-        } else {
-            ui->cmbPortPc->setCurrentText(portname);
-        }
-        ui->pbPortPc->setEnabled(ui->cmbPortPc->count() != 0);
-    }
-}
-
-//
-void MainWindow::connectSerialPortPc() {
-    if (portPC.isNull() && threadPC.isNull()) {
-        portPC = new SerialPort(ui->cmbPortPc->currentText(), 19200);
-        threadPC = new QThread(this);
-
-        connect(threadPC, &QThread::started, portPC, &SerialPort::start);
-        connect(threadPC, &QThread::finished, portPC, &SerialPort::stop);
-        connect(threadPC, &QThread::finished, threadPC, &QThread::deleteLater);
-
-        connect(portPC, &SerialPort::finished, this, &MainWindow::closeSerialPortPc);
-        connect(portPC, &SerialPort::finished, threadPC, &QThread::quit);
-        connect(portPC, &SerialPort::finished, portPC, &SerialPort::deleteLater);
-
-        connect(this, &MainWindow::writeByteToPc, portPC, &SerialPort::writeByte);
-        connect(portPC, &SerialPort::readByte, this, &MainWindow::readByteFromPc);
-        connect(portPC, &SerialPort::sendFinished, this, &MainWindow::resetStatusPc);
-
-        disconnect(ui->pbPortPc, &QPushButton::clicked,
-                this, &MainWindow::connectSerialPortPc);
-        connect(ui->pbPortPc, &QPushButton::clicked, portPC, &SerialPort::stop);
-
-        ui->cmbPortPc->setEnabled(false);
-        ui->pbPortPc->setText("Close");
-        ui->pbRefreshPc->setEnabled(false);
-
-        portPC->moveToThread(threadPC);
-        threadPC->start();
-    } else {
-        qDebug() << "";
-    }
-}
-
-//
-void MainWindow::closeSerialPortPc() {
-    connect(ui->pbPortPc, &QPushButton::clicked,
-            this, &MainWindow::connectSerialPortPc);
-
-    refreshPortListPc();
-    ui->cmbPortPc->setEnabled(true);
-    ui->pbPortPc->setText("Open");
-    ui->pbPortPc->setEnabled(true);
-    ui->pbRefreshPc->setEnabled(true);
-}
-
-//
-void MainWindow::readByteFromPc(int value) {
-    uint8_t byte = static_cast<uint8_t> (value);
-
-    pcPushByteFrom(byte, false);
-}
-
-//
-void MainWindow::resetStatusPc() {
-    pcTxEnd();
 }
 
 //
@@ -465,6 +340,7 @@ void MainWindow::test3() {
 
 //
 void MainWindow::test4() {
-
+    qDebug() << "Set Disable Regime";
+    menu.sParam.txComBuf.addFastCom(GB_COM_SET_REG_DISABLED, GB_SEND_NO_DATA);
 }
 
