@@ -50,8 +50,6 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
 
     Bsp::initClock();
     initViewCommands();
-
-    QTimer
 }
 
 //

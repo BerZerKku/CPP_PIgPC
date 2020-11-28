@@ -1351,7 +1351,21 @@ void Bsp::procCommandWriteRegime(eGB_COM com, pkg_t &data) {
         setComboBoxValue(stateGlb.regime, eGB_REGIME::GB_REGIME_ENABLED);
         pkgTx.append(com);
     } break;
+    case GB_COM_SET_REG_TEST_1: {
+        if (data.isEmpty()) {
+            setComboBoxValue(stateGlb.regime, eGB_REGIME::GB_REGIME_TEST_1);
+        }
 
+        pkgTx.append(com);
+    } break;
+    case GB_COM_SET_REG_TEST_2: {
+        if (!data.isEmpty()) {
+            qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
+        }
+
+        setComboBoxValue(stateGlb.regime, eGB_REGIME::GB_REGIME_TEST_2);
+        pkgTx.append(com);
+    } break;
     default: {
         qWarning("No command handler: 0x%.2X", com);
     }

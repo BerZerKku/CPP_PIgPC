@@ -56,9 +56,6 @@ private:
     void initViewCommands();
 
 private slots:
-    void refreshPortList();
-    void connectSerialPort();
-    void closeSerialPort();
     void readByte(int value);
 };
 #endif // MAINWINDOW_H
