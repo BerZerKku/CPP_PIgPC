@@ -70,8 +70,8 @@ MainWindow::showEvent(QShowEvent *event) {
 //
 void
 MainWindow::initViewCommands() {
-//    viewCom.append(GB_COM_GET_JRN_IS_CNT);
-//    viewCom.append(GB_COM_GET_JRN_IS_ENTRY);
+    viewCom.append(GB_COM_GET_JRN_IS_CNT);
+    viewCom.append(GB_COM_GET_JRN_IS_ENTRY);
 //    viewCom.append(GB_COM_JRN_IS_CLR);
 //    viewCom.append(GB_COM_JRN_IS_SET_ENTRY);
     viewCom.append(GB_COM_NO);
