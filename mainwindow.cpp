@@ -253,7 +253,7 @@ void MainWindow::cycleMenu() {
     }
 
     if (len > 0) {
-//        qDebug() << "Pkg to PC: " << Qt::showbase << Qt::hex << pkg;
+        qDebug() << "Pkg to PC: " << Qt::showbase << Qt::hex << pkg;
         cntsendtopc++;
     }
 
@@ -265,7 +265,7 @@ void MainWindow::cycleMenu() {
     }
 
     if (len > 0) {
-        if ((pkg.at(2) == 0xF3) || (pkg.at(2) == 0xF4)) {
+        if (pkg.at(2) == 0x7E) {
             qDebug() << "Pkg to BSP: " << Qt::showbase << Qt::hex << pkg;
         }
         cntsendtobsp++;
@@ -282,8 +282,8 @@ void MainWindow::cycleMenu() {
 
     hdlrView();
 
-    ui->serialBsp->setLedLink(menu.isConnectionBsp());
-    ui->serialPc->setLedLink(menu.isConnectionPc());
+    ui->serialBsp->setLedLink(menu.sParam.connectionBsp);
+    ui->serialPc->setLedLink(menu.sParam.connectionPc);
 }
 
 //
