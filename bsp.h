@@ -47,6 +47,14 @@ class Bsp : public QTreeWidget
         QTreeWidget *securityTw = nullptr;
     };
 
+    struct test_t {
+        QLineEdit* byte1;
+        QLineEdit* byte2;
+        QLineEdit* byte3;
+        QLineEdit* byte4;
+        QLineEdit* byte5;
+    };
+
     static const QString kTimeFormat;
 
 public:
@@ -71,6 +79,7 @@ public:
     void crtTreeState(QTreeWidgetItem *top, std::string name, state_t &state);
     void crtTreeUser();
     void crtJournals();
+    void crtTest();
 
     static QMap<eGB_PARAM, QVector<QComboBox*>> mapCombobox;
     static QMap<eGB_PARAM, QLineEdit*> mapLineEdit;
@@ -104,6 +113,7 @@ public:
     static state_t statePrm;
     static state_t statePrd;
     static jrn_t journals;
+    static test_t test;
 
     /// Обработка команды.
     static void procCommand(eGB_COM com, pkg_t &data);
@@ -160,6 +170,8 @@ private:
     static void hdlrComGetJrnIsCnt(eGB_COM com, pkg_t &data);
     static void hdlrComGetJrnIsEntry(eGB_COM com, pkg_t &data);
     static void hdlrComGetJrnIsSetEntry(eGB_COM com, pkg_t &data);
+
+    static void hdlrComGetTest(eGB_COM com, pkg_t &data);
 
 private slots:
     static void setRegime(int index);

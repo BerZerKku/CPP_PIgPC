@@ -23,6 +23,7 @@ Bsp::state_t Bsp::stateGlb;
 Bsp::state_t Bsp::statePrm;
 Bsp::state_t Bsp::statePrd;
 Bsp::jrn_t Bsp::journals;
+Bsp::test_t Bsp::test;
 
 QDateTime *Bsp::dt = nullptr;
 pkg_t Bsp::pkgTx;
@@ -212,7 +213,7 @@ void Bsp::crtTreeDevice() {
     fillComboboxListTypeOpto(device.typeOpto);
     setItemWidget(item, 1, device.typeOpto);
 
-    top->setExpanded(true);
+//    top->setExpanded(true);
 }
 
 void Bsp::crtTreeGlb() {
@@ -399,6 +400,68 @@ void Bsp::crtJournals() {
 
     expandItem(journals.security);
     expandItem(top);
+}
+
+//
+void
+Bsp::crtTest() {
+    QTreeWidgetItem* top = new QTreeWidgetItem();
+    QTreeWidgetItem* item;
+    QLineEdit *lineedit;
+    insertTopLevelItem(topLevelItemCount(), top);
+    top->setText(0, codec->toUnicode("Тест"));
+
+    item = new QTreeWidgetItem();
+    lineedit = new QLineEdit();
+    test.byte1 = lineedit;
+    lineedit->setMaxLength(2);
+    lineedit->setInputMask("HH");
+    lineedit->setText("00");
+    top->addChild(item);
+    item->setText(0, codec->toUnicode("Байт 1"));
+    setItemWidget(item, 1, lineedit);
+
+    item = new QTreeWidgetItem();
+    lineedit = new QLineEdit();
+    test.byte2 = lineedit;
+    lineedit->setMaxLength(2);
+    lineedit->setInputMask("HH");
+    lineedit->setText("00");
+    top->addChild(item);
+    item->setText(0, codec->toUnicode("Байт 2"));
+    setItemWidget(item, 1, lineedit);
+
+    item = new QTreeWidgetItem();
+    lineedit = new QLineEdit();
+    test.byte3 = lineedit;
+    lineedit->setMaxLength(2);
+    lineedit->setInputMask("HH");
+    lineedit->setText("00");
+    top->addChild(item);
+    item->setText(0, codec->toUnicode("Байт 3"));
+    setItemWidget(item, 1, lineedit);
+
+    item = new QTreeWidgetItem();
+    lineedit = new QLineEdit();
+    test.byte4 = lineedit;
+    lineedit->setMaxLength(2);
+    lineedit->setInputMask("HH");
+    lineedit->setText("00");
+    top->addChild(item);
+    item->setText(0, codec->toUnicode("Байт 4"));
+    setItemWidget(item, 1, lineedit);
+
+    item = new QTreeWidgetItem();
+    lineedit = new QLineEdit();
+    test.byte5 = lineedit;
+    lineedit->setMaxLength(2);
+    lineedit->setInputMask("HH");
+    lineedit->setText("00");
+    top->addChild(item);
+    item->setText(0, codec->toUnicode("Байт 5"));
+    setItemWidget(item, 1, lineedit);
+
+    top->setExpanded(true);
 }
 
 //
@@ -1212,6 +1275,14 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data) {
             pkgTx.append(0x02);
         } break;
 
+        case GB_COM_GET_TEST: {
+            if (!data.isEmpty()) {
+                qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
+            }
+            // TODO Сделать тесты для всех типов аппаратов.
+            hdlrComGetTest(com, data);
+        } break;
+
         case GB_COM_GET_VERS: {
             hdlrComGetVers(com, data);
         } break;
@@ -1352,11 +1423,43 @@ void Bsp::procCommandWriteRegime(eGB_COM com, pkg_t &data) {
         pkgTx.append(com);
     } break;
     case GB_COM_SET_REG_TEST_1: {
+        // TODO Сделать для всех тестов
         if (data.isEmpty()) {
             setComboBoxValue(stateGlb.regime, eGB_REGIME::GB_REGIME_TEST_1);
-        }
+            pkgTx.append(com);
+        } else if (data.count() == 2) {
+            uint8_t byte1 = 0;
+            uint8_t byte2 = 0;
+            uint8_t byte3 = 0;
+            uint8_t byte4 = 0;
+            uint8_t byte5 = 0;
+            if (data.at(0) == 1) {
+                if (data.at(1) == 1) {
+                    byte1 = 1;
+                } else if ((data.at(1) >= 3) && (data.at(1) <= 10)) {
+                    byte2 = (1 << (data.at(1) - 3));
+                } else if ((data.at(1) >= 11) && (data.at(1) <= 18)) {
+                    byte3 = (1 << (data.at(1) - 11));
+                } else if ((data.at(1) >= 19) && (data.at(1) <= 26)) {
+                    byte4 = (1 << (data.at(1) - 19));
+                } else if ((data.at(1) >= 27) && (data.at(1) <= 34)) {
+                    byte5 = (1 << (data.at(1) - 27));
+                }
 
-        pkgTx.append(com);
+                test.byte1->setText(QString("%1").arg(byte1, 2, 16, QLatin1Char('0')));
+                test.byte2->setText(QString("%1").arg(byte2, 2, 16, QLatin1Char('0')));
+                test.byte3->setText(QString("%1").arg(byte3, 2, 16, QLatin1Char('0')));
+                test.byte4->setText(QString("%1").arg(byte4, 2, 16, QLatin1Char('0')));
+                test.byte5->setText(QString("%1").arg(byte5, 2, 16, QLatin1Char('0')));
+            } else if (data.at(0) == 2) {
+                if (data.at(1) != 0) {
+                    qWarning() << "Wrong test value fo RZ byte: " << data.at(1);
+                }
+            }
+            hdlrComGetTest(com, data);
+        } else {
+            qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
+        }
     } break;
     case GB_COM_SET_REG_TEST_2: {
         if (!data.isEmpty()) {
@@ -1381,9 +1484,9 @@ void Bsp::hdlrComGetVers(eGB_COM com, pkg_t &data) {
     //
     pkgTx.append(com);
     pkgTx.append(getComboBoxValue(device.isDef) ? 1 : 0);
-    pkgTx.append(getSpinBoxValue(GB_PARAM_PRM_COM_NUMS) / 4); // прм1
-    pkgTx.append(getSpinBoxValue(GB_PARAM_PRM_COM_NUMS) / 4); // прм2
-    pkgTx.append(getSpinBoxValue(GB_PARAM_PRD_COM_NUMS) / 4);
+    pkgTx.append(getSpinBoxValue(GB_PARAM_PRM_COM_NUMS)); // прм1
+    pkgTx.append(getSpinBoxValue(GB_PARAM_PRM_COM_NUMS)); // прм2
+    pkgTx.append(getSpinBoxValue(GB_PARAM_PRD_COM_NUMS));
     pkgTx.append(getComboBoxValue(GB_PARAM_NUM_OF_DEVICES)+1);
     pkgTx.append(getComboBoxValue(device.typeLine));
 
@@ -1647,6 +1750,17 @@ Bsp::hdlrComGetJrnIsSetEntry(eGB_COM com, pkg_t &data) {
     event = static_cast<TSecurityEvent::event_t>(data.takeFirst());
     addJSEntry(user, src, event);
 
+}
+
+//
+void
+Bsp::hdlrComGetTest(eGB_COM com, pkg_t &data) {
+    pkgTx.append(com);
+    pkgTx.append(test.byte1->text().toUInt(nullptr, 16));
+    pkgTx.append(test.byte2->text().toUInt(nullptr, 16));
+    pkgTx.append(test.byte3->text().toUInt(nullptr, 16));
+    pkgTx.append(test.byte4->text().toUInt(nullptr, 16));
+    pkgTx.append(test.byte5->text().toUInt(nullptr, 16));
 }
 
 //

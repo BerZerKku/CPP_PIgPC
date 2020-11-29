@@ -32,6 +32,7 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     glb.crtTreeState();
     glb.crtTreeInterface();
     glb.crtTreeDevice();
+    glb.crtTest();
 
     oth.crtTreePrm();
     oth.crtTreePrd();
@@ -70,11 +71,14 @@ MainWindow::showEvent(QShowEvent *event) {
 //
 void
 MainWindow::initViewCommands() {
-    viewCom.append(GB_COM_GET_JRN_IS_CNT);
-    viewCom.append(GB_COM_GET_JRN_IS_ENTRY);
+//    viewCom.append(GB_COM_GET_JRN_IS_CNT);
+//    viewCom.append(GB_COM_GET_JRN_IS_ENTRY);
 //    viewCom.append(GB_COM_JRN_IS_CLR);
 //    viewCom.append(GB_COM_JRN_IS_SET_ENTRY);
-    viewCom.append(GB_COM_NO);
+    viewCom.append(GB_COM_SET_REG_TEST_1);
+    viewCom.append(GB_COM_SET_REG_TEST_2);
+//    viewCom.append(GB_COM_GET_TEST);
+    viewCom.append(GB_COM_GET_VERS);
 }
 
 //
