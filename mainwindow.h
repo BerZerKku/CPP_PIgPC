@@ -65,6 +65,15 @@ class MainWindow : public QMainWindow
         QLineEdit regimeDef;
         QLineEdit regimePrm;
         QLineEdit regimePrd;
+        QLineEdit typeDevice;
+        QLineEdit def;
+        QLineEdit numComPrm;
+        QLineEdit numComPrd;
+        QLineEdit numDevices;
+        QLineEdit typeCommLine;
+        QLineEdit typeComp;
+        QLineEdit typeCompK400;
+        QLineEdit typeOpto;
     } view;
 
 public:
@@ -80,6 +89,8 @@ private:
     Ui::MainWindow *ui;
     QTextCodec *codec;
 
+    QPalette pred;
+    QPalette pblue;
     QElapsedTimer etimer;
 
     /// Инициализация параметров.
@@ -106,6 +117,13 @@ private slots:
     void test2();
     void test3();
     void test4();
+
+    QString getDeviceName(eGB_TYPE_DEVICE type) const;
+    QString getTypeLine(eGB_TYPE_LINE type) const;
+    void viewNumComPrd();
+    void viewNumComPrm();
+    void viewTypeCompK400();
+    QString getTypeOpto(eGB_TYPE_OPTO type) const;
 };
 
 // Для использвоании в wrapper

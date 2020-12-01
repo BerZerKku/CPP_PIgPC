@@ -118,9 +118,27 @@ void MainWindow::initView() {
     addViewItem(top, "Режим ПРМ", &view.regimePrm);
     addViewItem(top, "Режим ПРД", &view.regimePrd);
 
+    top = new QTreeWidgetItem();
+    ui->treeWidget->addTopLevelItem(top);
+    top->setText(0, codec->toUnicode("Устройство"));
+    addViewItem(top, "Устройство", &view.typeDevice);
+    addViewItem(top, "Защита", &view.def);
+    addViewItem(top, "Кол-во команд ПРМ", &view.numComPrm);
+    addViewItem(top, "Кол-во команд ПРД", &view.numComPrd);
+    addViewItem(top, "Кол-во аппаратов", &view.numDevices);
+    addViewItem(top, "Тип линии", &view.typeCommLine);
+    addViewItem(top, "Совместимость", &view.typeComp);
+    addViewItem(top, "Совместимость K400", &view.typeCompK400);
+    addViewItem(top, "Тип оптики", &view.typeOpto);
+
     ui->treeWidget->expandAll();
     ui->treeWidget->resizeColumnToContents(0);
     ui->treeWidget->resizeColumnToContents(1);
+
+    pred = view.engCounter.palette();
+    pred.setColor(QPalette::Text, Qt::red);
+    pblue = view.engCounter.palette();
+    pblue.setColor(QPalette::Text, Qt::blue);
 }
 
 //
@@ -144,11 +162,6 @@ void MainWindow::hdlrView() {
     quint8 value  = 0;
     quint16 time = 0;
     user_t user;
-
-    QPalette pred = view.engCounter.palette();
-    pred.setColor(QPalette::Text, Qt::red);
-    QPalette pblue = view.engCounter.palette();
-    pblue.setColor(QPalette::Text, Qt::blue);
 
     value = menu.sParam.security.getUser(USER_SOURCE_pi);
     time = menu.sParam.security.getUserTime(USER_SOURCE_pi);
@@ -192,6 +205,18 @@ void MainWindow::hdlrView() {
     view.regimePrm.setText(codec->toUnicode(fcRegime[value]));
     value = menu.sParam.prd.status.getRegime();
     view.regimePrd.setText(codec->toUnicode(fcRegime[value]));
+
+    view.typeDevice.setText(getDeviceName(menu.sParam.typeDevice));
+    view.def.setText(menu.sParam.def.status.isEnable() ? "ok" : "no");
+    viewNumComPrm();
+    viewNumComPrd();
+    value = menu.sParam.glb.getNumDevices();
+    view.numDevices.setText(codec->toUnicode(fcNumDevices[value - 1]));
+    view.typeCommLine.setText(getTypeLine(menu.sParam.glb.getTypeLine()));
+    value = menu.sParam.glb.getCompatibility();
+    view.typeComp.setText(codec->toUnicode(fcCompatibility[value]));
+    viewTypeCompK400();
+    view.typeOpto.setText(getTypeOpto(menu.sParam.glb.getTypeOpto()));
 }
 
 //
@@ -265,7 +290,11 @@ void MainWindow::cycleMenu() {
     }
 
     if (len > 0) {
-        if (pkg.at(2) == 0x7E) {
+        if ((pkg.at(2) == GB_COM_SET_CONTROL) ||
+            (pkg.at(2) == GB_COM_PRD_RES_IND) ||
+            (pkg.at(2) == GB_COM_PRM_RES_IND) ||
+            (pkg.at(2) == GB_COM_PRM_ENTER) ||
+            (pkg.at(2) == GB_COM_DEF_SET_TYPE_AC)) {
             qDebug() << "Pkg to BSP: " << Qt::showbase << Qt::hex << pkg;
         }
         cntsendtobsp++;
@@ -342,5 +371,119 @@ void MainWindow::test3() {
 void MainWindow::test4() {
     qDebug() << "Set Disable Regime";
     menu.sParam.txComBuf.addFastCom(GB_COM_SET_REG_DISABLED, GB_SEND_NO_DATA);
+}
+
+//
+QString
+MainWindow::getDeviceName(eGB_TYPE_DEVICE type) const {
+    QString typeName = codec->toUnicode("Ошибка");
+
+    switch(type) {
+        case AVANT_NO:
+            typeName = codec->toUnicode("Нет");
+            break;
+        case AVANT_R400:
+            typeName = codec->toUnicode("Р400");
+            break;
+        case AVANT_RZSK:
+            typeName = codec->toUnicode("РЗСК");
+            break;
+        case AVANT_K400:
+            typeName = codec->toUnicode("К400");
+            break;
+        case AVANT_R400M:
+            typeName = codec->toUnicode("Р400М");
+            break;
+        case AVANT_OPTO:
+            typeName = codec->toUnicode("Оптика");
+            break;
+        case AVANT_MAX:
+            typeName = codec->toUnicode("MAX");
+            break;
+    }
+
+    return typeName;
+}
+
+//
+QString
+MainWindow::getTypeLine(eGB_TYPE_LINE type) const {
+    QString typeName = codec->toUnicode("Ошибка");
+
+    switch(type) {
+        case GB_TYPE_LINE_UM:
+            typeName = codec->toUnicode("ВЧ");
+            break;
+        case GB_TYPE_LINE_OPTO:
+            typeName = codec->toUnicode("Оптика");
+            break;
+        case GB_TYPE_LINE_E1:
+            typeName = codec->toUnicode("Е1");
+            break;
+        case GB_TYPE_LINE_MAX:
+            typeName = codec->toUnicode("MAX");
+            break;
+    }
+
+    return typeName;
+}
+
+//
+void
+MainWindow::viewNumComPrd() {
+    uint8_t number = menu.sParam.prd.getNumCom();
+    bool enable = menu.sParam.prd.status.isEnable();
+
+    view.numComPrd.setText(QString::number(number));
+    view.numComPrd.setPalette((enable == (number > 0)) ? pblue : pred);
+}
+
+//
+void
+MainWindow::viewNumComPrm() {
+    uint8_t number = menu.sParam.prm.getNumCom();
+    bool enable = menu.sParam.prm.status.isEnable();
+
+    view.numComPrm.setText(QString::number(number));
+    view.numComPrm.setPalette((enable == (number > 0)) ? pblue : pred);
+}
+
+//
+void
+MainWindow::viewTypeCompK400() {
+    eGB_COMP_K400 comp = menu.sParam.glb.getCompK400();
+
+    if (comp < GB_COMP_K400_MAX) {
+        view.typeCompK400.setText(codec->toUnicode(fcCompK400[comp]));
+        view.typeCompK400.setPalette(pblue);
+    } else {
+        view.typeCompK400.setText(QString::number(comp));
+        view.typeCompK400.setPalette(pred);
+    }
+
+
+}
+
+//
+QString
+MainWindow::getTypeOpto(eGB_TYPE_OPTO type) const {
+    QString typeName = codec->toUnicode("Ошибка");
+
+    switch(type) {
+        case TYPE_OPTO_STANDART:
+            typeName = codec->toUnicode("Стандартная");
+            break;
+        case TYPE_OPTO_RING_UNI:
+            typeName = codec->toUnicode("Кольцо однонапр.");
+            break;
+        case TYPE_OPTO_RING_BI:
+            typeName = codec->toUnicode("Кольцо двунапр.");
+            break;
+        case TYPE_OPTO_MAX:
+            typeName = codec->toUnicode("MAX");
+            break;
+    }
+
+    return typeName;
 }
 
