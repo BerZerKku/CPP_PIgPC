@@ -198,6 +198,7 @@ void Bsp::crtTreeDevice() {
 
     // FIXME Может быть еще Р400
     crtComboBox(GB_PARAM_COMP_K400);
+    crtComboBox(GB_PARAM_COMP_P400);
 
     item = new QTreeWidgetItem();
     device.typeDevice = new QComboBox();
@@ -1256,9 +1257,14 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data) {
                 qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
             }
             //
-            // FIXME Добавить остальные параметры для К400. Учесть что в Р400 только совместимость!.
             pkgTx.append(com);
-            pkgTx.append(Bsp::getComboBoxValue(GB_PARAM_COM_PRD_KEEP));
+            if (getComboBoxValue(device.typeDevice) == AVANT_K400) {
+                pkgTx.append(Bsp::getComboBoxValue(GB_PARAM_COM_PRD_KEEP));
+                pkgTx.append(Bsp::getComboBoxValue(GB_PARAM_COMP_K400));
+                // FIXME Добавить остальные параметры для К400.
+            } else {
+                pkgTx.append(Bsp::getComboBoxValue(GB_PARAM_COMP_P400));
+            }
         } break;
 
         case GB_COM_GET_NET_ADR: {
@@ -1497,8 +1503,14 @@ void Bsp::hdlrComGetVers(eGB_COM com, pkg_t &data) {
     pkgTx.append(vers >> 8);
     pkgTx.append(vers);
 
-    // FIXME В Р400 отдельная
-    pkgTx.append(getComboBoxValue(GB_PARAM_COMP_K400));
+    // Совместимость
+    if (getComboBoxValue(device.typeDevice) == AVANT_K400) {
+        pkgTx.append(getComboBoxValue(GB_PARAM_COMP_K400));
+    } else if (getComboBoxValue(device.typeDevice) == AVANT_R400) {
+        pkgTx.append(getComboBoxValue(GB_PARAM_COMP_P400));
+    } else {
+        pkgTx.append(0);
+    }
 
     vers = 0x33;    // GB_IC_BSK_PLIS_PRD1
     pkgTx.append(vers);
@@ -1526,7 +1538,6 @@ void Bsp::hdlrComGetVers(eGB_COM com, pkg_t &data) {
 
 //
 void  Bsp::hdlrComNetAdrGet(eGB_COM com, pkg_t &data) {
-
     //
     pkgTx.append(com);
     qint16 value = getSpinBoxValue(GB_PARAM_NET_ADDRESS);
