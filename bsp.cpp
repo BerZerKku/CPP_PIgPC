@@ -1104,7 +1104,7 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data) {
             //
             pkgTx.append(com);
             // FIXME Добавить параметр
-            pkgTx.append(0x01);
+            pkgTx.append(getComboBoxValue(GB_PARAM_NUM_OF_DEVICES));
         } break;
 
         case GB_COM_PRM_GET_TIME_ON: {
