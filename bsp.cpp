@@ -1412,72 +1412,75 @@ void Bsp::procCommandWriteParam(eGB_COM com, pkg_t &data) {
 //
 void Bsp::procCommandWriteRegime(eGB_COM com, pkg_t &data) {
     switch(com) {
-    case GB_COM_SET_REG_DISABLED: {
-        if (!data.isEmpty()) {
-            qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
-        }
-
-        setComboBoxValue(stateGlb.regime, eGB_REGIME::GB_REGIME_DISABLED);
-        pkgTx.append(com);
-    } break;
-    case GB_COM_SET_REG_ENABLED: {
-        if (!data.isEmpty()) {
-            qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
-        }
-
-        setComboBoxValue(stateGlb.regime, eGB_REGIME::GB_REGIME_ENABLED);
-        pkgTx.append(com);
-    } break;
-    case GB_COM_SET_REG_TEST_1: {
-        // TODO Сделать для всех тестов
-        if (data.isEmpty()) {
-            setComboBoxValue(stateGlb.regime, eGB_REGIME::GB_REGIME_TEST_1);
-            pkgTx.append(com);
-        } else if (data.count() == 2) {
-            uint8_t byte1 = 0;
-            uint8_t byte2 = 0;
-            uint8_t byte3 = 0;
-            uint8_t byte4 = 0;
-            uint8_t byte5 = 0;
-            if (data.at(0) == 1) {
-                if (data.at(1) == 1) {
-                    byte1 = 1;
-                } else if ((data.at(1) >= 3) && (data.at(1) <= 10)) {
-                    byte2 = (1 << (data.at(1) - 3));
-                } else if ((data.at(1) >= 11) && (data.at(1) <= 18)) {
-                    byte3 = (1 << (data.at(1) - 11));
-                } else if ((data.at(1) >= 19) && (data.at(1) <= 26)) {
-                    byte4 = (1 << (data.at(1) - 19));
-                } else if ((data.at(1) >= 27) && (data.at(1) <= 34)) {
-                    byte5 = (1 << (data.at(1) - 27));
-                }
-
-                test.byte1->setText(QString("%1").arg(byte1, 2, 16, QLatin1Char('0')));
-                test.byte2->setText(QString("%1").arg(byte2, 2, 16, QLatin1Char('0')));
-                test.byte3->setText(QString("%1").arg(byte3, 2, 16, QLatin1Char('0')));
-                test.byte4->setText(QString("%1").arg(byte4, 2, 16, QLatin1Char('0')));
-                test.byte5->setText(QString("%1").arg(byte5, 2, 16, QLatin1Char('0')));
-            } else if (data.at(0) == 2) {
-                if (data.at(1) != 0) {
-                    qWarning() << "Wrong test value fo RZ byte: " << data.at(1);
-                }
+        case GB_COM_SET_REG_DISABLED: {
+            if (!data.isEmpty()) {
+                qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
             }
-            hdlrComGetTest(com, data);
-        } else {
-            qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
-        }
-    } break;
-    case GB_COM_SET_REG_TEST_2: {
-        if (!data.isEmpty()) {
-            qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
-        }
 
-        setComboBoxValue(stateGlb.regime, eGB_REGIME::GB_REGIME_TEST_2);
-        pkgTx.append(com);
-    } break;
-    default: {
-        qWarning("No command handler: 0x%.2X", com);
-    }
+            setComboBoxValue(stateGlb.regime, eGB_REGIME::GB_REGIME_DISABLED);
+            pkgTx.append(com);
+        } break;
+        case GB_COM_SET_REG_ENABLED: {
+            if (!data.isEmpty()) {
+                qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
+            }
+
+            setComboBoxValue(stateGlb.regime, eGB_REGIME::GB_REGIME_ENABLED);
+            pkgTx.append(com);
+        } break;
+        case GB_COM_SET_CONTROL: {
+            hdlrComSetControl(com, data);
+        } break;
+        case GB_COM_SET_REG_TEST_1: {
+            // TODO Сделать для всех тестов
+            if (data.isEmpty()) {
+                setComboBoxValue(stateGlb.regime, eGB_REGIME::GB_REGIME_TEST_1);
+                pkgTx.append(com);
+            } else if (data.count() == 2) {
+                uint8_t byte1 = 0;
+                uint8_t byte2 = 0;
+                uint8_t byte3 = 0;
+                uint8_t byte4 = 0;
+                uint8_t byte5 = 0;
+                if (data.at(0) == 1) {
+                    if (data.at(1) == 1) {
+                        byte1 = 1;
+                    } else if ((data.at(1) >= 3) && (data.at(1) <= 10)) {
+                        byte2 = (1 << (data.at(1) - 3));
+                    } else if ((data.at(1) >= 11) && (data.at(1) <= 18)) {
+                        byte3 = (1 << (data.at(1) - 11));
+                    } else if ((data.at(1) >= 19) && (data.at(1) <= 26)) {
+                        byte4 = (1 << (data.at(1) - 19));
+                    } else if ((data.at(1) >= 27) && (data.at(1) <= 34)) {
+                        byte5 = (1 << (data.at(1) - 27));
+                    }
+
+                    test.byte1->setText(QString("%1").arg(byte1, 2, 16, QLatin1Char('0')));
+                    test.byte2->setText(QString("%1").arg(byte2, 2, 16, QLatin1Char('0')));
+                    test.byte3->setText(QString("%1").arg(byte3, 2, 16, QLatin1Char('0')));
+                    test.byte4->setText(QString("%1").arg(byte4, 2, 16, QLatin1Char('0')));
+                    test.byte5->setText(QString("%1").arg(byte5, 2, 16, QLatin1Char('0')));
+                } else if (data.at(0) == 2) {
+                    if (data.at(1) != 0) {
+                        qWarning() << "Wrong test value fo RZ byte: " << data.at(1);
+                    }
+                }
+                hdlrComGetTest(com, data);
+            } else {
+                qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
+            }
+        } break;
+        case GB_COM_SET_REG_TEST_2: {
+            if (!data.isEmpty()) {
+                qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
+            }
+
+            setComboBoxValue(stateGlb.regime, eGB_REGIME::GB_REGIME_TEST_2);
+            pkgTx.append(com);
+        } break;
+        default: {
+            qWarning("No command handler: 0x%.2X", com);
+        }
     }
 }
 
@@ -1644,6 +1647,27 @@ void  Bsp::hdlrComNetAdrSet(eGB_COM com, pkg_t &data) {
 
 //
 void
+Bsp::hdlrComSetControl(eGB_COM com, pkg_t &data) {
+    pkgTx.append(com);
+    pkgTx.append(data);
+
+    if (data.count() != 1) {
+        qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
+        return;
+    }
+
+    switch(data.at(0)) {
+        case 0x08: {    // Пуск налад. вкл.
+            setSpinBoxValue(stateDef.state, 7);
+        } break;
+        case 0x09: {    // Пуск налад. выкл.
+            setSpinBoxValue(stateDef.state, 1);
+        } break;
+    }
+}
+
+//
+void
 Bsp::hdlrComJrnIsClr(eGB_COM com, pkg_t &data) {
     if (!data.isEmpty()) {
         qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
@@ -1656,7 +1680,6 @@ Bsp::hdlrComJrnIsClr(eGB_COM com, pkg_t &data) {
     for(quint16 i = 0; i < journals.security->childCount(); i++) {
         journals.security->child(i)->setHidden(0);
     }
-
 }
 
 //

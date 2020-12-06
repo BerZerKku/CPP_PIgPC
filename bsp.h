@@ -165,6 +165,7 @@ private:
     static void hdlrComGetVers(eGB_COM com, pkg_t &data);
     static void hdlrComNetAdrGet(eGB_COM com, pkg_t &data);
     static void hdlrComNetAdrSet(eGB_COM com, pkg_t &data);
+    static void hdlrComSetControl(eGB_COM com, pkg_t &data);
 
     static void hdlrComJrnIsClr(eGB_COM com, pkg_t &data);
     static void hdlrComGetJrnIsCnt(eGB_COM com, pkg_t &data);
