@@ -1486,6 +1486,8 @@ void Bsp::procCommandWriteRegime(eGB_COM com, pkg_t &data) {
 
 void Bsp::hdlrComGetVers(eGB_COM com, pkg_t &data) {
     uint16_t vers = 0;
+    eGB_TYPE_DEVICE typedevice = static_cast<eGB_TYPE_DEVICE>
+        (getComboBoxValue(device.typeDevice));
 
     if (data.size() != 0) {
         qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
@@ -1493,9 +1495,16 @@ void Bsp::hdlrComGetVers(eGB_COM com, pkg_t &data) {
     //
     pkgTx.append(com);
     pkgTx.append(getComboBoxValue(device.isDef) ? 1 : 0);
-    pkgTx.append(getSpinBoxValue(GB_PARAM_PRM_COM_NUMS)); // прм1
-    pkgTx.append(getSpinBoxValue(GB_PARAM_PRM_COM_NUMS)); // прм2
-    pkgTx.append(getSpinBoxValue(GB_PARAM_PRD_COM_NUMS));
+
+    if ((typedevice == AVANT_R400) || (typedevice == AVANT_R400M)) {
+        pkgTx.append(0); // прм1
+        pkgTx.append(0); // прм2
+        pkgTx.append(0);
+    } else {
+        pkgTx.append(getSpinBoxValue(GB_PARAM_PRM_COM_NUMS)); // прм1
+        pkgTx.append(getSpinBoxValue(GB_PARAM_PRM_COM_NUMS)); // прм2
+        pkgTx.append(getSpinBoxValue(GB_PARAM_PRD_COM_NUMS));
+    }
     pkgTx.append(getComboBoxValue(GB_PARAM_NUM_OF_DEVICES)+1);
     pkgTx.append(getComboBoxValue(device.typeLine));
 
@@ -1507,9 +1516,9 @@ void Bsp::hdlrComGetVers(eGB_COM com, pkg_t &data) {
     pkgTx.append(vers);
 
     // Совместимость
-    if (getComboBoxValue(device.typeDevice) == AVANT_K400) {
+    if (typedevice == AVANT_K400) {
         pkgTx.append(getComboBoxValue(GB_PARAM_COMP_K400));
-    } else if (getComboBoxValue(device.typeDevice) == AVANT_R400) {
+    } else if (typedevice == AVANT_R400) {
         pkgTx.append(getComboBoxValue(GB_PARAM_COMP_P400));
     } else {
         pkgTx.append(0);
@@ -1526,13 +1535,18 @@ void Bsp::hdlrComGetVers(eGB_COM com, pkg_t &data) {
     vers = 0x77;    // GB_IC_BSZ_PLIS
     pkgTx.append(vers);
 
-    pkgTx.append(getComboBoxValue(device.typeDevice));
+    pkgTx.append(typedevice);
 
     vers = 0x0128;  // GB_IC_PI_MCU
     pkgTx.append(vers >> 8);
     pkgTx.append(vers);
 
-    pkgTx.append(getComboBoxValue(device.typeOpto));
+    // FIXME В случае любого кольца передается 0xAB, иначе любое другое значение
+    uint8_t typeopto = getComboBoxValue(device.typeOpto);
+    if (typeopto != TYPE_OPTO_STANDART) {
+        typeopto = 0xAB;
+    }
+    pkgTx.append(typeopto);
 
     vers = 0x9009;  // GB_IC_BSP_DSP
     pkgTx.append(vers >> 8);
