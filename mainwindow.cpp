@@ -213,9 +213,7 @@ void MainWindow::hdlrView() {
     value = menu.sParam.glb.getNumDevices();
     view.numDevices.setText(codec->toUnicode(fcNumDevices[value - 1]));
     view.typeCommLine.setText(getTypeLine(menu.sParam.glb.getTypeLine()));
-    value = menu.sParam.glb.getCompatibility();
-    view.typeComp.setText(codec->toUnicode(fcCompatibility[value]));
-    viewTypeCompK400();
+    viewTypeComp();
     view.typeOpto.setText(getTypeOpto(menu.sParam.glb.getTypeOpto()));
 }
 
@@ -378,28 +376,33 @@ QString
 MainWindow::getDeviceName(eGB_TYPE_DEVICE type) const {
     QString typeName = codec->toUnicode("Îøèáêà");
 
-    switch(type) {
-        case AVANT_NO:
-            typeName = codec->toUnicode("Íåò");
-            break;
-        case AVANT_R400:
-            typeName = codec->toUnicode("Ð400");
-            break;
-        case AVANT_RZSK:
-            typeName = codec->toUnicode("ÐÇÑÊ");
-            break;
-        case AVANT_K400:
-            typeName = codec->toUnicode("Ê400");
-            break;
-        case AVANT_R400M:
-            typeName = codec->toUnicode("Ð400Ì");
-            break;
-        case AVANT_OPTO:
-            typeName = codec->toUnicode("Îïòèêà");
-            break;
-        case AVANT_MAX:
-            typeName = codec->toUnicode("MAX");
-            break;
+    if (type <= AVANT_MAX){
+        switch(type) {
+            case AVANT_NO:
+                typeName = codec->toUnicode("Íåò");
+                break;
+            case AVANT_R400:
+                typeName = codec->toUnicode("Ð400");
+                break;
+            case AVANT_RZSK:
+                typeName = codec->toUnicode("ÐÇÑÊ");
+                break;
+            case AVANT_K400:
+                typeName = codec->toUnicode("Ê400");
+                break;
+            case AVANT_R400M:
+                typeName = codec->toUnicode("Ð400Ì");
+                break;
+            case AVANT_OPTO:
+                typeName = codec->toUnicode("Îïòèêà");
+                break;
+            case AVANT_MAX:
+                typeName = codec->toUnicode("MAX");
+                break;
+        }
+
+    } else {
+
     }
 
     return typeName;
@@ -450,18 +453,35 @@ MainWindow::viewNumComPrm() {
 
 //
 void
-MainWindow::viewTypeCompK400() {
-    eGB_COMP_K400 comp = menu.sParam.glb.getCompK400();
+MainWindow::viewTypeComp() {
 
-    if (comp < GB_COMP_K400_MAX) {
-        view.typeCompK400.setText(codec->toUnicode(fcCompK400[comp]));
-        view.typeCompK400.setPalette(pblue);
+    if (menu.sParam.typeDevice == AVANT_K400) {
+        eGB_COMP_K400 comp = menu.sParam.glb.getCompK400();
+
+        if (comp < GB_COMP_K400_MAX) {
+            view.typeCompK400.setText(codec->toUnicode(fcCompK400[comp]));
+            view.typeCompK400.setPalette(pblue);
+        } else {
+            view.typeCompK400.setText(QString::number(comp));
+            view.typeCompK400.setPalette(pred);
+        }
     } else {
-        view.typeCompK400.setText(QString::number(comp));
-        view.typeCompK400.setPalette(pred);
+        view.typeCompK400.setText("");
     }
 
+    if (menu.sParam.typeDevice == AVANT_R400M) {
+        eGB_COMPATIBILITY comp = menu.sParam.glb.getCompatibility();
 
+        if (comp < GB_COMPATIBILITY_MAX) {
+            view.typeComp.setText(codec->toUnicode(fcCompatibility[comp]));
+            view.typeComp.setPalette(pblue);
+        } else {
+            view.typeComp.setText(QString::number(comp));
+            view.typeComp.setPalette(pred);
+        }
+    } else {
+        view.typeComp.setText("");
+    }
 }
 
 //

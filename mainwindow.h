@@ -122,7 +122,7 @@ private slots:
     QString getTypeLine(eGB_TYPE_LINE type) const;
     void viewNumComPrd();
     void viewNumComPrm();
-    void viewTypeCompK400();
+    void viewTypeComp();
     QString getTypeOpto(eGB_TYPE_OPTO type) const;
 };
 

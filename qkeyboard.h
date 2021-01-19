@@ -53,6 +53,9 @@ private:
     void setButtonColor(QColor color);
     void setButtonTextColor(QColor color);
     void setTypeK400();
+    void setTypeOpto();
+    void setTypeR400M();
+    void setTypeRZSK();
     QString getButtonName(eKEY ) const;
 };
 

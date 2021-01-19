@@ -244,12 +244,23 @@ void QKeyboard::setButtonTextColor(QColor color)
 }
 
 //
-void QKeyboard::setType(eGB_TYPE_DEVICE device) {
+void
+QKeyboard::setType(eGB_TYPE_DEVICE device) {
     reset();
 
+    // TODO Извлечь кнопки из имеющегося класса для ПИ
+    // TODO Убрать setTypeOpto, т.к. отдельной клавиатуры для оптики нет
     switch(device) {
         case AVANT_K400: {
             setTypeK400();
+        } break;
+
+        case AVANT_R400M: {
+            setTypeR400M();
+        } break;
+
+        case AVANT_RZSK: {
+            setTypeRZSK();
         } break;
 
         default: {
@@ -261,8 +272,10 @@ void QKeyboard::setType(eGB_TYPE_DEVICE device) {
 }
 
 //
-void QKeyboard::setTypeK400()
-{
+void
+QKeyboard::setTypeK400() {
+    qDebug() << "Set K400 keyboard";
+
     primary[ui->btn1] = KEY_FUNC;
     primary[ui->btn2] = KEY_UP;
     primary[ui->btn3] = KEY_EMPTY;
@@ -282,6 +295,84 @@ void QKeyboard::setTypeK400()
     secondary[ui->btn7] = KEY_EMPTY;
     secondary[ui->btn8] = KEY_EMPTY;
     secondary[ui->btn9] = KEY_RESET;
+}
+
+//
+void
+QKeyboard::setTypeOpto() {
+    qDebug() << "Set OPTO keyboard";
+
+    primary[ui->btn1] = KEY_FUNC;
+    primary[ui->btn2] = KEY_UP;
+    primary[ui->btn3] = KEY_EMPTY;
+    primary[ui->btn4] = KEY_LEFT;
+    primary[ui->btn5] = KEY_ENTER;
+    primary[ui->btn6] = KEY_RIGHT;
+    primary[ui->btn7] = KEY_CANCEL;
+    primary[ui->btn8] = KEY_DOWN;
+    primary[ui->btn9] = KEY_EMPTY;
+
+    secondary[ui->btn1] = KEY_FUNC;
+    secondary[ui->btn2] = KEY_EMPTY;
+    secondary[ui->btn3] = KEY_RESET_IND;
+    secondary[ui->btn4] = KEY_PUSK;
+    secondary[ui->btn5] = KEY_MENU;
+    secondary[ui->btn6] = KEY_EMPTY;
+    secondary[ui->btn7] = KEY_EMPTY;
+    secondary[ui->btn8] = KEY_EMPTY;
+    secondary[ui->btn9] = KEY_RESET;
+}
+
+//
+void
+QKeyboard::setTypeR400M() {
+    qDebug() << "Set R400M keyboard";
+
+    primary[ui->btn1] = KEY_FUNC;
+    primary[ui->btn2] = KEY_UP;
+    primary[ui->btn3] = KEY_EMPTY;
+    primary[ui->btn4] = KEY_LEFT;
+    primary[ui->btn5] = KEY_ENTER;
+    primary[ui->btn6] = KEY_RIGHT;
+    primary[ui->btn7] = KEY_EMPTY;
+    primary[ui->btn8] = KEY_DOWN;
+    primary[ui->btn9] = KEY_CANCEL;
+
+    secondary[ui->btn1] = KEY_FUNC;
+    secondary[ui->btn2] = KEY_CALL;
+    secondary[ui->btn3] = KEY_PUSK_UD;
+    secondary[ui->btn4] = KEY_AC_PUSK;
+    secondary[ui->btn5] = KEY_MENU;
+    secondary[ui->btn6] = KEY_AC_PUSK_UD;
+    secondary[ui->btn7] = KEY_AC_RESET;
+    secondary[ui->btn8] = KEY_AC_REGIME;
+    secondary[ui->btn9] = KEY_PUSK_NALAD;
+}
+
+//
+void
+QKeyboard::setTypeRZSK() {
+    qDebug() << "Set RZSK keyboard";
+
+    primary[ui->btn1] = KEY_FUNC;
+    primary[ui->btn2] = KEY_UP;
+    primary[ui->btn3] = KEY_EMPTY;
+    primary[ui->btn4] = KEY_LEFT;
+    primary[ui->btn5] = KEY_ENTER;
+    primary[ui->btn6] = KEY_RIGHT;
+    primary[ui->btn7] = KEY_EMPTY;
+    primary[ui->btn8] = KEY_DOWN;
+    primary[ui->btn9] = KEY_CANCEL;
+
+    secondary[ui->btn1] = KEY_FUNC;
+    secondary[ui->btn2] = KEY_CALL;
+    secondary[ui->btn3] = KEY_PUSK_UD;
+    secondary[ui->btn4] = KEY_PUSK;
+    secondary[ui->btn5] = KEY_MENU;
+    secondary[ui->btn6] = KEY_PUSK_NALAD;
+    secondary[ui->btn7] = KEY_RESET_IND;
+    secondary[ui->btn8] = KEY_EMPTY;
+    secondary[ui->btn9] = KEY_EMPTY;
 }
 
 //
