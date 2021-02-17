@@ -41,6 +41,7 @@ INCLUDEPATH += \
     PIg/src/security
 
 SOURCES += \
+    PIg/src/drivers/kbdLayout.cpp \
     PIg/src/flashParam.cpp \
     PIg/src/menu/base.cpp \
     PIg/src/menu/dateTime.cpp \
@@ -74,6 +75,7 @@ SOURCES += \
 HEADERS += \
     PIg/src/avr.h \
     PIg/src/debug/debug.hpp \
+    PIg/src/drivers/kbdLayout.h \
     PIg/src/drivers/keyboard.h \
     PIg/src/drivers/ks0108.h \
     PIg/src/drivers/tmp75.h \

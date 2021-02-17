@@ -36,7 +36,7 @@ QKeyboard::QKeyboard(QWidget *parent) :
     }
     reset();
 
-    connect(signalMapper, QOverload<int>::of(&QSignalMapper::mapped),
+    connect(signalMapper, QOverload<int>::of(&QSignalMapper::mappedInt),
             this, &QKeyboard::clicked);
 
     connect(this, &QKeyboard::clicked, this, &QKeyboard::btnPressed);
@@ -182,9 +182,9 @@ void QKeyboard::keyPressed(int value)
     }
 
     // Анмимация нажатия кнопки, если она есть на экране
-    QMap<QPushButton*, eKEY> *m = alt ? &secondary : &primary;
+    QMap<uint8_t, eKEY> *m = alt ? &secondary : &primary;
     if (m->values().contains(ekey)) {
-        m->key(ekey)->animateClick();
+        btns.at(m->key(ekey))->animateClick();
     } else {
         btnPressed(ekey);
     }
@@ -194,15 +194,16 @@ void QKeyboard::keyPressed(int value)
 void QKeyboard::refresh()
 {
     QColor color;
-    QMap<QPushButton*, eKEY> *m;
+    QMap<uint8_t, eKEY> *m;
 
     m = alt ? &secondary : &primary;
     color = alt ? kBtnColorSecondary : kBtnColorPrimary;
 
-    for(QPushButton *btn: btns) {
-        btn->setText(getButtonName(m->value(btn)));
-        btn->setEnabled(m->value(btn) != KEY_EMPTY);
-        signalMapper->setMapping(btn, m->value(btn));
+    for(quint8 i = 1; i <= btns.size(); i++) {
+        QPushButton *btn = btns.at(i - 1);
+        btn->setText(getButtonName(m->value(i)));
+        btn->setEnabled(m->value(i) != KEY_EMPTY);
+        signalMapper->setMapping(btn, m->value(i - 1));
     }
 
     setButtonTextColor(color);
@@ -211,10 +212,10 @@ void QKeyboard::refresh()
 //
 void QKeyboard::reset()
 {
-    for(QPushButton *btn: btns) {
-        primary[btn] = KEY_NO;
-        secondary[btn] = KEY_NO;
-        signalMapper->setMapping(btn, KEY_NO);
+    for(uint8_t i = 1; i <= NUM_KEY_IN_LAYOUT; i++) {
+        primary[i] = KEY_NO;
+        secondary[i] = KEY_NO;
+        signalMapper->setMapping(btns.at(i - 1), KEY_NO);
     }
 
     alt = false;
@@ -243,136 +244,21 @@ void QKeyboard::setButtonTextColor(QColor color)
     }
 }
 
-//
-void
-QKeyboard::setType(eGB_TYPE_DEVICE device) {
-    reset();
+void QKeyboard::setLayoutButton(uint8_t number, eKEY key)
+{
+    Q_ASSERT(number > 0);
+    Q_ASSERT(number <= 2*NUM_KEY_IN_LAYOUT);
 
-    // TODO Извлечь кнопки из имеющегося класса для ПИ
-    // TODO Убрать setTypeOpto, т.к. отдельной клавиатуры для оптики нет
-    switch(device) {
-        case AVANT_K400: {
-            setTypeK400();
-        } break;
-
-        case AVANT_R400M: {
-            setTypeR400M();
-        } break;
-
-        case AVANT_RZSK: {
-            setTypeRZSK();
-        } break;
-
-        default: {
-            Q_ASSERT(false);
+    if ((number > 0) && (number <= (2*NUM_KEY_IN_LAYOUT))) {
+        if (number <= NUM_KEY_IN_LAYOUT) {
+            primary.insert(number, key);
+        } else {
+            secondary.insert(number, key);
         }
     }
-
     refresh();
-}
 
-//
-void
-QKeyboard::setTypeK400() {
-    qDebug() << "Set K400 keyboard";
-
-    primary[ui->btn1] = KEY_FUNC;
-    primary[ui->btn2] = KEY_UP;
-    primary[ui->btn3] = KEY_EMPTY;
-    primary[ui->btn4] = KEY_LEFT;
-    primary[ui->btn5] = KEY_ENTER;
-    primary[ui->btn6] = KEY_RIGHT;
-    primary[ui->btn7] = KEY_CANCEL;
-    primary[ui->btn8] = KEY_DOWN;
-    primary[ui->btn9] = KEY_EMPTY;
-
-    secondary[ui->btn1] = KEY_FUNC;
-    secondary[ui->btn2] = KEY_EMPTY;
-    secondary[ui->btn3] = KEY_RESET_IND;
-    secondary[ui->btn4] = KEY_PUSK;
-    secondary[ui->btn5] = KEY_MENU;
-    secondary[ui->btn6] = KEY_EMPTY;
-    secondary[ui->btn7] = KEY_EMPTY;
-    secondary[ui->btn8] = KEY_EMPTY;
-    secondary[ui->btn9] = KEY_RESET;
-}
-
-//
-void
-QKeyboard::setTypeOpto() {
-    qDebug() << "Set OPTO keyboard";
-
-    primary[ui->btn1] = KEY_FUNC;
-    primary[ui->btn2] = KEY_UP;
-    primary[ui->btn3] = KEY_EMPTY;
-    primary[ui->btn4] = KEY_LEFT;
-    primary[ui->btn5] = KEY_ENTER;
-    primary[ui->btn6] = KEY_RIGHT;
-    primary[ui->btn7] = KEY_CANCEL;
-    primary[ui->btn8] = KEY_DOWN;
-    primary[ui->btn9] = KEY_EMPTY;
-
-    secondary[ui->btn1] = KEY_FUNC;
-    secondary[ui->btn2] = KEY_EMPTY;
-    secondary[ui->btn3] = KEY_RESET_IND;
-    secondary[ui->btn4] = KEY_PUSK;
-    secondary[ui->btn5] = KEY_MENU;
-    secondary[ui->btn6] = KEY_EMPTY;
-    secondary[ui->btn7] = KEY_EMPTY;
-    secondary[ui->btn8] = KEY_EMPTY;
-    secondary[ui->btn9] = KEY_RESET;
-}
-
-//
-void
-QKeyboard::setTypeR400M() {
-    qDebug() << "Set R400M keyboard";
-
-    primary[ui->btn1] = KEY_FUNC;
-    primary[ui->btn2] = KEY_UP;
-    primary[ui->btn3] = KEY_EMPTY;
-    primary[ui->btn4] = KEY_LEFT;
-    primary[ui->btn5] = KEY_ENTER;
-    primary[ui->btn6] = KEY_RIGHT;
-    primary[ui->btn7] = KEY_EMPTY;
-    primary[ui->btn8] = KEY_DOWN;
-    primary[ui->btn9] = KEY_CANCEL;
-
-    secondary[ui->btn1] = KEY_FUNC;
-    secondary[ui->btn2] = KEY_CALL;
-    secondary[ui->btn3] = KEY_PUSK_UD;
-    secondary[ui->btn4] = KEY_AC_PUSK;
-    secondary[ui->btn5] = KEY_MENU;
-    secondary[ui->btn6] = KEY_AC_PUSK_UD;
-    secondary[ui->btn7] = KEY_AC_RESET;
-    secondary[ui->btn8] = KEY_AC_REGIME;
-    secondary[ui->btn9] = KEY_PUSK_NALAD;
-}
-
-//
-void
-QKeyboard::setTypeRZSK() {
-    qDebug() << "Set RZSK keyboard";
-
-    primary[ui->btn1] = KEY_FUNC;
-    primary[ui->btn2] = KEY_UP;
-    primary[ui->btn3] = KEY_EMPTY;
-    primary[ui->btn4] = KEY_LEFT;
-    primary[ui->btn5] = KEY_ENTER;
-    primary[ui->btn6] = KEY_RIGHT;
-    primary[ui->btn7] = KEY_EMPTY;
-    primary[ui->btn8] = KEY_DOWN;
-    primary[ui->btn9] = KEY_CANCEL;
-
-    secondary[ui->btn1] = KEY_FUNC;
-    secondary[ui->btn2] = KEY_CALL;
-    secondary[ui->btn3] = KEY_PUSK_UD;
-    secondary[ui->btn4] = KEY_PUSK;
-    secondary[ui->btn5] = KEY_MENU;
-    secondary[ui->btn6] = KEY_PUSK_NALAD;
-    secondary[ui->btn7] = KEY_RESET_IND;
-    secondary[ui->btn8] = KEY_EMPTY;
-    secondary[ui->btn9] = KEY_EMPTY;
+    qDebug() << "number = " << (quint16) number << ", key = " << (quint16) key;
 }
 
 //

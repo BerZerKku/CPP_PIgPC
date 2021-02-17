@@ -42,7 +42,6 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
     friend void vKEYmain(void);
-    friend void vKEYset(eGB_TYPE_DEVICE type);
     friend eKEY eKEYget(void);
     friend uint8_t timePressKey();
     friend void vLCDclear(void);
@@ -95,6 +94,8 @@ private:
 
     /// Инициализация параметров.
     void initView();
+    /// Инициализация клавиатуры.
+    void initKeyboard();
     /// Настройка тестовых кнопок.
     void setupTestButtons();
     /// Отображение параметров.

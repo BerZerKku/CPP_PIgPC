@@ -13,45 +13,50 @@ static uint16_t uLedTimeOn = LCD_TIME_LED_ON;
 static eLCD_LED eLed = LED_OFF;
 static QString text;
 
-void vKEYmain(void) {
+void vKEYmain(void)
+{
 }
 
-void vKEYset(eGB_TYPE_DEVICE type) {
-    w->ui->kbd->setType(type);
-}
-
-eKEY eKEYget(void) {
+eKEY eKEYget(void)
+{
     return w->ui->kbd->getKey();
 }
 
-uint8_t timePressKey() {
+uint8_t timePressKey()
+{
     // FIXME В оригинале имеется еще обработка длительного нажатия кнопки.
     return 0;
 }
 
-void vLCDclear(void) {
+void vLCDclear(void)
+{
     text.clear();
     w->ui->textEdit->clear();
 }
 
-void vLCDinit(void) {
+void vLCDinit(void)
+{
 
 }
 
-void vLCDmain(void) {
+void vLCDmain(void)
+{
 
 }
 
-void vLCDrefresh(void) {
+void vLCDrefresh(void)
+{
     w->ui->textEdit->clear();
     w->ui->textEdit->setText(text);
 }
 
-bool vLCDdrawBoard(uint8_t num) {
+bool vLCDdrawBoard(uint8_t num)
+{
 
 }
 
-bool vLCDputchar(const char* buf, uint8_t num) {
+bool vLCDputchar(const char* buf, uint8_t num)
+{
     QTextCodec *codec = QTextCodec::codecForName("CP1251");
 
     text.clear();
@@ -71,14 +76,16 @@ bool vLCDputchar(const char* buf, uint8_t num) {
     return true;
 }
 
-void vLCDsetLed(eLCD_LED val) {
+void vLCDsetLed(eLCD_LED val)
+{
     if (val == LED_SWITCH)
         uLedTimeOn = LCD_TIME_LED_ON;
     else
         eLed = val;
 }
 
-void vLCDled() {
+void vLCDled()
+{
     const uint16_t step = 20; // период вызова/10мс
     bool enable = false;
 
@@ -94,7 +101,8 @@ void vLCDled() {
 
 void setupUart(TInterface::INTERFACE intf, uint16_t baudrate,
                TDataBits::DATA_BITS dbits, TParity::PARITY parity,
-               TStopBits::STOP_BITS sbits) {
+               TStopBits::STOP_BITS sbits)
+{
 
     qDebug() << "interface = " << intf <<
         ", baudrate = " << baudrate <<

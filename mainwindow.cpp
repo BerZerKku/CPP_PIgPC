@@ -16,7 +16,8 @@
 //
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
-      , ui(new Ui::MainWindow) {
+      , ui(new Ui::MainWindow)
+{
     ui->setupUi(this);
 
     setWindowTitle("BSP-PI");
@@ -54,6 +55,7 @@ MainWindow::MainWindow(QWidget *parent)
             this, &MainWindow::clearSelection);
 
     initView();
+    initKeyboard();
 
     installEventFilter(this);
     ui->textEdit->installEventFilter(this);
@@ -81,12 +83,14 @@ MainWindow::MainWindow(QWidget *parent)
 }
 
 //
-MainWindow::~MainWindow() {
+MainWindow::~MainWindow()
+{
     delete ui;
 }
 
 //
-void MainWindow::initView() {
+void MainWindow::initView()
+{
     QTreeWidgetItem *top = nullptr;
     QTreeWidgetItem *item = nullptr;
 
@@ -131,6 +135,9 @@ void MainWindow::initView() {
     addViewItem(top, "Совместимость K400", &view.typeCompK400);
     addViewItem(top, "Тип оптики", &view.typeOpto);
 
+    connect(&view.typeDevice, &QLineEdit::textChanged,
+            [=]() {initKeyboard();});
+
     ui->treeWidget->expandAll();
     ui->treeWidget->resizeColumnToContents(0);
     ui->treeWidget->resizeColumnToContents(1);
@@ -141,8 +148,16 @@ void MainWindow::initView() {
     pblue.setColor(QPalette::Text, Qt::blue);
 }
 
+void MainWindow::initKeyboard()
+{
+    for(uint8_t i = 1; i <= 2*NUM_KEY_IN_LAYOUT; i++) {
+        ui->kbd->setLayoutButton(i, vKEYgetButton(i));
+    }
+}
+
 //
-void MainWindow::setupTestButtons() {
+void MainWindow::setupTestButtons()
+{
     ui->pbTest1->setText("Engeneer PC");
     connect(ui->pbTest1, &QPushButton::clicked, this, &MainWindow::test1);
 
@@ -157,7 +172,8 @@ void MainWindow::setupTestButtons() {
 }
 
 //
-void MainWindow::hdlrView() {
+void MainWindow::hdlrView()
+{
     bool locked = false;
     quint8 value  = 0;
     quint16 time = 0;
@@ -207,7 +223,7 @@ void MainWindow::hdlrView() {
     view.regimePrd.setText(codec->toUnicode(fcRegime[value]));
 
     view.typeDevice.setText(getDeviceName(menu.sParam.typeDevice));
-    view.def.setText(menu.sParam.def.status.isEnable() ? "ok" : "no");
+    view.def.setText(menu.sParam.def.status.isEnable() ? "ok" : "---");
     viewNumComPrm();
     viewNumComPrd();
     value = menu.sParam.glb.getNumDevices();
@@ -219,7 +235,8 @@ void MainWindow::hdlrView() {
 
 //
 void MainWindow::addViewItem(QTreeWidgetItem *top, std::string name,
-                             QLineEdit *lineedit) {
+                             QLineEdit *lineedit)
+{
     QTreeWidgetItem *item = new QTreeWidgetItem();
 
     top->addChild(item);
@@ -244,7 +261,8 @@ bool MainWindow::eventFilter(QObject *object, QEvent *event) {
 }
 
 //
-void MainWindow::showEvent(QShowEvent *event) {
+void MainWindow::showEvent(QShowEvent *event)
+{
     QWidget::showEvent(event);
 
     mainInit();
@@ -253,7 +271,8 @@ void MainWindow::showEvent(QShowEvent *event) {
 }
 
 //
-void MainWindow::cycleMenu() {
+void MainWindow::cycleMenu()
+{
     uint8_t len = 0;
 
     static uint8_t cnt1s = 0;
@@ -300,8 +319,8 @@ void MainWindow::cycleMenu() {
 
     cnt1s++;
     if (cnt1s >= 10) {
-//        qDebug() << "Send " << cntsendtobsp << " packet to BSP per second.";
-//        qDebug() << "Send " << cntsendtopc << " packet to PC per second.";
+        //        qDebug() << "Send " << cntsendtobsp << " packet to BSP per second.";
+        //        qDebug() << "Send " << cntsendtopc << " packet to PC per second.";
         cntsendtopc = 0;
         cntsendtobsp = 0;
         cnt1s = 0;
@@ -314,14 +333,16 @@ void MainWindow::cycleMenu() {
 }
 
 //
-void MainWindow::clearSelection() {
+void MainWindow::clearSelection()
+{
     QTextCursor c = ui->textEdit->textCursor();
     c.clearSelection();
     ui->textEdit->setTextCursor(c);
 }
 
 //
-void MainWindow::setBacklight(bool enable) {
+void MainWindow::setBacklight(bool enable)
+{
     QColor color = enable ? Qt::green : Qt::gray;
 
     if (color.isValid()) {
@@ -331,7 +352,8 @@ void MainWindow::setBacklight(bool enable) {
 }
 
 //
-QString MainWindow::pwdToString(uint8_t *pwd) {
+QString MainWindow::pwdToString(uint8_t *pwd)
+{
     QString password;
     for(uint8_t i = 0; i < PWD_LEN; i++) {
         uint8_t ch = pwd[i];
@@ -348,32 +370,37 @@ QString MainWindow::pwdToString(uint8_t *pwd) {
 }
 
 //
-void MainWindow::test1() {
+void MainWindow::test1()
+{
     qDebug() << "Set user ENGINEER for PC";
     menu.sParam.security.setUser(USER_engineer, USER_SOURCE_pc);
 }
 
 //
-void MainWindow::test2() {
+void MainWindow::test2()
+{
     qDebug() << "Set user ADMIN for PI";
     menu.sParam.security.setUser(USER_admin, USER_SOURCE_pi);
 }
 
 //
-void MainWindow::test3() {
+void MainWindow::test3()
+{
     qDebug() << "Clear Security logs";
     menu.sParam.txComBuf.addFastCom(GB_COM_JRN_IS_CLR, GB_SEND_NO_DATA);
 }
 
 //
-void MainWindow::test4() {
+void MainWindow::test4()
+{
     qDebug() << "Set Disable Regime";
     menu.sParam.txComBuf.addFastCom(GB_COM_SET_REG_DISABLED, GB_SEND_NO_DATA);
 }
 
 //
 QString
-MainWindow::getDeviceName(eGB_TYPE_DEVICE type) const {
+MainWindow::getDeviceName(eGB_TYPE_DEVICE type) const
+{
     QString typeName = codec->toUnicode("Ошибка");
 
     if (type <= AVANT_MAX){
@@ -410,7 +437,8 @@ MainWindow::getDeviceName(eGB_TYPE_DEVICE type) const {
 
 //
 QString
-MainWindow::getTypeLine(eGB_TYPE_LINE type) const {
+MainWindow::getTypeLine(eGB_TYPE_LINE type) const
+{
     QString typeName = codec->toUnicode("Ошибка");
 
     switch(type) {
@@ -433,7 +461,8 @@ MainWindow::getTypeLine(eGB_TYPE_LINE type) const {
 
 //
 void
-MainWindow::viewNumComPrd() {
+MainWindow::viewNumComPrd()
+{
     uint8_t number = menu.sParam.prd.getNumCom();
     bool enable = menu.sParam.prd.status.isEnable();
 
@@ -453,8 +482,8 @@ MainWindow::viewNumComPrm() {
 
 //
 void
-MainWindow::viewTypeComp() {
-
+MainWindow::viewTypeComp()
+{
     if (menu.sParam.typeDevice == AVANT_K400) {
         eGB_COMP_K400 comp = menu.sParam.glb.getCompK400();
 

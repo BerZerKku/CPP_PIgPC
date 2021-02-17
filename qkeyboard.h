@@ -25,7 +25,7 @@ public:
     ~QKeyboard();
 
     void reset();
-    void setType(eGB_TYPE_DEVICE device);
+    void setLayoutButton(uint8_t number, eKEY key);
     eKEY getKey();
 
 public slots:
@@ -46,16 +46,12 @@ private:
     QSignalMapper *signalMapper;
     QVector<QPushButton*> btns;
 
-    QMap<QPushButton*, eKEY> primary;
-    QMap<QPushButton*, eKEY> secondary;
+    QMap<quint8, eKEY> primary;
+    QMap<quint8, eKEY> secondary;
 
     void refresh();
     void setButtonColor(QColor color);
     void setButtonTextColor(QColor color);
-    void setTypeK400();
-    void setTypeOpto();
-    void setTypeR400M();
-    void setTypeRZSK();
     QString getButtonName(eKEY ) const;
 };
 
