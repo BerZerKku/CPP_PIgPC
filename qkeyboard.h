@@ -26,7 +26,7 @@ public:
 
     void reset();
     void setLayoutButton(uint8_t number, eKEY key);
-    eKEY getKey();
+    uint8_t getKey();
 
 public slots:
     void btnPressed(int value);
@@ -40,14 +40,13 @@ signals:
     void debug(QString msg);
 
 private:
-    eKEY key = KEY_NO;
+    uint8_t key = KEY_NO;
     bool alt = true;
     Ui::QKeyboard *ui;
     QSignalMapper *signalMapper;
-    QVector<QPushButton*> btns;
 
-    QMap<quint8, eKEY> primary;
-    QMap<quint8, eKEY> secondary;
+    QVector<QPushButton*> btns;
+    QVector<eKEY> btnLayout;
 
     void refresh();
     void setButtonColor(QColor color);

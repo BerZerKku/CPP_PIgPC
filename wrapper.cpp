@@ -17,7 +17,7 @@ void vKEYmain(void)
 {
 }
 
-eKEY eKEYget(void)
+uint8_t eKEYget(void)
 {
     return w->ui->kbd->getKey();
 }

@@ -42,7 +42,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
     friend void vKEYmain(void);
-    friend eKEY eKEYget(void);
+    friend uint8_t eKEYget(void);
     friend uint8_t timePressKey();
     friend void vLCDclear(void);
     friend void vLCDinit(void);

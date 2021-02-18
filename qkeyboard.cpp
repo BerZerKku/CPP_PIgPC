@@ -12,34 +12,35 @@ QKeyboard::QKeyboard(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    signalMapper = new QSignalMapper(this);
+    btns.resize(NUM_KEY_IN_LAYOUT);
+    btnLayout.resize(2*btns.size());
 
-    btns.append(ui->btn1);
-    btns.append(ui->btn2);
-    btns.append(ui->btn3);
-    btns.append(ui->btn4);
-    btns.append(ui->btn5);
-    btns.append(ui->btn6);
-    btns.append(ui->btn7);
-    btns.append(ui->btn8);
-    btns.append(ui->btn9);
+    btns.replace(0, ui->btn1);
+    btns.replace(1, ui->btn2);
+    btns.replace(2, ui->btn3);
+    btns.replace(3, ui->btn4);
+    btns.replace(4, ui->btn5);
+    btns.replace(5, ui->btn6);
+    btns.replace(6, ui->btn7);
+    btns.replace(7, ui->btn8);
+    btns.replace(8, ui->btn9);
 
     QFont f = ui->btn1->font();
     f.setPointSize(15);
 
-    for(QPushButton *btn: btns) {
-        btn->setText(getButtonName(KEY_EMPTY));
-        btn->setEnabled(false);
+    for(int i = 0; i < btns.size(); i++) {
+        QPushButton *btn = btns.at(i);
         btn->setFont(f);
-        connect(btn, &QPushButton::clicked,
-                this->signalMapper, QOverload<>::of(&QSignalMapper::map));
+        btn->setFocusPolicy(Qt::NoFocus);
+        connect(btn, &QPushButton::clicked, [=]() {btnPressed(i);});
     }
+
     reset();
+    refresh();
 
-    connect(signalMapper, QOverload<int>::of(&QSignalMapper::mappedInt),
-            this, &QKeyboard::clicked);
+    connect(this, &QKeyboard::clicked, this, &QKeyboard::keyPressed);
 
-    connect(this, &QKeyboard::clicked, this, &QKeyboard::btnPressed);
+    reset();
 }
 
 //
@@ -51,15 +52,21 @@ QKeyboard::~QKeyboard()
 //
 void QKeyboard::btnPressed(int value)
 {
-    if (value != KEY_NO) {
-        if (value == KEY_FUNC) {
+    Q_ASSERT(value < btns.size());
+
+    if (alt) {
+        value += btns.size();
+    }
+    eKEY ekey = btnLayout.at(value);
+
+    if (ekey != KEY_NO) {
+        if (ekey == KEY_FUNC) {
             switchAlt();
         } else {
-            key = static_cast<eKEY> (value);
+            key = static_cast<uint8_t> (value + 1);
         }
     }
 
-    QString name = getButtonName(static_cast<eKEY> (value));
 //    emit debug(QString("Button pressed: %1").arg(name));
 }
 
@@ -106,28 +113,28 @@ QString QKeyboard::getButtonName(eKEY ekey) const
             name = QString::fromLocal8Bit("Пуск");
         } break;
         case KEY_PUSK_UD: {
-            name = "KEY_PUSK_UD";
+            name = QString::fromLocal8Bit("Удал.\nПуск\nПРД");
         } break;
         case KEY_PUSK_NALAD: {
-            name = "KEY_PUSK_NALAD";
+            name = QString::fromLocal8Bit("н. Пуск");
         } break;
         case KEY_RESET_IND: {
             name = QString::fromLocal8Bit("Сброс\nинд.");
         } break;
         case KEY_CALL: {
-            name = "KEY_CALL";
+            name = QString::fromLocal8Bit("Вызов");
         } break;
         case KEY_AC_PUSK: {
-            name = "KEY_AC_PUSK";
+            name = QString::fromLocal8Bit("Пуск\nАК");
         } break;
         case KEY_AC_PUSK_UD: {
-            name = "KEY_AC_PUSK_UD";
+            name = QString::fromLocal8Bit("Удал.\nПуск\nАК");
         } break;
         case KEY_AC_RESET: {
-            name = "KEY_AC_RESET";
+            name = QString::fromLocal8Bit("Сброс\nАК");
         } break;
         case KEY_AC_REGIME: {
-            name = "KEY_AC_REGIME";
+            name = QString::fromLocal8Bit("Режим\nАК");
         } break;
     }
 
@@ -137,10 +144,10 @@ QString QKeyboard::getButtonName(eKEY ekey) const
 }
 
 //
-eKEY QKeyboard::getKey()
+uint8_t QKeyboard::getKey()
 {
-    eKEY tkey = key;
-    key = KEY_NO;
+    uint8_t tkey = key;
+    key = 0;
     return tkey;
 }
 
@@ -181,12 +188,16 @@ void QKeyboard::keyPressed(int value)
         }
     }
 
-    // Анмимация нажатия кнопки, если она есть на экране
-    QMap<uint8_t, eKEY> *m = alt ? &secondary : &primary;
-    if (m->values().contains(ekey)) {
-        btns.at(m->key(ekey))->animateClick();
-    } else {
-        btnPressed(ekey);
+    if (btnLayout.count(ekey) > 0) {
+        int start = alt ? btns.size() : 0;
+        int keynumber = btnLayout.indexOf(ekey, start);
+
+        if ((keynumber >= 0) && ((keynumber - start) < btns.size())) {
+            // Анимация нажатия кнопки, если она есть на экране
+            btns.at(keynumber - start)->animateClick();
+        } else {
+            key = static_cast<uint8_t> (keynumber + 1);
+        }
     }
 }
 
@@ -194,16 +205,17 @@ void QKeyboard::keyPressed(int value)
 void QKeyboard::refresh()
 {
     QColor color;
-    QMap<uint8_t, eKEY> *m;
 
-    m = alt ? &secondary : &primary;
     color = alt ? kBtnColorSecondary : kBtnColorPrimary;
 
-    for(quint8 i = 1; i <= btns.size(); i++) {
-        QPushButton *btn = btns.at(i - 1);
-        btn->setText(getButtonName(m->value(i)));
-        btn->setEnabled(m->value(i) != KEY_EMPTY);
-        signalMapper->setMapping(btn, m->value(i - 1));
+    Q_ASSERT(btns.size() == NUM_KEY_IN_LAYOUT);
+    Q_ASSERT(btnLayout.size() == 2*btns.size());
+
+    for(quint8 i = 0; i < btns.size(); i++) {
+        QPushButton *btn = btns.at(i);
+        int keynumber = alt ? i + btns.size() : i;
+        btn->setText(getButtonName(btnLayout.at(keynumber)));
+        btn->setEnabled(btnLayout.at(keynumber) != KEY_EMPTY);
     }
 
     setButtonTextColor(color);
@@ -212,10 +224,8 @@ void QKeyboard::refresh()
 //
 void QKeyboard::reset()
 {
-    for(uint8_t i = 1; i <= NUM_KEY_IN_LAYOUT; i++) {
-        primary[i] = KEY_NO;
-        secondary[i] = KEY_NO;
-        signalMapper->setMapping(btns.at(i - 1), KEY_NO);
+    for(auto &btn: btnLayout) {
+        btn = KEY_NO;
     }
 
     alt = false;
@@ -250,15 +260,9 @@ void QKeyboard::setLayoutButton(uint8_t number, eKEY key)
     Q_ASSERT(number <= 2*NUM_KEY_IN_LAYOUT);
 
     if ((number > 0) && (number <= (2*NUM_KEY_IN_LAYOUT))) {
-        if (number <= NUM_KEY_IN_LAYOUT) {
-            primary.insert(number, key);
-        } else {
-            secondary.insert(number, key);
-        }
+        btnLayout.replace(number - 1, key);
     }
     refresh();
-
-    qDebug() << "number = " << (quint16) number << ", key = " << (quint16) key;
 }
 
 //

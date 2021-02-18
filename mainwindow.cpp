@@ -151,7 +151,7 @@ void MainWindow::initView()
 void MainWindow::initKeyboard()
 {
     for(uint8_t i = 1; i <= 2*NUM_KEY_IN_LAYOUT; i++) {
-        ui->kbd->setLayoutButton(i, vKEYgetButton(i));
+        ui->kbd->setLayoutButton(i, vKEYgetButtonLayout(i));
     }
 }
 
@@ -295,7 +295,7 @@ void MainWindow::cycleMenu()
     }
 
     if (len > 0) {
-        qDebug() << "Pkg to PC: " << Qt::showbase << Qt::hex << pkg;
+        qDebug() << "Pkg to PC: " << showbase << hex << pkg;
         cntsendtopc++;
     }
 
@@ -312,7 +312,7 @@ void MainWindow::cycleMenu()
             (pkg.at(2) == GB_COM_PRM_RES_IND) ||
             (pkg.at(2) == GB_COM_PRM_ENTER) ||
             (pkg.at(2) == GB_COM_DEF_SET_TYPE_AC)) {
-            qDebug() << "Pkg to BSP: " << Qt::showbase << Qt::hex << pkg;
+            qDebug() << "Pkg to BSP: " << showbase << hex << pkg;
         }
         cntsendtobsp++;
     }
