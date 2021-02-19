@@ -249,7 +249,8 @@ void MainWindow::addViewItem(QTreeWidgetItem *top, std::string name,
 }
 
 //
-bool MainWindow::eventFilter(QObject *object, QEvent *event) {
+bool MainWindow::eventFilter(QObject *object, QEvent *event)
+{
     if (event->type() == QEvent::KeyRelease) {
         // У элементов созданных на вкладке Bsp имен нет.
         if (!focusWidget()->objectName().isEmpty()) {
@@ -472,7 +473,8 @@ MainWindow::viewNumComPrd()
 
 //
 void
-MainWindow::viewNumComPrm() {
+MainWindow::viewNumComPrm()
+{
     uint8_t number = menu.sParam.prm.getNumCom();
     bool enable = menu.sParam.prm.status.isEnable();
 
@@ -515,7 +517,8 @@ MainWindow::viewTypeComp()
 
 //
 QString
-MainWindow::getTypeOpto(eGB_TYPE_OPTO type) const {
+MainWindow::getTypeOpto(eGB_TYPE_OPTO type) const
+{
     QString typeName = codec->toUnicode("Ошибка");
 
     switch(type) {
