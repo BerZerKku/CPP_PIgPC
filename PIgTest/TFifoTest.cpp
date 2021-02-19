@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "fifo.h"
+#include "PIg/src/fifo.h"
 #include <cstdio>
 #include <iostream>
 using namespace std;
@@ -8,6 +8,10 @@ using namespace std;
 #define SIZE_ARRAY(arr) (sizeof(arr) / sizeof(arr[0]))
 
 class TFifo_Test: public ::testing::Test {
+public:
+    TFifo_Test() {}
+    virtual ~TFifo_Test() {}
+    virtual void Clean() {}
 
 protected:
 };
@@ -23,20 +27,20 @@ TEST_F(TFifo_Test, UINT8_T) {
 
 	// Проверка заполнения очереди
 	for(size_t i = 0; i < len; i++) {
-		ASSERT_TRUE(fifo.push((uint8_t) (i + 1))) << " i = " << i;
+        ASSERT_TRUE(fifo.push(static_cast<uint8_t> (i + 1))) << " i = " << i;
 	}
 	ASSERT_FALSE(fifo.push(var));
 
 	// Проверка считывания очереди
 	for(size_t i = 0; i < len; i++) {
 		ASSERT_TRUE(fifo.pop(var));
-		ASSERT_EQ((uint8_t) (i + 1), var);
+        ASSERT_EQ(static_cast<uint8_t> (i + 1), var);
 	}
 	ASSERT_FALSE(fifo.pop(var));
 
 	// Проверка очистки очереди
 	for(size_t i = 0; i < len; i++) {
-		ASSERT_TRUE(fifo.push((uint8_t) (i + 1))) << " i = " << i;
+        ASSERT_TRUE(fifo.push(static_cast<uint8_t> (i + 1))) << " i = " << i;
 	}
 	fifo.flush();
 	ASSERT_FALSE(fifo.pop(var));
@@ -52,20 +56,20 @@ TEST_F(TFifo_Test, FLOAT) {
 
 	// Проверка заполнения очереди
 	for(size_t i = 0; i < len; i++) {
-		ASSERT_TRUE(fifo.push((float) (i + 1))) << " i = " << i;
+        ASSERT_TRUE(fifo.push(static_cast<float> (i + 1))) << " i = " << i;
 	}
 	ASSERT_FALSE(fifo.push(var));
 
 	// Проверка считывания очереди
 	for(size_t i = 0; i < len; i++) {
 		ASSERT_TRUE(fifo.pop(var));
-		ASSERT_EQ((float) (i + 1), var);
+        ASSERT_FLOAT_EQ(static_cast<float> (i + 1), var);
 	}
 	ASSERT_FALSE(fifo.pop(var));
 
 	// Проверка очистки очереди
 	for(size_t i = 0; i < len; i++) {
-		ASSERT_TRUE(fifo.push((float) (i + 1))) << " i = " << i;
+        ASSERT_TRUE(fifo.push(static_cast<float> (i + 1))) << " i = " << i;
 	}
 	fifo.flush();
 	ASSERT_FALSE(fifo.pop(var));

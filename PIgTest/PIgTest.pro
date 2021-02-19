@@ -16,7 +16,6 @@ DEFINES += \
 
 INCLUDEPATH += \
     googletest \
-	$${PIG_PATH}/src
 
 HEADERS += \
 

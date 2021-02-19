@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "security/pwd.h"
+#include "PIg/src/security/pwd.h"
 #include <cstdio>
 #include <iostream>
 using namespace std;
@@ -15,11 +15,11 @@ protected:
 	virtual void SetUp() {
 		pwd = new TPwd();
 
-	};
+    }
 
 	virtual void TearDown() {
 		delete pwd;
-	};
+    }
 
 	const uint8_t pwdReset[PWD_LEN] =  {0};
 };
@@ -41,8 +41,8 @@ TEST_F(TPwd_Test, getSet) {
 
 	// состояние после сброса
 	ASSERT_EQ(NULL, pwd->getPwd(USER_operator));
-	ASSERT_EQ(0, memcmp(pwdReset, pwd->getPwd(USER_engineer), PWD_LEN));
-	ASSERT_EQ(0, memcmp(pwdReset, pwd->getPwd(USER_admin), PWD_LEN));
+    ASSERT_EQ(int{0}, memcmp(pwdReset, pwd->getPwd(USER_engineer), PWD_LEN));
+    ASSERT_EQ(int{0}, memcmp(pwdReset, pwd->getPwd(USER_admin), PWD_LEN));
 	ASSERT_EQ(NULL, pwd->getPwd(USER_MAX));
 	ASSERT_EQ(NULL, pwd->getPwd(USER_factory));
 
@@ -55,16 +55,16 @@ TEST_F(TPwd_Test, getSet) {
 
 	// проверка пароля
 	ASSERT_EQ(NULL, pwd->getPwd(USER_operator));
-	ASSERT_EQ(0, memcmp(pwdEng, pwd->getPwd(USER_engineer), PWD_LEN));
-	ASSERT_EQ(0, memcmp(pwdAdm, pwd->getPwd(USER_admin), PWD_LEN));
+    ASSERT_EQ(int{0}, memcmp(pwdEng, pwd->getPwd(USER_engineer), PWD_LEN));
+    ASSERT_EQ(int{0}, memcmp(pwdAdm, pwd->getPwd(USER_admin), PWD_LEN));
 	ASSERT_EQ(NULL, pwd->getPwd(USER_MAX));
 	ASSERT_EQ(NULL, pwd->getPwd(USER_factory));
 
 	// установка пароля содержащего недопустимый символ
 	ASSERT_FALSE(pwd->setPwd(USER_engineer, pwdError1));
-	ASSERT_EQ(0, memcmp(pwdEng, pwd->getPwd(USER_engineer), PWD_LEN));
+    ASSERT_EQ(int{0}, memcmp(pwdEng, pwd->getPwd(USER_engineer), PWD_LEN));
 	ASSERT_FALSE(pwd->setPwd(USER_admin, pwdError2));
-	ASSERT_EQ(0, memcmp(pwdAdm, pwd->getPwd(USER_admin), PWD_LEN));
+    ASSERT_EQ(int{0}, memcmp(pwdAdm, pwd->getPwd(USER_admin), PWD_LEN));
 }
 
 TEST_F(TPwd_Test, getSetCounter) {
@@ -79,7 +79,7 @@ TEST_F(TPwd_Test, getSetCounter) {
     // установка счетчика для пользователя
     counter = 1;
     pwd->setCounter(USER_operator, counter);
-    ASSERT_EQ(0, pwd->getCounter(USER_operator));
+    ASSERT_EQ(int{0}, pwd->getCounter(USER_operator));
     pwd->setCounter(USER_engineer, counter);
     ASSERT_EQ(counter, pwd->getCounter(USER_engineer));
     pwd->setCounter(USER_admin, counter);
@@ -95,7 +95,7 @@ TEST_F(TPwd_Test, getSetCounter) {
 
     // проверка сброса счетчиков
     pwd->reset();
-    ASSERT_EQ(0, pwd->getCounter(USER_operator));
+    ASSERT_EQ(int{0}, pwd->getCounter(USER_operator));
     ASSERT_EQ(2*PWD_CNT_BLOCK, pwd->getCounter(USER_engineer));
     ASSERT_EQ(2*PWD_CNT_BLOCK, pwd->getCounter(USER_admin));
     ASSERT_EQ(2*PWD_CNT_BLOCK, pwd->getCounter(USER_MAX));

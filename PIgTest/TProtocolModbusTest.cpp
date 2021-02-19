@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "protocols/modbus/protocolModbus.h"
+#include "PIg/src/protocols/modbus/protocolModbus.h"
 #include <cstdio>
 #include <iostream>
 using namespace std;
@@ -7,11 +7,10 @@ using namespace std;
 // размер массива
 #define SIZE_ARRAY(arr) (sizeof(arr) / sizeof(arr[0]))
 
-// чтобы было короче
-#define TPM TProtocolModbus
+using TPM = TProtocolModbus;
 
-char msg[1000];		// буфер сообщений
-uint16_t cnt_msg = 0; 	// кол-во данных в буфере
+static char msg[1000];		// буфер сообщений
+static uint16_t cnt_msg = 0; 	// кол-во данных в буфере
 
 class TProtocolModbus_Test: public ::testing::Test {
 public:
@@ -107,7 +106,7 @@ public:
         for(uint8_t i = 0; i < size; i++) {
             cnt += sprintf(&msg[cnt], "0x%02X ", arr[i]);
         }
-        return (char *) arr;
+        return reinterpret_cast<char *> (arr);
     }
 
 private:
@@ -267,7 +266,7 @@ TEST_F(TProtocolModbus_Test, tick) {
 
 		TPM::STATE state = mb.getState();
 		if (state != data[i].stopState) {
-			uint8_t cnt = sprintf(msg, "  >>> Ошибка на шаге %d", i);
+            int cnt = sprintf(msg, "  >>> Ошибка на шаге %d", i);
 			cnt += sprintf(&msg[cnt], "\n start = %d,  finish = %d, need = %d",
 					data[i].startState, state, data[i].stopState);
 			cnt += sprintf(&msg[cnt], "\n step tick = %d", step);
@@ -284,7 +283,7 @@ TEST_F(TProtocolModbus_Test, push) {
 	// 1. Проверка записи максимально возможного кол-ва байт данных
 	// без проверки срабатывания tick
 	for (uint16_t i = 1; i <= 2 * sizeof (buf); i++) {
-		uint16_t t = mb.push(i);
+        uint16_t t = mb.push(static_cast<uint8_t> (i));
 		if (i <= sizeof (buf)) {
 			if (t != i) {
 				sprintf(msg, "  <<< Неверное количество принятых байт на шаге %d", i);
@@ -337,14 +336,14 @@ TEST_F(TProtocolModbus_Test, push) {
 
 		TPM::STATE state = mb.getState();
 		if (state != data[i].stateStop) {
-			uint8_t cnt = sprintf(msg, "  >>> Ошибочное состояние на шаге %d", i);
+            int cnt = sprintf(msg, "  >>> Ошибочное состояние на шаге %d", i);
 			cnt += sprintf(&msg[cnt], "\n start = %d,  finish = %d, need = %d", data[i].stateStart, state, data[i].stateStop);
 			cnt += sprintf(&msg[cnt], "\n num = %d", num);
 			ASSERT_TRUE(false) << msg;
 		}
 
 		if (num != data[i].numOfByte) {
-			uint8_t cnt = sprintf(msg, "  >>> Ошибочное кол-во принятых байт на шаге %d", i);
+            int cnt = sprintf(msg, "  >>> Ошибочное кол-во принятых байт на шаге %d", i);
 			cnt += sprintf(&msg[cnt], "\n start = %d,  finish = %d", data[i].stateStart, data[i].stateStop);
 			cnt += sprintf(&msg[cnt], "\n num = %d, need = %d", num, data[i].numOfByte);
 			ASSERT_TRUE(false) << msg;
@@ -367,7 +366,7 @@ TEST_F(TProtocolModbus_Test, get_and_set) {
 
 	// 2. Проверка установки/считывания адреса.
 	for (uint16_t i = 0; i <= 255; i++) {
-		bool t = mb.setAddressLan(i);
+        bool t = mb.setAddressLan(static_cast<uint8_t> (i));
 
 		// проверка возвращаемого значения функцией serAddress())
 		if (((i < adrMin) || (i > adrMax)) == t) {

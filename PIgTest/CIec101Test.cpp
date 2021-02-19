@@ -15,7 +15,7 @@ using namespace std;
 		friend class TIec101_Full_readData_Events_Class2_Test; \
 		friend class TIec101_Full_readData_Events_Class1_Test
 
-#include "protocols/iec101/CIec101.h"
+#include "PIg/src/protocols/iec101/CIec101.h"
 
 // размер массивов
 static const uint8_t SIZE = 64;

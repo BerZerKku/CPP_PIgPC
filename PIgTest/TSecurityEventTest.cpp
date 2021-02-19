@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "security/securityevent.h"
+#include "PIg/src/security/securityevent.h"
 #include <cstdio>
 #include <iostream>
 #include <cstring>
@@ -16,11 +16,11 @@ protected:
 	virtual void SetUp() {
 		event = new TSecurityEvent();
 
-	};
+    }
 
 	virtual void TearDown() {
 		delete event;
-	};
+    }
 };
 
 TEST_F(TSecurityTest_Test, constant) {
@@ -32,61 +32,61 @@ TEST_F(TSecurityTest_Test, eventString) {
 	TSecurityEvent::event_t ev;
 
 	ev = TSecurityEvent::EVENT_autoEnd;
-	ASSERT_EQ(0, strcmp("Авто. заверш. сеанса", event->getEventString(ev)));
+    ASSERT_EQ(int{0}, strcmp("Авто. заверш. сеанса", event->getEventString(ev)));
 
 	ev = TSecurityEvent::EVENT_chgSettings;
-	ASSERT_EQ(0, strcmp("Изменение настроек", event->getEventString(ev)));
+    ASSERT_EQ(int{0}, strcmp("Изменение настроек", event->getEventString(ev)));
 
 	ev = TSecurityEvent::EVENT_chgTime;
-	ASSERT_EQ(0, strcmp("Изменение даты/врем", event->getEventString(ev)));
+    ASSERT_EQ(int{0}, strcmp("Изменение даты/врем", event->getEventString(ev)));
 
 	ev = TSecurityEvent::EVENT_setOperator;
-	ASSERT_EQ(0, strcmp("Изменен. на Оператор", event->getEventString(ev)));
+    ASSERT_EQ(int{0}, strcmp("Изменен. на Оператор", event->getEventString(ev)));
 
 	ev = TSecurityEvent::EVENT_setEngineer;
-	ASSERT_EQ(0, strcmp("Изменен. на Инженер", event->getEventString(ev)));
+    ASSERT_EQ(int{0}, strcmp("Изменен. на Инженер", event->getEventString(ev)));
 
 	ev = TSecurityEvent::EVENT_setAdmin;
-	ASSERT_EQ(0, strcmp("Изменен. на Админ.", event->getEventString(ev)));
+    ASSERT_EQ(int{0}, strcmp("Изменен. на Админ.", event->getEventString(ev)));
 
 	ev = TSecurityEvent::EVENT_blkEngineer;
-	ASSERT_EQ(0, strcmp("Блокировка Инженера", event->getEventString(ev)));
+    ASSERT_EQ(int{0}, strcmp("Блокировка Инженера", event->getEventString(ev)));
 
 	ev = TSecurityEvent::EVENT_blkAdmin;
-	ASSERT_EQ(0, strcmp("Блокировка Админ.", event->getEventString(ev)));
+    ASSERT_EQ(int{0}, strcmp("Блокировка Админ.", event->getEventString(ev)));
 
 	ev = TSecurityEvent::EVENT_chgPwdEng;
-	ASSERT_EQ(0, strcmp("Изм. пароля Инженера", event->getEventString(ev)));
+    ASSERT_EQ(int{0}, strcmp("Изм. пароля Инженера", event->getEventString(ev)));
 
 	ev = TSecurityEvent::EVENT_chgPwdAdm;
-	ASSERT_EQ(0, strcmp("Изм. пароля Админ.", event->getEventString(ev)));
+    ASSERT_EQ(int{0}, strcmp("Изм. пароля Админ.", event->getEventString(ev)));
 
 	ev = TSecurityEvent::EVENT_wrgPwdEng;
-	ASSERT_EQ(0, strcmp("Ош. пароль Инженера", event->getEventString(ev)));
+    ASSERT_EQ(int{0}, strcmp("Ош. пароль Инженера", event->getEventString(ev)));
 
 	ev = TSecurityEvent::EVENT_wrgPwdAdm;
-	ASSERT_EQ(0, strcmp("Ош. пароль Админ.", event->getEventString(ev)));
+    ASSERT_EQ(int{0}, strcmp("Ош. пароль Админ.", event->getEventString(ev)));
 
 	ev = TSecurityEvent::EVENT_resetPwd;
-	ASSERT_EQ(0, strcmp("Сброс паролей", event->getEventString(ev)));
+    ASSERT_EQ(int{0}, strcmp("Сброс паролей", event->getEventString(ev)));
 
 	ev = TSecurityEvent::EVENT_regEnable;
-	ASSERT_EQ(0, strcmp("Режим Введен", event->getEventString(ev)));
+    ASSERT_EQ(int{0}, strcmp("Режим Введен", event->getEventString(ev)));
 
 	ev = TSecurityEvent::EVENT_regDisable;
-	ASSERT_EQ(0, strcmp("Режим Выведен", event->getEventString(ev)));
+    ASSERT_EQ(int{0}, strcmp("Режим Выведен", event->getEventString(ev)));
 
 	ev = TSecurityEvent::EVENT_regTestPrd;
-	ASSERT_EQ(0, strcmp("Режим Тест ПРД", event->getEventString(ev)));
+    ASSERT_EQ(int{0}, strcmp("Режим Тест ПРД", event->getEventString(ev)));
 
 	ev = TSecurityEvent::EVENT_regTestPrm;
-	ASSERT_EQ(0, strcmp("Режим Тест ПРМ", event->getEventString(ev)));
+    ASSERT_EQ(int{0}, strcmp("Режим Тест ПРМ", event->getEventString(ev)));
 
 	ev = TSecurityEvent::EVENT_MAX;
-	ASSERT_EQ(0, strcmp("Событие - %d", event->getEventString(ev)));
+    ASSERT_EQ(int{0}, strcmp("Событие - %d", event->getEventString(ev)));
 
 	ev = static_cast<TSecurityEvent::event_t> (TSecurityEvent::EVENT_MAX + 1);
-	ASSERT_EQ(0, strcmp("Событие - %d", event->getEventString(ev)));
+    ASSERT_EQ(int{0}, strcmp("Событие - %d", event->getEventString(ev)));
 }
 
 TEST_F(TSecurityTest_Test, getUserSourceString) {
@@ -94,16 +94,16 @@ TEST_F(TSecurityTest_Test, getUserSourceString) {
 	ASSERT_EQ(2, USER_SOURCE_MAX);
 
 	src = USER_SOURCE_pi;
-	ASSERT_EQ(0, strcmp("ПИ", event->getUserSourceString(src)));
+    ASSERT_EQ(int{0}, strcmp("ПИ", event->getUserSourceString(src)));
 
 	src = USER_SOURCE_pc;
-	ASSERT_EQ(0, strcmp("ПК", event->getUserSourceString(src)));
+    ASSERT_EQ(int{0}, strcmp("ПК", event->getUserSourceString(src)));
 
 	src = USER_SOURCE_MAX;
-	ASSERT_EQ(0, strcmp("ОШ", event->getUserSourceString(src)));
+    ASSERT_EQ(int{0}, strcmp("ОШ", event->getUserSourceString(src)));
 
 	src = static_cast<userSrc_t> (USER_SOURCE_MAX + 1);
-	ASSERT_EQ(0, strcmp("ОШ", event->getUserSourceString(src)));
+    ASSERT_EQ(int{0}, strcmp("ОШ", event->getUserSourceString(src)));
 }
 
 TEST_F(TSecurityTest_Test, pushPwdBlocked) {
