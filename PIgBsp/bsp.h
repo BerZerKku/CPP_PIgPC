@@ -12,7 +12,7 @@
 #include <QStringList>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
-#include "glbDefine.h"
+#include "PIg/src/glbDefine.h"
 #include "PIg/src/security/user.h"
 #include "PIg/src/security/securityevent.h"
 
