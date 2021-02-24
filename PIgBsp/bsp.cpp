@@ -1,7 +1,7 @@
 #include "bsp.h"
-#include "PIg/src/flash.h"
-#include "PIg/src/parameter/param.h"
-#include "PIg/src/menu/txCom.hpp"
+#include "src/flash.h"
+#include "src/parameter/param.h"
+#include "src/menu/txCom.hpp"
 #include <QDebug>
 #include "QTextCodec"
 #include <QTimer>

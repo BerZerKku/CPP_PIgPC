@@ -51,10 +51,6 @@ SOURCES += \
     $${PIG_PATH}/src/protocols/standart/protocolBspS.cpp \
     $${PIG_PATH}/src/protocols/standart/protocolPcS.cpp \
     $${PIG_PATH}/src/protocols/standart/protocolS.cpp \
-    $${PIG_PATH}/src/security/infosecurity.cpp \
-    $${PIG_PATH}/src/security/pwd.cpp \
-    $${PIG_PATH}/src/security/securityevent.cpp \
-    $${PIG_PATH}/src/security/user.cpp \
     main.cpp \
     mainwindow.cpp \
     qkeyboard.cpp \
@@ -101,10 +97,6 @@ HEADERS += \
     $${PIG_PATH}/src/protocols/standart/protocolBspS.h \
     $${PIG_PATH}/src/protocols/standart/protocolPcS.h \
     $${PIG_PATH}/src/protocols/standart/protocolS.h \
-    $${PIG_PATH}/src/security/infosecurity.h \
-    $${PIG_PATH}/src/security/pwd.h \
-    $${PIG_PATH}/src/security/securityevent.h \
-    $${PIG_PATH}/src/security/user.h \
     mainwindow.h \
     qkeyboard.h \
     serial.h \
