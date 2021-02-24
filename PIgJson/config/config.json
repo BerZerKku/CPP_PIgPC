@@ -1,0 +1,44 @@
+﻿{
+    "01_param_config": {
+        "name": "Параметры",
+        "type": "tab",
+        "desc": "Вкладка параметров",
+         
+        "data": {
+            "time_year": {
+                "name": "Год",
+                "type": "value_uint",
+                "desc": "Год",
+
+                "data": {
+                    "group": "Дата и время",
+                    "minimum": 2021,
+                    "maximum": 3000
+                }
+            },
+            "time_month": {
+                "name": "Месяц",
+                "type": "value_uint",
+                "desc": "Год",
+
+                "data": {
+                    "group": "Дата и время",
+                    "minimum": 1,
+                    "maximum": 12
+                }
+            },
+            "time_day": {
+                "name": "День",
+                "type": "value_uint",
+                "desc": "День года",
+
+                "data": {
+                    "group": "Дата и время",
+                    "minimum": 1,
+                    "maximum": 31,
+                    "depend": "depend_day"
+                }    
+            }
+        }    
+    }
+}
