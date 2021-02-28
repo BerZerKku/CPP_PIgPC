@@ -174,43 +174,7 @@ void MainWindow::setupTestButtons()
 //
 void MainWindow::hdlrView()
 {
-    bool locked = false;
     quint8 value  = 0;
-    quint16 time = 0;
-    user_t user;
-
-    value = menu.sParam.security.getUser(USER_SOURCE_pi);
-    time = menu.sParam.security.getUserTime(USER_SOURCE_pi);
-    view.userPi.setText(QString("%1 / %2c").
-                        arg(codec->toUnicode(fcUser[value])).
-                        arg(time));
-
-    value = menu.sParam.security.getUser(USER_SOURCE_pc);
-    time = menu.sParam.security.getUserTime(USER_SOURCE_pc);
-    view.userPc.setText(QString("%1 / %2c").
-                        arg(codec->toUnicode(fcUser[value])).
-                        arg(time));
-
-
-    user = USER_engineer;
-    view.engPwd.setText(pwdToString(menu.sParam.security.pwd.getPwd(user)));
-    value = menu.sParam.security.pwd.getCounter(user);
-    time = menu.sParam.security.pwd.getLockTime(user);
-    locked = menu.sParam.security.pwd.isLocked(user);
-    view.engCounter.setText(QString("%1 / %2c").
-                            arg(value, 2, 16, QLatin1Char('0')).
-                            arg(time));
-    view.engCounter.setPalette(locked > 0 ? pred : pblue);
-
-    user = USER_admin;
-    view.admPwd.setText(pwdToString(menu.sParam.security.pwd.getPwd(user)));
-    value = menu.sParam.security.pwd.getCounter(user);
-    time = menu.sParam.security.pwd.getLockTime(user);
-    locked = menu.sParam.security.pwd.isLocked(user);
-    view.admCounter.setText(QString("%1 / %2c").
-                            arg(value, 2, 16, QLatin1Char('0')).
-                            arg(time));
-    view.admCounter.setPalette(locked ? pred : pblue);
 
     value = menu.sParam.Uart.Interface.get();
     view.interface.setText(codec->toUnicode(fcInterface[value]));
@@ -353,49 +317,28 @@ void MainWindow::setBacklight(bool enable)
 }
 
 //
-QString MainWindow::pwdToString(uint8_t *pwd)
-{
-    QString password;
-    for(uint8_t i = 0; i < PWD_LEN; i++) {
-        uint8_t ch = pwd[i];
-        if ((ch < '0') || (ch > '9')) {
-            if (!password.isEmpty() && (password.back() != ' ')) {
-                password += " ";
-            }
-            password += QString("%1 ").arg(ch, 2, 16, QLatin1Char('0'));
-        } else {
-            password += QChar(pwd[i]);
-        }
-    }
-    return password;
-}
-
-//
 void MainWindow::test1()
 {
-    qDebug() << "Set user ENGINEER for PC";
-    menu.sParam.security.setUser(USER_engineer, USER_SOURCE_pc);
+    qDebug() << "test1 button pressed";
 }
 
 //
 void MainWindow::test2()
 {
-    qDebug() << "Set user ADMIN for PI";
-    menu.sParam.security.setUser(USER_admin, USER_SOURCE_pi);
+    qDebug() << "test2 button pressed";
 }
 
 //
 void MainWindow::test3()
 {
-    qDebug() << "Clear Security logs";
-    menu.sParam.txComBuf.addFastCom(GB_COM_JRN_IS_CLR, GB_SEND_NO_DATA);
+   qDebug() << "test3 button pressed";
 }
 
 //
 void MainWindow::test4()
 {
     qDebug() << "Set Disable Regime";
-    menu.sParam.txComBuf.addFastCom(GB_COM_SET_REG_DISABLED, GB_SEND_NO_DATA);
+    menu.sParam.txComBuf.addFastCom(GB_COM_SET_REG_DISABLED);
 }
 
 //

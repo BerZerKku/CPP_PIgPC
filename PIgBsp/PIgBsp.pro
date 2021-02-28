@@ -36,12 +36,6 @@ DEFINES += \
 INCLUDEPATH +=
 
 SOURCES += \
-    $${PIG_PATH}/src/flashParam.cpp \
-	$${PIG_PATH}/src/parameter/param.cpp \
-	$${PIG_PATH}/src/security/infosecurity.cpp \
-	$${PIG_PATH}/src/security/pwd.cpp \
-	$${PIG_PATH}/src/security/securityevent.cpp \
-	$${PIG_PATH}/src/security/user.cpp \
     bsp.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -53,22 +47,6 @@ SOURCES += \
     wrapper.cpp
 
 HEADERS += \
-    $${PIG_PATH}/src/avr.h \
-	$${PIG_PATH}/src/debug/debug.hpp \
-	$${PIG_PATH}/src/flash.h \
-	$${PIG_PATH}/src/flashParams.h \
-	$${PIG_PATH}/src/glbDefine.h \
-	$${PIG_PATH}/src/menu/deviceStatus.hpp \
-	$${PIG_PATH}/src/paramIS.h \
-	$${PIG_PATH}/src/paramUart.h \
-	$${PIG_PATH}/src/parameter/param.h \
-	$${PIG_PATH}/src/protocols/standart/protocolBspS.h \
-	$${PIG_PATH}/src/protocols/standart/protocolPcS.h \
-	$${PIG_PATH}/src/protocols/standart/protocolS.h \
-	$${PIG_PATH}/src/security/infosecurity.h \
-	$${PIG_PATH}/src/security/pwd.h \
-	$${PIG_PATH}/src/security/securityevent.h \
-	$${PIG_PATH}/src/security/user.h \
     bsp.h \
     mainwindow.h \
     serial.h \

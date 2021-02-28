@@ -45,8 +45,6 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     hl->addWidget(&oth);
     hl->addWidget(&jrn);
 
-    jrn.crtJournals();
-
     glb.initParam();
 
     Bsp::initClock();

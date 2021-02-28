@@ -4,4 +4,4 @@ TEMPLATE = subdirs
 
 SUBDIRS += PIgGui
 
-SUBDIRS += PIgTest
+#SUBDIRS += PIgTest

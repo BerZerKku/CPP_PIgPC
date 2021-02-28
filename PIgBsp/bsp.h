@@ -13,8 +13,6 @@
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 #include "PIg/src/glbDefine.h"
-#include "PIg/src/security/user.h"
-#include "PIg/src/security/securityevent.h"
 
 typedef QVector<uint8_t> pkg_t;
 
@@ -38,13 +36,6 @@ class Bsp : public QTreeWidget
         QComboBox *typeDevice = nullptr;
         QComboBox *typeLine = nullptr;
         QComboBox *typeOpto = nullptr;
-    };
-
-    struct jrn_t {
-        quint16 cntSecurity = 0;
-        quint16 posSecurity = SIZE_OF_SECURITY_JRN - 1;
-        QTreeWidgetItem *security = nullptr;
-        QTreeWidget *securityTw = nullptr;
     };
 
     struct test_t {
@@ -112,7 +103,6 @@ public:
     static state_t stateGlb;
     static state_t statePrm;
     static state_t statePrd;
-    static jrn_t journals;
     static test_t test;
 
     /// Обработка команды.
@@ -130,9 +120,6 @@ private:
     QRegExpValidator pwdValidator;
     QRegExp errRegExp;
     QRegExpValidator errValidator;
-
-    static void addJSEntry(user_t user, userSrc_t src, TSecurityEvent::event_t event);
-    QTreeWidgetItem* crtJSEntry(quint16 index);
 
     void crtComboBox(eGB_PARAM param);
     void fillComboboxList(QComboBox *combobox, eGB_PARAM param);
@@ -166,11 +153,6 @@ private:
     static void hdlrComNetAdrGet(eGB_COM com, pkg_t &data);
     static void hdlrComNetAdrSet(eGB_COM com, pkg_t &data);
     static void hdlrComSetControl(eGB_COM com, pkg_t &data);
-
-    static void hdlrComJrnIsClr(eGB_COM com, pkg_t &data);
-    static void hdlrComGetJrnIsCnt(eGB_COM com, pkg_t &data);
-    static void hdlrComGetJrnIsEntry(eGB_COM com, pkg_t &data);
-    static void hdlrComGetJrnIsSetEntry(eGB_COM com, pkg_t &data);
 
     static void hdlrComGetTest(eGB_COM com, pkg_t &data);
 

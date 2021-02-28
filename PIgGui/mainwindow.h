@@ -18,8 +18,6 @@
 #include "PIg/src/protocols/standart/protocolPcS.h"
 #include "PIg/src/protocols/modbus/protocolPcM.h"
 #include "PIg/src/protocols/iec101/protocolPcI.h"
-#include "PIg/src/security/user.h"
-
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -111,8 +109,6 @@ private slots:
     void cycleMenu();  ///< Цикл 200 мс.
     void clearSelection();  ///< Очистка выделения в textEdit.
     void setBacklight(bool enable);
-
-    QString pwdToString(uint8_t *pwd);
 
     void test1();
     void test2();
