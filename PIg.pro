@@ -1,7 +1,7 @@
 TEMPLATE = subdirs
 
-#SUBDIRS += PIgBsp
+SUBDIRS += PIgBsp
 
 SUBDIRS += PIgGui
 
-#SUBDIRS += PIgTest
+SUBDIRS += PIgTest

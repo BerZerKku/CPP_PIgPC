@@ -21,6 +21,7 @@ HEADERS += \
     wrapper.hpp
 
 SOURCES += \
+    TDateTimeTest.cpp \
     googletest/gtest-all.cc \
 	main.cpp \
 	CIec101Test.cpp \

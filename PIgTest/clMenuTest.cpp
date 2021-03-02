@@ -17,15 +17,15 @@ class clMenu_Test: public ::testing::Test {
     clMenu *menu;
 
     clMenu_Test() {}
-    virtual ~clMenu_Test() {}
-    virtual void Clean() {}
+    virtual ~clMenu_Test() override {}
 
    protected:
-    virtual void SetUp() {
+
+    void SetUp() override {
         menu = new clMenu();
     }
 
-    virtual void TearDown() {
+     void TearDown() override{
         delete menu;
     }
 };
