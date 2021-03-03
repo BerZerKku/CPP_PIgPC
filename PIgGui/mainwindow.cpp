@@ -103,17 +103,18 @@ void MainWindow::initView()
     top = new QTreeWidgetItem();
     ui->treeWidget->addTopLevelItem(top);
     top->setText(0, codec->toUnicode("Пользователь"));
-    addViewItem(top, "Роль ПИ", &view.userPi);
-    addViewItem(top, "Роль ПК", &view.userPc);
-    addViewItem(top, "Пароль инженера", &view.engPwd);
+    addViewItem(top, "Пароль пользователя", &view.userPwd);
     addViewItem(top, "Пароль админисратора", &view.admPwd);
-    addViewItem(top, "Счетчик инж.", &view.engCounter);
-    addViewItem(top, "Счетчик адм.", &view.admCounter);
 
     top = new QTreeWidgetItem();
     ui->treeWidget->addTopLevelItem(top);
-    top->setText(0, codec->toUnicode("Сетевые настройки"));
-    addViewItem(top, "Интерфейс", &view.interface);
+    top->setText(0, codec->toUnicode("Локальная сеть"));
+    addViewItem(top, getNameOfParam(GB_PARAM_INTF_PROTOCOL), &view.lnProtocol);
+    addViewItem(top, getNameOfParam(GB_PARAM_NET_ADDRESS), &view.lnAddress);
+    addViewItem(top, getNameOfParam(GB_PARAM_INTF_BAUDRATE), &view.lnBaudrate);
+    addViewItem(top, getNameOfParam(GB_PARAM_INTF_DATA_BITS), &view.lnDataBits);
+    addViewItem(top, getNameOfParam(GB_PARAM_INTF_PARITY), &view.lnParity);
+    addViewItem(top, getNameOfParam(GB_PARAM_INTF_STOP_BITS), &view.lnStopBits);
 
     top = new QTreeWidgetItem();
     ui->treeWidget->addTopLevelItem(top);
@@ -142,10 +143,10 @@ void MainWindow::initView()
     ui->treeWidget->resizeColumnToContents(0);
     ui->treeWidget->resizeColumnToContents(1);
 
-    pred = view.engCounter.palette();
-    pred.setColor(QPalette::Text, Qt::red);
-    pblue = view.engCounter.palette();
-    pblue.setColor(QPalette::Text, Qt::blue);
+//    pred = view.engCounter.palette();
+//    pred.setColor(QPalette::Text, Qt::red);
+//    pblue = view.engCounter.palette();
+//    pblue.setColor(QPalette::Text, Qt::blue);
 }
 
 void MainWindow::initKeyboard()
@@ -174,24 +175,39 @@ void MainWindow::setupTestButtons()
 //
 void MainWindow::hdlrView()
 {
-    quint8 value  = 0;
+    quint8 value8  = 0;
+    quint16 value16 = 0;
 
-    value = menu.sParam.Uart.Interface.get();
-    view.interface.setText(codec->toUnicode(fcInterface[value]));
+    value16 = menu.sParam.password.get();
+    view.userPwd.setText(QString::number(value16));
+    view.admPwd.setText(QString::number(PASSWORD_ADMIN));
 
-    value = menu.sParam.def.status.getRegime();
-    view.regimeDef.setText(codec->toUnicode(fcRegime[value]));
-    value = menu.sParam.prm.status.getRegime();
-    view.regimePrm.setText(codec->toUnicode(fcRegime[value]));
-    value = menu.sParam.prd.status.getRegime();
-    view.regimePrd.setText(codec->toUnicode(fcRegime[value]));
+    value8 = menu.sParam.Uart.Protocol.get();
+    view.lnProtocol.setText(codec->toUnicode(fcProtocol[value8]));
+    value8 = menu.sParam.Uart.NetAddress.get();
+    view.lnAddress.setText(QString::number(value8));
+    value8 = menu.sParam.Uart.BaudRate.get();
+    view.lnBaudrate.setText(codec->toUnicode(fcBaudRate[value8]));
+    value8 = menu.sParam.Uart.DataBits.get();
+    view.lnDataBits.setText(codec->toUnicode(fcDataBits[value8]));
+    value8 = menu.sParam.Uart.Parity.get();
+    view.lnParity.setText(codec->toUnicode(fcParity[value8]));
+    value8 = menu.sParam.Uart.StopBits.get();
+    view.lnStopBits.setText(codec->toUnicode(fcStopBits[value8]));
+
+    value8 = menu.sParam.def.status.getRegime();
+    view.regimeDef.setText(codec->toUnicode(fcRegime[value8]));
+    value8 = menu.sParam.prm.status.getRegime();
+    view.regimePrm.setText(codec->toUnicode(fcRegime[value8]));
+    value8 = menu.sParam.prd.status.getRegime();
+    view.regimePrd.setText(codec->toUnicode(fcRegime[value8]));
 
     view.typeDevice.setText(getDeviceName(menu.sParam.typeDevice));
     view.def.setText(menu.sParam.def.status.isEnable() ? "ok" : "---");
     viewNumComPrm();
     viewNumComPrd();
-    value = menu.sParam.glb.getNumDevices();
-    view.numDevices.setText(codec->toUnicode(fcNumDevices[value - 1]));
+    value8 = menu.sParam.glb.getNumDevices();
+    view.numDevices.setText(codec->toUnicode(fcNumDevices[value8 - 1]));
     view.typeCommLine.setText(getTypeLine(menu.sParam.glb.getTypeLine()));
     viewTypeComp();
     view.typeOpto.setText(getTypeOpto(menu.sParam.glb.getTypeOpto()));

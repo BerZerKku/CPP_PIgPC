@@ -12,7 +12,6 @@ HEADERS += \
     $${PIG_PATH}/src/drivers/ks0108.h \
     $${PIG_PATH}/src/drivers/tmp75.h \
     $${PIG_PATH}/src/drivers/uart.h \
-    $${PIG_PATH}/src/fifo.h \
     $${PIG_PATH}/src/flash.h \
     $${PIG_PATH}/src/flashParams.h \
     $${PIG_PATH}/src/glbDefine.h \

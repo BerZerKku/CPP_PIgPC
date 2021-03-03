@@ -66,6 +66,7 @@ public:
     void crtTreeInterface();
     void crtTreePrd();
     void crtTreePrm();
+    void crtTreeVP();
     void crtTreeState();
     void crtTreeState(QTreeWidgetItem *top, std::string name, state_t &state);
     void crtTreeUser();

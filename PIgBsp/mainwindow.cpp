@@ -37,6 +37,7 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     oth.crtTreePrm();
     oth.crtTreePrd();
     oth.crtTreeGlb();
+    oth.crtTreeVP();
 
     vl->addWidget(port);
     vl->addWidget(&glb);

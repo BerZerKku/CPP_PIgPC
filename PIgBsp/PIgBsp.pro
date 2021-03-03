@@ -25,7 +25,6 @@ CONFIG(release, debug|release) {
 # depend on your compiler). Please consult the documentation of the
 # deprecated API in order to know how to port your code away from it.
 DEFINES += \
-    MY_TESTS \
     QT_DEPRECATED_WARNINGS
 
 # You can also make your code fail to compile if it uses deprecated APIs.

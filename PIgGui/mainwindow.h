@@ -52,13 +52,14 @@ class MainWindow : public QMainWindow
     friend void vLCDled();
 
     struct view_t {
-        QLineEdit userPi;
-        QLineEdit userPc;
-        QLineEdit engPwd;
+        QLineEdit userPwd;
         QLineEdit admPwd;
-        QLineEdit engCounter;
-        QLineEdit admCounter;
-        QLineEdit interface;
+        QLineEdit lnProtocol;
+        QLineEdit lnAddress;
+        QLineEdit lnBaudrate;
+        QLineEdit lnDataBits;
+        QLineEdit lnParity;
+        QLineEdit lnStopBits;
         QLineEdit regimeDef;
         QLineEdit regimePrm;
         QLineEdit regimePrd;

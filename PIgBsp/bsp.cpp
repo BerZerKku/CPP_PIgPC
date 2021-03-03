@@ -33,11 +33,11 @@ Bsp::Bsp(QWidget *parent) : QTreeWidget(parent) {
     headerItem()->setText(0, codec->toUnicode("Parameter"));
     headerItem()->setText(1, codec->toUnicode("Value"));
 
-//    expandAll();
-//    header()->resizeSections(QHeaderView::ResizeToContents);
-//    header()->setSectionResizeMode(0, QHeaderView::Fixed);
-//    header()->resizeSection(0, header()->sectionSize(0) + 5);
-//    setFixedWidth(1.75*header()->sectionSize(0));
+    //    expandAll();
+    //    header()->resizeSections(QHeaderView::ResizeToContents);
+    //    header()->setSectionResizeMode(0, QHeaderView::Fixed);
+    //    header()->resizeSection(0, header()->sectionSize(0) + 5);
+    //    setFixedWidth(1.75*header()->sectionSize(0));
 
     header()->setSectionResizeMode(0, QHeaderView::Fixed);
     header()->resizeSection(0, 220);
@@ -51,8 +51,8 @@ Bsp::Bsp(QWidget *parent) : QTreeWidget(parent) {
 void Bsp::initParam() {
     eGB_PARAM param = GB_PARAM_NULL_PARAM;
 
-//    setLineEditValue(eGB_PARAM::GB_PARAM_IS_PWD_ENGINEER, "00000001");
-//    setLineEditValue(eGB_PARAM::GB_PARAM_IS_PWD_ADMIN, "00000002");
+    //    setLineEditValue(eGB_PARAM::GB_PARAM_IS_PWD_ENGINEER, "00000001");
+    //    setLineEditValue(eGB_PARAM::GB_PARAM_IS_PWD_ADMIN, "00000002");
 
     setComboBoxValue(stateGlb.regime, eGB_REGIME::GB_REGIME_ENABLED);
     setSpinBoxValue(stateGlb.state, 1);
@@ -70,7 +70,6 @@ void Bsp::initParam() {
     setComboBoxValue(GB_PARAM_COM_PRM_KEEP, 0);
     setComboBoxValue(GB_PARAM_TIME_SYNCH, 0);
 
-    setComboBoxValue(GB_PARAM_INTF_INTERFACE, TInterface::USB);
     setComboBoxValue(GB_PARAM_INTF_PROTOCOL, TProtocol::IEC_101);
     setSpinBoxValue(GB_PARAM_NET_ADDRESS, 17);
     setComboBoxValue(GB_PARAM_INTF_BAUDRATE, TBaudRate::_9600);
@@ -99,6 +98,8 @@ void Bsp::initParam() {
     setComboBoxValue(GB_PARAM_COMP_K400, 0);
     setComboBoxValue(device.typeDevice, AVANT_K400);
     setComboBoxValue(device.typeOpto, TYPE_OPTO_STANDART);
+
+    setSpinBoxValue(GB_PARAM_USER_PASSWORD, 1234);
 }
 
 void Bsp::initClock() {
@@ -195,7 +196,7 @@ void Bsp::crtTreeDevice() {
     fillComboboxListTypeOpto(device.typeOpto);
     setItemWidget(item, 1, device.typeOpto);
 
-//    top->setExpanded(true);
+    //    top->setExpanded(true);
 }
 
 void Bsp::crtTreeGlb() {
@@ -217,7 +218,6 @@ void Bsp::crtTreeInterface() {
 
     top->setText(0, codec->toUnicode("Интерфейс"));
 
-    crtComboBox(GB_PARAM_INTF_INTERFACE);
     crtComboBox(GB_PARAM_INTF_PROTOCOL);
     crtSpinBox(GB_PARAM_NET_ADDRESS);
     crtComboBox(GB_PARAM_INTF_BAUDRATE);
@@ -235,6 +235,13 @@ void Bsp::crtTreePrd() {
 
     top->setText(0, codec->toUnicode("Передатчик"));
 
+    crtSpinBox(GB_PARAM_PRD_IN_DELAY);
+    //    crtComboBox(GB_PARAM_PRD_COM_BLOCK);
+    //    crtSpinBox(GB_PARAM_PRD_DURATION_L);
+    crtSpinBox(GB_PARAM_PRD_DURATION_O);
+    crtComboBox(GB_PARAM_PRD_COM_LONG);
+    crtComboBox(GB_PARAM_PRD_COM_SIGNAL);
+
     top->setExpanded(false);
 }
 
@@ -246,12 +253,27 @@ void Bsp::crtTreePrm() {
 
     // FIXME Есть два вида задержки на фиксацию команды!
     crtSpinBox(GB_PARAM_PRM_TIME_ON);
-    crtComboBox(GB_PARAM_PRM_COM_BLOCK);
+    //    crtComboBox(GB_PARAM_PRM_COM_BLOCK_ALL);
+    //    crtComboBox(GB_PARAM_PRM_COM_BLOCK);
     crtSpinBox(GB_PARAM_PRM_TIME_OFF);
-//    crtComboBox(GB_PARAM_PRD_DR_ENABLE);
-//    crtComboBox(GB_PARAM_PRM_DR_COM_BLOCK);
-//    crtComboBox(GB_PARAM_PRM_DR_COM_TO_HF);
-//    crtComboBox(GB_PARAM_PRM_COM_SIGNAL);
+    //    crtComboBox(GB_PARAM_PRD_DR_ENABLE);
+    //    crtComboBox(GB_PARAM_PRM_DR_COM_BLOCK);
+    //    crtComboBox(GB_PARAM_PRM_DR_COM_TO_HF);
+    //    crtComboBox(GB_PARAM_PRM_COM_SIGNAL);
+
+    top->setExpanded(true);
+}
+
+void Bsp::crtTreeVP()
+{
+    QTreeWidgetItem* top = new QTreeWidgetItem();
+    insertTopLevelItem(topLevelItemCount(), top);
+
+    top->setText(0, codec->toUnicode("Панель ВК"));
+
+    crtComboBox(GB_PARAM_PRM_COM_BLOCK_ALL);
+    crtComboBox(GB_PARAM_PRM_COM_BLOCK);
+    crtComboBox(GB_PARAM_PRD_COM_BLOCK);
 
     top->setExpanded(true);
 }
@@ -343,7 +365,7 @@ void Bsp::crtTreeState(QTreeWidgetItem *top, std::string name,
             state.warning, &QLineEdit::deselect);
 
     ltop->setExpanded(&state == &stateGlb);
-//    ltop->setExpanded(true);
+    //    ltop->setExpanded(true);
 }
 
 //
@@ -353,11 +375,7 @@ void Bsp::crtTreeUser() {
 
     top->setText(0, codec->toUnicode("Пользователь"));
 
-    pwdRegExp.setPattern("[0-9]+");
-    pwdValidator.setRegExp(pwdRegExp);
-
-//    crtLineEdit(GB_PARAM_IS_PWD_ENGINEER, "00000000");
-//    crtLineEdit(GB_PARAM_IS_PWD_ADMIN, "00000000");
+    crtSpinBox(GB_PARAM_USER_PASSWORD);
 
     top->setExpanded(true);
 }
@@ -545,12 +563,12 @@ void Bsp::crtLineEdit(eGB_PARAM param, std::string value) {
     QTreeWidgetItem *top = topLevelItem(topLevelItemCount()-1);
 
     if (getParamType(param) == Param::PARAM_PWD) {
-//        lineedit->setMaxLength(PWD_LEN);
-//        lineedit->setInputMask("99999999");
-//        lineedit->setValidator(&pwdValidator);;
+        //        lineedit->setMaxLength(PWD_LEN);
+        //        lineedit->setInputMask("99999999");
+        //        lineedit->setValidator(&pwdValidator);;
     } else {
         qCritical() << QString("Parameter %1 is not PWD!").
-                      arg(getParamName(param));
+                       arg(getParamName(param));
     }
 
     if (getCom(param) == eGB_COM::GB_COM_NO) {
@@ -599,7 +617,8 @@ void Bsp::crtSpinBox(eGB_PARAM param) {
             spinbox = new QSpinBox(this);
             vspinbox.append(spinbox);
 
-            if (getParamType(param) == Param::PARAM_INT) {
+            if ((getParamType(param) == Param::PARAM_INT) ||
+                (getParamType(param) == Param::PARAM_PWD)) {
                 qint16 min = getAbsMin(param);
                 qint16 max = getAbsMax(param);
                 spinbox->setRange(min, max);
@@ -668,7 +687,8 @@ void Bsp::setComboBoxValue(eGB_PARAM param, quint8 value, uint8_t number) {
         combobox = mapCombobox.value(param).at(number-1);
         if (setComboBoxValue(combobox, value) == -1) {
             QString msg = QString("%1: Wrong value %2 for parameter '%3' (%4).").
-                          arg(__FUNCTION__).arg(value).
+                          arg(__FUNCTION__).
+                          arg(value).
                           arg(getParamName(param)).arg(number);
             qWarning() << msg;
         }
@@ -989,6 +1009,70 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data) {
             pkgTx.append(Bsp::getComboBoxValue(GB_PARAM_PRM_COM_BLOCK, 25));
         } break;
 
+        case GB_COM_PRM_GET_BLOCK_ALL: {
+            if (data.size() != 0) {
+                qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
+            }
+            //
+            pkgTx.append(com);
+            pkgTx.append(Bsp::getComboBoxValue(GB_PARAM_PRM_COM_BLOCK_ALL));
+        } break;
+
+        case GB_COM_PRD_GET_TIME_ON: {
+            if (data.size() != 0) {
+                qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
+            }
+            //
+            pkgTx.append(com);
+            pkgTx.append(Bsp::getSpinBoxValue(GB_PARAM_PRD_IN_DELAY));
+        } break;
+
+        case GB_COM_PRD_GET_DURATION: {
+            if (data.size() != 0) {
+                qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
+            }
+            //
+            pkgTx.append(com);
+            // FIXME Тут разные параметры для оптики / вч
+            pkgTx.append(Bsp::getSpinBoxValue(GB_PARAM_PRD_DURATION_O));
+        } break;
+
+        case GB_COM_PRD_GET_BLOCK_COM: {
+            if (data.size() != 0) {
+                qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
+            }
+            //
+            pkgTx.append(com);
+            pkgTx.append(Bsp::getComboBoxValue(GB_PARAM_PRD_COM_BLOCK, 1));
+            pkgTx.append(Bsp::getComboBoxValue(GB_PARAM_PRD_COM_BLOCK, 9));
+            pkgTx.append(Bsp::getComboBoxValue(GB_PARAM_PRD_COM_BLOCK, 17));
+            pkgTx.append(Bsp::getComboBoxValue(GB_PARAM_PRD_COM_BLOCK, 25));
+        } break;
+
+        case GB_COM_PRD_GET_LONG_COM: {
+            if (data.size() != 0) {
+                qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
+            }
+            //
+            pkgTx.append(com);
+            pkgTx.append(Bsp::getComboBoxValue(GB_PARAM_PRD_COM_LONG, 1));
+            pkgTx.append(Bsp::getComboBoxValue(GB_PARAM_PRD_COM_LONG, 9));
+            pkgTx.append(Bsp::getComboBoxValue(GB_PARAM_PRD_COM_LONG, 17));
+            pkgTx.append(Bsp::getComboBoxValue(GB_PARAM_PRD_COM_LONG, 25));
+        } break;
+
+        case GB_COM_PRD_GET_COM_SIGN: {
+            if (data.size() != 0) {
+                qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
+            }
+            //
+            pkgTx.append(com);
+            pkgTx.append(Bsp::getComboBoxValue(GB_PARAM_PRD_COM_SIGNAL, 1));
+            pkgTx.append(Bsp::getComboBoxValue(GB_PARAM_PRD_COM_SIGNAL, 9));
+            pkgTx.append(Bsp::getComboBoxValue(GB_PARAM_PRD_COM_SIGNAL, 17));
+            pkgTx.append(Bsp::getComboBoxValue(GB_PARAM_PRD_COM_SIGNAL, 25));
+        } break;
+
         case GB_COM_GET_SOST: {
             if (data.size() != 1) {
                 qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
@@ -1150,6 +1234,8 @@ void Bsp::procCommandWriteParam(eGB_COM com, pkg_t &data) {
     pkgTx.append(com);
     pkgTx.append(data);
 
+    qDebug() << "Write command: " <<  hex << pkgTx;
+
     switch(com) {
         case GB_COM_PRM_SET_TIME_ON: {
             if (data.size() != 1) {
@@ -1180,6 +1266,65 @@ void Bsp::procCommandWriteParam(eGB_COM com, pkg_t &data) {
                 uint8_t value = data.takeFirst();
                 // FIXME Есть два разных параметра "Задержка на фиксацию команды"
                 Bsp::setComboBoxValueBits(GB_PARAM_PRM_COM_BLOCK, value, number);
+            }
+        } break;
+
+        case GB_COM_PRM_SET_BLOCK_ALL: {
+            if (data.size() != 1) {
+                qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
+            } else {
+                uint8_t value = data.takeFirst();
+                //
+                Bsp::setComboBoxValue(GB_PARAM_PRM_COM_BLOCK_ALL, value);
+            }
+        } break;
+
+        case GB_COM_PRD_SET_TIME_ON: {
+            if (data.size() != 1) {
+                qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
+            } else {
+                uint8_t value = data.takeFirst();
+                Bsp::setSpinBoxValue(GB_PARAM_PRD_IN_DELAY, value);
+            }
+        } break;
+
+        case GB_COM_PRD_SET_DURATION: {
+            if (data.size() != 1) {
+                qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
+            } else {
+                uint8_t value = data.takeFirst();
+                // FIXME Тут может быть разный параметр для ВЧ / Оптика
+                Bsp::setSpinBoxValue(GB_PARAM_PRD_DURATION_O, value);
+            }
+        } break;
+
+        case GB_COM_PRD_SET_BLOCK_COM: {
+            if (data.size() != 2) {
+                qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
+            } else {
+                uint8_t number = data.takeFirst();
+                uint8_t value = data.takeFirst();
+                Bsp::setComboBoxValueBits(GB_PARAM_PRD_COM_BLOCK, value, number);
+            }
+        } break;
+
+        case GB_COM_PRD_SET_LONG_COM: {
+            if (data.size() != 2) {
+                qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
+            } else {
+                uint8_t number = data.takeFirst();
+                uint8_t value = data.takeFirst();
+                Bsp::setComboBoxValueBits(GB_PARAM_PRD_COM_LONG, value, number);
+            }
+        } break;
+
+        case GB_COM_PRD_SET_COM_SIGN: {
+            if (data.size() != 2) {
+                qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
+            } else {
+                uint8_t number = data.takeFirst();
+                uint8_t value = data.takeFirst();
+                Bsp::setComboBoxValueBits(GB_PARAM_PRD_COM_SIGNAL, value, number);
             }
         } break;
 
@@ -1333,7 +1478,7 @@ void Bsp::procCommandWriteRegime(eGB_COM com, pkg_t &data) {
 void Bsp::hdlrComGetVers(eGB_COM com, pkg_t &data) {
     uint16_t vers = 0;
     eGB_TYPE_DEVICE typedevice = static_cast<eGB_TYPE_DEVICE>
-        (getComboBoxValue(device.typeDevice));
+                                 (getComboBoxValue(device.typeDevice));
 
     if (data.size() != 0) {
         qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
@@ -1405,101 +1550,70 @@ void  Bsp::hdlrComNetAdrGet(eGB_COM com, pkg_t &data) {
     pkgTx.append(com);
     qint16 value = getSpinBoxValue(GB_PARAM_NET_ADDRESS);
     pkgTx.append(static_cast<uint8_t> (value));
-    pkgTx.append(getComboBoxValue(GB_PARAM_INTF_INTERFACE));
     pkgTx.append(getComboBoxValue(GB_PARAM_INTF_PROTOCOL));
     pkgTx.append(getComboBoxValue(GB_PARAM_INTF_BAUDRATE));
     pkgTx.append(getComboBoxValue(GB_PARAM_INTF_DATA_BITS));
     pkgTx.append(getComboBoxValue(GB_PARAM_INTF_PARITY));
     pkgTx.append(getComboBoxValue(GB_PARAM_INTF_STOP_BITS));
+    value = getSpinBoxValue(GB_PARAM_USER_PASSWORD);
+    pkgTx.append(value & 0x00FF);
+    pkgTx.append((value >> 8) & 0x00FF);
 
-//    char const* pwd = getLineEditValue(GB_PARAM_IS_PWD_ENGINEER).
-//                      toStdString().c_str();
-//    for(uint8_t i = 0; i < PWD_LEN; i++) {
-//        pkgTx.append(static_cast <uint8_t> (*pwd));
-//        pwd++;
-//    }
+    //    char const* pwd = getLineEditValue(GB_PARAM_IS_PWD_ENGINEER).
+    //                      toStdString().c_str();
+    //    for(uint8_t i = 0; i < PWD_LEN; i++) {
+    //        pkgTx.append(static_cast <uint8_t> (*pwd));
+    //        pwd++;
+    //    }
 
-//    pwd = getLineEditValue(GB_PARAM_IS_PWD_ADMIN).
-//          toStdString().c_str();
-//    for(uint8_t i = 0; i < PWD_LEN; i++) {
-//        pkgTx.append(static_cast <uint8_t> (*pwd));
-//        pwd++;
-//    }
+    //    pwd = getLineEditValue(GB_PARAM_IS_PWD_ADMIN).
+    //          toStdString().c_str();
+    //    for(uint8_t i = 0; i < PWD_LEN; i++) {
+    //        pkgTx.append(static_cast <uint8_t> (*pwd));
+    //        pwd++;
+    //    }
 }
 
 //
 void  Bsp::hdlrComNetAdrSet(eGB_COM com, pkg_t &data) {
-//    uint8_t dop = data.takeFirst();
-//    switch(dop) {
-//    case POS_COM_NET_ADR_netAdr: {
-//        uint8_t byte = data.takeFirst();
-//        setSpinBoxValue(GB_PARAM_NET_ADDRESS, byte);
-//    } break;
-//    case POS_COM_NET_ADR_interface: {
-//        uint8_t byte = data.takeFirst();
-//        setComboBoxValue(GB_PARAM_INTF_INTERFACE, byte);
-//    } break;
-//    case POS_COM_NET_ADR_protocol: {
-//        uint8_t byte = data.takeFirst();
-//        setComboBoxValue(GB_PARAM_INTF_PROTOCOL, byte);
-//    } break;
-//    case POS_COM_NET_ADR_baudrate: {
-//        uint8_t byte = data.takeFirst();
-//        setComboBoxValue(GB_PARAM_INTF_BAUDRATE, byte);
-//    } break;
-//    case POS_COM_NET_ADR_dataBits: {
-//        uint8_t byte = data.takeFirst();
-//        setComboBoxValue(GB_PARAM_INTF_DATA_BITS, byte);
-//    } break;
-//    case POS_COM_NET_ADR_parity: {
-//        uint8_t byte = data.takeFirst();
-//        setComboBoxValue(GB_PARAM_INTF_PARITY, byte);
-//    } break;
-//    case POS_COM_NET_ADR_stopBits: {
-//        uint8_t byte = data.takeFirst();
-//        setComboBoxValue(GB_PARAM_INTF_STOP_BITS, byte);
-//    } break;
-//    case POS_COM_NET_ADR_pwdEngineer: {
-//        if (data.size() != 8) {
-//            qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
-//        } else {
-//            QString value;
-//            for(uint8_t i = 0; i < PWD_LEN; i++) {
-//                value.append(data.takeFirst());
-//            }
-//            mapLineEdit.value(GB_PARAM_IS_PWD_ENGINEER)->setText(value);
-//        }
-//    } break;
-//    case POS_COM_NET_ADR_pwdAdmin: {
-//        if (data.size() != 8) {
-//            qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
-//        } else {
-//            QString value;
-//            for(uint8_t i = 0; i < PWD_LEN; i++) {
-//                value.append(data.takeFirst());
-//            }
-//            mapLineEdit.value(GB_PARAM_IS_PWD_ADMIN)->setText(value);
-//        }
-//    } break;
-//    case POS_COM_NET_ADR_cntEngineer: {
-//        if (data.size() != 1) {
-//            qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
-//        } else {
-//            uint8_t byte = data.takeFirst();
-//            setSpinBoxValue(GB_PARAM_IS_PWD_ENG_CNT, byte);
-//        }
-//    } break;
-//    case POS_COM_NET_ADR_cntAdmin: {
-//        if (data.size() != 1) {
-//            qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
-//        } else {
-//            uint8_t byte = data.takeFirst();
-//            setSpinBoxValue(GB_PARAM_IS_PWD_ADM_CNT, byte);
-//        }
-//    } break;
+    uint8_t dop = data.takeFirst();
+    switch(dop) {
+        case POS_COM_NET_ADR_netAdr: {
+            uint8_t byte = data.takeFirst();
+            setSpinBoxValue(GB_PARAM_NET_ADDRESS, byte);
+        } break;
+        case POS_COM_NET_ADR_protocol: {
+            uint8_t byte = data.takeFirst();
+            setComboBoxValue(GB_PARAM_INTF_PROTOCOL, byte);
+        } break;
+        case POS_COM_NET_ADR_baudrate: {
+            uint8_t byte = data.takeFirst();
+            setComboBoxValue(GB_PARAM_INTF_BAUDRATE, byte);
+        } break;
+        case POS_COM_NET_ADR_dataBits: {
+            uint8_t byte = data.takeFirst();
+            setComboBoxValue(GB_PARAM_INTF_DATA_BITS, byte);
+        } break;
+        case POS_COM_NET_ADR_parity: {
+            uint8_t byte = data.takeFirst();
+            setComboBoxValue(GB_PARAM_INTF_PARITY, byte);
+        } break;
+        case POS_COM_NET_ADR_stopBits: {
+            uint8_t byte = data.takeFirst();
+            setComboBoxValue(GB_PARAM_INTF_STOP_BITS, byte);
+        } break;
+        case POS_COM_NET_ADR_password: {
+            if (data.size() != 2) {
+                qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
+            } else {
+                quint16 bytelo = data.takeFirst();
+                quint16 bytehi = data.takeFirst();
+                setSpinBoxValue(GB_PARAM_USER_PASSWORD, bytelo + (bytehi << 8));
+            }
+        } break;
 
-//    default: qDebug("No dop byte handler: 0x%.2X", dop);
-//    }
+        default: qDebug("No dop byte handler: 0x%.2X", dop);
+    }
 }
 
 //
