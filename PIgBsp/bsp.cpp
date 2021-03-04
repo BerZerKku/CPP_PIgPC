@@ -784,14 +784,19 @@ qint16 Bsp::getSpinBoxValue(eGB_PARAM param, uint8_t number) {
         mapSpinBox.value(param).size() >= number) {
 
         number -= 1;
-        if (getParamType(param) == Param::PARAM_INT) {
+        if ((getParamType(param) == Param::PARAM_INT) ||
+            (getParamType(param) == Param::PARAM_PWD)) {
             value = getSpinBoxValue(mapSpinBox.value(param).at(number));
             value = (value / getDisc(param)) * getDisc(param);
             value /= getFract(param);
+        } else {
+            QString msg = QString("Parameter '%1' type (%2) not found.").
+                          arg(getParamName(param)).arg(getParamType(param));
+            qWarning() << msg;
         }
     } else {
-        QString msg = QString("%1: Parameter '%2' (%3) not found.").
-                      arg(__FUNCTION__).arg(getParamName(param)).arg(number);
+        QString msg = QString("Parameter '%1' (%2) not found.").
+                      arg(getParamName(param)).arg(number);
         qWarning() << msg;
     }
 
@@ -1558,6 +1563,8 @@ void  Bsp::hdlrComNetAdrGet(eGB_COM com, pkg_t &data) {
     value = getSpinBoxValue(GB_PARAM_USER_PASSWORD);
     pkgTx.append(value & 0x00FF);
     pkgTx.append((value >> 8) & 0x00FF);
+
+    qDebug() << hex << pkgTx;
 
     //    char const* pwd = getLineEditValue(GB_PARAM_IS_PWD_ENGINEER).
     //                      toStdString().c_str();
