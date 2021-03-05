@@ -208,6 +208,7 @@ void Bsp::crtTreeGlb() {
     crtComboBox(GB_PARAM_COM_PRD_KEEP);
     crtComboBox(GB_PARAM_COM_PRM_KEEP);
     crtComboBox(GB_PARAM_TIME_SYNCH);
+    crtComboBox(GB_PARAM_ALARM_RESET_MODE);
 
     top->setExpanded(false);
 }
@@ -1194,9 +1195,30 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data) {
             //
             pkgTx.append(com);
             if (getComboBoxValue(device.typeDevice) == AVANT_K400) {
+                // FIXME Добавить остальные параметры для К400.
                 pkgTx.append(Bsp::getComboBoxValue(GB_PARAM_COM_PRD_KEEP));
                 pkgTx.append(Bsp::getComboBoxValue(GB_PARAM_COMP_K400));
-                // FIXME Добавить остальные параметры для К400.
+                pkgTx.append(0);
+                pkgTx.append(0);
+                pkgTx.append(0);
+                pkgTx.append(0);
+                pkgTx.append(0);
+                pkgTx.append(0);
+                pkgTx.append(0);
+                pkgTx.append(0);
+                pkgTx.append(0);
+                pkgTx.append(0);
+                pkgTx.append(0);
+                pkgTx.append(0);
+                pkgTx.append(0);
+                pkgTx.append(0);
+                pkgTx.append(0);
+                pkgTx.append(0);
+                pkgTx.append(0);
+                pkgTx.append(0);
+                pkgTx.append(0);
+                pkgTx.append(0);
+                pkgTx.append(Bsp::getComboBoxValue(GB_PARAM_ALARM_RESET_MODE));
             } else {
                 pkgTx.append(Bsp::getComboBoxValue(GB_PARAM_COMP_P400));
             }
@@ -1387,8 +1409,11 @@ void Bsp::procCommandWriteParam(eGB_COM com, pkg_t &data) {
             // FIXME Добавить остальные параметры для К400.
             // Учесть что в Р400 только один байт "Совместимость".
             switch(dop) {
-                case 1: {
+                case POS_COM_PRD_KEEP_prdKeep: {
                     Bsp::setComboBoxValue(GB_PARAM_COM_PRD_KEEP, value);
+                } break;
+                case POS_COM_PRD_KEEP_alarmResetMode: {
+                    Bsp::setComboBoxValue(GB_PARAM_ALARM_RESET_MODE, value);
                 } break;
 
                 default: qDebug("No dop byte handler: 0x%.2X", dop);
