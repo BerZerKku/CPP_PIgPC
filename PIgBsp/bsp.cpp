@@ -99,6 +99,9 @@ void Bsp::initParam() {
     setComboBoxValue(device.typeDevice, AVANT_K400);
     setComboBoxValue(device.typeOpto, TYPE_OPTO_STANDART);
 
+    setComboBoxValue(GB_PARAM_VP_SAC1, 0);
+    setComboBoxValue(GB_PARAM_VP_SAC2, 0);
+
     setSpinBoxValue(GB_PARAM_USER_PASSWORD, 1234);
 }
 
@@ -272,7 +275,8 @@ void Bsp::crtTreeVP()
 
     top->setText(0, codec->toUnicode("Панель ВК"));
 
-    crtComboBox(GB_PARAM_PRM_COM_BLOCK_ALL);
+    crtComboBox(GB_PARAM_VP_SAC1);
+    crtComboBox(GB_PARAM_VP_SAC2);
     crtComboBox(GB_PARAM_PRM_COM_BLOCK);
     crtComboBox(GB_PARAM_PRD_COM_BLOCK);
 
@@ -690,7 +694,8 @@ void Bsp::setComboBoxValue(eGB_PARAM param, quint8 value, uint8_t number) {
             QString msg = QString("%1: Wrong value %2 for parameter '%3' (%4).").
                           arg(__FUNCTION__).
                           arg(value).
-                          arg(getParamName(param)).arg(number);
+                          arg(param).
+                          arg(number);
             qWarning() << msg;
         }
     } else {
@@ -1021,7 +1026,7 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data) {
             }
             //
             pkgTx.append(com);
-            pkgTx.append(Bsp::getComboBoxValue(GB_PARAM_PRM_COM_BLOCK_ALL));
+            pkgTx.append(Bsp::getComboBoxValue(GB_PARAM_VP_SAC1));
         } break;
 
         case GB_COM_PRD_GET_TIME_ON: {
@@ -1261,7 +1266,7 @@ void Bsp::procCommandWriteParam(eGB_COM com, pkg_t &data) {
     pkgTx.append(com);
     pkgTx.append(data);
 
-    qDebug() << "Write command: " <<  hex << pkgTx;
+    qDebug() << "Write command: " <<  Qt::hex << pkgTx;
 
     switch(com) {
         case GB_COM_PRM_SET_TIME_ON: {
@@ -1302,7 +1307,7 @@ void Bsp::procCommandWriteParam(eGB_COM com, pkg_t &data) {
             } else {
                 uint8_t value = data.takeFirst();
                 //
-                Bsp::setComboBoxValue(GB_PARAM_PRM_COM_BLOCK_ALL, value);
+                Bsp::setComboBoxValue(GB_PARAM_VP_SAC1, value);
             }
         } break;
 
@@ -1404,10 +1409,12 @@ void Bsp::procCommandWriteParam(eGB_COM com, pkg_t &data) {
         } break;
 
         case GB_COM_SET_COM_PRD_KEEP: {
+            qDebug() << "GB_COM_SET_COM_PRD_KEEP: " << data;
             uint8_t value = data.takeFirst();
             uint8_t dop = data.takeFirst();
             // FIXME Добавить остальные параметры для К400.
             // Учесть что в Р400 только один байт "Совместимость".
+
             switch(dop) {
                 case POS_COM_PRD_KEEP_prdKeep: {
                     Bsp::setComboBoxValue(GB_PARAM_COM_PRD_KEEP, value);
@@ -1588,22 +1595,9 @@ void  Bsp::hdlrComNetAdrGet(eGB_COM com, pkg_t &data) {
     value = getSpinBoxValue(GB_PARAM_USER_PASSWORD);
     pkgTx.append(value & 0x00FF);
     pkgTx.append((value >> 8) & 0x00FF);
+    pkgTx.append(Bsp::getComboBoxValue(GB_PARAM_VP_SAC2));
 
-    qDebug() << hex << pkgTx;
-
-    //    char const* pwd = getLineEditValue(GB_PARAM_IS_PWD_ENGINEER).
-    //                      toStdString().c_str();
-    //    for(uint8_t i = 0; i < PWD_LEN; i++) {
-    //        pkgTx.append(static_cast <uint8_t> (*pwd));
-    //        pwd++;
-    //    }
-
-    //    pwd = getLineEditValue(GB_PARAM_IS_PWD_ADMIN).
-    //          toStdString().c_str();
-    //    for(uint8_t i = 0; i < PWD_LEN; i++) {
-    //        pkgTx.append(static_cast <uint8_t> (*pwd));
-    //        pwd++;
-    //    }
+//    qDebug() << hex << pkgTx;
 }
 
 //
@@ -1642,6 +1636,10 @@ void  Bsp::hdlrComNetAdrSet(eGB_COM com, pkg_t &data) {
                 quint16 bytehi = data.takeFirst();
                 setSpinBoxValue(GB_PARAM_USER_PASSWORD, bytelo + (bytehi << 8));
             }
+        } break;
+        case POS_COM_NET_ADR_vpSac2: {
+            uint8_t byte = data.takeFirst();
+            setComboBoxValue(GB_PARAM_VP_SAC2, byte);
         } break;
 
         default: qDebug("No dop byte handler: 0x%.2X", dop);
