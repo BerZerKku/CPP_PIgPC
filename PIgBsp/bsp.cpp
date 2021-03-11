@@ -1266,8 +1266,6 @@ void Bsp::procCommandWriteParam(eGB_COM com, pkg_t &data) {
     pkgTx.append(com);
     pkgTx.append(data);
 
-    qDebug() << "Write command: " <<  Qt::hex << pkgTx;
-
     switch(com) {
         case GB_COM_PRM_SET_TIME_ON: {
             if (data.size() != 1) {
@@ -1302,12 +1300,16 @@ void Bsp::procCommandWriteParam(eGB_COM com, pkg_t &data) {
         } break;
 
         case GB_COM_PRM_SET_BLOCK_ALL: {
-            if (data.size() != 1) {
+            if (data.size() != 2) {
                 qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
             } else {
+                uint8_t number = data.takeFirst();
                 uint8_t value = data.takeFirst();
-                //
-                Bsp::setComboBoxValue(GB_PARAM_VP_SAC1, value);
+                switch(posComPrmBlockAll_t(number)) {
+                    case POS_COM_PRM_BLOCK_ALL_vpSac1: {
+                        Bsp::setComboBoxValue(GB_PARAM_VP_SAC1, value);
+                    } break;
+                }
             }
         } break;
 
@@ -1409,7 +1411,6 @@ void Bsp::procCommandWriteParam(eGB_COM com, pkg_t &data) {
         } break;
 
         case GB_COM_SET_COM_PRD_KEEP: {
-            qDebug() << "GB_COM_SET_COM_PRD_KEEP: " << data;
             uint8_t value = data.takeFirst();
             uint8_t dop = data.takeFirst();
             // FIXME Добавить остальные параметры для К400.
