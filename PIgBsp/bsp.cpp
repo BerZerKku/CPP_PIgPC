@@ -101,6 +101,7 @@ void Bsp::initParam() {
 
     setComboBoxValue(GB_PARAM_VP_SAC1, 0);
     setComboBoxValue(GB_PARAM_VP_SAC2, 0);
+    setComboBoxValueBits(GB_PARAM_VP_SAm, 0x41);
 
     setSpinBoxValue(GB_PARAM_USER_PASSWORD, 1234);
 }
@@ -279,6 +280,7 @@ void Bsp::crtTreeVP()
     crtComboBox(GB_PARAM_VP_SAC2);
     crtComboBox(GB_PARAM_PRM_COM_BLOCK);
     crtComboBox(GB_PARAM_PRD_COM_BLOCK);
+    crtComboBox(GB_PARAM_VP_SAm);
 
     top->setExpanded(true);
 }
@@ -1597,6 +1599,7 @@ void  Bsp::hdlrComNetAdrGet(eGB_COM com, pkg_t &data) {
     pkgTx.append(value & 0x00FF);
     pkgTx.append((value >> 8) & 0x00FF);
     pkgTx.append(Bsp::getComboBoxValue(GB_PARAM_VP_SAC2));
+    pkgTx.append(Bsp::getComboBoxValue(GB_PARAM_VP_SAm));
 
 //    qDebug() << hex << pkgTx;
 }
@@ -1641,6 +1644,10 @@ void  Bsp::hdlrComNetAdrSet(eGB_COM com, pkg_t &data) {
         case POS_COM_NET_ADR_vpSac2: {
             uint8_t byte = data.takeFirst();
             setComboBoxValue(GB_PARAM_VP_SAC2, byte);
+        } break;
+        case POS_COM_NET_ADR_vpSam: {
+            uint8_t byte = data.takeFirst();
+            setComboBoxValueBits(GB_PARAM_VP_SAm, byte);
         } break;
 
         default: qDebug("No dop byte handler: 0x%.2X", dop);

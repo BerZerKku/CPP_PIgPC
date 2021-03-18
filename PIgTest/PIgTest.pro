@@ -27,6 +27,7 @@ SOURCES += \
 	CIec101Test.cpp \
     clMenuTest.cpp \
 	TProtocolModbusTest.cpp \
+    test_clProtocolBspS.cpp \
     wrapper.cpp
 
 
