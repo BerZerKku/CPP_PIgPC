@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<DEVICES PROTOCOL="МЭК-60870-5-101">
+  <DEVICE NAME="АВАНТ К400" DESC="Не задано" DISABLED="0" STATION_ADDRESS="1" COMMON_ADDRESS_OF_ASDU="1" ASDU_ADDRESS_BYTES="1" OBJ_ADDRESS_BYTES="2" COT_BYTES="1" STATION_ADDRESS_BYTES="1" INTERROGATION_CHECK="60" CLOCK_SYNCH="1" CLOCK_SYNCH_CHECK="15" SLEEP="0">
+    <POINTS>
+      <POINT NAME="Connect" ADDRESS="0" TYPE="1" CAT="1" NAMING=""/>
+      <POINT NAME="Неисправность" ADDRESS="201" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Предупреждение" ADDRESS="202" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>      
+      <POINT NAME="Команда передатчика" ADDRESS="203" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда приемника" ADDRESS="204" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ОБЩ Неиспр 0x0001: Неиспр.чт. FLASH" ADDRESS="301" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ОБЩ Неиспр 0x0002: Неиспр.зап.FLASH" ADDRESS="302" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ОБЩ Неиспр 0x0004: Неиспр.чт. PLIS" ADDRESS="303" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ОБЩ Неиспр 0x0008: Неиспр.зап.PLIS" ADDRESS="304" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ОБЩ Неиспр 0x0010: Неиспр.зап.2RAM" ADDRESS="305" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ОБЩ Неиспр 0x0100: Неиспр.DSP 2RAM" ADDRESS="309" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ОБЩ Неиспр 0x0200: Неиспр.чт. 2RAM" ADDRESS="310" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ОБЩ Предуп 0x0001: Установите часы" ADDRESS="317" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ОБЩ Предуп 0x0002: Отказ резерв.лин" ADDRESS="318" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ОБЩ Предуп 0x0004: Кольцо 1 наруш." ADDRESS="319" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ОБЩ Предуп 0x0008: Кольцо 2 наруш." ADDRESS="320" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ОБЩ Предуп 0x0020: Удал.ПРД неиспр" ADDRESS="322" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ОБЩ Предуп 0x0040: Удал.ПРМ неиспр" ADDRESS="323" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Передатчик подключен" ADDRESS="400" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Передатчик режим Выведен" ADDRESS="485" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Передатчик режим Введен" ADDRESS="486" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Передатчик режим Тест" ADDRESS="487" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ПРД Неиспр 0x0001: Нет блока БСК" ADDRESS="401" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ПРД Неиспр 0x0002: Неиспр.верс. БСК" ADDRESS="402" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ПРД Неиспр 0x0100: Неиспр.чт.команд" ADDRESS="409" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ПРД Неиспр 0x0200: Неиспр.выкл.Тест" ADDRESS="410" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ПРД Неиспр 0x0400: Неиспр.вкл. Тест" ADDRESS="411" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ПРД Неиспр 0x0800: Неиспр.вход. ком" ADDRESS="412" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда передатчика 1" ADDRESS="450" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда передатчика 2" ADDRESS="451" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда передатчика 3" ADDRESS="452" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда передатчика 4" ADDRESS="453" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда передатчика 5" ADDRESS="454" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда передатчика 6" ADDRESS="455" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда передатчика 7" ADDRESS="456" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда передатчика 8" ADDRESS="457" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда передатчика 9" ADDRESS="458" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда передатчика 10" ADDRESS="459" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда передатчика 11" ADDRESS="460" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда передатчика 12" ADDRESS="461" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда передатчика 13" ADDRESS="462" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда передатчика 14" ADDRESS="463" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда передатчика 15" ADDRESS="464" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда передатчика 16" ADDRESS="465" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда передатчика 17" ADDRESS="466" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда передатчика 18" ADDRESS="467" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда передатчика 19" ADDRESS="468" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда передатчика 20" ADDRESS="469" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда передатчика 21" ADDRESS="470" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда передатчика 22" ADDRESS="471" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда передатчика 23" ADDRESS="472" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда передатчика 24" ADDRESS="473" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда передатчика 25" ADDRESS="474" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда передатчика 26" ADDRESS="475" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда передатчика 27" ADDRESS="476" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда передатчика 28" ADDRESS="477" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда передатчика 29" ADDRESS="478" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда передатчика 30" ADDRESS="479" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда передатчика 31" ADDRESS="480" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда передатчика 32" ADDRESS="481" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Приемник подключен" ADDRESS="500" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Приемник режим Выведен" ADDRESS="585" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Приемник режим Готов" ADDRESS="586" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Приемник режим Введен" ADDRESS="587" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Приемник режим Тест" ADDRESS="588" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ПРМ Неиспр 0x0001: Нет блока БСК" ADDRESS="501" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ПРМ Неиспр 0x0002: Неиспр.верс. БСК" ADDRESS="502" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ПРМ Неиспр 0x0004: Нет КЧ" ADDRESS="503" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ПРМ Неиспр 0x0100: Неиспр.зап. БСК" ADDRESS="509" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ПРМ Неиспр 0x0200: Неиспр.выкл. ком" ADDRESS="510" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ПРМ Неиспр 0x0400: Неиспр.вкл. ком" ADDRESS="511" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ПРМ Неиспр 0x0800: Неиспр.контр.ком" ADDRESS="512" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ПРМ Предуп 0x0001: Нет КЧ" ADDRESS="517" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда приемника 1" ADDRESS="550" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда приемника 2" ADDRESS="551" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда приемника 3" ADDRESS="552" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда приемника 4" ADDRESS="553" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда приемника 5" ADDRESS="554" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда приемника 6" ADDRESS="555" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда приемника 7" ADDRESS="556" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда приемника 8" ADDRESS="557" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда приемника 9" ADDRESS="558" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда приемника 10" ADDRESS="559" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда приемника 11" ADDRESS="560" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда приемника 12" ADDRESS="561" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда приемника 13" ADDRESS="562" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда приемника 14" ADDRESS="563" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда приемника 15" ADDRESS="564" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда приемника 16" ADDRESS="565" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда приемника 17" ADDRESS="566" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда приемника 18" ADDRESS="567" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда приемника 19" ADDRESS="568" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда приемника 20" ADDRESS="569" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда приемника 21" ADDRESS="570" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда приемника 22" ADDRESS="571" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда приемника 23" ADDRESS="572" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда приемника 24" ADDRESS="573" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда приемника 25" ADDRESS="574" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда приемника 26" ADDRESS="575" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда приемника 27" ADDRESS="576" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда приемника 28" ADDRESS="577" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда приемника 29" ADDRESS="578" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда приемника 30" ADDRESS="579" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда приемника 31" ADDRESS="580" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Команда приемника 32" ADDRESS="581" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+    </POINTS>
+    <COMMANDS/>
+  </DEVICE>
+</DEVICES>

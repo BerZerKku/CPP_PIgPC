@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<DEVICES PROTOCOL="МЭК-60870-5-101">
+  <DEVICE NAME="ABAHT-P400M-100-B" DESC="Не задано" DISABLED="0" STATION_ADDRESS="1" COMMON_ADDRESS_OF_ASDU="1" ASDU_ADDRESS_BYTES="1" OBJ_ADDRESS_BYTES="2" COT_BYTES="1" STATION_ADDRESS_BYTES="1" INTERROGATION_CHECK="60" CLOCK_SYNCH="1" CLOCK_SYNCH_CHECK="60" SLEEP="0">
+    <POINTS>
+      <POINT NAME="Connect" ADDRESS="0" TYPE="1" CAT="1" NAMING=""/>
+      <POINT NAME="Неисправность" ADDRESS="201" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Предупреждение" ADDRESS="202" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>      
+      <POINT NAME="ОБЩ Неиспр 0x0001: Неиспр.чт. FLASH" ADDRESS="301" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ОБЩ Неиспр 0x0002: Неиспр.зап.FLASH" ADDRESS="302" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ОБЩ Неиспр 0x0004: Неиспр.чт. PLIS" ADDRESS="303" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ОБЩ Неиспр 0x0008: Неиспр.зап.PLIS" ADDRESS="304" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ОБЩ Неиспр 0x0010: Неиспр.зап.2RAM" ADDRESS="305" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ОБЩ Неиспр 0x0020: АК-Нет ответа" ADDRESS="306" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ОБЩ Неиспр 0x0040: АК-Снижен.запаса" ADDRESS="307" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ОБЩ Неиспр 0x0080: Помеха в линии" ADDRESS="308" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ОБЩ Неиспр 0x0100: Неиспр.DSP 2RAM" ADDRESS="309" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ОБЩ Неиспр 0x0200: Неиспр.чт. 2RAM" ADDRESS="310" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ОБЩ Неиспр 0x0400: Ток покоя" ADDRESS="311" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ОБЩ Неиспр 0x0800: Низкое напр.вых" ADDRESS="312" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ОБЩ Неиспр 0x1000: Высокое напр.вых" ADDRESS="313" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ОБЩ Неиспр 0x2000: Неиспр. МК УМ" ADDRESS="314" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ОБЩ Неиспр 0x4000: ВЧ тракт восст." ADDRESS="315" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ОБЩ Предуп 0x0001: Установите часы" ADDRESS="317" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="Защита подключена" ADDRESS="600" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ЗАЩ Неиспр 0x0001: Нет блока БСЗ" ADDRESS="601" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ЗАЩ Неиспр 0x0002: Неиспр.верс.БСЗ" ADDRESS="602" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ЗАЩ Неиспр 0x0004: Неиспр.перекл." ADDRESS="603" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ЗАЩ Неиспр 0x0010: АК-Нет ответа" ADDRESS="605" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ЗАЩ Неиспр 0x0040: Неиспр.уд.ДФЗ" ADDRESS="607" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ЗАЩ Неиспр 0x0080: Неиспр.уд.ВЫХ" ADDRESS="608" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ЗАЩ Неиспр 0x0100: Неиспр.вход.ПУСК" ADDRESS="609" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ЗАЩ Неиспр 0x0200: Неиспр.вход.СТОП" ADDRESS="610" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ЗАЩ Неиспр 0x0400: Удал.без отв." ADDRESS="611" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ЗАЩ Неиспр 0x0800: Неиспр.цепь ВЫХ" ADDRESS="612" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ЗАЩ Неиспр 0x1000: Удал.обн.пом." ADDRESS="613" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ЗАЩ Неиспр 0x2000: Неиспр.зап. ВЫХ" ADDRESS="614" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ЗАЩ Неиспр 0x4000: Помеха в линии" ADDRESS="615" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ЗАЩ Неиспр 0x8000: Неиспр. ДФЗ" ADDRESS="616" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ЗАЩ Предуп 0x0001: АК-Сн.запаса" ADDRESS="617" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ЗАЩ Предуп 0x0002: Нет сигнала МАН" ADDRESS="618" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ЗАЩ Предуп 0x0004: Порог по помехе" ADDRESS="619" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+      <POINT NAME="ЗАЩ Предуп 0x0008: Автоконтроль" ADDRESS="620" TYPE="1" CAT="1" NAMING="Внутреннее  системное событие"/>
+    </POINTS>
+    <COMMANDS/>
+  </DEVICE>
+</DEVICES>

@@ -1,0 +1,15 @@
+/html
+/man
+/MyTests
+/Debug/src
+/Debug/MyTests
+/Release/src
+*.eep
+*.elf
+*.lss
+*.map
+*.d
+*.o
+makefile
+*.mk
+/Debug/
