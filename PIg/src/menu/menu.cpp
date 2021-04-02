@@ -883,24 +883,23 @@ eGB_COM clMenu::getTxCommand() {
     // быстрая команда идет с самым высоким приоритетом
     eGB_COM com = sParam.txComBuf.getFastCom();
 
-    if (com == GB_COM_NO) {
+    while (com == GB_COM_NO) {
         if (cnt == 0) {
             com = GB_COM_GET_SOST;
         } else if (cnt == 1) {
             com = GB_COM_GET_TIME;
-        } else if (cnt <= (1 + MAX_NUM_COM_BUF2)) {
+        } else if (cnt <= (1 + sParam.txComBuf.getNumCom2())) {
             // команды которые должны передаваться минимум раз в секунду
             com = sParam.txComBuf.getCom2();
         }
 
+        cnt++;
+
         if (com == GB_COM_NO) {
             // команды которые должны периодически передаваться
             com = sParam.txComBuf.getCom1();
+            cnt = 0;
         }
-    }
-
-    if ((++cnt >= MIN_NUM_COM_SEND_IN_1_SEK) || (com == GB_COM_NO)) {
-        cnt = 0;
     }
 
     return com;
@@ -1313,16 +1312,17 @@ void clMenu::lvlInfo() {
         }
 
         Punkts_.add(GB_IC_PI_MCU);
+
+        if (sParam.typeDevice == AVANT_OPTO){
+            Punkts_.add(GB_IC_BVP_STM32);
+//            Punkts_.add(GB_IC_VP);
+        }
+
         if (sParam.prd.status.isEnable()) {
             Punkts_.add(GB_IC_BSK_PLIS_PRD1);
             if (sParam.prd.getNumCom() > 16) {
                 Punkts_.add(GB_IC_BSK_PLIS_PRD2);
             }
-        }
-
-        if (sParam.typeDevice == AVANT_OPTO){
-            Punkts_.add(GB_IC_BVP_STM32);
-//            Punkts_.add(GB_IC_VP);
         }
 
         if (sParam.prm.status.isEnable()) {

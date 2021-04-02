@@ -276,11 +276,12 @@ void MainWindow::cycleMenu()
     }
 
     if (len > 0) {
-        qDebug() << "Pkg to PC: " << showbase << hex << pkg;
+//        qDebug() << "Pkg to PC: " << Qt::showbase << Qt::hex << pkg;
         cntsendtopc++;
     }
 
     pkg.clear();
+    qDebug() << "Main cycle";
     len = bspWrite();
     for(uint8_t i = 0; i < len; i++) {
         pkg.append(uBufUartBsp[i]);
@@ -288,20 +289,20 @@ void MainWindow::cycleMenu()
     }
 
     if (len > 0) {
-        if ((pkg.at(2) == GB_COM_SET_CONTROL) ||
-            (pkg.at(2) == GB_COM_PRD_RES_IND) ||
-            (pkg.at(2) == GB_COM_PRM_RES_IND) ||
-            (pkg.at(2) == GB_COM_PRM_ENTER) ||
-            (pkg.at(2) == GB_COM_DEF_SET_TYPE_AC)) {
-            qDebug() << "Pkg to BSP: " << showbase << hex << pkg;
-        }
+//        if ((pkg.at(2) == GB_COM_SET_CONTROL) ||
+//            (pkg.at(2) == GB_COM_PRD_RES_IND) ||
+//            (pkg.at(2) == GB_COM_PRM_RES_IND) ||
+//            (pkg.at(2) == GB_COM_PRM_ENTER) ||
+//            (pkg.at(2) == GB_COM_DEF_SET_TYPE_AC)) {
+            qDebug() << "Pkg to BSP: " << Qt::showbase << Qt::hex << pkg;
+//        }
         cntsendtobsp++;
     }
 
     cnt1s++;
     if (cnt1s >= 10) {
-        //        qDebug() << "Send " << cntsendtobsp << " packet to BSP per second.";
-        //        qDebug() << "Send " << cntsendtopc << " packet to PC per second.";
+                qDebug() << "Send " << cntsendtobsp << " packet to BSP per second.";
+                qDebug() << "Send " << cntsendtopc << " packet to PC per second.";
         cntsendtopc = 0;
         cntsendtobsp = 0;
         cnt1s = 0;

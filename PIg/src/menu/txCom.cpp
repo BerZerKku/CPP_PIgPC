@@ -43,10 +43,12 @@ bool TTxCom::addCom1(eGB_COM com, uint8_t num) {
 eGB_COM TTxCom::getCom1() {
     eGB_COM com= GB_COM_NO;
 
-    if (cnt1_ < numCom1_) {
+    if (numCom1_ > 0) {
+        if (cnt1_ >= numCom1_) {
+            cnt1_ = 0;
+        }
+
         com = com1_[cnt1_++];
-    } else {
-        cnt1_ = 0;
     }
 
     return com;
@@ -66,13 +68,19 @@ bool TTxCom::addCom2(eGB_COM com) {
 eGB_COM TTxCom::getCom2() {
     eGB_COM com= GB_COM_NO;
 
-    if (cnt2_ < numCom2_) {
+    if (numCom2_ > 0) {
+        if (cnt2_ >= numCom2_) {
+            cnt2_ = 0;
+        }
+
         com = com2_[cnt2_++];
-    } else {
-        cnt2_ = 0;
     }
 
     return com;
+}
+
+uint8_t TTxCom::getNumCom2() const {
+    return numCom2_;
 }
 
 //

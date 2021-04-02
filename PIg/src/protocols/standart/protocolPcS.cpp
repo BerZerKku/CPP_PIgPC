@@ -13,54 +13,8 @@ clProtocolS(buf, size, sParam) {
 
 
 bool clProtocolPcS::getData() {
-
-	bool stat = false;
     lastCom = static_cast<eGB_COM> (buf[2]);
-
-    switch(getCurrentCom()) {
-        case GB_COM_GET_PASSWORD: {
-            uint16_t password = sParam_->password.get();
-            uint8_t bytehi = static_cast<uint8_t> (password >> 8);
-            uint8_t bytelo = static_cast<uint8_t> (password);
-            stat = (addCom(GB_COM_GET_PASSWORD, bytehi, bytelo) > 0);
-        } break;
-
-        case GB_COM_SET_PASSWORD: {
-            if (buf[NUM] == 2) {
-                // ≈сли в команде 2 байта, то
-                // сформируем команду установки нового значени€ парол€.
-                // »наче завернем команду обратно.
-                uint8_t bytehi = buf[B1];
-                uint8_t bytelo = buf[B2];
-
-                buf[COM] = GB_COM_SET_NET_ADR;
-                buf[NUM] = 3;
-                buf[B1] = POS_COM_NET_ADR_password;
-                buf[B2] = bytelo;
-                buf[B3] = bytehi;
-                buf[B4] = getCRC();
-            } else {
-                stat = (addCom() > 0);
-            }
-        } break;
-
-        case GB_COM_GET_NET_ADR: {
-            if (buf[NUM] >= 2) {
-                uint16_t value = *((uint16_t *) &buf[B1]);
-                sParam_->glb.setVersProgIC16(value, GB_IC_BVP_STM32);
-            }
-            if (buf[NUM] >= 4) {
-                uint16_t value = *((uint16_t *) &buf[B3]);
-                sParam_->glb.setVersProgIC16(value, GB_IC_VP);
-            }
-            // убрать из команды все данные
-            addCom(GB_COM_GET_NET_ADR);
-        } break;
-
-        default: {
-
-        }
-    }
+    bool stat = procCommand(static_cast<eGB_COM>(getCurrentCom()));
 
 	return stat;
 }
@@ -102,5 +56,73 @@ bool clProtocolPcS::modifyCommand() {
 
     lastCom = GB_COM_NO;
 
-	return state;
+    return state;
+}
+
+bool clProtocolPcS::procCommand(eGB_COM com)
+{
+    bool proc = false;
+
+    if (com == GB_COM_GET_PASSWORD) {
+        proc = hdlrGetPassword();
+    } else if (com == GB_COM_SET_PASSWORD) {
+        proc = hdlrSetPassword();
+    } else if (com == GB_COM_GET_NET_ADR) {
+        proc = hdlrGetNetAdr();
+    }
+
+    return proc;
+}
+
+bool clProtocolPcS::hdlrGetPassword()
+{
+    bool proc = true;
+    uint16_t password = sParam_->password.get();
+    uint8_t bytehi = static_cast<uint8_t> (password >> 8);
+    uint8_t bytelo = static_cast<uint8_t> (password);
+    addCom(GB_COM_GET_PASSWORD, bytehi, bytelo);
+    return proc;
+}
+
+bool clProtocolPcS::hdlrSetPassword()
+{
+    bool proc = false;
+    if (buf[NUM] == 2) {
+        // ≈сли в команде 2 байта, то
+        // сформируем команду установки нового значени€ парол€.
+        // »наче завернем команду обратно.
+        uint8_t bytehi = buf[B1];
+        uint8_t bytelo = buf[B2];
+
+        buf[COM] = GB_COM_SET_NET_ADR;
+        buf[NUM] = 3;
+        buf[B1] = POS_COM_NET_ADR_password;
+        buf[B2] = bytelo;
+        buf[B3] = bytehi;
+        buf[B4] = getCRC();
+    } else {
+        // ѕросто вернем сообщение обратно.
+        addCom();
+        proc = true;
+    }
+
+    return proc;
+}
+
+bool clProtocolPcS::hdlrGetNetAdr()
+{
+    bool proc = false;
+
+    if (buf[NUM] >= 2) {
+        uint16_t value = *(reinterpret_cast<uint16_t *>(&buf[B1]));
+        sParam_->glb.setVersProgIC16(value, GB_IC_BVP_STM32);
+    }
+    if (buf[NUM] >= 4) {
+        uint16_t value = *(reinterpret_cast<uint16_t *>(&buf[B3]));
+        sParam_->glb.setVersProgIC16(value, GB_IC_VP);
+    }
+
+    // команда проходит дальше
+    addCom(GB_COM_GET_NET_ADR);
+    return proc;
 }
