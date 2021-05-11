@@ -18,8 +18,6 @@
 #include "PIg/src/protocols/standart/protocolPcS.h"
 #include "PIg/src/protocols/modbus/protocolPcM.h"
 #include "PIg/src/protocols/iec101/protocolPcI.h"
-#include "PIg/src/security/user.h"
-
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -54,13 +52,14 @@ class MainWindow : public QMainWindow
     friend void vLCDled();
 
     struct view_t {
-        QLineEdit userPi;
-        QLineEdit userPc;
-        QLineEdit engPwd;
+        QLineEdit userPwd;
         QLineEdit admPwd;
-        QLineEdit engCounter;
-        QLineEdit admCounter;
-        QLineEdit interface;
+        QLineEdit lnProtocol;
+        QLineEdit lnAddress;
+        QLineEdit lnBaudrate;
+        QLineEdit lnDataBits;
+        QLineEdit lnParity;
+        QLineEdit lnStopBits;
         QLineEdit regimeDef;
         QLineEdit regimePrm;
         QLineEdit regimePrd;
@@ -111,8 +110,6 @@ private slots:
     void cycleMenu();  ///< Цикл 200 мс.
     void clearSelection();  ///< Очистка выделения в textEdit.
     void setBacklight(bool enable);
-
-    QString pwdToString(uint8_t *pwd);
 
     void test1();
     void test2();

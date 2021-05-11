@@ -11,25 +11,27 @@ CONFIG -= debug_and_release
 CONFIG += cmdline
 
 DEFINES += \
-    MY_TESTS \
-	NDEBUG
+    NDEBUG \
+    MY_TESTS
 
 INCLUDEPATH += \
     googletest \
 
 HEADERS += \
+    wrapper.hpp
 
 SOURCES += \
+    TDateTimeTest.cpp \
     googletest/gtest-all.cc \
 	main.cpp \
 	CIec101Test.cpp \
-	TFifoTest.cpp \	
+    clMenuTest.cpp \
 	TProtocolModbusTest.cpp \
-	TPwdTest.cpp \
-	TSecurityEventTest.cpp \
-	TUserTest.cpp \	
-	$${PIG_PATH}/src/protocols/iec101/CIec101.cpp \
-	$${PIG_PATH}/src/protocols/modbus/protocolModbus.cpp \
-	$${PIG_PATH}/src/security/pwd.cpp \
-	$${PIG_PATH}/src/security/securityevent.cpp \
-	$${PIG_PATH}/src/security/user.cpp
+    test_clProtocolBspS.cpp \
+    wrapper.cpp
+
+
+
+#    $${PIG_PATH}/src/menu/menu.cpp \
+#	$${PIG_PATH}/src/protocols/iec101/CIec101.cpp \
+#	$${PIG_PATH}/src/protocols/modbus/protocolModbus.cpp \

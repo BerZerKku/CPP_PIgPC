@@ -103,17 +103,18 @@ void MainWindow::initView()
     top = new QTreeWidgetItem();
     ui->treeWidget->addTopLevelItem(top);
     top->setText(0, codec->toUnicode("Пользователь"));
-    addViewItem(top, "Роль ПИ", &view.userPi);
-    addViewItem(top, "Роль ПК", &view.userPc);
-    addViewItem(top, "Пароль инженера", &view.engPwd);
+    addViewItem(top, "Пароль пользователя", &view.userPwd);
     addViewItem(top, "Пароль админисратора", &view.admPwd);
-    addViewItem(top, "Счетчик инж.", &view.engCounter);
-    addViewItem(top, "Счетчик адм.", &view.admCounter);
 
     top = new QTreeWidgetItem();
     ui->treeWidget->addTopLevelItem(top);
-    top->setText(0, codec->toUnicode("Сетевые настройки"));
-    addViewItem(top, "Интерфейс", &view.interface);
+    top->setText(0, codec->toUnicode("Локальная сеть"));
+    addViewItem(top, getNameOfParam(GB_PARAM_INTF_PROTOCOL), &view.lnProtocol);
+    addViewItem(top, getNameOfParam(GB_PARAM_NET_ADDRESS), &view.lnAddress);
+    addViewItem(top, getNameOfParam(GB_PARAM_INTF_BAUDRATE), &view.lnBaudrate);
+    addViewItem(top, getNameOfParam(GB_PARAM_INTF_DATA_BITS), &view.lnDataBits);
+    addViewItem(top, getNameOfParam(GB_PARAM_INTF_PARITY), &view.lnParity);
+    addViewItem(top, getNameOfParam(GB_PARAM_INTF_STOP_BITS), &view.lnStopBits);
 
     top = new QTreeWidgetItem();
     ui->treeWidget->addTopLevelItem(top);
@@ -142,10 +143,10 @@ void MainWindow::initView()
     ui->treeWidget->resizeColumnToContents(0);
     ui->treeWidget->resizeColumnToContents(1);
 
-    pred = view.engCounter.palette();
-    pred.setColor(QPalette::Text, Qt::red);
-    pblue = view.engCounter.palette();
-    pblue.setColor(QPalette::Text, Qt::blue);
+//    pred = view.engCounter.palette();
+//    pred.setColor(QPalette::Text, Qt::red);
+//    pblue = view.engCounter.palette();
+//    pblue.setColor(QPalette::Text, Qt::blue);
 }
 
 void MainWindow::initKeyboard()
@@ -174,60 +175,39 @@ void MainWindow::setupTestButtons()
 //
 void MainWindow::hdlrView()
 {
-    bool locked = false;
-    quint8 value  = 0;
-    quint16 time = 0;
-    user_t user;
+    quint8 value8  = 0;
+    quint16 value16 = 0;
 
-    value = menu.sParam.security.getUser(USER_SOURCE_pi);
-    time = menu.sParam.security.getUserTime(USER_SOURCE_pi);
-    view.userPi.setText(QString("%1 / %2c").
-                        arg(codec->toUnicode(fcUser[value])).
-                        arg(time));
+    value16 = menu.sParam.password.get();
+    view.userPwd.setText(QString::number(value16));
+    view.admPwd.setText(QString::number(PASSWORD_ADMIN));
 
-    value = menu.sParam.security.getUser(USER_SOURCE_pc);
-    time = menu.sParam.security.getUserTime(USER_SOURCE_pc);
-    view.userPc.setText(QString("%1 / %2c").
-                        arg(codec->toUnicode(fcUser[value])).
-                        arg(time));
+    value8 = menu.sParam.Uart.Protocol.get();
+    view.lnProtocol.setText(codec->toUnicode(fcProtocol[value8]));
+    value8 = menu.sParam.Uart.NetAddress.get();
+    view.lnAddress.setText(QString::number(value8));
+    value8 = menu.sParam.Uart.BaudRate.get();
+    view.lnBaudrate.setText(codec->toUnicode(fcBaudRate[value8]));
+    value8 = menu.sParam.Uart.DataBits.get();
+    view.lnDataBits.setText(codec->toUnicode(fcDataBits[value8]));
+    value8 = menu.sParam.Uart.Parity.get();
+    view.lnParity.setText(codec->toUnicode(fcParity[value8]));
+    value8 = menu.sParam.Uart.StopBits.get();
+    view.lnStopBits.setText(codec->toUnicode(fcStopBits[value8]));
 
-
-    user = USER_engineer;
-    view.engPwd.setText(pwdToString(menu.sParam.security.pwd.getPwd(user)));
-    value = menu.sParam.security.pwd.getCounter(user);
-    time = menu.sParam.security.pwd.getLockTime(user);
-    locked = menu.sParam.security.pwd.isLocked(user);
-    view.engCounter.setText(QString("%1 / %2c").
-                            arg(value, 2, 16, QLatin1Char('0')).
-                            arg(time));
-    view.engCounter.setPalette(locked > 0 ? pred : pblue);
-
-    user = USER_admin;
-    view.admPwd.setText(pwdToString(menu.sParam.security.pwd.getPwd(user)));
-    value = menu.sParam.security.pwd.getCounter(user);
-    time = menu.sParam.security.pwd.getLockTime(user);
-    locked = menu.sParam.security.pwd.isLocked(user);
-    view.admCounter.setText(QString("%1 / %2c").
-                            arg(value, 2, 16, QLatin1Char('0')).
-                            arg(time));
-    view.admCounter.setPalette(locked ? pred : pblue);
-
-    value = menu.sParam.Uart.Interface.get();
-    view.interface.setText(codec->toUnicode(fcInterface[value]));
-
-    value = menu.sParam.def.status.getRegime();
-    view.regimeDef.setText(codec->toUnicode(fcRegime[value]));
-    value = menu.sParam.prm.status.getRegime();
-    view.regimePrm.setText(codec->toUnicode(fcRegime[value]));
-    value = menu.sParam.prd.status.getRegime();
-    view.regimePrd.setText(codec->toUnicode(fcRegime[value]));
+    value8 = menu.sParam.def.status.getRegime();
+    view.regimeDef.setText(codec->toUnicode(fcRegime[value8]));
+    value8 = menu.sParam.prm.status.getRegime();
+    view.regimePrm.setText(codec->toUnicode(fcRegime[value8]));
+    value8 = menu.sParam.prd.status.getRegime();
+    view.regimePrd.setText(codec->toUnicode(fcRegime[value8]));
 
     view.typeDevice.setText(getDeviceName(menu.sParam.typeDevice));
     view.def.setText(menu.sParam.def.status.isEnable() ? "ok" : "---");
     viewNumComPrm();
     viewNumComPrd();
-    value = menu.sParam.glb.getNumDevices();
-    view.numDevices.setText(codec->toUnicode(fcNumDevices[value - 1]));
+    value8 = menu.sParam.glb.getNumDevices();
+    view.numDevices.setText(codec->toUnicode(fcNumDevices[value8 - 1]));
     view.typeCommLine.setText(getTypeLine(menu.sParam.glb.getTypeLine()));
     viewTypeComp();
     view.typeOpto.setText(getTypeOpto(menu.sParam.glb.getTypeOpto()));
@@ -296,11 +276,12 @@ void MainWindow::cycleMenu()
     }
 
     if (len > 0) {
-        qDebug() << "Pkg to PC: " << showbase << hex << pkg;
+//        qDebug() << "Pkg to PC: " << Qt::showbase << Qt::hex << pkg;
         cntsendtopc++;
     }
 
     pkg.clear();
+    qDebug() << "Main cycle";
     len = bspWrite();
     for(uint8_t i = 0; i < len; i++) {
         pkg.append(uBufUartBsp[i]);
@@ -308,20 +289,20 @@ void MainWindow::cycleMenu()
     }
 
     if (len > 0) {
-        if ((pkg.at(2) == GB_COM_SET_CONTROL) ||
-            (pkg.at(2) == GB_COM_PRD_RES_IND) ||
-            (pkg.at(2) == GB_COM_PRM_RES_IND) ||
-            (pkg.at(2) == GB_COM_PRM_ENTER) ||
-            (pkg.at(2) == GB_COM_DEF_SET_TYPE_AC)) {
-            qDebug() << "Pkg to BSP: " << showbase << hex << pkg;
-        }
+//        if ((pkg.at(2) == GB_COM_SET_CONTROL) ||
+//            (pkg.at(2) == GB_COM_PRD_RES_IND) ||
+//            (pkg.at(2) == GB_COM_PRM_RES_IND) ||
+//            (pkg.at(2) == GB_COM_PRM_ENTER) ||
+//            (pkg.at(2) == GB_COM_DEF_SET_TYPE_AC)) {
+            qDebug() << "Pkg to BSP: " << Qt::showbase << Qt::hex << pkg;
+//        }
         cntsendtobsp++;
     }
 
     cnt1s++;
     if (cnt1s >= 10) {
-        //        qDebug() << "Send " << cntsendtobsp << " packet to BSP per second.";
-        //        qDebug() << "Send " << cntsendtopc << " packet to PC per second.";
+                qDebug() << "Send " << cntsendtobsp << " packet to BSP per second.";
+                qDebug() << "Send " << cntsendtopc << " packet to PC per second.";
         cntsendtopc = 0;
         cntsendtobsp = 0;
         cnt1s = 0;
@@ -353,49 +334,28 @@ void MainWindow::setBacklight(bool enable)
 }
 
 //
-QString MainWindow::pwdToString(uint8_t *pwd)
-{
-    QString password;
-    for(uint8_t i = 0; i < PWD_LEN; i++) {
-        uint8_t ch = pwd[i];
-        if ((ch < '0') || (ch > '9')) {
-            if (!password.isEmpty() && (password.back() != ' ')) {
-                password += " ";
-            }
-            password += QString("%1 ").arg(ch, 2, 16, QLatin1Char('0'));
-        } else {
-            password += QChar(pwd[i]);
-        }
-    }
-    return password;
-}
-
-//
 void MainWindow::test1()
 {
-    qDebug() << "Set user ENGINEER for PC";
-    menu.sParam.security.setUser(USER_engineer, USER_SOURCE_pc);
+    qDebug() << "test1 button pressed";
 }
 
 //
 void MainWindow::test2()
 {
-    qDebug() << "Set user ADMIN for PI";
-    menu.sParam.security.setUser(USER_admin, USER_SOURCE_pi);
+    qDebug() << "test2 button pressed";
 }
 
 //
 void MainWindow::test3()
 {
-    qDebug() << "Clear Security logs";
-    menu.sParam.txComBuf.addFastCom(GB_COM_JRN_IS_CLR, GB_SEND_NO_DATA);
+   qDebug() << "test3 button pressed";
 }
 
 //
 void MainWindow::test4()
 {
     qDebug() << "Set Disable Regime";
-    menu.sParam.txComBuf.addFastCom(GB_COM_SET_REG_DISABLED, GB_SEND_NO_DATA);
+    menu.sParam.txComBuf.addFastCom(GB_COM_SET_REG_DISABLED);
 }
 
 //

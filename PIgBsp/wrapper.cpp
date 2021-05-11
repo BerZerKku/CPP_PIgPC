@@ -2,54 +2,78 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include "PIg/src/menu/base.hpp"
 #include "PIg/src/drivers/keyboard.h"
 #include "PIg/src/drivers/ks0108.h"
+#include "PIg/src/paramUart.h"
 
 #include <QTextCodec>
 
-static uint16_t uLedTimeOn = LCD_TIME_LED_ON;
-static eLCD_LED eLed = LED_OFF;
-static QString text;
-
-
-
-void vKEYmain(void) {
-}
-
-void vKEYset(eGB_TYPE_DEVICE type) {
-}
-
-uint8_t timePressKey() {
-}
-
-void vLCDclear(void) {
+void vKEYmain(void)
+{
 
 }
 
-void vLCDinit(void) {
+uint8_t eKEYget(void)
+{
+    return 0;
+}
+
+uint8_t timePressKey()
+{
+    return 0;
+}
+
+void vLCDclear(void)
+{
 
 }
 
-void vLCDmain(void) {
+void vLCDinit(void)
+{
 
 }
 
-void vLCDrefresh(void) {
+void vLCDmain(void)
+{
 
 }
 
-bool vLCDdrawBoard(uint8_t num) {
+void vLCDrefresh(void)
+{
 
 }
 
-bool vLCDputchar(const char* buf, uint8_t num) {
+bool vLCDdrawBoard(uint8_t num)
+{
+    Q_UNUSED(num);
+    return true;
+}
+
+bool vLCDputchar(const char* buf, uint8_t num)
+{
+    Q_UNUSED(buf);
+    Q_UNUSED(num);
+    return true;
+}
+
+void vLCDsetLed(eLCD_LED val)
+{
+    Q_UNUSED(val);
+}
+
+void vLCDled()
+{
 
 }
 
-void vLCDsetLed(eLCD_LED val) {
-
-}
-
-void vLCDled() {
-
+void setupUart(TInterface::INTERFACE intf, uint16_t baudrate,
+               TDataBits::DATA_BITS dbits, TParity::PARITY parity,
+               TStopBits::STOP_BITS sbits)
+{
+    qDebug() << "interface = " << intf <<
+        ", baudrate = " << baudrate <<
+        ", databits = " << dbits <<
+        ", parity = " << parity <<
+        ", stopbits = " << sbits;
 }
