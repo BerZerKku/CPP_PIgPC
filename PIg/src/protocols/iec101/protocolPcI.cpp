@@ -284,12 +284,12 @@ bool TProtocolPcI::checkEventClass1(uint16_t &adr, bool &val, SCp56Time2a &time)
 		return false;
 	}
 
-    time.years 			= jrn->dtime.getYear();
-    time.months 		= jrn->dtime.getMonth();
-    time.dayOfMonth 	= jrn->dtime.getDay();
-    time.hours 			= jrn->dtime.getHour();
-    time.minutes 		= jrn->dtime.getMinute();
-    time.milliseconds 	= jrn->dtime.getSecond() * 1000;
+	time.years 			= jrn->dtime.getYear();
+	time.months 		= jrn->dtime.getMonth();
+	time.dayOfMonth 	= jrn->dtime.getDay();
+	time.hours 			= jrn->dtime.getHour();
+	time.minutes 		= jrn->dtime.getMinute();
+	time.milliseconds 	= jrn->dtime.getSecond() * 1000;
 	time.milliseconds  += ms;
 
 	return true;
@@ -342,16 +342,16 @@ bool TProtocolPcI::procInterrog(uint16_t &adr, bool &val) {
 bool TProtocolPcI::procSetTime() {
 	// Заполнение команды для передачи нового времени в БСП
 	uint8_t i = 0;
-    sParam_->txComBuf.setInt8(stTime.years, i++);
-    sParam_->txComBuf.setInt8(stTime.months, i++);
-    sParam_->txComBuf.setInt8(stTime.dayOfMonth, i++);
-    sParam_->txComBuf.setInt8(stTime.hours, i++);
-    sParam_->txComBuf.setInt8(stTime.minutes, i++);
-    sParam_->txComBuf.setInt8((stTime.milliseconds / 1000), i++);
-
+	sParam_->txComBuf.setInt8(BIN_TO_BCD(stTime.years), i++);
+	sParam_->txComBuf.setInt8(BIN_TO_BCD(stTime.months), i++);
+	sParam_->txComBuf.setInt8(BIN_TO_BCD(stTime.dayOfMonth), i++);
+	sParam_->txComBuf.setInt8(BIN_TO_BCD(stTime.hours), i++);
+	sParam_->txComBuf.setInt8(BIN_TO_BCD(stTime.minutes), i++);
+	sParam_->txComBuf.setInt8(BIN_TO_BCD(stTime.milliseconds / 1000), i++);
 	uint16_t ms = stTime.milliseconds % 1000 + getDelay();
-    sParam_->txComBuf.setInt8(static_cast<uint8_t> (ms), i++);
-    sParam_->txComBuf.setInt8(static_cast<uint8_t> (ms >> 8), i++);
+
+	sParam_->txComBuf.setInt8(BIN_TO_BCD((uint8_t) ms), i++);
+	sParam_->txComBuf.setInt8(BIN_TO_BCD((uint8_t) (ms >> 8)), i++);
 	sParam_->txComBuf.setInt8(1, i++);
 	sParam_->txComBuf.addFastCom(GB_COM_SET_TIME);
 
@@ -372,13 +372,13 @@ bool TProtocolPcI::procSetTimeEnd() {
 		*ptr++ = 0;
 	}
 
-    stTime.years = sParam_->DateTimeReq.getYear();
-    stTime.months = sParam_->DateTimeReq.getMonth();
-    stTime.dayOfMonth = sParam_->DateTimeReq.getDay();
-    stTime.hours = sParam_->DateTimeReq.getHour();
-    stTime.minutes = sParam_->DateTimeReq.getMinute();
-    stTime.milliseconds = 1000 * sParam_->DateTimeReq.getSecond();
-    stTime.milliseconds +=	sParam_->DateTimeReq.getMsSecond();
+	stTime.years = sParam_->DateTimeReq.getYear();
+	stTime.months = sParam_->DateTimeReq.getMonth();
+	stTime.dayOfMonth = sParam_->DateTimeReq.getDay();
+	stTime.hours = sParam_->DateTimeReq.getHour();
+	stTime.minutes = sParam_->DateTimeReq.getMinute();
+	stTime.milliseconds = 1000 * sParam_->DateTimeReq.getSecond();
+	stTime.milliseconds +=	sParam_->DateTimeReq.getMsSecond();
 
 	// сброс флага наличия принятых даты/времени в момент синхронизации БСП
 	sParam_->DateTimeReq.setTimeBsp_ = false;

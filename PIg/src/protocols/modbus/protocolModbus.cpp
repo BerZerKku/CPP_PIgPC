@@ -1,5 +1,8 @@
 //#include "protocolModbus.h"
 #include "protocolModbus.h"
+#ifdef DEBUG
+#include "debug/debug.hpp"
+#endif
 
 const uint8_t TProtocolModbus::CRC_HI[256] PROGMEM = {
 		0x00, 0xC1, 0x81, 0x40, 0x01,
@@ -51,7 +54,7 @@ const uint8_t TProtocolModbus::CRC_LOW[256]  PROGMEM = {
 
 // Конструктор
 TProtocolModbus::TProtocolModbus(uint8_t *buf, uint8_t size) :
-						buf_(buf), size_(size) {
+                         size_(size), buf_(buf) {
 	state_ = STATE_OFF;
 	address_ = ADDRESS_ERR;
 

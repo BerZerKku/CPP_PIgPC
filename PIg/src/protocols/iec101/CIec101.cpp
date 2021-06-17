@@ -6,7 +6,9 @@
  */
 
 #include "CIec101.h"
-#include "src/glbDefine.h"
+#ifdef AVR
+	#include "debug.hpp"
+#endif
 
 // Контструктор.
 CIec101::CIec101(uint8_t *pBuf, uint8_t u8Size) :

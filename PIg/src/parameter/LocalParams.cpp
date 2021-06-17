@@ -62,12 +62,20 @@ void LocalParams::prevSameParam() {
 }
 
 // ƒобавление в список нового параметра.
-bool LocalParams::addParam(eGB_PARAM newParam) {
+bool LocalParams::addParam(eGB_PARAM newParam, bool readonly) {
 	if (numOfParams >= (MAX_NUM_OF_PARAMS - 1))
 		return false;
 
-	param[numOfParams++] = newParam;
+	param[numOfParams].param = newParam;
+	param[numOfParams].readOnly = readonly;
+	numOfParams++;
+
 	return true;
+}
+
+// ѕровер€ет текущий параметр на возможность только чтени€.
+bool LocalParams::isReadOnly() {
+	return param[currParam].readOnly;
 }
 
 // ”становка нового значени€ параметра и его проверка на корректность.
@@ -105,7 +113,8 @@ uint8_t LocalParams::getValueB() const {
 
 // ќчистка списка параметров.
 void LocalParams::clearParams() {
-	param[0] = GB_PARAM_NULL_PARAM;
+	param[0].param = GB_PARAM_NULL_PARAM;
+	param[0].readOnly = true;
 	currParam = 0;
 	val = 0;
 	numOfParams = 0;

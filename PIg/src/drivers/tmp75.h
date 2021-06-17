@@ -8,8 +8,6 @@
 #ifndef TWI_H_
 #define TWI_H_
 
-#include <avr/io.h>
-
 class TTmp75 {
 	static const uint8_t s_u8AdrBits = 1;
 

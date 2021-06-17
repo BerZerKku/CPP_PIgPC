@@ -8,9 +8,6 @@
 #ifndef PARAMGLB_H_
 #define PARAMGLB_H_
 
-#include "src/glbDefine.h"
-#include "menu/deviceStatus.hpp"
-
 /// ОБЩИЕ
 /// номер аппарата
 #define GLB_DEV_NUM_MIN		1
@@ -41,22 +38,20 @@ enum eGB_IC {
 	GB_IC_BSK_PLIS_PRM1,
 	GB_IC_BSK_PLIS_PRM2,
 	GB_IC_BSZ_PLIS,
-    GB_IC_BVP_STM32,
-    GB_IC_VP,
 	GB_IC_MAX
 };
 
 /// Совместимость
-enum eGB_COMPATIBILITY {
-	GB_COMPATIBILITY_MIN 	= 0,
-	GB_COMPATIBILITY_AVANT 	= 0,
-	GB_COMPATIBILITY_PVZ90 	= 1,
-	GB_COMPATIBILITY_AVZK80	= 2,
-	GB_COMPATIBILITY_PVZUE 	= 3,
-	GB_COMPATIBILITY_PVZL 	= 4,
-	GB_COMPATIBILITY_LINER 	= 5,
-	GB_COMPATIBILITY_PVZK	= 6,	// TODO задел на будущее. Ничего по нему не сделано.
-	GB_COMPATIBILITY_MAX
+enum eGB_COMP_R400M {
+	GB_COMP_R400M_MIN    = 0,
+	GB_COMP_R400M_AVANT  = 0,
+	GB_COMP_R400M_PVZ90  = 1,
+	GB_COMP_R400M_AVZK80 = 2,
+	GB_COMP_R400M_PVZUE  = 3,
+	GB_COMP_R400M_PVZL   = 4,
+	GB_COMP_R400M_LINER  = 5,
+	GB_COMP_R400M_PVZK   = 6, // TODO задел на будущее. Ничего по нему не сделано.
+	GB_COMP_R400M_MAX
 };
 
 /// Совместимость для К400
@@ -78,6 +73,16 @@ enum eGB_COMP_K400 {
 	GB_COMP_K400_MAX
 };
 
+/// Совместимость для РЗСК
+enum eGB_COMP_RZSK {
+    GB_COMP_RZSK_MIN    = 0,
+    GB_COMP_RZSK        = GB_COMP_RZSK_MIN,
+    GB_COMP_RZSK_M,
+	GB_COMP_RZSK_3E8,
+    //
+    GB_COMP_RZSK_MAX
+};
+
 /// класс для общих параметров и настроек
 class TDeviceGlb {
 	/// Дискретные входы
@@ -93,8 +98,9 @@ public:
 		typeOpto_ = TYPE_OPTO_MAX;
 		numDevices_ = GB_NUM_DEVICES_MAX;
 		typeLine_ = GB_TYPE_LINE_MAX;
-		compatibility_ = GB_COMPATIBILITY_MAX;
+		compR400m_ = GB_COMP_R400M_MAX;
 		compK400_ = GB_COMP_K400_MAX;
+		compRZSK_ = GB_COMP_RZSK_MAX;
 
 		deviceNum_ = GLB_DEV_NUM_MIN_F;
 		netAdr_ = 0;
@@ -128,27 +134,17 @@ public:
 		uint8_t act = GB_ACT_NO;
 
 		if ((val < AVANT_NO) || (val > AVANT_MAX)) {
-			act = GB_ACT_ERROR;
-		} else {
-			if ((val == AVANT_K400) && (typeLine_ == GB_TYPE_LINE_OPTO)) {
-				val = AVANT_OPTO;
-			}
-
-			if ((val == AVANT_RZSK) && (typeLine_ == GB_TYPE_LINE_OPTO)) {
-				val = AVANT_OPTO;
-			}
-
-			if ((val == AVANT_R400) && (typeLine_ == GB_TYPE_LINE_OPTO)) {
-				val = AVANT_OPTO;
-			}
-
-			if (typeDevice_ == val) {
-				act = GB_ACT_OLD;
-			} else {
-				typeDevice_ = val;
-				act = GB_ACT_NEW;
-			}
+			act |= GB_ACT_ERROR;
+			val = typeDevice_;
 		}
+
+		// NOTE Р400м не выпускается оптическим
+		if (typeLine_ == GB_TYPE_LINE_OPTO) {
+			val = AVANT_OPTO;
+		}
+
+		act |= (typeDevice_ == val) ? GB_ACT_OLD : GB_ACT_NEW;
+		typeDevice_ = val;
 
 		return act;
 	}
@@ -161,14 +157,33 @@ public:
 		return typeOpto_;
 	}
 
-    /**	Установка типа аппарата.
-     *
-     * 	В случае ошибки, значение не поменяется.
-     *
-     * 	@param Тип аппарата.
-     * 	@return Статус установки.
-     */
-    uint8_t setTypeOpto(eGB_TYPE_OPTO val);
+	/**	Установка типа аппарата.
+		 *
+		 * 	В случае ошибки, значение не поменяется.
+		 *
+		 * 	@param Тип аппарата.
+		 * 	@return Статус установки.
+		 */
+		uint8_t setTypeOpto(eGB_TYPE_OPTO val) {
+			uint8_t act = GB_ACT_NO;
+
+			if (val > TYPE_OPTO_MAX) {
+				act |= GB_ACT_ERROR;
+			} else {
+				if (typeLine_ == GB_TYPE_LINE_OPTO) {
+					if (typeOpto_ == val) {
+						act = GB_ACT_OLD;
+					} else {
+						typeOpto_ = val;
+						act = GB_ACT_NEW;
+					}
+				}
+			}
+
+			return act;
+		}
+
+
 
 	/**	Возвращает максимальное кол-во аппаратов в линии.
 	 *
@@ -281,23 +296,35 @@ public:
 	}
 
 
-	/**	Установка совместимости (тип удаленного аппарата).
-	 * 	@param val Совместимость.
-	 * 	@return Статус установки (eGB_ACT - побитные значения).
+	/** Установка совместимости.
+	 *  @param[in] val Совместимость.
+	 *  @return Статус установки (eGB_ACT - побитные значения).
+	 *  @retval GB_ACT_OLD
+	 *  @retval GB_ACT_NEW
 	 */
-	uint8_t setCompatibility(eGB_COMPATIBILITY val) {
+	uint8_t setCompatibility(uint8_t compatibility) {
 		uint8_t act = GB_ACT_NO;
 
-		if ((val < GB_COMPATIBILITY_MIN) || (val >= GB_COMPATIBILITY_MAX)) {
-			val = GB_COMPATIBILITY_MAX;
-			act = GB_ACT_ERROR;
-		}
+		switch(typeDevice_) {
+			case AVANT_R400: // DOWN
+			case AVANT_R400M: {
+				act = setCompR400m(eGB_COMP_R400M(compatibility));
+			} break;
+			case AVANT_RZSK: {
+				act = setCompRZSK(eGB_COMP_RZSK(compatibility));
+			} break;
+			case AVANT_K400: {
+				act = setCompK400(eGB_COMP_K400(compatibility));
+			} break;
+			case AVANT_OPTO: {
 
-		if (compatibility_ == val) {
-			act |= GB_ACT_OLD;
-		} else {
-			compatibility_ = val;
-			act |= GB_ACT_NEW;
+			} break;
+			case AVANT_NO: // DOWN
+			case AVANT_MAX: {
+				act |= setCompR400m(eGB_COMP_R400M(compatibility));
+				act |= setCompRZSK(eGB_COMP_RZSK(compatibility));
+				act |= setCompK400(eGB_COMP_K400(compatibility));
+			} break;
 		}
 
 		return act;
@@ -306,30 +333,8 @@ public:
 	/**	Возвращает текущую совместимость.
 	 * 	@return Совместимость.
 	 */
-	eGB_COMPATIBILITY getCompatibility() const {
-		return compatibility_;
-	}
-
-	/**	Установка совместимости для К400 (тип удаленного аппарата).
-	 * 	@param val Совместимость.
-	 * 	@return Статус установки (eGB_ACT - побитные значения).
-	 */
-	uint8_t setCompK400(eGB_COMP_K400 val) {
-		uint8_t act = GB_ACT_NO;
-
-		if ((val < GB_COMP_K400_MIN) || (val >= GB_COMP_K400_MAX)) {
-			val = GB_COMP_K400_MAX;
-			act = GB_ACT_ERROR;
-		}
-
-		if (compK400_ == val) {
-			act |= GB_ACT_OLD;
-		} else {
-			compK400_ = val;
-			act |= GB_ACT_NEW;
-		}
-
-		return act;
+	eGB_COMP_R400M getCompR400m() const {
+		return compR400m_;
 	}
 
 	/**	Возвращает текущую совместимость в К400ю
@@ -338,6 +343,14 @@ public:
 	 */
 	eGB_COMP_K400 getCompK400() const {
 		return compK400_;
+	}
+
+	/** Возвращает текущую совместимость в К400ю
+	 *
+	 *  @return Совместимость в К400.
+	 */
+	eGB_COMP_RZSK getCompRZSK() const {
+	    return compRZSK_;
 	}
 
 	// номер аппарата
@@ -423,10 +436,13 @@ private:
 	eGB_TYPE_LINE typeLine_;
 
 	// совместимость
-	eGB_COMPATIBILITY compatibility_;
+	eGB_COMP_R400M compR400m_;
 
 	// совместимость в К400
 	eGB_COMP_K400 compK400_;
+
+	// совместимость в РЗСК
+	eGB_COMP_RZSK compRZSK_;
 
 	// номер аппарата
 	uint8_t deviceNum_;
@@ -440,6 +456,59 @@ private:
 	// состояние дискретных входов (побитно, выкл(0)/вкл(1)).
 	uint8_t dInputState;
 
+	/**	Установка совместимости (тип удаленного аппарата).
+	 * 	@param val Совместимость.
+	 * 	@return Статус установки (eGB_ACT - побитные значения).
+	 */
+	uint8_t setCompR400m(eGB_COMP_R400M val) {
+		uint8_t act = GB_ACT_NO;
+
+		if ((val < GB_COMP_R400M_MIN) || (val >= GB_COMP_R400M_MAX)) {
+			val = GB_COMP_R400M_MAX;
+			act = GB_ACT_ERROR;
+		}
+
+		act |= (compR400m_ == val) ? GB_ACT_OLD : GB_ACT_NEW;
+		compR400m_ = val;
+
+		return act;
+	}
+
+	/** Установка совместимости для RZSK (тип удаленного аппарата).
+	 *  @param val Совместимость.
+	 *  @return Статус установки (eGB_ACT - побитные значения).
+	 */
+	uint8_t setCompRZSK(eGB_COMP_RZSK val) {
+		uint8_t act = GB_ACT_NO;
+
+		if ((val < GB_COMP_RZSK_MIN) || (val >= GB_COMP_RZSK_MAX)) {
+			val = GB_COMP_RZSK_MAX;
+			act = GB_ACT_ERROR;
+		}
+
+		act |= (compRZSK_ == val) ? GB_ACT_OLD : GB_ACT_NEW;
+		compRZSK_ = val;
+
+		return act;
+	}
+
+	/**	Установка совместимости для К400 (тип удаленного аппарата).
+	 * 	@param val Совместимость.
+	 * 	@return Статус установки (eGB_ACT - побитные значения).
+	 */
+	uint8_t setCompK400(eGB_COMP_K400 val) {
+		uint8_t act = GB_ACT_NO;
+
+		if ((val < GB_COMP_K400_MIN) || (val >= GB_COMP_K400_MAX)) {
+			val = GB_COMP_K400_MAX;
+			act = GB_ACT_ERROR;
+		}
+
+		act |= (compK400_ == val) ? GB_ACT_OLD : GB_ACT_NEW;
+		compK400_ = val;
+
+		return act;
+	}
 };
 
 

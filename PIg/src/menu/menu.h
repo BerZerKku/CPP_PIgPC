@@ -8,12 +8,12 @@
 #ifndef MENU_H_
 #define MENU_H_
 
-#include "src/glbDefine.h"
-#include "src/paramBsp.h"
-#include "src/drivers/keyboard.h"
-#include "src/menu/enterParam.h"
-#include "src/menu/menuPunkt.h"
-#include "src/parameter/LocalParams.h"
+#include "keyboard.h"
+#include "glbDefine.h"
+#include "paramBsp.h"
+#include "LocalParams.h"
+#include "menuPunkt.h"
+#include "enterParam.h"
 
 /// время до первой инициализации дисплея, мс
 #define TIME_TO_INIT_LCD (200 / MENU_TIME_CYLCE)
@@ -35,6 +35,9 @@
 
 /// время до выхода из Тест 1 / Тест 2 и т.д. если режим != данному тесту, мс
 #define TIME_TEST_EXIT (1000 / MENU_TIME_CYLCE)
+
+/// время до возврата на начальный уровень, с
+#define TIME_RETURN_LVL_START (5 * 60 * (1000 / MENU_TIME_CYLCE))
 
 /// Измеряемые параметры
 enum eMENU_MEAS_PARAM {
@@ -63,10 +66,6 @@ enum eMENU_MEAS_PARAM {
 
 // класс меню
 class clMenu {
-#ifdef TEST_FRIENDS
-    TEST_FRIENDS;
-#endif
-
 public:
 
 	/**	Конструктор.
@@ -78,7 +77,7 @@ public:
 
 	/**	Работа с меню.
 	 */
-    void proc();
+	void main();
 
 	/** Установка типа аппарата и настройка меню с его учетом.
 	 * 	По умолчанию будет сделан выбор исходя из меющейся информации в
@@ -214,13 +213,13 @@ private:
 	void lvlControl();
 	void lvlSetup();
 	void lvlRegime();
+	void lvlRegimeAc();
 	void lvlSetupParam();
 	void lvlSetupParamDef();
 	void lvlSetupParamPrm();
 	void lvlSetupParamPrd();
 	void lvlSetupParamGlb();
 	void lvlSetupParamRing();
-    void lvlSetupParamVP();
 	void lvlSetupDT();
 	void lvlMeasure();
 	void lvlTest();
@@ -233,29 +232,17 @@ private:
 
 	eMENU_ENTER_PARAM enterPassword();
 
-    /// перемещение курсора вверх
-    void cursorLineUp();
+	// перемещение курсора вверх
+	void cursorLineUp() {
+		cursorLine_=(cursorLine_>1)? cursorLine_-1 : Punkts_.getMaxNumPunkts();
+	}
 
-    /// пермещение курсора вниз
-    void cursorLineDown();
+	// пермещение курсора вниз
+	void cursorLineDown() {
+		cursorLine_=(cursorLine_<Punkts_.getMaxNumPunkts())? cursorLine_+1 : 1;
+	}
 
-    /** Переносит строку из FLASH в RAM.
-     *
-     *  Используется в случае вывода на экран параметра из flash.
-     *  Необходим для замены типа переменной %S на %s, т.к. %S имеет разное
-     *  значение в МК и ПК.
-     *
-     *  !!!
-     *  Значения параметров похоже вычисляются до начала вывода строки,
-     *  поэтому нельзя использовать со строкой в которой более 1 параметра
-     *  значение которого надо взять из flash.
-     *  !!!
-     *
-     *  @param[in] str Строка во FLASH.
-     */
-    char *strFromFlash(PGM_P str);
-
-    /// вывод на экран текущих пунктов меню и курсора
+	// вывод на экран текущих пунктов меню и курсора
 	void printPunkts();
 
 	/// Вывод на экран текущего параметра.
@@ -280,6 +267,21 @@ private:
 	 * 	осуществляется выбор из массива строк значений параметра.
 	 */
 	void printValue(uint8_t pos);
+
+	/** Вывод на экран режима АК и времени до следующей проверки.
+	 *
+	 * 	Время выводится если соблюдаются условия:
+	 * 	- АК не выключен
+	 *	- Режим "Введен"
+	 *	- Состояние "Контроль"
+	 *
+	 *	В Р400м производится подмена названий режимов АК:
+	 *	- В совместимости ЛинияР: АК-норм меняется на АК-авт;
+	 *	- В совместимости АВЗК-80 и ПВЗ-90: АК-бегл меняется на АК-пров.
+	 *
+	 *	@param[in] pos Начальная позиция в буфере.
+	 */
+	void printAc(uint8_t pos);
 
 	/**	Настройка параметров для ввода значения с клавиатуры.
 	 *
@@ -350,6 +352,19 @@ private:
 	 * 	@retval False Необходимости в подсветке нет.
 	 */
 	bool checkLedOn();
+
+	/**	Проверка текущего аппарата РСЗК и совместимости РСЗКм.
+	 *
+	 * 	@return true если РСЗК и совместимость РЗСКм, иначе false.
+	 */
+	bool isRzskM() const;
+
+	/** Обработчик дополнительных функций кнопок клавиатуры.
+	 *
+	 *	@param[in] key Нажатая кнопка или функция.
+	 *	@return Код кнопки если она не была обработана, иначе \a KEY_NO.
+	 */
+	eKEY onFnButton(eKEY key);
 };
 
 #endif /* MENU_H_ */

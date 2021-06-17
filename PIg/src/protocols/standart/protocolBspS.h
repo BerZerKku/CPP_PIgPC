@@ -30,32 +30,6 @@ private:
 	uint8_t sendModifGlbCommand(eGB_COM com);
 
 	uint8_t sendReadJrnCommand(eGB_COM com);
-
-    /** Обрабатывает ответ на принятую команду чтения "Сетевой адрес"
-     *
-     *  @return true всегда
-     */
-    bool hdlrComGetNetAdr();
-
-    /** Обрабатывает ответ на принятую команду записи "Сетевой адрес"
-     *
-     *  @return true всегда
-     */
-    bool hdlrComSetNetAdr();
-
-    /** Считывание параметров для команд GB_COM_GET_NET_ADR и SET.
-     *
-     *  @param pos Номер параметра.
-     *  @param buf Начальный адрес буфера.
-     *  @param len Количество оставшихся байт в буфере.
-     *  @return Количество считанных байт данных.
-     *  @retval len если в буфере не достаточно байт для параметра.
-     */
-    uint8_t getComNetAdr(posComNetAdr_t pos, const uint8_t *buf, uint8_t len);
-
-#ifdef TEST_FRIENDS
-    TEST_FRIENDS;
-#endif
 };
 
 

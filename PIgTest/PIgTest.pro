@@ -16,22 +16,22 @@ DEFINES += \
 
 INCLUDEPATH += \
     googletest \
+    $${PIG_PATH}/src/ \
+    $${PIG_PATH}/src/menu \
+    $${PIG_PATH}/src/protocols/iec101 \
+    $${PIG_PATH}/src/protocols/modbus
 
 HEADERS += \
-    wrapper.hpp
 
 SOURCES += \
-    TDateTimeTest.cpp \
     googletest/gtest-all.cc \
-	main.cpp \
-	CIec101Test.cpp \
-    clMenuTest.cpp \
-	TProtocolModbusTest.cpp \
-    test_clProtocolBspS.cpp \
-    wrapper.cpp
+    main.cpp \
+    test_Flash.cpp \
+    menu/test_dateTime.cpp \
+    menu/test_measure.cpp \
+    menu/test_password.cpp \
+    menu/test_test.cpp \
+    menu/test_txCom.cpp \
+    protocols/iec101/test_CIec101.cpp \
+    protocols/modbus/test_protocolModbus.cpp
 
-
-
-#    $${PIG_PATH}/src/menu/menu.cpp \
-#	$${PIG_PATH}/src/protocols/iec101/CIec101.cpp \
-#	$${PIG_PATH}/src/protocols/modbus/protocolModbus.cpp \

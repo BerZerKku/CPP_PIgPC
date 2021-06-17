@@ -8,27 +8,23 @@
 #ifndef PARAMBSP_H_
 #define PARAMBSP_H_
 
-#include "src/glbDefine.h"
-#include "src/paramDef.h"
-#include "src/paramGlb.h"
-#include "src/paramPrm.h"
-#include "src/paramPrd.h"
-#include "src/paramUart.h"
-#include "src/menu/dateTime.hpp"
-#include "src/menu/journalEntry.hpp"
-#include "src/menu/jrnScada.hpp"
-#include "src/menu/txCom.hpp"
-#include "src/parameter/LocalParams.h"
+#include "glbDefine.h"
+#include "paramPrm.h"
+#include "paramPrd.h"
+#include "paramDef.h"
+#include "paramGlb.h"
+#include "paramUart.h"
+#include "parameter/LocalParams.h"
+#include "menu/measure.h"
+#include "menu/password.h"
+#include "menu/test.h"
+#include "menu/txCom.h"
+
 
 /// Структура параметров БСП
 struct stGBparam {
 	// false - означает что надо настроить меню под текущий тип аппарата
 	bool device;
-
-    // Флаг наличия связи с БСП.
-    bool connectionBsp;
-    // Флаг наличия связи с ПК.
-    bool connectionPc;
 
 	// тип аппарата
 	eGB_TYPE_DEVICE typeDevice;
@@ -40,15 +36,15 @@ struct stGBparam {
 	TPassword password;
 
 	// дата/время
-    TDateTime DateTime;
+	TDateTime DateTime;
 
 	// дата/время БСП в момент установки новго времени
-    TDateTime DateTimeReq;
+	TDateTime DateTimeReq;
 
 	// дата/время
 
 	// измеряемые параметры
-	TMeasuredParameters measParam;
+	TMeasure measParam;
 
 	// текущее состояние устройств
 	TDeviceDef def;

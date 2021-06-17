@@ -14,8 +14,10 @@ class LocalParams {
 	/// Максимальное количество параметров в списке.
 	static const uint8_t MAX_NUM_OF_PARAMS = 25;
 
-	/// Максимальное количество байт для битовых переменных.
-//	static const uint8_t MAX_BUF_BITS_VALUES = 12;
+	struct prop_t {
+		eGB_PARAM param;
+		bool readOnly;
+	};
 
 public:
 
@@ -98,12 +100,18 @@ public:
 	 *
 	 * 	В случае переполнения буфера параметров, будет возвращена ошибка.
 	 *
-	 * 	@param *newParam Указатель на структуру параметра.
+	 * 	@param[in] newParam Параметр.
+	 * 	@param[in] readonly true - только для чтения, иначе false.
 	 * 	@retval True Параметр добавлен.
 	 * 	@retval False Буфер переполнен, параметр небыл добавлен.
 	 *
 	 */
-	bool addParam(eGB_PARAM newParam);
+	bool addParam(eGB_PARAM newParam, bool readonly=false);
+
+	/**	Проверяет текущий параметр на возможность только чтения.
+	 * 	@return true если параметр можно только просматривать, иначе false.
+	 */
+	bool isReadOnly();
 
 	/**	Очистка списка параметров.
 	 *
@@ -165,7 +173,7 @@ public:
 	 * 	@return Текущий параметр.
 	 */
 	eGB_PARAM getParam() const {
-		return param[currParam];
+		return param[currParam].param;
 	}
 
 	/** Установка кол-ва команд на передачу.
@@ -195,22 +203,14 @@ public:
 	}
 
 private:
-	eGB_PARAM param[MAX_NUM_OF_PARAMS]; ///< Массив параметров.
-
+	prop_t param[MAX_NUM_OF_PARAMS]; ///< Массив параметров.
 	int16_t val;			///< Значение текущего параметра.
-
 	uint8_t currParam;		///< Номер текущего параметра.
-
 	uint8_t numOfParams;	///< Количество параметров в текущем списке.
-
 	uint8_t currSameParam;	///< Номер текущего однотипного параметра.
-
 	STATE state;			///< Флаг ошибки в текущем значении.
-
 	uint8_t numComPrm;		///< Количество команд на приеме.
-
 	uint8_t numComPrd;		///< Количество команд на передачу.
-
 	uint8_t numDevices;		///< Количество аппаратов в линии.
 
 	/**	Проверка установленного значения параметра на корректность.

@@ -71,9 +71,9 @@ uint16_t TEnterParam::incValue(uint8_t velocity) {
 
 		// FIXME По приказу Чиркова убрана возможность установки "лишних" совместимостей.
 		if (param_ == GB_PARAM_COMP_P400) {
-			if (val_ == GB_COMPATIBILITY_PVZUE) {
+			if (val_ == GB_COMP_R400M_PVZUE) {
 				val_ = (val_ > min_) ? val_ - 1 : max_;
-			} else if (val_ == GB_COMPATIBILITY_LINER) {
+			} else if (val_ == GB_COMP_R400M_LINER) {
 				val_ = (val_ > min_) ? val_ - 1 : max_;
 			}
 		}
@@ -121,9 +121,9 @@ uint16_t TEnterParam::decValue(uint8_t velocity) {
 
 		// FIXME По приказу Чиркова убрана возможность установки "лишних" совместимостей.
 		if (param_ == GB_PARAM_COMP_P400) {
-			if (val_ == GB_COMPATIBILITY_PVZUE) {
+			if (val_ == GB_COMP_R400M_PVZUE) {
 				val_ = (val_ < max_) ? val_ + 1 : min_;
-			} else if (val_ == GB_COMPATIBILITY_LINER) {
+			} else if (val_ == GB_COMP_R400M_LINER) {
 				val_ = (val_ < max_) ? val_ + 1 : min_;
 			}
 		}

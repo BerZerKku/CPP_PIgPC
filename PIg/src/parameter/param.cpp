@@ -1,5 +1,7 @@
 #include "param.h"
 
+const char fcNullBuf[] PROGMEM= "";
+
 /** ¬озвращает указатель на структуру параметра.
  *
  * @param[in] params —писок параметров.
@@ -116,6 +118,29 @@ uint8_t getFract(eGB_PARAM pn) {
  */
 PGM_P getListOfValues(eGB_PARAM pn) {
     return static_cast<PGM_P> (pgm_read_ptr(&getPtrParam(pn)->listValues));
+}
+
+/** ¬озвращает указатель на значение из списка параметра.
+ *
+ *	Ќачальное значение в списке может быть не 0.
+ *
+ *  @param[in] pn ѕараметр.
+ *  @param[in] value «начение.
+ * 	@return ”казатель на начало списка значений.
+ * 	@retval fcNullBuf дл€ недопустимого значени€.
+ */
+PGM_P getTextValue(eGB_PARAM pn, uint8_t value) {
+    PGM_P str = fcNullBuf;
+    const uint8_t min = getAbsMin(pn);
+
+    if (value >= min) {
+    	value -= min;
+    	if (value < getAbsMax(pn)) {
+    		str = getListOfValues(pn) + (value * STRING_LENGHT);
+    	}
+    }
+
+    return str;
 }
 
 /** ¬озвращает указатель на строку с названием параметра.
