@@ -9,13 +9,6 @@
 #define CIEC101_H_
 
 #include <stdint.h>
-#ifdef AVR
-	#include "debug.hpp"
-#endif
-
-#ifdef MY_TESTS
-//	#include <stdio.h>
-#endif
 
 /**	\defgroup Notation Стиль оформления.
  *

@@ -17,8 +17,7 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
 
     setWindowTitle("BSP");
 
-    QHBoxLayout *hl = new QHBoxLayout(this);
-    QVBoxLayout *vl = new QVBoxLayout();
+    QVBoxLayout *vl = new QVBoxLayout(this);
 
     port = new TSerial();
     port->setup(4800, QSerialPort::NoParity, QSerialPort::TwoStop);
@@ -28,25 +27,18 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     connect(port, &TSerial::read, this, &MainWindow::readByte);
     connect(this, &MainWindow::writeByte, port, &TSerial::write);
 
-    glb.crtTreeUser();
-    glb.crtTreeState();
-    glb.crtTreeInterface();
-    glb.crtTreeDevice();
-    glb.crtTest();
+    mBsp.crtTreeDevice();
+    mBsp.crtTreeState();
+    mBsp.crtTreePrm();
+    mBsp.crtTreePrd();
+    mBsp.crtTreeGlb();
+    mBsp.crtTreeInterface();
+    mBsp.crtTest();
 
-    oth.crtTreePrm();
-    oth.crtTreePrd();
-    oth.crtTreeGlb();
-    oth.crtTreeVP();
+    mBsp.initParam();
 
     vl->addWidget(port);
-    vl->addWidget(&glb);
-
-    hl->addLayout(vl);
-    hl->addWidget(&oth);
-    hl->addWidget(&jrn);
-
-    glb.initParam();
+    vl->addWidget(&mBsp);
 
     Bsp::initClock();
     initViewCommands();

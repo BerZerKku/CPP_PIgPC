@@ -5,17 +5,10 @@
  *      Author: Shcheblykin
  */
 
-#ifndef __PROTOCOL_MODBUS_H_
-#define __PROTOCOL_MODBUS_H_
+#ifndef PROTOCOL_MODBUS_H_
+#define PROTOCOL_MODBUS_H_
 
 #include <stdint.h> 
-
-#ifdef AVR
-#include <avr/pgmspace.h>
-#else
-#define PROGMEM
-#define pgm_read_byte(a) (*a)
-#endif
 
 /**	\brief Класс работы с протоколом MODBUS.
  *
@@ -550,4 +543,4 @@ private:
 	virtual TProtocolModbus::CHECK_ERR readID(char *buf, uint8_t &size);
 };
 
-#endif /* __PROTOCOL_MODBUS_H_ */
+#endif /* PROTOCOL_MODBUS_H_ */

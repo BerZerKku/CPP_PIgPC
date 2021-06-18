@@ -53,7 +53,7 @@ HEADERS += \
     widget/combobox.h \
     widget/qledindicator.h \
     widget/qpush1.h \
-    wrapper.hpp
+    wrapper.h
 
 FORMS += \
     mainwindow.ui \

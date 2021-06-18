@@ -1475,7 +1475,7 @@ public:
 
         m_eState = STATE_IDLE;
         m_step = 0;
-    };
+    }
 
     TDateTime dtime;
 

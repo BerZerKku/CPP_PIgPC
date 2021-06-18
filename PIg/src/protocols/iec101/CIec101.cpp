@@ -6,9 +6,7 @@
  */
 
 #include "CIec101.h"
-#ifdef AVR
-	#include "debug.hpp"
-#endif
+
 
 // Контструктор.
 CIec101::CIec101(uint8_t *pBuf, uint8_t u8Size) :
@@ -795,5 +793,4 @@ void CIec101::writeCp56Time2a(SCp56Time2a &rTime, uint8_t years, uint8_t months,
 	rTime.dayOfMonth = day;
 	rTime.months = months;
 	rTime.years = years;
-
 }

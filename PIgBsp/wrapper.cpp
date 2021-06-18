@@ -1,8 +1,8 @@
-#include "wrapper.hpp"
+#include "wrapper.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include "PIg/src/menu/base.hpp"
+#include "PIg/src/menu/base.h"
 #include "PIg/src/drivers/keyboard.h"
 #include "PIg/src/drivers/ks0108.h"
 #include "PIg/src/paramUart.h"
