@@ -1,6 +1,6 @@
-#include "wrapper.hpp"
+#include "wrapper.h"
 
-#include "PIg/src/menu/base.hpp"
+#include "PIg/src/menu/base.h"
 #include "PIg/src/drivers/keyboard.h"
 #include "PIg/src/drivers/ks0108.h"
 #include "PIg/src/paramUart.h"
@@ -74,4 +74,15 @@ void setupUart(TInterface::INTERFACE intf, uint16_t baudrate,
         ", databits = " << dbits <<
         ", parity = " << parity <<
         ", stopbits = " << sbits;
+}
+
+void saveEeprom(eGB_PARAM param, uint16_t value) {
+    Q_UNUSED(param)
+    Q_UNUSED(value)
+}
+
+uint16_t loadEeprom(eGB_PARAM param) {
+    Q_UNUSED(param)
+
+    return 0;
 }

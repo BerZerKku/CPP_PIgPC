@@ -22,11 +22,13 @@ INCLUDEPATH += \
     $${PIG_PATH}/src/protocols/modbus
 
 HEADERS += \
+    wrapper.h
 
 SOURCES += \
     googletest/gtest-all.cc \
     main.cpp \
     test_Flash.cpp \
+    wrapper.cpp \
     menu/test_dateTime.cpp \
     menu/test_measure.cpp \
     menu/test_password.cpp \

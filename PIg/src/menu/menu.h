@@ -78,7 +78,7 @@ public:
 
 	/**	Работа с меню.
 	 */
-	void main();
+	void proc();
 
 	/** Установка типа аппарата и настройка меню с его учетом.
 	 * 	По умолчанию будет сделан выбор исходя из меющейся информации в
@@ -107,22 +107,6 @@ public:
 	 */
 	eGB_COM getTxCommand();
 
-	/** Возвращает текущее состояние связи с БСП.
-	 * 	@retval True - связь с БСП есть.
-	 * 	@retval False - связи с БСП нет.
-	 */
-	bool isConnectionBsp() const {
-		return connectionBsp_;
-	}
-
-	/** Устнаовка флага наличия связи с БСП.
-	 * 	@retval True - связь есть.
-	 * 	@retval False - связи нет.
-	 */
-	void setConnectionBsp(bool f) {
-		connectionBsp_ = f;
-	}
-
 	/** Параметры
 	 */
 	stGBparam sParam;
@@ -136,9 +120,6 @@ private:
 
 	// флаг смены измеряемых параметров
 	bool blinkMeasParam_;
-
-	// флаг текущего сосотояния связи с БСП, True - есть
-	bool connectionBsp_;
 
 	// true - необходимо вывести на экран курсор
 	bool cursorEnable_;

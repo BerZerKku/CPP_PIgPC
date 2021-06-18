@@ -10,7 +10,7 @@
 #include <QTimer>
 #include <QThread>
 #include <QTreeWidgetItem>
-#include "wrapper.hpp"
+#include "wrapper.h"
 
 #include "PIg/src/drivers/ks0108.h"
 #include "PIg/src/menu/menu.h"

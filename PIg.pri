@@ -44,19 +44,19 @@ HEADERS += \
 SOURCES += \
     $${PIG_PATH}/src/drivers/kbdLayout.cpp \
     $${PIG_PATH}/src/flashParams.cpp \
-#    $${PIG_PATH}/src/menu/base.cpp \
+    $${PIG_PATH}/src/menu/base.cpp \
     $${PIG_PATH}/src/menu/dateTime.cpp \
     $${PIG_PATH}/src/menu/enterParam.cpp \
-#    $${PIG_PATH}/src/menu/menu.cpp \
+    $${PIG_PATH}/src/menu/menu.cpp \
     $${PIG_PATH}/src/menu/test.cpp \
     $${PIG_PATH}/src/menu/txCom.cpp \
 #    $${PIG_PATH}/src/paramGlb.cpp \
-#    $${PIG_PATH}/src/parameter/LocalParams.cpp \
+    $${PIG_PATH}/src/parameter/LocalParams.cpp \
     $${PIG_PATH}/src/parameter/param.cpp \
     $${PIG_PATH}/src/protocols/iec101/CIec101.cpp \
-#    $${PIG_PATH}/src/protocols/iec101/protocolPcI.cpp \
+    $${PIG_PATH}/src/protocols/iec101/protocolPcI.cpp \
     $${PIG_PATH}/src/protocols/modbus/protocolModbus.cpp \
-#    $${PIG_PATH}/src/protocols/modbus/protocolPcM.cpp \
-#    $${PIG_PATH}/src/protocols/standart/protocolBspS.cpp \
-#    $${PIG_PATH}/src/protocols/standart/protocolPcS.cpp \
-#    $${PIG_PATH}/src/protocols/standart/protocolS.cpp
+    $${PIG_PATH}/src/protocols/modbus/protocolPcM.cpp \
+    $${PIG_PATH}/src/protocols/standart/protocolBspS.cpp \
+    $${PIG_PATH}/src/protocols/standart/protocolPcS.cpp \
+    $${PIG_PATH}/src/protocols/standart/protocolS.cpp

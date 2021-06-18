@@ -30,7 +30,7 @@
 #include <cstddef>
 
 #if defined(QT_CORE_LIB) && !defined(MY_TESTS)
-#include "wrapper.hpp"
+#include "wrapper.h"
 #endif
 
 #define PGM_P const char *

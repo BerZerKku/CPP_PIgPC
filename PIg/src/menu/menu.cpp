@@ -7,10 +7,10 @@
 #include <stdio.h>
 
 #include "menu.h"
-#include "debug.hpp"
-#include "ks0108.h"
 #include "flash.h"
 #include "txCom.h"
+#include "drivers/ks0108.h"
+
 
 /// режим подсветки по умолчанию
 #define LED_REGIME LED_SWITCH
@@ -45,8 +45,9 @@ clMenu::clMenu() {
 	// тип устройства еще не известен
 	setDevice(AVANT_NO);
 
-	// связи с БСП еще нет
-	connectionBsp_ = false;
+	// связи еще нет
+	sParam.connectionBsp = false;
+	sParam.connectionPc = false;
 
 	// заполним массивы состояний работы для всех устройств
 	// массив должен быть заполнен полностью и последним всегда должно
@@ -113,7 +114,7 @@ clMenu::clMenu() {
 #endif
 }
 
-void clMenu::main(void) {
+void clMenu::proc(void) {
 
 	static const char fcNoConnectBsp[] PROGMEM = " Нет связи с БСП!!! ";
 
@@ -212,7 +213,7 @@ void clMenu::main(void) {
 #endif
 
 	// вывод сообщения в случае отсутствия связи с БСП
-	bool connection = isConnectionBsp();
+	bool connection = sParam.connectionBsp;
 	if (!connection) {
 		if (blink_) {
 			// если связи нет, периодически вместо измеряемых параметров

@@ -9,9 +9,7 @@
 #include <QTimer>
 
 #include "PIg/src/flash.h"
-//#include "PIg/src/flashParams.h"
 #include "PIg/src/menu/base.h"
-
 
 //
 MainWindow::MainWindow(QWidget *parent)
@@ -180,7 +178,6 @@ void MainWindow::hdlrView()
 
     value16 = menu.sParam.password.get();
     view.userPwd.setText(QString::number(value16));
-    view.admPwd.setText(QString::number(PASSWORD_ADMIN));
 
     value8 = menu.sParam.Uart.Protocol.get();
     view.lnProtocol.setText(codec->toUnicode(fcProtocol[value8]));
@@ -281,7 +278,6 @@ void MainWindow::cycleMenu()
     }
 
     pkg.clear();
-    qDebug() << "Main cycle";
     len = bspWrite();
     for(uint8_t i = 0; i < len; i++) {
         pkg.append(uBufUartBsp[i]);
@@ -461,9 +457,9 @@ MainWindow::viewTypeComp()
     }
 
     if (menu.sParam.typeDevice == AVANT_R400M) {
-        eGB_COMPATIBILITY comp = menu.sParam.glb.getCompatibility();
+        eGB_COMP_R400M comp = menu.sParam.glb.getCompR400m();
 
-        if (comp < GB_COMPATIBILITY_MAX) {
+        if (comp < GB_COMP_R400M_MAX) {
             view.typeComp.setText(codec->toUnicode(fcCompatibility[comp]));
             view.typeComp.setPalette(pblue);
         } else {

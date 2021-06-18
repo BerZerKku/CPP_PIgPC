@@ -7,7 +7,7 @@
 #include "protocolBspS.h"
 #include "glbDefine.h"
 #include "paramBsp.h"
-#include "dateTime.h"
+#include "menu/dateTime.h"
 
 clProtocolBspS::clProtocolBspS(uint8_t *buf, uint8_t size, stGBparam *sParam) :
 clProtocolS(buf, size, sParam) {
@@ -725,7 +725,7 @@ bool clProtocolBspS::getGlbCommand(eGB_COM com, bool pc) {
 		break;
 
 		case GB_COM_GET_NET_ADR: {
-			stat = sParam_->glb.setNetAddress(buf[B1]);
+			stat = sParam_->Uart.NetAddress.set(buf[B1]);
 		}
 		break;
 
