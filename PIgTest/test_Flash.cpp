@@ -101,12 +101,12 @@ TEST_F(TFlash_Test, gbParam_TimeSynchSrc) {
         "Синхронизация часов",  // название параметра
         GB_COM_GET_TIME_SINCHR, // команда стандартного протокола
         Param::PARAM_LIST,      // тип параметра
-        Param::RANGE_ON_OFF,    // диапазон измнения
+        Param::RANGE_LIST,      // диапазон измнения
         Param::DIM_NO,          // размерность
-        fcTymeSynchSrc[0],         // массив значений
+        fcTymeSynchSrc[0],      // массив значений
         1,                      // кол-во повторений параметра
         0,                      // минимальное значение
-        SIZE_OF(fcTymeSynchSrc),   // максимальное значение
+        SIZE_OF(fcTymeSynchSrc),// максимальное значение
         1,                      // дискретность
         1,                      // множитель для стандартного протокола
         GB_SEND_INT8_DOP,       // тип параметра для сохранения новго значения
