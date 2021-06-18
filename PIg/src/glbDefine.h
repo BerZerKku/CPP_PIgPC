@@ -18,10 +18,7 @@
 #include <stdint.h>
 #include "avr.h"
 #include "menu/dateTime.h"
-
-#ifndef MY_TESTS
-    #include "debug.hpp"
-#endif
+#include "debug/debug.hpp"
 
 /// размер массива
 #define SIZE_OF(mas) (sizeof(mas) / sizeof(mas[0]))

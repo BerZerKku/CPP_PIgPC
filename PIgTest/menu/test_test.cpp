@@ -6,9 +6,9 @@
 
 using namespace std;
 
-#include "src/menu/test.h"
-#include "src/flash.h"
-#include "src/glbDefine.h"
+#include "menu/test.h"
+#include "flash.h"
+#include "glbDefine.h"
 
 // размер массива
 #define SIZE_ARRAY(arr) (sizeof(arr) / sizeof(arr[0]))

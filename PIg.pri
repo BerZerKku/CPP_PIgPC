@@ -2,12 +2,12 @@ PIG_PATH = $$system(pwd)/PIg
 
 INCLUDEPATH += \
     $$system(pwd) \
-	$${PIG_PATH}
+    $${PIG_PATH}/src
 
 HEADERS += \
     $${PIG_PATH}/src/avr.h \
     $${PIG_PATH}/src/debug/debug.hpp \
-#    $${PIG_PATH}/src/drivers/kbdLayout.h \
+    $${PIG_PATH}/src/drivers/kbdLayout.h \
     $${PIG_PATH}/src/drivers/keyboard.h \
     $${PIG_PATH}/src/drivers/ks0108.h \
     $${PIG_PATH}/src/drivers/tmp75.h \
@@ -15,7 +15,7 @@ HEADERS += \
     $${PIG_PATH}/src/flash.h \
     $${PIG_PATH}/src/flashParams.h \
     $${PIG_PATH}/src/glbDefine.h \
-#    $${PIG_PATH}/src/menu/base.hpp \
+    $${PIG_PATH}/src/menu/base.h \
     $${PIG_PATH}/src/menu/dateTime.h \
 #    $${PIG_PATH}/src/menu/deviceStatus.h \
     $${PIG_PATH}/src/menu/enterParam.h \
@@ -42,7 +42,7 @@ HEADERS += \
     $${PIG_PATH}/src/protocols/standart/protocolS.h
 
 SOURCES += \
-#    $${PIG_PATH}/src/drivers/kbdLayout.cpp \
+    $${PIG_PATH}/src/drivers/kbdLayout.cpp \
     $${PIG_PATH}/src/flashParams.cpp \
 #    $${PIG_PATH}/src/menu/base.cpp \
     $${PIG_PATH}/src/menu/dateTime.cpp \

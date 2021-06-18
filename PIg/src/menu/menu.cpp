@@ -148,7 +148,7 @@ void clMenu::main(void) {
 
 	// Считаем код с клавиатуры
 	// Если нажата любая кнопка - включится кратковременная подсветка
-	eKEY tmp = eKEYget();
+	eKEY tmp = vKEYgetButton(eKEYget());
 	if (tmp != KEY_NO) {
 		if (tmp == KEY_EMPTY)
 			tmp = KEY_NO;
@@ -4152,10 +4152,10 @@ eMENU_ENTER_PARAM clMenu::enterValue() {
 			break;
 
 		case KEY_UP:
-			EnterParam.incValue(timePressKey());
+			EnterParam.incValue();
 			break;
 		case KEY_DOWN:
-			EnterParam.decValue(timePressKey());
+			EnterParam.decValue();
 			break;
 
 		case KEY_ENTER:

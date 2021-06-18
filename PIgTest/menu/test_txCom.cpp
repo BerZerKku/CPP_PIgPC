@@ -4,7 +4,7 @@
 
 using namespace std;
 
-#include "src/menu/txCom.h"
+#include "menu/txCom.h"
 
 // размер массива
 #define SIZE_ARRAY(arr) (sizeof(arr) / sizeof(arr[0]))

@@ -8,7 +8,7 @@
 #ifndef KS0108_H_
 #define KS0108_H_
 
-#include <avr/io.h>
+#include "avr.h"
 
 /// Управление подсветкой
 enum eLCD_LED

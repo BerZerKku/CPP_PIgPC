@@ -8,12 +8,13 @@
 #ifndef MENU_H_
 #define MENU_H_
 
-#include "keyboard.h"
 #include "glbDefine.h"
 #include "paramBsp.h"
-#include "LocalParams.h"
-#include "menuPunkt.h"
-#include "enterParam.h"
+#include "drivers/keyboard.h"
+#include "menu/menuPunkt.h"
+#include "menu/enterParam.h"
+#include "parameter/LocalParams.h"
+
 
 /// время до первой инициализации дисплея, мс
 #define TIME_TO_INIT_LCD (200 / MENU_TIME_CYLCE)
