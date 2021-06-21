@@ -27,6 +27,7 @@ HEADERS += \
 SOURCES += \
     googletest/gtest-all.cc \
     main.cpp \
+    menu/test_clMenu.cpp \
     test_Flash.cpp \
     wrapper.cpp \
     menu/test_dateTime.cpp \

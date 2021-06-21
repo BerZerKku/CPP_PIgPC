@@ -356,6 +356,10 @@ private:
 	 *	@return Код кнопки если она не была обработана, иначе \a KEY_NO.
 	 */
 	eKEY onFnButton(eKEY key);
+
+#ifdef TEST_FRIENDS
+    TEST_FRIENDS
+#endif
 };
 
 #endif /* MENU_H_ */
