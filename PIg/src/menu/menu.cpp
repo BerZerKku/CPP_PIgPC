@@ -4610,23 +4610,20 @@ void clMenu::printRange(uint8_t pos) {
     }
 
     if (dimension) {
-        snprintf_P(&vLCDbuf[pos+len], MAX_CHARS-len, fcDimension[getDim(param)]);
+        printDimension(pos + len, MAX_CHARS - len, param);
     }
 }
 
 // Вывод на экран текущего значения параметра.
 void clMenu::printValue(uint8_t pos) {
-    static prog_uint8_t MAX_CHARS = 11;
+    const uint8_t MAX_CHARS = 11;
 
     int16_t val = sParam.local.getValue();
     eGB_PARAM param = sParam.local.getParam();
-    PGM_P dim = fcDimension[getDim(param)];
-    PGM_P str = fcNullBuf;
 
     pos += snprintf_P(&vLCDbuf[pos], MAX_CHARS, PSTR("Значение: "));
 
     LocalParams::STATE state = sParam.local.getState();
-
     if (state == LocalParams::STATE_ERROR) {
         // вывод ошибочного значения
         if (blink_) {
@@ -4642,31 +4639,49 @@ void clMenu::printValue(uint8_t pos) {
         }
     } else {
         // вывод корректного значения
+        uint8_t len = 0;
+        bool dimension = false;
         switch(getParamType(param)) {
             case Param::PARAM_BITES: // DOWN
             case Param::PARAM_LIST:
-                str = getTextValue(param, val);
-                snprintf_P(&vLCDbuf[pos], MAX_CHARS, str);
+                len = snprintf_P(&vLCDbuf[pos], MAX_CHARS, getTextValue(param, val));
                 break;
             case Param::PARAM_I_COR: // DOWN
             case Param::PARAM_INT:
-                str = PSTR("%d%S");
-                snprintf_P(&vLCDbuf[pos], MAX_CHARS, str, val, dim);
+                dimension = true;
+                len = snprintf(&vLCDbuf[pos], MAX_CHARS, "%d", val);
                 break;
             case Param::PARAM_U_COR:
+                dimension = true;
                 if (val >= 0) {
-                    str = PSTR("%d.%d%S");
+                    len = snprintf(&vLCDbuf[pos], MAX_CHARS, "%d.%d", val/10, val%10);
                 } else {
                     val = -val;
-                    str = PSTR("-%d.%d%S");
+                    len = snprintf(&vLCDbuf[pos], MAX_CHARS, "-%d.%d", val/10, val%10);
                 }
-                snprintf_P(&vLCDbuf[pos], MAX_CHARS, str, val / 10, val % 10,
-                           dim);
                 break;
             case Param::PARAM_NO:
                 break;
         }
+
+        if (dimension) {
+            printDimension(pos + len, MAX_CHARS - len, param);
+        }
     }
+}
+
+//
+uint8_t clMenu::printDimension(uint8_t pos, uint8_t size, eGB_PARAM pn) {
+    uint8_t len = 0;
+
+    if (pn < GB_PARAM_MAX) {
+        Param::DIMENSION dimension = getDim(pn);
+        if ((dimension > Param::DIM_NO) && (dimension < Param::DIM_MAX)) {
+            len = snprintf_P(&vLCDbuf[pos], size, fcDimension[dimension]);
+        }
+    }
+
+    return len;
 }
 
 // Вывод на экран режима АК и времени до следующей проверки.

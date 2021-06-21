@@ -21,7 +21,9 @@ struct Param {
         DIM_DB,         ///< дЅ
         DIM_HZ,         ///< √ц
         DIM_KHZ,        ///< к√ц
-        DIM_DEG         ///< град
+        DIM_DEG,        ///< град
+        //
+        DIM_MAX
     } DIMENSION;
 
     /// “ип строки дл€ отображени€ диапазона значений параметра.
