@@ -11,13 +11,14 @@ using namespace std;
 // размер массива
 #define SIZE_ARRAY(arr) (sizeof(arr) / sizeof(arr[0]))
 
-class TFlash_Test: public ::testing::Test {
+class FlashParam_Test: public ::testing::Test {
    public:
 
-    TFlash_Test() {}
-    virtual ~TFlash_Test() override = default;
+    FlashParam_Test() {}
+    virtual ~FlashParam_Test() override = default;
 
-    bool checkParam(eGB_PARAM param, Param &prop) {
+    bool checkParam(eGB_PARAM param, Param &prop)
+    {
         bool check = true;
 
         EXPECT_STREQ(prop.name, getNameOfParam(param));
@@ -46,9 +47,10 @@ class TFlash_Test: public ::testing::Test {
     static int cntTestedParam;
 };
 
-int TFlash_Test::cntTestedParam = 0;
+int FlashParam_Test::cntTestedParam = 0;
 
-TEST_F(TFlash_Test, gbParam_NullParam) {
+TEST_F(FlashParam_Test, gbParam_NullParam)
+{
     Param prop = {
         "",                     // название параметра
         GB_COM_NO,              // команда стандартного протокола
@@ -72,7 +74,8 @@ TEST_F(TFlash_Test, gbParam_NullParam) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_TimeSynch) {
+TEST_F(FlashParam_Test, gbParam_TimeSynch)
+{
     Param prop = {
         "Синхронизация часов",  // название параметра
         GB_COM_GET_TIME_SINCHR, // команда стандартного протокола
@@ -96,7 +99,8 @@ TEST_F(TFlash_Test, gbParam_TimeSynch) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_TimeSynchSrc) {
+TEST_F(FlashParam_Test, gbParam_TimeSynchSrc)
+{
     Param prop = {
         "Синхронизация часов",  // название параметра
         GB_COM_GET_TIME_SINCHR, // команда стандартного протокола
@@ -120,7 +124,8 @@ TEST_F(TFlash_Test, gbParam_TimeSynchSrc) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_NumOfDevice) {
+TEST_F(FlashParam_Test, gbParam_NumOfDevice)
+{
     Param prop = {
         "Номер аппарата",       // название параметра
         GB_COM_GET_DEVICE_NUM,  // команда стандартного протокола
@@ -144,7 +149,8 @@ TEST_F(TFlash_Test, gbParam_NumOfDevice) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_NumOfDeviceRing) {
+TEST_F(FlashParam_Test, gbParam_NumOfDeviceRing)
+{
     Param prop = {
         "Номер аппарата",       // название параметра
         GB_COM_GET_DEVICE_NUM,  // команда стандартного протокола
@@ -168,7 +174,8 @@ TEST_F(TFlash_Test, gbParam_NumOfDeviceRing) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_OutCheck) {
+TEST_F(FlashParam_Test, gbParam_OutCheck)
+{
     Param prop = {
         "Контроль вых.сигнала", // название параметра
         GB_COM_GET_OUT_CHECK,   // команда стандартного протокола
@@ -192,7 +199,8 @@ TEST_F(TFlash_Test, gbParam_OutCheck) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_WarnThd) {
+TEST_F(FlashParam_Test, gbParam_WarnThd)
+{
     Param prop = {
         "Порог предупреждения", // название параметра
         GB_COM_GET_CF_THRESHOLD,// команда стандартного протокола
@@ -216,7 +224,8 @@ TEST_F(TFlash_Test, gbParam_WarnThd) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_WarnThdCf) {
+TEST_F(FlashParam_Test, gbParam_WarnThdCf)
+{
     Param prop = {
         "Порог предупр. по КC", // название параметра
         GB_COM_GET_CF_THRESHOLD,// команда стандартного протокола
@@ -240,7 +249,8 @@ TEST_F(TFlash_Test, gbParam_WarnThdCf) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_TimeRerun) {
+TEST_F(FlashParam_Test, gbParam_TimeRerun)
+{
     Param prop = {
         "Время перезапуска",    // название параметра
         GB_COM_GET_TIME_RERUN,  // команда стандартного протокола
@@ -264,7 +274,8 @@ TEST_F(TFlash_Test, gbParam_TimeRerun) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_ComPrdKeep) {
+TEST_F(FlashParam_Test, gbParam_ComPrdKeep)
+{
     Param prop = {
         "Удерж. реле ком. ПРД", // название параметра
         GB_COM_GET_COM_PRD_KEEP,// команда стандартного протокола
@@ -288,7 +299,8 @@ TEST_F(TFlash_Test, gbParam_ComPrdKeep) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_ComPrmKeep) {
+TEST_F(FlashParam_Test, gbParam_ComPrmKeep)
+{
     Param prop = {
         "Удерж. реле ком. ПРМ", // название параметра
         GB_COM_GET_COM_PRM_KEEP,// команда стандартного протокола
@@ -312,7 +324,8 @@ TEST_F(TFlash_Test, gbParam_ComPrmKeep) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_InDec) {
+TEST_F(FlashParam_Test, gbParam_InDec)
+{
     Param prop = {
         "Загрубл. чувств. ПРМ", // название параметра
         GB_COM_GET_CF_THRESHOLD,// команда стандартного протокола
@@ -336,7 +349,8 @@ TEST_F(TFlash_Test, gbParam_InDec) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_NetAddress) {
+TEST_F(FlashParam_Test, gbParam_NetAddress)
+{
     Param prop = {
         "Сетевой адрес",        // название параметра
         GB_COM_GET_NET_ADR,     // команда стандартного протокола
@@ -360,7 +374,8 @@ TEST_F(TFlash_Test, gbParam_NetAddress) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_UOutNom) {
+TEST_F(FlashParam_Test, gbParam_UOutNom)
+{
     Param prop = {
         "Uвых номинальное",     // название параметра
         GB_COM_GET_COM_PRM_KEEP,// команда стандартного протокола
@@ -384,7 +399,8 @@ TEST_F(TFlash_Test, gbParam_UOutNom) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_Freq) {
+TEST_F(FlashParam_Test, gbParam_Freq)
+{
     Param prop = {
         "Частота",              // название параметра
         GB_COM_GET_FREQ,        // команда стандартного протокола
@@ -408,7 +424,8 @@ TEST_F(TFlash_Test, gbParam_Freq) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_CompP400) {
+TEST_F(FlashParam_Test, gbParam_CompP400)
+{
     Param prop = {
         "Совместимость",        // название параметра
         GB_COM_GET_COM_PRD_KEEP,// команда стандартного протокола
@@ -432,7 +449,8 @@ TEST_F(TFlash_Test, gbParam_CompP400) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_InDecAcAnswe) {
+TEST_F(FlashParam_Test, gbParam_InDecAcAnswe)
+{
     Param prop = {
         "Снижение ответа АК",   // название параметра
         GB_COM_GET_TIME_RERUN,  // команда стандартного протокола
@@ -456,7 +474,8 @@ TEST_F(TFlash_Test, gbParam_InDecAcAnswe) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_InDetector) {
+TEST_F(FlashParam_Test, gbParam_InDetector)
+{
     Param prop = {
         "Тип детектора",        // название параметра
         GB_COM_GET_TIME_SINCHR, // команда стандартного протокола
@@ -480,7 +499,8 @@ TEST_F(TFlash_Test, gbParam_InDetector) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_CorU) {
+TEST_F(FlashParam_Test, gbParam_CorU)
+{
     Param prop = {
         "Коррекция напряжения", // название параметра
         GB_COM_GET_COR_U_I,     // команда стандартного протокола
@@ -504,7 +524,8 @@ TEST_F(TFlash_Test, gbParam_CorU) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_CorI) {
+TEST_F(FlashParam_Test, gbParam_CorI)
+{
     Param prop = {
         "Коррекция тока",       // название параметра
         GB_COM_GET_COR_U_I,     // команда стандартного протокола
@@ -528,7 +549,8 @@ TEST_F(TFlash_Test, gbParam_CorI) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_PvzueProtocol) {
+TEST_F(FlashParam_Test, gbParam_PvzueProtocol)
+{
     Param prop = {
         "Протокол обмена",      // название параметра
         GB_COM_GET_TIME_RERUN,  // команда стандартного протокола
@@ -552,7 +574,8 @@ TEST_F(TFlash_Test, gbParam_PvzueProtocol) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_PvzueParity) {
+TEST_F(FlashParam_Test, gbParam_PvzueParity)
+{
     Param prop = {
         "Признак четности",     // название параметра
         GB_COM_GET_TIME_RERUN,  // команда стандартного протокола
@@ -576,7 +599,8 @@ TEST_F(TFlash_Test, gbParam_PvzueParity) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_PvzueFail) {
+TEST_F(FlashParam_Test, gbParam_PvzueFail)
+{
     Param prop = {
         "Допустимые провалы",   // название параметра
         GB_COM_GET_TIME_RERUN,  // команда стандартного протокола
@@ -600,7 +624,8 @@ TEST_F(TFlash_Test, gbParam_PvzueFail) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_PvzueNoiseThd) {
+TEST_F(FlashParam_Test, gbParam_PvzueNoiseThd)
+{
     Param prop = {
         "Порог по помехе",      // название параметра
         GB_COM_GET_TIME_RERUN,  // команда стандартного протокола
@@ -624,7 +649,8 @@ TEST_F(TFlash_Test, gbParam_PvzueNoiseThd) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_PvzueNoiseLvl) {
+TEST_F(FlashParam_Test, gbParam_PvzueNoiseLvl)
+{
     Param prop = {
         "Допустимая помеха",    // название параметра
         GB_COM_GET_TIME_RERUN,  // команда стандартного протокола
@@ -648,7 +674,8 @@ TEST_F(TFlash_Test, gbParam_PvzueNoiseLvl) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_PvzueAcType) {
+TEST_F(FlashParam_Test, gbParam_PvzueAcType)
+{
     Param prop = {
         "Тип автоконтроля",     // название параметра
         GB_COM_GET_TIME_RERUN,  // команда стандартного протокола
@@ -672,7 +699,8 @@ TEST_F(TFlash_Test, gbParam_PvzueAcType) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_PvzueAcPeriod) {
+TEST_F(FlashParam_Test, gbParam_PvzueAcPeriod)
+{
     Param prop = {
         "Период беглого АК",    // название параметра
         GB_COM_GET_TIME_RERUN,  // команда стандартного протокола
@@ -696,7 +724,8 @@ TEST_F(TFlash_Test, gbParam_PvzueAcPeriod) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_PvzueAcPerRe) {
+TEST_F(FlashParam_Test, gbParam_PvzueAcPerRe)
+{
     Param prop = {
         "Период повт.бегл. АК", // название параметра
         GB_COM_GET_TIME_RERUN,  // команда стандартного протокола
@@ -720,7 +749,8 @@ TEST_F(TFlash_Test, gbParam_PvzueAcPerRe) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_Backup) {
+TEST_F(FlashParam_Test, gbParam_Backup)
+{
     Param prop = {
         "Резервирование",       // название параметра
         GB_COM_GET_COR_U_I,     // команда стандартного протокола
@@ -744,7 +774,8 @@ TEST_F(TFlash_Test, gbParam_Backup) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_CompK400) {
+TEST_F(FlashParam_Test, gbParam_CompK400)
+{
     Param prop = {
         "Совместимость",        // название параметра
         GB_COM_GET_COM_PRD_KEEP,// команда стандартного протокола
@@ -768,7 +799,8 @@ TEST_F(TFlash_Test, gbParam_CompK400) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_NumOfDevices) {
+TEST_F(FlashParam_Test, gbParam_NumOfDevices)
+{
     Param prop = {
         "Тип линии",            // название параметра
         GB_COM_DEF_GET_LINE_TYPE,// команда стандартного протокола
@@ -792,7 +824,8 @@ TEST_F(TFlash_Test, gbParam_NumOfDevices) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_TmK400) {
+TEST_F(FlashParam_Test, gbParam_TmK400)
+{
     Param prop = {
         "Телемеханика",         // название параметра
         GB_COM_GET_COM_PRD_KEEP,// команда стандартного протокола
@@ -816,7 +849,8 @@ TEST_F(TFlash_Test, gbParam_TmK400) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_WarnD) {
+TEST_F(FlashParam_Test, gbParam_WarnD)
+{
     Param prop = {
         "Порог предупр. по D",  // название параметра
         GB_COM_GET_COM_PRD_KEEP,// команда стандартного протокола
@@ -840,7 +874,8 @@ TEST_F(TFlash_Test, gbParam_WarnD) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_AlarmD) {
+TEST_F(FlashParam_Test, gbParam_AlarmD)
+{
     Param prop = {
         "Порог аварии по D",    // название параметра
         GB_COM_GET_COM_PRD_KEEP,// команда стандартного протокола
@@ -864,7 +899,8 @@ TEST_F(TFlash_Test, gbParam_AlarmD) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_TempMonitor) {
+TEST_F(FlashParam_Test, gbParam_TempMonitor)
+{
     Param prop = {
         "Контроль температуры", // название параметра
         GB_COM_GET_COM_PRD_KEEP,// команда стандартного протокола
@@ -888,7 +924,8 @@ TEST_F(TFlash_Test, gbParam_TempMonitor) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_TempThrHi) {
+TEST_F(FlashParam_Test, gbParam_TempThrHi)
+{
     Param prop = {
         "Верх.значение темпер", // название параметра
         GB_COM_GET_COM_PRD_KEEP,// команда стандартного протокола
@@ -912,7 +949,8 @@ TEST_F(TFlash_Test, gbParam_TempThrHi) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_TempThrLow) {
+TEST_F(FlashParam_Test, gbParam_TempThrLow)
+{
     Param prop = {
         "Нижн.значение темпер", // название параметра
         GB_COM_GET_COM_PRD_KEEP,// команда стандартного протокола
@@ -936,7 +974,8 @@ TEST_F(TFlash_Test, gbParam_TempThrLow) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_TmSpeed) {
+TEST_F(FlashParam_Test, gbParam_TmSpeed)
+{
     Param prop = {
         "Скорость ТМ",          // название параметра
         GB_COM_GET_COM_PRD_KEEP,// команда стандартного протокола
@@ -960,7 +999,8 @@ TEST_F(TFlash_Test, gbParam_TmSpeed) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_CompRZSK) {
+TEST_F(FlashParam_Test, gbParam_CompRZSK)
+{
     Param prop = {
         "Совместимость",        // название параметра
         GB_COM_GET_COM_PRD_KEEP,// команда стандартного протокола
@@ -984,7 +1024,8 @@ TEST_F(TFlash_Test, gbParam_CompRZSK) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_DefType) {
+TEST_F(FlashParam_Test, gbParam_DefType)
+{
     Param prop = {
         "Тип защиты",           // название параметра
         GB_COM_DEF_GET_DEF_TYPE,// команда стандартного протокола
@@ -1008,7 +1049,8 @@ TEST_F(TFlash_Test, gbParam_DefType) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_TimeNoMan) {
+TEST_F(FlashParam_Test, gbParam_TimeNoMan)
+{
     Param prop = {
         "Доп. время без ман.",  // название параметра
         GB_COM_DEF_GET_T_NO_MAN,// команда стандартного протокола
@@ -1032,7 +1074,8 @@ TEST_F(TFlash_Test, gbParam_TimeNoMan) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_Overlap) {
+TEST_F(FlashParam_Test, gbParam_Overlap)
+{
     Param prop = {
         "Перекрытие импульсов", // название параметра
         GB_COM_DEF_GET_OVERLAP, // команда стандартного протокола
@@ -1056,7 +1099,8 @@ TEST_F(TFlash_Test, gbParam_Overlap) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_OverlapP400) {
+TEST_F(FlashParam_Test, gbParam_OverlapP400)
+{
     Param prop = {
         "Перекрытие импульсов", // название параметра
         GB_COM_DEF_GET_OVERLAP, // команда стандартного протокола
@@ -1080,7 +1124,8 @@ TEST_F(TFlash_Test, gbParam_OverlapP400) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_OverlapOpto) {
+TEST_F(FlashParam_Test, gbParam_OverlapOpto)
+{
     Param prop = {
         "Перекрытие импульсов", // название параметра
         GB_COM_DEF_GET_OVERLAP, // команда стандартного протокола
@@ -1104,7 +1149,8 @@ TEST_F(TFlash_Test, gbParam_OverlapOpto) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_Delay) {
+TEST_F(FlashParam_Test, gbParam_Delay)
+{
     Param prop = {
         "Компенсация задержки", // название параметра
         GB_COM_DEF_GET_DELAY,   // команда стандартного протокола
@@ -1128,7 +1174,8 @@ TEST_F(TFlash_Test, gbParam_Delay) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_DelayOpto) {
+TEST_F(FlashParam_Test, gbParam_DelayOpto)
+{
     Param prop = {
         "Компенсация задержки", // название параметра
         GB_COM_DEF_GET_DELAY,   // команда стандартного протокола
@@ -1152,7 +1199,8 @@ TEST_F(TFlash_Test, gbParam_DelayOpto) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_WarnThdRz) {
+TEST_F(FlashParam_Test, gbParam_WarnThdRz)
+{
     Param prop = {
         "Порог предупр. по РЗ", // название параметра
         GB_COM_DEF_GET_RZ_THRESH,// команда стандартного протокола
@@ -1176,7 +1224,8 @@ TEST_F(TFlash_Test, gbParam_WarnThdRz) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_SensDec) {
+TEST_F(FlashParam_Test, gbParam_SensDec)
+{
     Param prop = {
         "Загрубление чувствит", // название параметра
         GB_COM_DEF_GET_RZ_DEC,  // команда стандартного протокола
@@ -1200,7 +1249,8 @@ TEST_F(TFlash_Test, gbParam_SensDec) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_SensDecRz) {
+TEST_F(FlashParam_Test, gbParam_SensDecRz)
+{
     Param prop = {
         "Загрубл. чувств. РЗ",  // название параметра
         GB_COM_DEF_GET_RZ_DEC,  // команда стандартного протокола
@@ -1224,7 +1274,8 @@ TEST_F(TFlash_Test, gbParam_SensDecRz) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_PrmType) {
+TEST_F(FlashParam_Test, gbParam_PrmType)
+{
     Param prop = {
         "Тип приемника",        // название параметра
         GB_COM_DEF_GET_PRM_TYPE,// команда стандартного протокола
@@ -1248,7 +1299,8 @@ TEST_F(TFlash_Test, gbParam_PrmType) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_AcInDec) {
+TEST_F(FlashParam_Test, gbParam_AcInDec)
+{
     Param prop = {
         "Снижение уровня АК",   // название параметра
         GB_COM_DEF_GET_PRM_TYPE,// команда стандартного протокола
@@ -1272,7 +1324,8 @@ TEST_F(TFlash_Test, gbParam_AcInDec) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_FreqPrd) {
+TEST_F(FlashParam_Test, gbParam_FreqPrd)
+{
     Param prop = {
         "Частота ПРД",          // название параметра
         GB_COM_DEF_GET_FREQ_PRD,// команда стандартного протокола
@@ -1296,7 +1349,8 @@ TEST_F(TFlash_Test, gbParam_FreqPrd) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_FreqPrm) {
+TEST_F(FlashParam_Test, gbParam_FreqPrm)
+{
     Param prop = {
         "Частота ПРМ",          // название параметра
         GB_COM_DEF_GET_RZ_THRESH,// команда стандартного протокола
@@ -1320,7 +1374,8 @@ TEST_F(TFlash_Test, gbParam_FreqPrm) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_ShiftFront) {
+TEST_F(FlashParam_Test, gbParam_ShiftFront)
+{
     Param prop = {
         "Сдвиг пер.фронта ПРД", // название параметра
         GB_COM_DEF_GET_OVERLAP, // команда стандартного протокола
@@ -1344,7 +1399,8 @@ TEST_F(TFlash_Test, gbParam_ShiftFront) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_ShiftBack) {
+TEST_F(FlashParam_Test, gbParam_ShiftBack)
+{
     Param prop = {
         "Сдвиг зад.фронта ПРД", // название параметра
         GB_COM_DEF_GET_OVERLAP, // команда стандартного протокола
@@ -1368,7 +1424,8 @@ TEST_F(TFlash_Test, gbParam_ShiftBack) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_ShiftPrm) {
+TEST_F(FlashParam_Test, gbParam_ShiftPrm)
+{
     Param prop = {
         "Сдвиг ПРМ",            // название параметра
         GB_COM_DEF_GET_OVERLAP, // команда стандартного протокола
@@ -1392,7 +1449,8 @@ TEST_F(TFlash_Test, gbParam_ShiftPrm) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_ShiftPrd) {
+TEST_F(FlashParam_Test, gbParam_ShiftPrd)
+{
     Param prop = {
         "Сдвиг ВЧ ПРД от ПУСК", // название параметра
         GB_COM_DEF_GET_OVERLAP, // команда стандартного протокола
@@ -1416,7 +1474,8 @@ TEST_F(TFlash_Test, gbParam_ShiftPrd) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_LimitPrd) {
+TEST_F(FlashParam_Test, gbParam_LimitPrd)
+{
     Param prop = {
         "Огранич. полосы ПРД",  // название параметра
         GB_COM_DEF_GET_LIMIT_PRD,// команда стандартного протокола
@@ -1440,7 +1499,8 @@ TEST_F(TFlash_Test, gbParam_LimitPrd) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_DelayOffPrm) {
+TEST_F(FlashParam_Test, gbParam_DelayOffPrm)
+{
     Param prop = {
         "Задержка выкл. ПРМ",   // название параметра
         GB_COM_DEF_GET_LIMIT_PRD,// команда стандартного протокола
@@ -1464,7 +1524,8 @@ TEST_F(TFlash_Test, gbParam_DelayOffPrm) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_DelayOnPrm) {
+TEST_F(FlashParam_Test, gbParam_DelayOnPrm)
+{
     Param prop = {
         "Задержка вкл. ПРМ",    // название параметра
         GB_COM_DEF_GET_LIMIT_PRD,// команда стандартного протокола
@@ -1488,7 +1549,8 @@ TEST_F(TFlash_Test, gbParam_DelayOnPrm) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_DelayOnPrd) {
+TEST_F(FlashParam_Test, gbParam_DelayOnPrd)
+{
     Param prop = {
         "Задержка вкл. ПРД",    // название параметра
         GB_COM_DEF_GET_LIMIT_PRD,// команда стандартного протокола
@@ -1512,7 +1574,8 @@ TEST_F(TFlash_Test, gbParam_DelayOnPrd) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_MinTimePrd) {
+TEST_F(FlashParam_Test, gbParam_MinTimePrd)
+{
     Param prop = {
         "Мин. длит. ПРД",       // название параметра
         GB_COM_DEF_GET_LIMIT_PRD,// команда стандартного протокола
@@ -1536,7 +1599,8 @@ TEST_F(TFlash_Test, gbParam_MinTimePrd) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_PrdInDelay) {
+TEST_F(FlashParam_Test, gbParam_PrdInDelay)
+{
     Param prop = {
         "Задержка срабат. ПРД", // название параметра
         GB_COM_PRD_GET_TIME_ON, // команда стандартного протокола
@@ -1560,7 +1624,8 @@ TEST_F(TFlash_Test, gbParam_PrdInDelay) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_PrdDurationL) {
+TEST_F(FlashParam_Test, gbParam_PrdDurationL)
+{
     Param prop = {
         "Длительность команды", // название параметра
         GB_COM_PRD_GET_DURATION,// команда стандартного протокола
@@ -1584,7 +1649,8 @@ TEST_F(TFlash_Test, gbParam_PrdDurationL) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_PrdDurationO) {
+TEST_F(FlashParam_Test, gbParam_PrdDurationO)
+{
     Param prop = {
         "Длительность команды", // название параметра
         GB_COM_PRD_GET_DURATION,// команда стандартного протокола
@@ -1608,7 +1674,8 @@ TEST_F(TFlash_Test, gbParam_PrdDurationO) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_PrdTestCom) {
+TEST_F(FlashParam_Test, gbParam_PrdTestCom)
+{
     Param prop = {
         "Тестовая команда",     // название параметра
         GB_COM_PRD_GET_TEST_COM,// команда стандартного протокола
@@ -1632,7 +1699,8 @@ TEST_F(TFlash_Test, gbParam_PrdTestCom) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_PrdComLong) {
+TEST_F(FlashParam_Test, gbParam_PrdComLong)
+{
     Param prop = {
         "Следящие команды",     // название параметра
         GB_COM_PRD_GET_LONG_COM,// команда стандартного протокола
@@ -1656,7 +1724,8 @@ TEST_F(TFlash_Test, gbParam_PrdComLong) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_PrdComBlock) {
+TEST_F(FlashParam_Test, gbParam_PrdComBlock)
+{
     Param prop = {
         "Блокиров. команды",    // название параметра
         GB_COM_PRD_GET_BLOCK_COM,// команда стандартного протокола
@@ -1680,7 +1749,8 @@ TEST_F(TFlash_Test, gbParam_PrdComBlock) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_PrdDrEnable) {
+TEST_F(FlashParam_Test, gbParam_PrdDrEnable)
+{
     Param prop = {
         "Трансляция ЦП",        // название параметра
         GB_COM_PRD_GET_DR_STATE,// команда стандартного протокола
@@ -1704,7 +1774,8 @@ TEST_F(TFlash_Test, gbParam_PrdDrEnable) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_PrdDrComBlock) {
+TEST_F(FlashParam_Test, gbParam_PrdDrComBlock)
+{
     Param prop = {
         "Блокиров. команды ЦП", // название параметра
         GB_COM_PRD_GET_DR_BLOCK,// команда стандартного протокола
@@ -1728,7 +1799,8 @@ TEST_F(TFlash_Test, gbParam_PrdDrComBlock) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_PrdComNums) {
+TEST_F(FlashParam_Test, gbParam_PrdComNums)
+{
     Param prop = {
         "Количество команд",    // название параметра
         GB_COM_PRD_GET_COM,     // команда стандартного протокола
@@ -1752,7 +1824,8 @@ TEST_F(TFlash_Test, gbParam_PrdComNums) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_PrdComNumsA) {
+TEST_F(FlashParam_Test, gbParam_PrdComNumsA)
+{
     Param prop = {
         "Количество команд А",  // название параметра
         GB_COM_PRD_GET_COM_A,   // команда стандартного протокола
@@ -1776,7 +1849,8 @@ TEST_F(TFlash_Test, gbParam_PrdComNumsA) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_PrdFreqCorr) {
+TEST_F(FlashParam_Test, gbParam_PrdFreqCorr)
+{
     Param prop = {
         "Коррекция частоты",    // название параметра
         GB_COM_PRD_GET_FREQ_CORR,// команда стандартного протокола
@@ -1800,7 +1874,8 @@ TEST_F(TFlash_Test, gbParam_PrdFreqCorr) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_PrdDecCf) {
+TEST_F(FlashParam_Test, gbParam_PrdDecCf)
+{
     Param prop = {
         "Снижение уровня КС",   // название параметра
         GB_COM_PRD_GET_CF_TM,   // команда стандартного протокола
@@ -1824,7 +1899,8 @@ TEST_F(TFlash_Test, gbParam_PrdDecCf) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_PrdDecTm) {
+TEST_F(FlashParam_Test, gbParam_PrdDecTm)
+{
     Param prop = {
         "Снижение уровня ТМ",   // название параметра
         GB_COM_PRD_GET_CF_TM,   // команда стандартного протокола
@@ -1848,7 +1924,8 @@ TEST_F(TFlash_Test, gbParam_PrdDecTm) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_PrdDefaultCf) {
+TEST_F(FlashParam_Test, gbParam_PrdDefaultCf)
+{
     Param prop = {
         "КС по умолчанию",      // название параметра
         GB_COM_PRD_GET_CF_TM,   // команда стандартного протокола
@@ -1872,7 +1949,8 @@ TEST_F(TFlash_Test, gbParam_PrdDefaultCf) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_PrdComSignal) {
+TEST_F(FlashParam_Test, gbParam_PrdComSignal)
+{
     Param prop = {
         "Сигнализация команд",  // название параметра
         GB_COM_PRD_GET_COM_SIGN,// команда стандартного протокола
@@ -1896,7 +1974,8 @@ TEST_F(TFlash_Test, gbParam_PrdComSignal) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_PrmTimeOn) {
+TEST_F(FlashParam_Test, gbParam_PrmTimeOn)
+{
     Param prop = {
         "Задержка на фикс.ком", // название параметра
         GB_COM_PRM_GET_TIME_ON, // команда стандартного протокола
@@ -1920,7 +1999,8 @@ TEST_F(TFlash_Test, gbParam_PrmTimeOn) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_PrmComBlock) {
+TEST_F(FlashParam_Test, gbParam_PrmComBlock)
+{
     Param prop = {
         "Блокиров. команды",    // название параметра
         GB_COM_PRM_GET_BLOCK_COM,// команда стандартного протокола
@@ -1944,7 +2024,8 @@ TEST_F(TFlash_Test, gbParam_PrmComBlock) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_PrmTimeOff) {
+TEST_F(FlashParam_Test, gbParam_PrmTimeOff)
+{
     Param prop = {
         "Задержка на выкл.ком", // название параметра
         GB_COM_PRM_GET_TIME_OFF,// команда стандартного протокола
@@ -1968,7 +2049,8 @@ TEST_F(TFlash_Test, gbParam_PrmTimeOff) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_PrmDrEnable) {
+TEST_F(FlashParam_Test, gbParam_PrmDrEnable)
+{
     Param prop = {
         "Трансляция ЦП",        // название параметра
         GB_COM_PRM_GET_DR_STATE,// команда стандартного протокола
@@ -1992,7 +2074,8 @@ TEST_F(TFlash_Test, gbParam_PrmDrEnable) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_PrmDrComBlock) {
+TEST_F(FlashParam_Test, gbParam_PrmDrComBlock)
+{
     Param prop = {
         "Блокиров. команды ЦП", // название параметра
         GB_COM_PRM_GET_DR_BLOCK,// команда стандартного протокола
@@ -2016,7 +2099,8 @@ TEST_F(TFlash_Test, gbParam_PrmDrComBlock) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_PrmDrComToHf) {
+TEST_F(FlashParam_Test, gbParam_PrmDrComToHf)
+{
     Param prop = {
         "Команда ПРМ в ЦП",     // название параметра
         GB_COM_PRM_GET_DR_COM,  // команда стандартного протокола
@@ -2040,7 +2124,8 @@ TEST_F(TFlash_Test, gbParam_PrmDrComToHf) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_PrmComNums) {
+TEST_F(FlashParam_Test, gbParam_PrmComNums)
+{
     Param prop = {
         "Количество команд",    // название параметра
         GB_COM_PRM_GET_COM,     // команда стандартного протокола
@@ -2064,7 +2149,8 @@ TEST_F(TFlash_Test, gbParam_PrmComNums) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_PrmTestCom) {
+TEST_F(FlashParam_Test, gbParam_PrmTestCom)
+{
     Param prop = {
         "Прием тестовой ком.",  // название параметра
         GB_COM_PRM_GET_TEST_COM,// команда стандартного протокола
@@ -2088,7 +2174,8 @@ TEST_F(TFlash_Test, gbParam_PrmTestCom) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_PrmFreqCorr) {
+TEST_F(FlashParam_Test, gbParam_PrmFreqCorr)
+{
     Param prop = {
         "Коррекция частоты",    // название параметра
         GB_COM_PRM_GET_FREQ_CORR,// команда стандартного протокола
@@ -2112,7 +2199,8 @@ TEST_F(TFlash_Test, gbParam_PrmFreqCorr) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_PrmComSignal) {
+TEST_F(FlashParam_Test, gbParam_PrmComSignal)
+{
     Param prop = {
         "Сигнализация команд",  // название параметра
         GB_COM_PRM_GET_COM_SIGN,// команда стандартного протокола
@@ -2136,7 +2224,8 @@ TEST_F(TFlash_Test, gbParam_PrmComSignal) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_PrmIncSafety) {
+TEST_F(FlashParam_Test, gbParam_PrmIncSafety)
+{
     Param prop = {
         "Повышение безопас-ти", // название параметра
         GB_COM_PRM_GET_INC_SAFETY,// команда стандартного протокола
@@ -2160,7 +2249,8 @@ TEST_F(TFlash_Test, gbParam_PrmIncSafety) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_IntfProtocol) {
+TEST_F(FlashParam_Test, gbParam_IntfProtocol)
+{
     Param prop = {
         "Протокол",             // название параметра
         GB_COM_NO,              // команда стандартного протокола
@@ -2184,7 +2274,8 @@ TEST_F(TFlash_Test, gbParam_IntfProtocol) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_IntfBaudrate) {
+TEST_F(FlashParam_Test, gbParam_IntfBaudrate)
+{
     Param prop = {
         "Скорость передачи",    // название параметра
         GB_COM_NO,              // команда стандартного протокола
@@ -2208,7 +2299,8 @@ TEST_F(TFlash_Test, gbParam_IntfBaudrate) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_IntfDataBits) {
+TEST_F(FlashParam_Test, gbParam_IntfDataBits)
+{
     Param prop = {
         "Биты данных",          // название параметра
         GB_COM_NO,              // команда стандартного протокола
@@ -2232,7 +2324,8 @@ TEST_F(TFlash_Test, gbParam_IntfDataBits) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_IntfParity) {
+TEST_F(FlashParam_Test, gbParam_IntfParity)
+{
     Param prop = {
         "Четность",             // название параметра
         GB_COM_NO,              // команда стандартного протокола
@@ -2256,7 +2349,8 @@ TEST_F(TFlash_Test, gbParam_IntfParity) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_IntfStopBits) {
+TEST_F(FlashParam_Test, gbParam_IntfStopBits)
+{
     Param prop = {
         "Стоповые биты",        // название параметра
         GB_COM_NO,              // команда стандартного протокола
@@ -2280,7 +2374,8 @@ TEST_F(TFlash_Test, gbParam_IntfStopBits) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_IntfInterface) {
+TEST_F(FlashParam_Test, gbParam_IntfInterface)
+{
     Param prop = {
         "Интерфейс связи",      // название параметра
         GB_COM_NO,              // команда стандартного протокола
@@ -2304,7 +2399,8 @@ TEST_F(TFlash_Test, gbParam_IntfInterface) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_RingTimeWait) {
+TEST_F(FlashParam_Test, gbParam_RingTimeWait)
+{
     Param prop = {
         "Время ожидания ком.",  // название параметра
         GB_COM_GET_COM_PRD_KEEP,// команда стандартного протокола TODO
@@ -2328,7 +2424,8 @@ TEST_F(TFlash_Test, gbParam_RingTimeWait) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_RingComTransit) {
+TEST_F(FlashParam_Test, gbParam_RingComTransit)
+{
     Param prop = {
         "Транзитные команды",   // название параметра
         GB_COM_GET_COM_PRD_KEEP,// команда стандартного протокола TODO
@@ -2353,7 +2450,8 @@ TEST_F(TFlash_Test, gbParam_RingComTransit) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_RingComRec) {
+TEST_F(FlashParam_Test, gbParam_RingComRec)
+{
     Param prop = {
         "Переназначение ПРМ",   // название параметра
         GB_COM_PRM_GET_RING_COM_REC,// команда стандартного протокола
@@ -2378,7 +2476,8 @@ TEST_F(TFlash_Test, gbParam_RingComRec) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_RingComTr) {
+TEST_F(FlashParam_Test, gbParam_RingComTr)
+{
     Param prop = {
         "Переназначение ПРД",   // название параметра
         GB_COM_PRD_GET_RING_COM_TR, // команда стандартного протокола
@@ -2402,7 +2501,8 @@ TEST_F(TFlash_Test, gbParam_RingComTr) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_OtherTestSignal) {
+TEST_F(FlashParam_Test, gbParam_OtherTestSignal)
+{
     Param prop = {
         "Тестовый сигнал",      // название параметра
         GB_COM_NO,              // команда стандартного протокола
@@ -2426,7 +2526,8 @@ TEST_F(TFlash_Test, gbParam_OtherTestSignal) {
 }
 
 //
-TEST_F(TFlash_Test, gbParam_common) {
+TEST_F(FlashParam_Test, gbParam_common)
+{
     ASSERT_EQ(GB_PARAM_MAX, getSizeOfParam());
     ASSERT_EQ(GB_PARAM_MAX, cntTestedParam);
 

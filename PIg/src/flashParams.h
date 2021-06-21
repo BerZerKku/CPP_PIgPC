@@ -18,6 +18,7 @@ extern size_t getSizeOfParam();
 
 /// массив строк размерностей, связан с Param::DIMENSION
 static const char fcDimension[] [5] PROGMEM = {
+    //234
     "",     // Param::DIM_NO
     "мА",   // Param::DIM_MA
     "А",    // Param::DIM_A
@@ -35,14 +36,14 @@ static const char fcDimension[] [5] PROGMEM = {
 
 /// Возможные значения параметра.
 static const char fcOnOff[][STRING_LENGHT] PROGMEM = {
-    //       1234567890
+    //234567890
     "выкл.",        ///< 0
     "вкл."          ///< 1
 };
 
 /// Тип защиты (параметр Защиты).
 static const char fcDefType[][STRING_LENGHT] PROGMEM = {
-    //       1234567890
+    //234567890
     "ДФЗ-ПрПд",     ///< 0
     "ДФЗ-МК1",      ///< 1
     "ДФЗ-МК2",      ///< 2
@@ -55,14 +56,14 @@ static const char fcDefType[][STRING_LENGHT] PROGMEM = {
 
 /// Тип линии (параметр Общий).
 static const char fcNumDevices[][STRING_LENGHT] PROGMEM = {
-    //       1234567890
+    //234567890
     "2 концевая",   ///< 1
     "3 концевая"    ///< 2
 };
 
 /// Тип детектора (параметр Общий).
 static const char fcPrmType[][STRING_LENGHT] PROGMEM = {
-    //       1234567890
+    //234567890
     "акт+пасс",     ///< 0
     "активный",     ///< 1
     "пассивный"     ///< 2
@@ -70,7 +71,7 @@ static const char fcPrmType[][STRING_LENGHT] PROGMEM = {
 
 /// Тип совместимости (параметр Защиты). Связан с eGB_COMPATIBILITY.
 static const char fcCompatibility[][STRING_LENGHT] PROGMEM = {
-    //       1234567890
+    //234567890
     "АВАНТ Р400",   ///< 0
     "ПВЗ-90",       ///< 1
     "АВЗК-80",      ///< 2
@@ -82,7 +83,7 @@ static const char fcCompatibility[][STRING_LENGHT] PROGMEM = {
 
 /// Тип совместимости (параметр К400). Связан с eGB_COMP_K400.
 static const char fcCompK400[][STRING_LENGHT] PROGMEM = {
-    //       1234567890
+    //234567890
     "АВАНТ",        ///< 0
     "АВАНТ ПРД",    ///< 1
     "АВАНТ ПРМ",    ///< 2
@@ -100,7 +101,7 @@ static const char fcCompK400[][STRING_LENGHT] PROGMEM = {
 
 /// Тип совместимости (параметр РЗСК). Связан с eGB_COMP_RZSK.
 static const char fcCompRZSK[][STRING_LENGHT] PROGMEM = {
-    //       1234567890
+    //234567890
     "РЗСК",         ///< 0
     "РЗСКм",        ///< 1
     "РЗСК-3 8к"     ///< 2
@@ -108,7 +109,7 @@ static const char fcCompRZSK[][STRING_LENGHT] PROGMEM = {
 
 /// Частота ПРД / ПРМ (параметр Защиты).
 static const char fcPvzlFreq[][STRING_LENGHT] PROGMEM = {
-    //       1234567890
+    //234567890
     "-1000Гц",      ///< 0
     "-500Гц",       ///< 1
     "0Гц",          ///< 2
@@ -118,14 +119,14 @@ static const char fcPvzlFreq[][STRING_LENGHT] PROGMEM = {
 
 /// Протокол обмена (параметр Общий).
 static const char fcPvzueProtocol[][STRING_LENGHT] PROGMEM = {
-    //       1234567890
+    //234567890
     "быстрый",      ///< 1
     "медленный"     ///< 2
 };
 
 /// Тип атоконтроля (параметр Общий).
 static char fcPvzueTypeAC[][STRING_LENGHT] PROGMEM = {
-    //       1234567890
+    //234567890
     "тревожный",    ///< 1
     "нормальный",   ///< 2
     "спокойный"     ///< 3
@@ -133,21 +134,21 @@ static char fcPvzueTypeAC[][STRING_LENGHT] PROGMEM = {
 
 /// Признак четности (параметр Общий).
 static char fcPvzueParity[][STRING_LENGHT] PROGMEM = {
-    //       1234567890
+    //234567890
     "вкл.",         ///< 1
     "выкл."         ///< 2
 };
 
 /// Интерфейс связи (параметр Интерфейс).
 static char fcInterface[TInterface::MAX][STRING_LENGHT] PROGMEM = {
-    //       1234567890
+    //234567890
     "USB",          ///< TInterface::USB
     "RS485"         ///< TInterface::RS485
 };
 
 // Протокол (параметр Интерфейс).
 static char fcProtocol[TProtocol::MAX ][STRING_LENGHT] PROGMEM = {
-    //       1234567890
+    //234567890
     "СТАНДАРТ",     ///< TProtocol::STANDART
     "MODBUS",       ///< TProtocol::MODBUS
     "МЭК-101"       ///< TProtocol::IEC_101
@@ -155,7 +156,7 @@ static char fcProtocol[TProtocol::MAX ][STRING_LENGHT] PROGMEM = {
 
 // Скорость, бит/с (параметр Интерфейс).
 static char fcBaudRate[TBaudRate::MAX][STRING_LENGHT] PROGMEM = {
-    //       1234567890
+    //234567890
     "600",          ///< TBaudRate::_600
     "1200",         ///< TBaudRate::_1200
     "2400",         ///< TBaudRate::_2400
@@ -166,13 +167,13 @@ static char fcBaudRate[TBaudRate::MAX][STRING_LENGHT] PROGMEM = {
 
 /// Количество бит данных (параметр Интерфейс).
 static char fcDataBits[TDataBits::MAX][STRING_LENGHT] PROGMEM = {
-    //       1234567890
+    //234567890
     "8"             ///< TDataBits::_8
 };
 
 /// Четность (параметр Интерфейс).
 static char fcParity[TParity::MAX][STRING_LENGHT] PROGMEM = {
-    //       1234567890
+    //234567890
     "нет",          ///< TParity::NONE
     "чет",          ///< TParity::EVEN
     "нечет"         ///< TParity::ODD
@@ -180,14 +181,14 @@ static char fcParity[TParity::MAX][STRING_LENGHT] PROGMEM = {
 
 /// Стоповые биты (параметр Интерфейс).
 static char fcStopBits[TStopBits::MAX][STRING_LENGHT] PROGMEM = {
-    //       1234567890
+    //234567890
     "1",            ///< TStopBits::ONE
     "2"             ///< TStopBits::TWO
 };
 
 /// Скорость ТМ
 static char fcTMSpeed[][STRING_LENGHT] PROGMEM = {
-    //       1234567890
+    //234567890
     "200",
     "400"
 };
@@ -214,7 +215,7 @@ static char fcRingRenumber[][STRING_LENGHT] PROGMEM = {
 
 // Синхронизация времени
 static char fcTymeSynchSrc[][STRING_LENGHT] PROGMEM = {
-    //   1234567890
+    //234567890
     "выкл.",
     "канал св.",
     "АСУ ТП"

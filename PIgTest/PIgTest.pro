@@ -28,7 +28,8 @@ SOURCES += \
     googletest/gtest-all.cc \
     main.cpp \
     menu/test_clMenu.cpp \
-    test_Flash.cpp \
+    test_flash.cpp \
+    test_flashParam.cpp \
     wrapper.cpp \
     menu/test_dateTime.cpp \
     menu/test_measure.cpp \
