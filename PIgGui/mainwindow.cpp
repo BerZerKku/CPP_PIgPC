@@ -52,6 +52,15 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->textEdit, &QTextEdit::selectionChanged,
             this, &MainWindow::clearSelection);
 
+    // палитры
+    QLineEdit lineedit;
+    pdefault = lineedit.palette();
+    pred = pdefault;
+    pred.setColor(QPalette::Text, Qt::red);
+    pblue = pdefault;
+    pblue.setColor(QPalette::Text, Qt::blue);
+
+
     initView();
     initKeyboard();
 
@@ -130,8 +139,7 @@ void MainWindow::initView()
     addViewItem(top, "Кол-во команд ПРД", &view.numComPrd);
     addViewItem(top, "Кол-во аппаратов", &view.numDevices);
     addViewItem(top, "Тип линии", &view.typeCommLine);
-    addViewItem(top, "Совместимость", &view.typeComp);
-    addViewItem(top, "Совместимость K400", &view.typeCompK400);
+    addViewItem(top, "Совместимость Р400", &view.typeCompatibility);
     addViewItem(top, "Тип оптики", &view.typeOpto);
 
     connect(&view.typeDevice, &QLineEdit::textChanged,
@@ -140,11 +148,6 @@ void MainWindow::initView()
     ui->treeWidget->expandAll();
     ui->treeWidget->resizeColumnToContents(0);
     ui->treeWidget->resizeColumnToContents(1);
-
-//    pred = view.engCounter.palette();
-//    pred.setColor(QPalette::Text, Qt::red);
-//    pblue = view.engCounter.palette();
-//    pblue.setColor(QPalette::Text, Qt::blue);
 }
 
 void MainWindow::initKeyboard()
@@ -173,6 +176,7 @@ void MainWindow::setupTestButtons()
 //
 void MainWindow::hdlrView()
 {
+    std::string text;
     quint8 value8  = 0;
     quint16 value16 = 0;
 
@@ -203,8 +207,10 @@ void MainWindow::hdlrView()
     view.def.setText(menu.sParam.def.status.isEnable() ? "ok" : "---");
     viewNumComPrm();
     viewNumComPrd();
-    value8 = menu.sParam.glb.getNumDevices();
-    view.numDevices.setText(codec->toUnicode(fcNumDevices[value8 - 1]));
+
+    text = getTextValue(GB_PARAM_NUM_OF_DEVICES, menu.sParam.glb.getNumDevices());
+    view.numDevices.setText(codec->toUnicode(text.c_str()));
+
     view.typeCommLine.setText(getTypeLine(menu.sParam.glb.getTypeLine()));
     viewTypeComp();
     view.typeOpto.setText(getTypeOpto(menu.sParam.glb.getTypeOpto()));
@@ -442,33 +448,47 @@ MainWindow::viewNumComPrm()
 void
 MainWindow::viewTypeComp()
 {
-    if (menu.sParam.typeDevice == AVANT_K400) {
-        eGB_COMP_K400 comp = menu.sParam.glb.getCompK400();
+    eGB_PARAM pn = GB_PARAM_MAX;
+    uint8_t min = 0;
+    uint8_t max = 0;
+    uint8_t value = 0;
 
-        if (comp < GB_COMP_K400_MAX) {
-            view.typeCompK400.setText(codec->toUnicode(fcCompK400[comp]));
-            view.typeCompK400.setPalette(pblue);
-        } else {
-            view.typeCompK400.setText(QString::number(comp));
-            view.typeCompK400.setPalette(pred);
-        }
-    } else {
-        view.typeCompK400.setText("");
+    switch(menu.sParam.typeDevice) {
+        case AVANT_K400: {
+            pn = GB_PARAM_COMP_K400;
+            value = menu.sParam.glb.getCompK400();
+        } break;
+
+        case AVANT_RZSK: {
+            pn = GB_PARAM_COMP_RZSK;
+            value = menu.sParam.glb.getCompRZSK();
+        } break;
+
+        case AVANT_R400: // DOWN
+        case AVANT_R400M: {
+            pn = GB_PARAM_COMP_RZSK;
+            value = menu.sParam.glb.getCompR400m();
+        } break;
+
+        case AVANT_OPTO: break;
+        case AVANT_NO: break;
+        case AVANT_MAX: break;
     }
 
-    if (menu.sParam.typeDevice == AVANT_R400M) {
-        eGB_COMP_R400M comp = menu.sParam.glb.getCompR400m();
-
-        if (comp < GB_COMP_R400M_MAX) {
-            view.typeComp.setText(codec->toUnicode(fcCompatibility[comp]));
-            view.typeComp.setPalette(pblue);
+    std::string text = "---";
+    if (pn < GB_PARAM_MAX) {
+        if (value < getAbsMax(pn)) {
+            text = getTextValue(pn, value);
+            view.typeCompatibility.setPalette(pblue);
         } else {
-            view.typeComp.setText(QString::number(comp));
-            view.typeComp.setPalette(pred);
+            text = std::to_string(value);
+            view.typeCompatibility.setPalette(pred);
         }
     } else {
-        view.typeComp.setText("");
+        view.typeCompatibility.setPalette(pdefault);
     }
+    view.typeCompatibility.setText(codec->toUnicode(text.c_str()));
+
 }
 
 //

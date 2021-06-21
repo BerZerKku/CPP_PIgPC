@@ -2402,12 +2402,37 @@ TEST_F(TFlash_Test, gbParam_RingComTr) {
 }
 
 //
+TEST_F(TFlash_Test, gbParam_OtherTestSignal) {
+    Param prop = {
+        "Тестовый сигнал",      // название параметра
+        GB_COM_NO,              // команда стандартного протокола
+        Param::PARAM_LIST,      // тип параметра
+        Param::RANGE_LIST,      // диапазон измнения
+        Param::DIM_NO,          // размерность
+        fcTest1K400[0],         // массив значений
+        1,                      // кол-во повторений параметра
+        0,                      // минимальное значение
+        SIZE_OF(fcTest1K400),   // максимальное значение
+        1,                      // дискретность
+        1,                      // множитель для стандартного протокола
+        GB_SEND_NO,             // тип параметра для сохранения новго значения
+        1,                      // байт дополнительной информации для сохранения
+        Param::DEPEND_MAX_NO,   // заивимость максимума
+        Param::DEPEND_SAME_NO,  // зависимость повторений
+        Param::CHANGE_REG_DISABLE // условие для изменения параметра
+    };
+
+    ASSERT_TRUE(checkParam(GB_PARAM_OTHER_TEST_SIGNAL, prop));
+}
+
+//
 TEST_F(TFlash_Test, gbParam_common) {
     ASSERT_EQ(GB_PARAM_MAX, getSizeOfParam());
     ASSERT_EQ(GB_PARAM_MAX, cntTestedParam);
 
+    // NOTE Почему тест всегда выполняется последним ?!
+
     ASSERT_EQ(32, MAX_NUM_COM_PRM);
     ASSERT_EQ(32, MAX_NUM_COM_PRD);
     ASSERT_EQ(96, MAX_NUM_COM_RING);
-
 }

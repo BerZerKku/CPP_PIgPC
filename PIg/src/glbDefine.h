@@ -480,6 +480,8 @@ typedef enum {
     GB_PARAM_RING_COM_TRANSIT,  ///< транзитные команды
     GB_PARAM_RING_COM_REC,      ///< переназначение команд приемника
     GB_PARAM_RING_COM_TR,       ///< переназначение команд дискретных входов
+    // другое
+    GB_PARAM_OTHER_TEST_SIGNAL, ///< “естовый сигнал.
     //
     GB_PARAM_MAX
 } eGB_PARAM;

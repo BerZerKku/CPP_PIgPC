@@ -8,6 +8,8 @@
 #ifndef PARAMPRD_H_
 #define PARAMPRD_H_
 
+#include <stdint.h>
+
 /// класс для параметров и настроек передатчика
 class TDevicePrd {
 public:

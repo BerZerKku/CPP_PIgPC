@@ -133,11 +133,11 @@ PGM_P getTextValue(eGB_PARAM pn, uint8_t value) {
     PGM_P str = fcNullBuf;
     const uint8_t min = getAbsMin(pn);
 
-    if (value >= min) {
-    	value -= min;
-    	if (value < getAbsMax(pn)) {
-    		str = getListOfValues(pn) + (value * STRING_LENGHT);
-    	}
+    if ((getListOfValues(pn) != fcNullBuf) && (value >= min)) {
+        value -= min;
+        if (value < getAbsMax(pn)) {
+            str = getListOfValues(pn) + (value * STRING_LENGHT);
+        }
     }
 
     return str;

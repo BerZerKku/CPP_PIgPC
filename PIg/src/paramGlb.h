@@ -8,6 +8,9 @@
 #ifndef PARAMGLB_H_
 #define PARAMGLB_H_
 
+#include "glbDefine.h"
+
+
 /// ОБЩИЕ
 /// номер аппарата
 #define GLB_DEV_NUM_MIN		1

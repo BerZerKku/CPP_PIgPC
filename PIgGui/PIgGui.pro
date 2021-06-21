@@ -17,7 +17,7 @@ CONFIG(release, debug|release) {
     message(===Release===)
 
     DEFINES += \
-	    NDEBUG
+        NDEBUG
 }
 
 # The following define makes your compiler emit warnings if you use
@@ -56,7 +56,7 @@ SOURCES += \
     widget/combobox.cpp \
     widget/qledindicator.cpp \
     widget/qpush1.cpp \
-    wrapper.cpp
+    wrapperGui.cpp
 
 FORMS += \
     mainwindow.ui \

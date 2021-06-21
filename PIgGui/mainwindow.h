@@ -69,8 +69,9 @@ class MainWindow : public QMainWindow
         QLineEdit numComPrd;
         QLineEdit numDevices;
         QLineEdit typeCommLine;
-        QLineEdit typeComp;
+        QLineEdit typeCompatibility;
         QLineEdit typeCompK400;
+        QLineEdit typeCompRZSK;
         QLineEdit typeOpto;
     } view;
 
@@ -89,6 +90,7 @@ private:
 
     QPalette pred;
     QPalette pblue;
+    QPalette pdefault;
     QElapsedTimer etimer;
 
     /// Инициализация параметров.
