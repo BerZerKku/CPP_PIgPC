@@ -292,7 +292,7 @@ static const Param fFreq PROGMEM = {
     "Частота",              // название параметра
     GB_COM_GET_FREQ,        // команда стандартного протокола
     Param::PARAM_INT,       // тип параметра
-    Param::RANGE_INT_NO_DIM,// диапазон измнения
+    Param::RANGE_INT,       // диапазон измнения
     Param::DIM_KHZ,         // размерность
     fcNullBuf,              // массив значений
     1,                      // кол-во повторений параметра

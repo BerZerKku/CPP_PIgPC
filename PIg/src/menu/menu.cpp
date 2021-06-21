@@ -1240,7 +1240,6 @@ void clMenu::lvlFirst() {
  */
 void clMenu::lvlInfo() {
     static char title[] PROGMEM = "Меню\\Информация";
-    static char versProg[] PROGMEM = "%S: %02X.%02X";
 
     if (lvlCreate_) {
         lvlCreate_ = false;
@@ -1288,8 +1287,12 @@ void clMenu::lvlInfo() {
     uint8_t cntPunkts = cursorLine_;
     for (uint_fast8_t line = lineParam_; line < NUM_TEXT_LINES; line++) {
         uint8_t ic = Punkts_.getNumber(cntPunkts);
+
+        uint8_t pos = 20*line;
+        uint8_t len = snprintf_P(&vLCDbuf[pos], 21, fcIC[ic]);
+
         uint16_t vers = sParam.glb.getVersProgIC((eGB_IC) ic);
-        snprintf_P(&vLCDbuf[20 * line], 21, versProg, fcIC[ic],
+        snprintf_P(&vLCDbuf[pos + len], 21 - len, PSTR(": %02X.%02X"),
                 (uint8_t) (vers >> 8), (uint8_t) vers);
 
         if (++cntPunkts >= Punkts_.getMaxNumPunkts()) {
@@ -4559,17 +4562,10 @@ void clMenu::printSameNumber(uint8_t pos) {
 
         if (p == GB_PARAM_RING_COM_TRANSIT) {
             // для транзитных команд вместо номера выводится значение типа 16A/32C
-            // доступ к массиву значений осуществляется через параметр GB_PARAM_RING_COM_REC
-            Param* param = (Param*) pgm_read_word(&fParams[GB_PARAM_RING_COM_REC]);
-            PGM_P pval = getTextValue(GB_PARAM_RING_COM_REC, val);
-            PGM_P pmax = getTextValue(GB_PARAM_RING_COM_REC, max);
-            //          PGM_P pval =  (PGM_P) pgm_read_word(&param->listValues) + (val * STRING_LENGHT);
-            //          PGM_P pmax =  (PGM_P) pgm_read_word(&param->listValues) + (max * STRING_LENGHT);
-//            len = snprintf_P(&vLCDbuf[pos], MAX_CHARS, PSTR("Номер: %S/%S"), pval, pmax);
             len = snprintf_P(&vLCDbuf[pos], STRING_LENGHT, PSTR("Номер: "));
-            len += snprintf_P(&vLCDbuf[pos + len], 4, pval);
+            len += snprintf_P(&vLCDbuf[pos + len], 4, getTextValue(GB_PARAM_RING_COM_REC, val));
             vLCDbuf[pos + len++] = '/';
-            len = snprintf_P(&vLCDbuf[pos + len], 4, pmax);
+            snprintf_P(&vLCDbuf[pos + len], 4, getTextValue(GB_PARAM_RING_COM_REC, max));
         } else {
             snprintf_P(&vLCDbuf[pos], MAX_CHARS, PSTR("Номер: %u/%u"), val, max);
         }
@@ -4584,41 +4580,38 @@ void clMenu::printRange(uint8_t pos) {
     eGB_PARAM param = lp->getParam();
     int16_t min = lp->getMin();
     int16_t max = lp->getMax();
-    PGM_P str = fcNullBuf;
 
+    uint8_t len = 0;
+    bool dimension = false;
     pos += snprintf_P(&vLCDbuf[pos], MAX_CHARS, PSTR("Диапазон: "));
 
     switch(getRangeType(param)) {
         case Param::RANGE_LIST:
-            str = PSTR("список");
+            snprintf_P(&vLCDbuf[pos], MAX_CHARS, PSTR("список"));
             break;
 
         case Param::RANGE_ON_OFF:
-            str = PSTR("вкл./выкл.");
+            snprintf_P(&vLCDbuf[pos], MAX_CHARS, PSTR("вкл./выкл."));
             break;
 
-        case Param::RANGE_INT:
-            str = PSTR("%d..%d%S");
-            break;
-
+        case Param::RANGE_INT: // DOWN
+            dimension = true;
         case Param::RANGE_INT_NO_DIM:
-            str = PSTR("%d..%d");
+            len = snprintf_P(&vLCDbuf[pos], MAX_CHARS, PSTR("%d..%d"), min, max);
             break;
 
-        case Param::RANGE_U_COR:
-            min = 0;
+        case Param::RANGE_U_COR: // DOWN
             max /= 10;
-            str = PSTR("%d..±%d%S");
-            break;
-
         case Param::RANGE_INT_PM:
             min = 0;
-            str= PSTR("%d..±%d%S");
+            dimension = true;
+            len = snprintf_P(&vLCDbuf[pos], MAX_CHARS, PSTR("%d..±%d"), min, max);
             break;
     }
 
-    PGM_P dim = fcDimension[getDim(param)];
-    snprintf_P(&vLCDbuf[pos], MAX_CHARS, str, min, max, dim);
+    if (dimension) {
+        snprintf_P(&vLCDbuf[pos+len], MAX_CHARS-len, fcDimension[getDim(param)]);
+    }
 }
 
 // Вывод на экран текущего значения параметра.
