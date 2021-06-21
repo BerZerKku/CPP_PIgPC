@@ -1038,7 +1038,6 @@ void clMenu::lvlError() {
  *  @return Нет
  */
 void clMenu::lvlStart() {
-    static const char fcCompType[] PROGMEM = "Совместим. %S";
 
     if (lvlCreate_) {
         lvlCreate_ = false;
@@ -1106,8 +1105,8 @@ void clMenu::lvlStart() {
 
             // если работает в совместимости, выведем это на экран
             if (comp != GB_COMP_R400M_AVANT) {
-                snprintf_P(&vLCDbuf[poz], 21, fcCompType,
-                           fcCompatibility[static_cast<uint8_t>(comp)]);
+                uint8_t len = snprintf_P(&vLCDbuf[poz], 21, PSTR("Совместим. "));
+                snprintf_P(&vLCDbuf[poz+len], 21-len, fcCompatibility[comp]);
             }
 
             printAc(poz + 20);
@@ -4553,6 +4552,7 @@ void clMenu::printSameNumber(uint8_t pos) {
     static prog_uint8_t MAX_CHARS = 21;
 
     if (sParam.local.getNumOfSameParams() > 1) {
+        uint8_t len = 0;
         eGB_PARAM p = sParam.local.getParam();
         uint8_t val = sParam.local.getNumOfCurrSameParam();
         uint8_t max = sParam.local.getNumOfSameParams();
@@ -4565,7 +4565,11 @@ void clMenu::printSameNumber(uint8_t pos) {
             PGM_P pmax = getTextValue(GB_PARAM_RING_COM_REC, max);
             //          PGM_P pval =  (PGM_P) pgm_read_word(&param->listValues) + (val * STRING_LENGHT);
             //          PGM_P pmax =  (PGM_P) pgm_read_word(&param->listValues) + (max * STRING_LENGHT);
-            snprintf_P(&vLCDbuf[pos], MAX_CHARS, PSTR("Номер: %S/%S"), pval, pmax);
+//            len = snprintf_P(&vLCDbuf[pos], MAX_CHARS, PSTR("Номер: %S/%S"), pval, pmax);
+            len = snprintf_P(&vLCDbuf[pos], STRING_LENGHT, PSTR("Номер: "));
+            len += snprintf_P(&vLCDbuf[pos + len], 4, pval);
+            vLCDbuf[pos + len++] = '/';
+            len = snprintf_P(&vLCDbuf[pos + len], 4, pmax);
         } else {
             snprintf_P(&vLCDbuf[pos], MAX_CHARS, PSTR("Номер: %u/%u"), val, max);
         }

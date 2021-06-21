@@ -51,6 +51,9 @@ Bsp::Bsp(QWidget *parent) : QTreeWidget(parent) {
 void Bsp::initParam() {
     eGB_PARAM param = GB_PARAM_NULL_PARAM;
 
+    void (QComboBox::*signal)(int) = &QComboBox::currentIndexChanged;
+    connect(device.typeDevice, signal, this, &Bsp::updateCompatibility);
+
     setComboBoxValue(stateGlb.regime, eGB_REGIME::GB_REGIME_ENABLED);
     setSpinBoxValue(stateGlb.state, 1);
     setSpinBoxValue(stateGlb.dopByte, 1);
@@ -151,6 +154,20 @@ void Bsp::crtTreeDevice() {
     QTreeWidgetItem *item = nullptr;
 
     item = new QTreeWidgetItem();
+    device.typeDevice = new QComboBox();
+    item->setText(0, codec->toUnicode("Тип аппарата"));
+    top->addChild(item);
+    fillComboboxListTypeDevice(device.typeDevice);
+    setItemWidget(item, 1, device.typeDevice);
+
+    item = new QTreeWidgetItem();
+    device.typeLine = new QComboBox();
+    item->setText(0, codec->toUnicode("Тип линии"));
+    top->addChild(item);
+    fillComboboxListTypeLine(device.typeLine);
+    setItemWidget(item, 1, device.typeLine);
+
+    item = new QTreeWidgetItem();
     device.isDef = new QComboBox();
     item->setText(0, codec->toUnicode("Защита"));
     top->addChild(item);
@@ -161,23 +178,9 @@ void Bsp::crtTreeDevice() {
     crtSpinBox(GB_PARAM_PRD_COM_NUMS);
     crtComboBox(GB_PARAM_NUM_OF_DEVICES);
 
-    item = new QTreeWidgetItem();
-    device.typeLine = new QComboBox();
-    item->setText(0, codec->toUnicode("Тип линии"));
-    top->addChild(item);
-    fillComboboxListTypeLine(device.typeLine);
-    setItemWidget(item, 1, device.typeLine);
-
-    // FIXME Может быть еще Р400
     crtComboBox(GB_PARAM_COMP_K400);
     crtComboBox(GB_PARAM_COMP_P400);
-
-    item = new QTreeWidgetItem();
-    device.typeDevice = new QComboBox();
-    item->setText(0, codec->toUnicode("Тип аппарата"));
-    top->addChild(item);
-    fillComboboxListTypeDevice(device.typeDevice);
-    setItemWidget(item, 1, device.typeDevice);
+    crtComboBox(GB_PARAM_COMP_RZSK);
 
     item = new QTreeWidgetItem();
     device.typeOpto = new QComboBox();
@@ -186,7 +189,7 @@ void Bsp::crtTreeDevice() {
     fillComboboxListTypeOpto(device.typeOpto);
     setItemWidget(item, 1, device.typeOpto);
 
-    //    top->setExpanded(true);
+    top->setExpanded(true);
 }
 
 void Bsp::crtTreeGlb() {
@@ -245,7 +248,7 @@ void Bsp::crtTreePrm() {
     crtComboBox(GB_PARAM_PRM_DR_COM_TO_HF);
     crtComboBox(GB_PARAM_PRM_COM_SIGNAL);
 
-    top->setExpanded(true);
+    top->setExpanded(false);
 }
 
 //
@@ -397,7 +400,7 @@ Bsp::crtTest() {
     item->setText(0, codec->toUnicode("Байт 5"));
     setItemWidget(item, 1, lineedit);
 
-    top->setExpanded(true);
+    top->setExpanded(false);
 }
 
 //
@@ -1471,14 +1474,25 @@ void Bsp::hdlrComGetVers(eGB_COM com, pkg_t &data) {
     pkgTx.append(vers >> 8);
     pkgTx.append(vers);
 
-    // Совместимость
-    if (typedevice == AVANT_K400) {
-        pkgTx.append(getComboBoxValue(GB_PARAM_COMP_K400));
-    } else if (typedevice == AVANT_R400) {
-        pkgTx.append(getComboBoxValue(GB_PARAM_COMP_P400));
-    } else {
-        pkgTx.append(0);
+    uint8_t compatibility = 0;
+    switch(typedevice) {
+        case AVANT_R400: // DOWN
+        case AVANT_R400M: {
+            compatibility = getComboBoxValue(GB_PARAM_COMP_P400);
+        } break;
+        case AVANT_RZSK: {
+            getComboBoxValue(GB_PARAM_COMP_RZSK);
+        } break;
+        case AVANT_K400: {
+            getComboBoxValue(GB_PARAM_COMP_K400);
+        } break;
+        case AVANT_OPTO: // DOWN
+        case AVANT_NO:
+        case AVANT_MAX: {
+            compatibility = 0;
+        } break;
     }
+    pkgTx.append(compatibility);
 
     vers = 0x33;    // GB_IC_BSK_PLIS_PRD1
     pkgTx.append(vers);
@@ -1586,4 +1600,17 @@ void Bsp::setDopByte(int index) {
 //
 void Bsp::updateClock() {
     *dt = dt->addSecs(1);
+}
+
+void Bsp::updateCompatibility(int index)
+{
+    Q_UNUSED(index)
+
+    int value = device.typeDevice->currentData().toInt();
+    eGB_TYPE_DEVICE device = static_cast<eGB_TYPE_DEVICE> (value);
+
+    bool r400 = (device == AVANT_R400) || (device == AVANT_R400M);
+    mapCombobox.value(GB_PARAM_COMP_P400).at(0)->setEnabled(r400);
+    mapCombobox.value(GB_PARAM_COMP_RZSK).at(0)->setEnabled(device == AVANT_RZSK);
+    mapCombobox.value(GB_PARAM_COMP_K400).at(0)->setEnabled(device == AVANT_K400);
 }

@@ -466,7 +466,7 @@ MainWindow::viewTypeComp()
 
         case AVANT_R400: // DOWN
         case AVANT_R400M: {
-            pn = GB_PARAM_COMP_RZSK;
+            pn = GB_PARAM_COMP_P400;
             value = menu.sParam.glb.getCompR400m();
         } break;
 

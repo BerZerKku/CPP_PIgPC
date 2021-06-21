@@ -160,6 +160,7 @@ private slots:
     static void setState(int index);
     static void setDopByte(int index);
     static void updateClock();
+    static void updateCompatibility(int index);
 };
 
 #endif // BSP_H
