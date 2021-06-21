@@ -10,25 +10,6 @@
 
 #include "glbDefine.h"
 
-
-/// ОБЩИЕ
-/// номер аппарата
-#define GLB_DEV_NUM_MIN		1
-#define GLB_DEV_NUM_MAX 	3
-#define GLB_DEV_NUM_DISC 	1
-#define GLB_DEV_NUM_FRACT	1
-#define GLB_DEV_NUM_MIN_F	(GLB_DEV_NUM_MIN / GLB_DEV_NUM_FRACT)
-#define GLB_DEV_NUM_MAX_F 	(GLB_DEV_NUM_MAX / GLB_DEV_NUM_FRACT)
-#define GLB_DEV_NUM_DISC_F	(GLB_DEV_NUM_DISC / GLB_DEV_NUM_FRACT)
-/// сетевой адрес
-#define GLB_NET_ADR_MIN		1
-#define GLB_NET_ADR_MAX		247
-#define GLB_NET_ADR_DISC 	1
-#define GLB_NET_ADR_FRACT	1
-#define GLB_NET_ADR_MIN_F	(GLB_NET_ADR_MIN / GLB_NET_ADR_FRACT)
-#define GLB_NET_ADR_MAX_F	(GLB_NET_ADR_MAX / GLB_NET_ADR_FRACT)
-#define GLB_NET_ADR_DISC_F	(GLB_NET_ADR_DISC / GLB_NET_ADR_FRACT)
-
 /// Микросхемы имеющие прошивку
 enum eGB_IC {
     GB_IC_MIN = 0,
@@ -105,7 +86,7 @@ public:
         compK400_ = GB_COMP_K400_MAX;
         compRZSK_ = GB_COMP_RZSK_MAX;
 
-        deviceNum_ = GLB_DEV_NUM_MIN_F;
+        deviceNum_ = 1;
         ledOn = false;
 
         for(uint_fast8_t i = 0; i < GB_IC_MAX; i++) {
@@ -357,10 +338,9 @@ public:
     // номер аппарата
     bool setDeviceNum(uint8_t val) {
         bool stat = false;
-        val = (val / GLB_DEV_NUM_DISC_F) * GLB_DEV_NUM_DISC_F;
 
         // записано в таком виде т.к. иначе портится автоформат в Eclipse
-        if (val >= GLB_DEV_NUM_MIN_F) {
+        if (val >= 1) {
             if (val <= getMaxNumDevices()) {
                 deviceNum_ = val;
                 stat = true;
@@ -369,7 +349,7 @@ public:
         return stat;
     }
     uint8_t getDeviceNum() const {
-        return (deviceNum_ * GLB_DEV_NUM_FRACT);
+        return (deviceNum_);
     }
 
     // проверка флага включения подсветки

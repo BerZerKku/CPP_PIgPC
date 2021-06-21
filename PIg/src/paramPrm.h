@@ -8,7 +8,7 @@
 #ifndef PARAMPRM_H_
 #define PARAMPRM_H_
 
-// #include "glbDefine.h"
+#include "glbDefine.h"
 
 /// класс для параметров и настроек приемника
 class TDevicePrm {
