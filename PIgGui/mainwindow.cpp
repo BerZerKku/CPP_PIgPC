@@ -301,15 +301,15 @@ void MainWindow::cycleMenu()
 //            (pkg.at(2) == GB_COM_PRM_RES_IND) ||
 //            (pkg.at(2) == GB_COM_PRM_ENTER) ||
 //            (pkg.at(2) == GB_COM_DEF_SET_TYPE_AC)) {
-            qDebug() << "Pkg to BSP: " << Qt::showbase << Qt::hex << pkg;
+//            qDebug() << "Pkg to BSP: " << Qt::showbase << Qt::hex << pkg;
 //        }
         cntsendtobsp++;
     }
 
     cnt1s++;
     if (cnt1s >= 10) {
-                qDebug() << "Send " << cntsendtobsp << " packet to BSP per second.";
-                qDebug() << "Send " << cntsendtopc << " packet to PC per second.";
+//                qDebug() << "Send " << cntsendtobsp << " packet to BSP per second.";
+//                qDebug() << "Send " << cntsendtopc << " packet to PC per second.";
         cntsendtopc = 0;
         cntsendtobsp = 0;
         cnt1s = 0;

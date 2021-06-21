@@ -2729,7 +2729,6 @@ void clMenu::lvlRegime() {
             }
             EnterParam.setValueRange(min, max);
             EnterParam.setValue(val);
-//            EnterParam.list = fcRegimeEnter[min];
             EnterParam.com = GB_COM_NO;
         }
             break;
@@ -4150,8 +4149,7 @@ eMENU_ENTER_PARAM clMenu::enterValue() {
         snprintf_P(&vLCDbuf[pos + len], NAME_PARAM_LENGHT - len,
                 getTextValue(EnterParam.getParam(), val));
     } else if (status == MENU_ENTER_PARAM_LIST_2) {
-//        uint8_t val = EnterParam.listValue[EnterParam.getValue()];
-    	uint8_t val = EnterParam.getValue();
+        uint8_t val = EnterParam.listValue[EnterParam.getValue()];
         len = snprintf_P(&vLCDbuf[pos], NAME_PARAM_LENGHT, enterList);
         snprintf_P(&vLCDbuf[pos + len], NAME_PARAM_LENGHT - len,
                 getTextValue(EnterParam.getParam(), val));
