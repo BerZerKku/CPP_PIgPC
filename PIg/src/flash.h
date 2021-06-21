@@ -232,18 +232,18 @@ static const char fcDefFault0001[] PROGMEM = "Нет блока БСЗ";     ///<
 static const char fcDefFault0002[] PROGMEM = "Неиспр.верс.БСЗ";   ///<
 static const char fcDefFault0004[] PROGMEM = "Неиспр.перекл.";    ///<
 static const char fcDefFault0008[] PROGMEM = "Неиспр.зап. БСЗ";   ///<
-static const char fcDefFault0010[] PROGMEM = "АК-Нет ответа%S";   ///<
+static const char fcDefFault0010[] PROGMEM = "АК-Нет ответа%s";   ///<
 static const char fcDefFault0010opto[] PROGMEM = "Нет КС";        ///<
 static const char fcDefFault0020[] PROGMEM = "Низкий ур. РЗ";     ///<
-static const char fcDefFault0040[] PROGMEM = "Неиспр.уд.ДФЗ%S";   ///<
+static const char fcDefFault0040[] PROGMEM = "Неиспр.уд.ДФЗ%s";   ///<
 static const char fcDefFault0040rzskm[] PROGMEM = "Прием дальний";///<
-static const char fcDefFault0080[] PROGMEM = "Неиспр.уд.ВЫХ%S";   ///<
+static const char fcDefFault0080[] PROGMEM = "Неиспр.уд.ВЫХ%s";   ///<
 static const char fcDefFault0080rzskm[] PROGMEM = "Автоконтроль"; ///<
 static const char fcDefFault0100[] PROGMEM = "Неиспр.вход.ПУСК";  ///<
 static const char fcDefFault0200[] PROGMEM = "Неиспр.вход.СТОП";  ///<
-static const char fcDefFault0400[] PROGMEM = "Удал.без отв.%S";   ///<
+static const char fcDefFault0400[] PROGMEM = "Удал.без отв.%s";   ///<
 static const char fcDefFault0800[] PROGMEM = "Неиспр.цепь ВЫХ";   ///<
-static const char fcDefFault1000[] PROGMEM = "Удал.обн.пом.%S";   ///<
+static const char fcDefFault1000[] PROGMEM = "Удал.обн.пом.%s";   ///<
 static const char fcDefFault2000[] PROGMEM = "Неиспр.зап. ВЫХ";   ///<
 static const char fcDefFault4000[] PROGMEM = "Помеха в линии";    ///<
 static const char fcDefFault4000rzsk[] PROGMEM = "Нет сигнала РЗ";///<
@@ -251,7 +251,7 @@ static const char fcDefFault8000[] PROGMEM = "Неиспр. ДФЗ";       ///<
 static const char fcDefFault8000rzsk[] PROGMEM = "Удал. неисправен";///<
 
 // предупреждения защиты
-static const char fcDefWarning01[] PROGMEM = "АК-Сн.запаса %S";  ///<
+static const char fcDefWarning01[] PROGMEM = "АК-Сн.запаса %s";  ///<
 static const char fcDefWarning01rzsk[] PROGMEM = "Низкий уров. РЗ";///<
 static const char fcDefWarning01opto[] PROGMEM = "Нет КС";       ///<
 static const char fcDefWarning02[] PROGMEM = "Нет сигнала МАН";  ///<
@@ -309,7 +309,7 @@ static const char fcStateJrn[] PROGMEM = "Состояние:";
 /// Номер команды, для которой была сделана запись.
 static const char fcNumComJrn[] PROGMEM = "Команда: %u";
 /// Номер команды приемника, для которой была сделана запись.
-static const char fcNumComJrnPrm[] PROGMEM = "Команда: %u %S";
+static const char fcNumComJrnPrm[] PROGMEM = "Команда: %u %s";
 /// Дата, когда была сделана запись.
 static const char fcDateJrn[] PROGMEM = "Дата: %02u.%02u.%02u";
 /// Время, когда была сделана запись.
@@ -362,15 +362,15 @@ static char fcJrnEventK400[MAX_JRN_EVENT_VALUE + 1][21] PROGMEM = {
     "Восстан-е работы DSP",	///< 18
     "Низкое напр. выхода",	///< 19
     "Высокое напр. выхода",	///< 20
-    "Нет КЧ 5 сек на %S",	///< 21
-    "Нет КЧ на %S",			///< 22
-    "Восстан-е КЧ на %S",	///< 23
-    "Восст.ур. КЧ на %S",	///< 24
+    "Нет КЧ 5 сек на %s",	///< 21
+    "Нет КЧ на %s",			///< 22
+    "Восстан-е КЧ на %s",	///< 23
+    "Восст.ур. КЧ на %s",	///< 24
     "Неиспр чт/зап 2RAM",	///< 25
     "Неиспр чт/зап ПЛИС",	///< 26
     "Неиспр чт/зап FLASH",	///< 27
     "Неисправность часов",	///< 28
-    "Сниж.ур. КЧ на %S",	///< 29
+    "Сниж.ур. КЧ на %s",	///< 29
     "Ошибка работы ЦП",		///< 30
     "Вход RX ЦП пуст",		///< 31
     "Работа ЦП восстановл",	///< 32
@@ -397,27 +397,27 @@ static char fcJrnEventRZSK[MAX_JRN_EVENT_VALUE + 1][21] PROGMEM = {
     "Неиспр перекл-ей БСЗ",	///< 9
     "Нет сигнала манипул.",	///< 10
     "Неиспр выходной цепи",	///< 11
-    "Нет РЗ 5 сек на %S",	///< 12
+    "Нет РЗ 5 сек на %s",	///< 12
     "Отсут-е сигнала Пуск",	///< 13
     "Отсут-е сигнала Стоп",	///< 14
     "Неиспр чтения команд",	///< 15
-    "Сниж. ур. КЧ на %S",	///< 16
+    "Сниж. ур. КЧ на %s",	///< 16
     "Неиспр. работы DSP",	///< 17
     "Восстан-е работы DSP",	///< 18
     "Низкое напр. выхода",	///< 19
     "Высокое напр. выхода",	///< 20
-    "Нет КЧ 5 сек на %S",	///< 21
-    "Нет КЧ на %S",			///< 22
-    "Восстан-е КЧ на %S",	///< 23
-    "Восст. ур.КЧ на %S",	///< 24
+    "Нет КЧ 5 сек на %s",	///< 21
+    "Нет КЧ на %s",			///< 22
+    "Восстан-е КЧ на %s",	///< 23
+    "Восст. ур.КЧ на %s",	///< 24
     "Неиспр чт/зап 2RAM",	///< 25
     "Неиспр чт/зап ПЛИС",	///< 26
     "Неиспр чт/зап FLASH",	///< 27
     "Неисправность часов",	///< 28
-    "Сниж. ур. РЗ на %S",	///< 29
-    "Восстан-е РЗ на %S",	///< 30
-    "Нет РЗ на %S",			///< 31
-    "Восст. ур.РЗ на %S",	///< 32
+    "Сниж. ур. РЗ на %s",	///< 29
+    "Восстан-е РЗ на %s",	///< 30
+    "Нет РЗ на %s",			///< 31
+    "Восст. ур.РЗ на %s",	///< 32
     "Изменение параметров",	///< 33
     "Изменение дата/время",	///< 34
     "Событие - %d",			///< 35

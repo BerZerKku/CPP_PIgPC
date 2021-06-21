@@ -1324,7 +1324,13 @@ public:
 
     // номер адреса текущей записи в журнале
     uint16_t getEntryAdress() const {
-        return (currentEntry_ + addressFirstEntry_ - 1) % numJrnEntries_;
+        uint16_t address = 0;
+
+        if (numJrnEntries_ > 0) {
+            address= (currentEntry_ + addressFirstEntry_ - 1) % numJrnEntries_;
+        }
+
+        return address;
     }
 
     // текущая запись

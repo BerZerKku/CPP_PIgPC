@@ -1520,8 +1520,9 @@ void clMenu::lvlJournalEvent() {
         } else if (device == AVANT_K400) {
             if (event <= MAX_JRN_EVENT_VALUE) {
                 uint8_t dev = (uint8_t) sParam.jrnEntry.getDeviceJrn();
-                snprintf_P(&vLCDbuf[poz], 21, fcJrnEventK400[event],
-                           fcDevicesK400[dev]);
+                char tmp[SIZE_OF(fcDevicesK400[0])] = "";
+                strncpy_P(tmp, fcDevicesK400[dev], SIZE_OF(tmp) - 1);
+                snprintf_P(&vLCDbuf[poz], 21, fcJrnEventK400[event], tmp);
             } else {
                 snprintf_P(&vLCDbuf[poz], 21,
                            fcJrnEventK400[MAX_JRN_EVENT_VALUE], event);
@@ -1529,8 +1530,9 @@ void clMenu::lvlJournalEvent() {
         } else if (device == AVANT_RZSK) {
             if (event < MAX_JRN_EVENT_VALUE) {
                 uint8_t dev = (uint8_t) sParam.jrnEntry.getDeviceJrn();
-                snprintf_P(&vLCDbuf[poz], 21, fcJrnEventRZSK[event],
-                           fcDevicesK400[dev]);
+                char tmp[SIZE_OF(fcDevicesK400[0])] = "";
+                strncpy_P(tmp, fcDevicesK400[dev], SIZE_OF(tmp) - 1);
+                snprintf_P(&vLCDbuf[poz], 21, fcJrnEventRZSK[event], tmp);
             } else {
                 snprintf_P(&vLCDbuf[poz], 21,
                            fcJrnEventRZSK[MAX_JRN_EVENT_VALUE], event);
@@ -1795,12 +1797,19 @@ void clMenu::lvlJournalPrm() {
         if ((device == AVANT_RZSK) && (sParam.glb.getMaxNumDevices() == 3)) {
             uint8_t src = sParam.jrnEntry.getSrcCom();
             uint8_t devnum = sParam.glb.getDeviceNum();
+            uint8_t tmp[SIZE_OF(fcSrcPrm1[0])] = "";
             if (devnum == 1) {
-                snprintf_P(&vLCDbuf[poz], 21, fcNumComJrnPrm, com, fcSrcPrm1[src]);
+                char tmp[SIZE_OF(fcSrcPrm1[0])] = "";
+                strncpy_P(tmp, fcSrcPrm1[src], SIZE_OF(tmp)-1);
+                snprintf_P(&vLCDbuf[poz], 21, fcNumComJrnPrm, com, tmp);
             } else if (devnum == 2) {
-                snprintf_P(&vLCDbuf[poz], 21, fcNumComJrnPrm, com, fcSrcPrm2[src]);
+                char tmp[SIZE_OF(fcSrcPrm2[0])] = "";
+                strncpy_P(tmp, fcSrcPrm2[src], SIZE_OF(tmp)-1);
+                snprintf_P(&vLCDbuf[poz], 21, fcNumComJrnPrm, com, tmp);
             } else if (devnum == 3) {
-                snprintf_P(&vLCDbuf[poz], 21, fcNumComJrnPrm, com, fcSrcPrm3[src]);
+                char tmp[SIZE_OF(fcSrcPrm3[0])] = "";
+                strncpy_P(tmp, fcSrcPrm3[src], SIZE_OF(tmp)-1);
+                snprintf_P(&vLCDbuf[poz], 21, fcNumComJrnPrm, com, tmp);
             } else {
                 snprintf_P(&vLCDbuf[poz], 21, fcNumComJrn, com);
             }
@@ -4465,6 +4474,7 @@ void clMenu::printDevicesStatus(uint8_t poz, TDeviceStatus *device) {
     PGM_P *text;
     uint_fast8_t x = 0;
     uint_fast16_t y = 0;
+    char tmp[SIZE_OF(fcRemoteNum[0])] = "";
 
     snprintf_P(&vLCDbuf[poz], 4, device->name);
     poz += 3;
@@ -4485,7 +4495,8 @@ void clMenu::printDevicesStatus(uint8_t poz, TDeviceStatus *device) {
             text = device->faultText;
             x = device->getFault();
             y = device->getRemoteNumber();
-            snprintf_P(&vLCDbuf[poz], 17, text[x], fcRemoteNum[y]);
+            strncpy_P(tmp, fcRemoteNum[y], SIZE_OF(tmp) - 1);
+            snprintf_P(&vLCDbuf[poz], 17, text[x], tmp);
         } else {
             y = device->getFaults();
             snprintf_P(&vLCDbuf[poz], 17, fcFaults, 'l', y);
@@ -4504,7 +4515,8 @@ void clMenu::printDevicesStatus(uint8_t poz, TDeviceStatus *device) {
             text = device->warningText;
             x = device->getWarning();
             y = device->getRemoteNumber();
-            snprintf_P(&vLCDbuf[poz], 17, text[x], fcRemoteNum[y]);
+            strncpy_P(tmp, fcRemoteNum[y], SIZE_OF(tmp) - 1);
+            snprintf_P(&vLCDbuf[poz], 17, text[x], tmp);
         } else {
             y = device->getWarnings();
             snprintf_P(&vLCDbuf[poz], 17, fcWarnings, 'l', y);

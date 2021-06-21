@@ -28,6 +28,7 @@
 #include <climits>
 #include <cstdint>
 #include <cstddef>
+#include <cstring>
 
 #if defined(QT_CORE_LIB) && !defined(MY_TESTS)
 #include "wrapper.h"
@@ -41,6 +42,7 @@
 #define pgm_read_word *(uint16_t *)
 #define pgm_read_ptr(x) *(x)
 #define prog_uint8_t uint8_t
+#define strncpy_P(...) strncpy(__VA_ARGS__)
 
 #endif
 

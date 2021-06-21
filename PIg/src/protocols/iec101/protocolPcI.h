@@ -294,7 +294,7 @@ public:
 	 * 	@retval False Нет данных на передачу.
 	 * 	@retval True Есть данные на передачу.
 	 */
-    bool checkEventClass1(uint16_t &adr, bool &val, SCp56Time2a &time) override;
+    bool checkEventClass1(uint16_t &adr, bool &val, SCp56Time2a &time);
 
 	/**	Проверка наличия данных класса 2 на передачу.
 	 *
@@ -304,7 +304,7 @@ public:
 	 * 	@retval False Нет данных на передачу.
 	 * 	@retval True Есть данные на передачу.
 	 */
-    bool checkEventClass2(uint16_t &adr, bool &val, SCp56Time2a &time) override;
+    bool checkEventClass2(uint16_t &adr, bool &val, SCp56Time2a &time);
 
 private:
 
@@ -327,7 +327,7 @@ private:
 	 *	@retval True Подготовлены данные для передачи.
 	 *	@retval False Данных нет.
 	 */
-    bool procInterrog(uint16_t &adr, bool &val) override;
+    bool procInterrog(uint16_t &adr, bool &val);
 
 	/**	Установка времени.
 	 *
@@ -338,7 +338,7 @@ private:
 	 * 	@retval True Время установлено.
 	 * 	@retval False Время не установлено.
 	 */
-    bool procSetTime() override;
+    bool procSetTime();
 
 	/**	Установка времени, сообщение об окочнании.
 	 *
@@ -351,7 +351,7 @@ private:
 	 * 	@retval True Если был получен ответ от БСП с временем во время синхронизации.
 	 * 	@retval False Если ответа небыло.
 	 */
-    bool procSetTimeEnd() override;
+    bool procSetTimeEnd();
 
 	/**	Возвращает состояние элемента информации.
 	 *
