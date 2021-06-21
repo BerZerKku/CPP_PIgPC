@@ -93,6 +93,8 @@ void Bsp::initParam() {
     setComboBoxValue(GB_PARAM_COMP_K400, 0);
     setComboBoxValue(device.typeDevice, AVANT_K400);
     setComboBoxValue(device.typeOpto, TYPE_OPTO_STANDART);
+
+
 }
 
 void Bsp::initClock() {
@@ -1147,10 +1149,14 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data) {
             }
             //
             pkgTx.append(com);
-            if (getComboBoxValue(device.typeDevice) == AVANT_K400) {
+
+            uint8_t value = getComboBoxValue(device.typeDevice);
+            eGB_TYPE_DEVICE typedevice = static_cast<eGB_TYPE_DEVICE> (value);
+
+            if (typedevice == AVANT_K400) {
                 // FIXME Добавить остальные параметры для К400.
                 pkgTx.append(Bsp::getComboBoxValue(GB_PARAM_COM_PRD_KEEP));
-                pkgTx.append(Bsp::getComboBoxValue(GB_PARAM_COMP_K400));
+                pkgTx.append(getCompatibility(typedevice));
                 pkgTx.append(0);
                 pkgTx.append(0);
                 pkgTx.append(0);
@@ -1171,8 +1177,11 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data) {
                 pkgTx.append(0);
                 pkgTx.append(0);
                 pkgTx.append(0);
+            } else if (typedevice == AVANT_RZSK){
+                pkgTx.append(Bsp::getComboBoxValue(GB_PARAM_COM_PRD_KEEP));
+                pkgTx.append(getCompatibility(typedevice));
             } else {
-                pkgTx.append(Bsp::getComboBoxValue(GB_PARAM_COMP_P400));
+                pkgTx.append(getCompatibility(typedevice));
             }
         } break;
 
@@ -1352,6 +1361,11 @@ void Bsp::procCommandWriteParam(eGB_COM com, pkg_t &data) {
             switch(dop) {
                 case POS_COM_PRD_KEEP_prdKeep: {
                     Bsp::setComboBoxValue(GB_PARAM_COM_PRD_KEEP, value);
+                    Bsp::setComboBoxValue(GB_PARAM_COMP_P400, value);
+                } break;
+                case POS_COM_PRD_KEEP_compK400: {
+                    Bsp::setComboBoxValue(GB_PARAM_COMP_K400, value);
+                    Bsp::setComboBoxValue(GB_PARAM_COMP_RZSK, value);
                 } break;
 
                 default: qDebug("No dop byte handler: 0x%.2X", dop);
@@ -1445,8 +1459,9 @@ void Bsp::procCommandWriteRegime(eGB_COM com, pkg_t &data) {
 
 void Bsp::hdlrComGetVers(eGB_COM com, pkg_t &data) {
     uint16_t vers = 0;
-    eGB_TYPE_DEVICE typedevice = static_cast<eGB_TYPE_DEVICE>
-                                 (getComboBoxValue(device.typeDevice));
+    eGB_TYPE_DEVICE typedevice;
+
+    typedevice = static_cast<eGB_TYPE_DEVICE> (getComboBoxValue(device.typeDevice));
 
     if (data.size() != 0) {
         qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
@@ -1474,25 +1489,7 @@ void Bsp::hdlrComGetVers(eGB_COM com, pkg_t &data) {
     pkgTx.append(vers >> 8);
     pkgTx.append(vers);
 
-    uint8_t compatibility = 0;
-    switch(typedevice) {
-        case AVANT_R400: // DOWN
-        case AVANT_R400M: {
-            compatibility = getComboBoxValue(GB_PARAM_COMP_P400);
-        } break;
-        case AVANT_RZSK: {
-            getComboBoxValue(GB_PARAM_COMP_RZSK);
-        } break;
-        case AVANT_K400: {
-            getComboBoxValue(GB_PARAM_COMP_K400);
-        } break;
-        case AVANT_OPTO: // DOWN
-        case AVANT_NO:
-        case AVANT_MAX: {
-            compatibility = 0;
-        } break;
-    }
-    pkgTx.append(compatibility);
+    pkgTx.append(getCompatibility(typedevice));
 
     vers = 0x33;    // GB_IC_BSK_PLIS_PRD1
     pkgTx.append(vers);
@@ -1574,6 +1571,31 @@ Bsp::hdlrComGetTest(eGB_COM com, pkg_t &data) {
     pkgTx.append(test.byte3->text().toUInt(nullptr, 16));
     pkgTx.append(test.byte4->text().toUInt(nullptr, 16));
     pkgTx.append(test.byte5->text().toUInt(nullptr, 16));
+}
+
+uint8_t Bsp::getCompatibility(eGB_TYPE_DEVICE typedevice)
+{
+    uint8_t compatibility = 0;
+
+    switch(typedevice) {
+        case AVANT_R400: // DOWN
+        case AVANT_R400M: {
+            compatibility = getComboBoxValue(GB_PARAM_COMP_P400);
+        } break;
+        case AVANT_RZSK: {
+            compatibility = getComboBoxValue(GB_PARAM_COMP_RZSK);
+        } break;
+        case AVANT_K400: {
+            compatibility = getComboBoxValue(GB_PARAM_COMP_K400);
+        } break;
+        case AVANT_OPTO: // DOWN
+        case AVANT_NO:
+        case AVANT_MAX: {
+            compatibility = 0;
+        } break;
+    }
+
+    return compatibility;
 }
 
 //

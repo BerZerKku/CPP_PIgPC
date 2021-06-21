@@ -60,7 +60,7 @@ MainWindow::MainWindow(QWidget *parent)
     pblue = pdefault;
     pblue.setColor(QPalette::Text, Qt::blue);
 
-
+    initEeprom();
     initView();
     initKeyboard();
 
@@ -93,6 +93,11 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::initEeprom()
+{
+    menu.sParam.password.init(0);
 }
 
 //

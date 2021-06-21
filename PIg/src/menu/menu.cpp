@@ -2703,6 +2703,7 @@ void clMenu::lvlRegime() {
             // "Готов"      -> "Введен"  / "Выведен"
             // остальные    -> "Выведен" / "Введен"
             enterFunc = &clMenu::enterValue;
+            EnterParam.setParam(GB_PARAM_OTHER_REGIME);
             EnterParam.setEnable(MENU_ENTER_PARAM_LIST);
             switch(reg) {
                 case GB_REGIME_ENABLED:
@@ -2710,7 +2711,7 @@ void clMenu::lvlRegime() {
                     max = GB_REGIME_ENTER_DISABLED;
                     val = GB_REGIME_ENTER_DISABLED;
                     break;
-                case GB_REGIME_ENTER_DISABLED:
+                case GB_REGIME_DISABLED:
                     min = GB_REGIME_ENTER_ENABLED;
                     max = GB_REGIME_ENTER_ENABLED;
                     val = GB_REGIME_ENTER_ENABLED;
@@ -2728,7 +2729,7 @@ void clMenu::lvlRegime() {
             }
             EnterParam.setValueRange(min, max);
             EnterParam.setValue(val);
-            EnterParam.list = fcRegimeEnter[min];
+//            EnterParam.list = fcRegimeEnter[min];
             EnterParam.com = GB_COM_NO;
         }
             break;
@@ -3975,7 +3976,7 @@ void clMenu::lvlTest1() {
             EnterParam.setEnable(MENU_ENTER_PARAM_LIST_2);
             EnterParam.setValueRange(0, sParam.test.getNumSignals() - 1);
             EnterParam.listValue = sParam.test.signalList;
-            EnterParam.list = fcTest1K400[0];
+//            EnterParam.list = fcTest1K400[0];
             EnterParam.com = GB_COM_SET_REG_TEST_1;
             break;
 
@@ -4149,7 +4150,8 @@ eMENU_ENTER_PARAM clMenu::enterValue() {
         snprintf_P(&vLCDbuf[pos + len], NAME_PARAM_LENGHT - len,
                 getTextValue(EnterParam.getParam(), val));
     } else if (status == MENU_ENTER_PARAM_LIST_2) {
-        uint8_t val = EnterParam.listValue[EnterParam.getValue()];
+//        uint8_t val = EnterParam.listValue[EnterParam.getValue()];
+    	uint8_t val = EnterParam.getValue();
         len = snprintf_P(&vLCDbuf[pos], NAME_PARAM_LENGHT, enterList);
         snprintf_P(&vLCDbuf[pos + len], NAME_PARAM_LENGHT - len,
                 getTextValue(EnterParam.getParam(), val));
@@ -4811,7 +4813,7 @@ void clMenu::enterParameter() {
             EnterParam.setParam(lp->getParam());
             EnterParam.setValueRange(min, max);
             EnterParam.setValue(val);
-            EnterParam.list = getListOfValues(param);
+//            EnterParam.list = getListOfValues(param);
             EnterParam.setFract(getFract(param));
             EnterParam.setDisc(getDisc(param));
 

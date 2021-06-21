@@ -93,6 +93,8 @@ private:
     QPalette pdefault;
     QElapsedTimer etimer;
 
+    /// Инициализация параметров из EEPROM
+    void initEeprom();
     /// Инициализация параметров.
     void initView();
     /// Инициализация клавиатуры.

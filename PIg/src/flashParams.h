@@ -16,6 +16,18 @@
 
 extern size_t getSizeOfParam();
 
+/// Режимы работы устройств.
+static const char fcRegime[GB_REGIME_MAX + 1][8] PROGMEM = {
+    //234567
+    "Выведен",///<
+    "Готов",///<
+    "Введен",///<
+    "Речь",///<
+    "Тест",///< Тест + ПРД в состоянии
+    "Тест",///< Тест + ПРМ в состоянии
+    "ошибка"///< ошибочное значение
+};
+
 /// массив строк размерностей, связан с Param::DIMENSION
 static const char fcDimension[] [5] PROGMEM = {
     //234

@@ -482,6 +482,7 @@ typedef enum {
     GB_PARAM_RING_COM_TR,       ///< переназначение команд дискретных входов
     // другое
     GB_PARAM_OTHER_TEST_SIGNAL, ///< Тестовый сигнал.
+    GB_PARAM_OTHER_REGIME,      ///< Режим
     //
     GB_PARAM_MAX
 } eGB_PARAM;

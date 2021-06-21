@@ -155,6 +155,8 @@ private:
 
     static void hdlrComGetTest(eGB_COM com, pkg_t &data);
 
+    static uint8_t getCompatibility(eGB_TYPE_DEVICE typedevice);
+
 private slots:
     static void setRegime(int index);
     static void setState(int index);

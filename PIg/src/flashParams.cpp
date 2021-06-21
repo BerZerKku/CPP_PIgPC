@@ -1977,7 +1977,7 @@ static const Param fRingComTr PROGMEM = {
     Param::CHANGE_REG_DISABLE    // условие для изменения параметра
 };
 
-// Тестоый сигнал
+// Тестовый сигнал
 // Создан для удобства вывода текущего значения.
 static const Param fOtherTestSignal PROGMEM = {
     "Тестовый сигнал",      // название параметра
@@ -1989,6 +1989,27 @@ static const Param fOtherTestSignal PROGMEM = {
     1,                      // кол-во повторений параметра
     0,                      // минимальное значение
     SIZE_OF(fcTest1K400),   // максимальное значение
+    1,                      // дискретность
+    1,                      // множитель для стандартного протокола
+    GB_SEND_NO,             // тип параметра для сохранения новго значения
+    1,                      // байт дополнительной информации для сохранения
+    Param::DEPEND_MAX_NO,   // заивимость максимума
+    Param::DEPEND_SAME_NO,  // зависимость повторений
+    Param::CHANGE_REG_DISABLE // условие для изменения параметра
+};
+
+// Режим работы
+// Создан для удобства вывода текущего значения.
+static const Param fOtherRegime PROGMEM = {
+    "Режим",                // название параметра
+    GB_COM_NO,              // команда стандартного протокола
+    Param::PARAM_LIST,      // тип параметра
+    Param::RANGE_LIST,      // диапазон измнения
+    Param::DIM_NO,          // размерность
+    fcRegime[0],            // массив значений
+    1,                      // кол-во повторений параметра
+    0,                      // минимальное значение
+    SIZE_OF(fcRegime)-1,    // максимальное значение
     1,                      // дискретность
     1,                      // множитель для стандартного протокола
     GB_SEND_NO,             // тип параметра для сохранения новго значения
@@ -2105,7 +2126,8 @@ const Param* fParams[] PROGMEM  = {
     &fRingComRec,
     &fRingComTr,
     //
-    &fOtherTestSignal
+    &fOtherTestSignal,
+    &fOtherRegime
 };
 
 size_t getSizeOfParam() {
