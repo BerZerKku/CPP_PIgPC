@@ -177,7 +177,8 @@ void clMenu::proc(void) {
 
     // Обработка нажатий кнопка + "Фн", если не идет ввода нового значения
     if ((key_ != KEY_NO) && !EnterParam.isEnable()) {
-        key_ = onFnButton(key_);
+        TControl::ctrl_t ctrl = onFnButton(key_);
+        addControlToSend(ctrl);
     }
 
     if (checkLedOn()) {
@@ -1105,9 +1106,12 @@ void clMenu::lvlStart() {
         printDevicesStatus(poz, &sParam.prd.status);
     }
 
-    // Дополнительная проверка нажатия конпка + "Фн" в начальном меню
+
     if (key_ != KEY_NO) {
-        key_ = onFnButton(key_);
+        // TODO Разобрабться зачем нужна дополнительная проверка "Фн + кнопка"!
+        // Дополнительная проверка нажатия конпка + "Фн" в начальном меню
+        TControl::ctrl_t ctrl = onFnButton(key_);
+        addControlToSend(ctrl);
 
         if (key_ == KEY_MENU) {
             lvlMenu = &clMenu::lvlFirst;
@@ -3958,7 +3962,7 @@ void clMenu::lvlTest1() {
             EnterParam.setEnable(MENU_ENTER_PARAM_LIST_2);
             EnterParam.setValueRange(0, sParam.test.getNumSignals() - 1);
             EnterParam.listValue = sParam.test.signalList;
-//            EnterParam.list = fcTest1K400[0];
+            //            EnterParam.list = fcTest1K400[0];
             EnterParam.com = GB_COM_SET_REG_TEST_1;
             break;
 
@@ -4794,7 +4798,7 @@ void clMenu::enterParameter() {
             EnterParam.setParam(lp->getParam());
             EnterParam.setValueRange(min, max);
             EnterParam.setValue(val);
-//            EnterParam.list = getListOfValues(param);
+            //            EnterParam.list = getListOfValues(param);
             EnterParam.setFract(getFract(param));
             EnterParam.setDisc(getDisc(param));
 
@@ -5050,50 +5054,46 @@ bool clMenu::isRzskM() const {
 }
 
 // Обработчик дополнительных функций кнопок клавиатуры.
-eKEY clMenu::onFnButton(eKEY key) {
+TControl::ctrl_t clMenu::onFnButton(eKEY &key) {
     eKEY tkey = key;
     key = KEY_NO;
+    TControl::ctrl_t ctrl = TControl::CTRL_NO;
 
     switch(tkey) {
         case KEY_CALL:
-            sParam.txComBuf.setInt8(GB_CONTROL_CALL);
-            sParam.txComBuf.addFastCom(GB_COM_SET_CONTROL);
+            ctrl = TControl::CTRL_Call;
             break;
 
         case KEY_PUSK_UD:
             if (sParam.def.status.isEnable()) {
                 if (sParam.glb.getNumDevices() == GB_NUM_DEVICES_3) {
-                    sParam.txComBuf.setInt8(GB_CONTROL_PUSK_UD_ALL);
+                    ctrl = TControl::CTRL_RemotePuskAll;
+
                 } else {
-                    sParam.txComBuf.setInt8(GB_CONTROL_PUSK_UD_1);
+                    ctrl = TControl::CTRL_RemotePusk1;
                 }
-                sParam.txComBuf.addFastCom(GB_COM_SET_CONTROL);
             }
             break;
 
         case KEY_AC_PUSK_UD:
             if (sParam.def.status.isEnable()) {
-                sParam.txComBuf.setInt8(GB_CONTROL_PUSK_AC_UD);
-                sParam.txComBuf.addFastCom(GB_COM_SET_CONTROL);
+                ctrl = TControl::CTRL_RemoteAcPusk;
             }
             break;
 
         case KEY_PUSK_NALAD:
             if (sParam.def.status.isEnable()) {
                 if (sParam.def.status.getState() == 7) {
-                    sParam.txComBuf.setInt8(GB_CONTROL_PUSK_OFF);
-                    sParam.txComBuf.addFastCom(GB_COM_SET_CONTROL);
+                    ctrl = TControl::CTRL_PuskAdjOff;
                 } else {
-                    sParam.txComBuf.setInt8(GB_CONTROL_PUSK_ON);
-                    sParam.txComBuf.addFastCom(GB_COM_SET_CONTROL);
+                    ctrl = TControl::CTRL_PuskAdjOn;
                 }
             }
             break;
 
         case KEY_AC_RESET:
             if (sParam.def.status.isEnable()) {
-                sParam.txComBuf.setInt8(GB_CONTROL_RESET_AC);
-                sParam.txComBuf.addFastCom(GB_COM_SET_CONTROL);
+                ctrl = TControl::CTRL_AcReset;
             }
             break;
 
@@ -5104,48 +5104,44 @@ eKEY clMenu::onFnButton(eKEY key) {
                     if (comp != GB_COMP_R400M_LINER) {
                         if ((comp == GB_COMP_R400M_AVZK80) ||
                             (comp == GB_COMP_R400M_PVZ90)) {
-                            sParam.txComBuf.setInt8(GB_TYPE_AC_PUSK);
+                            ctrl = TControl::CTRL_AcPusk;
                         } else {
-                            sParam.txComBuf.setInt8(GB_TYPE_AC_PUSK_SELF);
+                            ctrl = TControl::CTRL_AcPuskSelf;
                         }
-                        sParam.txComBuf.addFastCom(GB_COM_DEF_SET_TYPE_AC);
                     }
                 } else if (isRzskM()) {
-                    sParam.txComBuf.setInt8(GB_TYPE_AC_PUSK_SELF);
-                    sParam.txComBuf.addFastCom(GB_COM_DEF_SET_TYPE_AC);
+                    ctrl = TControl::CTRL_AcPuskSelf;
                 }
             }
             break;
 
         case KEY_AC_REGIME:
             if (sParam.def.status.isEnable()) {
-                sParam.txComBuf.setInt8(GB_CONTROL_REG_AC);
-                sParam.txComBuf.addFastCom(GB_COM_SET_CONTROL);
+                ctrl = TControl::CTRL_AcRegime;
             }
             break;
 
         case KEY_RESET_IND:
             if (sParam.prd.status.isEnable() || sParam.prm.status.isEnable()) {
-                sParam.txComBuf.addFastCom(GB_COM_PRM_RES_IND);
+                ctrl = TControl::CTRL_IndReset;
             }
             break;
 
         case KEY_PUSK:
             if (sParam.prm.status.isEnable()) {
-                sParam.txComBuf.addFastCom(GB_COM_PRM_ENTER);
+                ctrl = TControl::CTRL_PuskPrm;
             }
             break;
 
         case KEY_RESET:
-            sParam.txComBuf.setInt8(GB_CONTROL_RESET_SELF);
-            sParam.txComBuf.addFastCom(GB_COM_SET_CONTROL);
+            ctrl = TControl::CTRL_Reset;
             break;
 
         default:
             key = tkey;
     }
 
-    return key;
+    return ctrl;
 }
 
 //
@@ -5190,4 +5186,20 @@ eGB_TYPE_DEVICE clMenu::getKeyboardLayout()
     }
 
     return layout;
+}
+
+void clMenu::addControlToSend(TControl::ctrl_t ctrl)
+{
+    eGB_COM com = GB_COM_NO;
+    bool hasbyte = false;
+    uint8_t byte = 0;
+
+    if (mControl.getData(ctrl, com, hasbyte, byte)) {
+        if (com != GB_COM_NO) {
+            if (hasbyte) {
+                sParam.txComBuf.setInt8(byte);
+            }
+            sParam.txComBuf.addFastCom(com);
+        }
+    }
 }

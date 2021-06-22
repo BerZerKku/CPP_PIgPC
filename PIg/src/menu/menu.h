@@ -13,6 +13,7 @@
 #include "drivers/keyboard.h"
 #include "menu/menuPunkt.h"
 #include "menu/enterParam.h"
+#include "menu/control.h"
 #include "parameter/LocalParams.h"
 
 
@@ -152,6 +153,8 @@ private:
 
     // параметры для ввода новых значений
     TEnterParam EnterParam;
+
+    TControl mControl;
 
     //  настройки для соответствующих аппаратов
     bool setDeviceK400();
@@ -350,10 +353,11 @@ private:
 
     /** Обработчик дополнительных функций кнопок клавиатуры.
      *
-     * @param[in] key Нажатая кнопка или функция.
-     * @return Код кнопки если она не была обработана, иначе \a KEY_NO.
+     * @param[in/out] key Нажатая кнопка. Если обработана то возвращается \a KEY_NO.
+     * @return Сигнал управления.
+     * @return \a TControl::CTRL_NO если сигнала нет.
      */
-    eKEY onFnButton(eKEY key);
+    TControl::ctrl_t onFnButton(eKEY &key);
 
     /**
      * @brief Возвращает расскладку клавиатуры.
@@ -372,6 +376,12 @@ private:
      * @return Расскладка устройства.
      */
     eGB_TYPE_DEVICE getKeyboardLayout();
+
+    /**
+     * @brief Добавляет команду для передачи сигнала управления.
+     * @param[in] ctrl Сигнал управления.
+     */
+    void addControlToSend(TControl::ctrl_t ctrl);
 
 #ifdef TEST_FRIENDS
     TEST_FRIENDS

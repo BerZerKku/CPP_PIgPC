@@ -16,6 +16,7 @@ HEADERS += \
     $${PIG_PATH}/src/flashParams.h \
     $${PIG_PATH}/src/glbDefine.h \
     $${PIG_PATH}/src/menu/base.h \
+    $${PIG_PATH}/src/menu/control.h \
     $${PIG_PATH}/src/menu/dateTime.h \
 #    $${PIG_PATH}/src/menu/deviceStatus.h \
     $${PIG_PATH}/src/menu/enterParam.h \
@@ -45,6 +46,7 @@ SOURCES += \
     $${PIG_PATH}/src/drivers/kbdLayout.cpp \
     $${PIG_PATH}/src/flashParams.cpp \
     $${PIG_PATH}/src/menu/base.cpp \
+    $${PIG_PATH}/src/menu/control.cpp \
     $${PIG_PATH}/src/menu/dateTime.cpp \
     $${PIG_PATH}/src/menu/enterParam.cpp \
     $${PIG_PATH}/src/menu/menu.cpp \

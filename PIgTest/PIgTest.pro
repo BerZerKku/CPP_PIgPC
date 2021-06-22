@@ -31,6 +31,7 @@ SOURCES += \
     test_flash.cpp \
     test_flashParam.cpp \
     wrapper.cpp \
+    menu/test_control.cpp \
     menu/test_dateTime.cpp \
     menu/test_measure.cpp \
     menu/test_password.cpp \

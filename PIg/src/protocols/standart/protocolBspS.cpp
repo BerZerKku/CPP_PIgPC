@@ -128,7 +128,6 @@ uint8_t clProtocolBspS::sendData(eGB_COM com) {
 	uint8_t num = 0;
 	uint8_t mask = 0;
 
-
 	mask = com & GB_COM_MASK_GROUP;
 
 	if (mask == GB_COM_MASK_GROUP_WRITE_PARAM) {
@@ -141,7 +140,7 @@ uint8_t clProtocolBspS::sendData(eGB_COM com) {
 		} else if (com ==  GB_COM_PRM_RES_IND) {
 			num = addCom(com);
 		} else if (com == GB_COM_DEF_SET_TYPE_AC) {
-			num = addCom(com, sParam_->txComBuf.getInt8());
+            num = addCom(com, sParam_->txComBuf.getInt8());
 		} else 	if (sendType != GB_SEND_NO) {
 			uint8_t val = sParam_->txComBuf.getInt8(0);
 			uint8_t dop = sParam_->txComBuf.getInt8(1);
@@ -182,12 +181,12 @@ uint8_t clProtocolBspS::sendData(eGB_COM com) {
 			// отсылаются команды установки сигналов в тесте
 			// 		тут последовательно передаются две команды
 			// 		сначала команда для КЧ (первый байт 1)
-			// 		а при следующем заходе  для РЗ (первый байт 2)
+            // 		а при следующем заходе для РЗ (первый байт 2)
 			uint8_t t = sParam_->txComBuf.getInt8(0);
 			if (t != 0) {
 				num = addCom(com, t, sParam_->txComBuf.getInt8(1));
 			} else {
-				num = addCom(com);										// вкл.
+                num = addCom(com); // вкл.
 			}
 		} else {
 			// GB_COM_PRM_ENTER

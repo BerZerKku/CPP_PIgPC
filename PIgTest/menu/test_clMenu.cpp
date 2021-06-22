@@ -10,6 +10,7 @@ using namespace std;
     friend class clMenu_Test; \
     FRIEND_TEST(clMenu_Test, checkLedOn); \
     FRIEND_TEST(clMenu_Test, onFnButton); \
+    FRIEND_TEST(clMenu_Test, addControlToSend); \
     FRIEND_TEST(clMenu_Test, isRzskM); \
     FRIEND_TEST(clMenu_Test, getKeyboardLayout);
 
@@ -27,7 +28,7 @@ public:
     clMenu_Test() {}
     virtual ~clMenu_Test() override = default;
 
-    bool testFnButton(eKEY key, eGB_COM rcom, uint8_t rbyte) const;
+    bool testFnButton(eKEY key, TControl::ctrl_t rctrl) const;
     bool testCheckLedOn(TDeviceStatus &status) const;
 
 protected:
@@ -43,24 +44,19 @@ protected:
 };
 
 //
-bool clMenu_Test::testFnButton(eKEY key, eGB_COM rcom, uint8_t rbyte) const
+bool clMenu_Test::testFnButton(eKEY key, TControl::ctrl_t rctrl) const
 {
     bool check = true;
+    TControl::ctrl_t ctrl = mObj->onFnButton(key);
 
-    EXPECT_EQ(KEY_NO, mObj->onFnButton(key));
-
-    eGB_COM com = mObj->sParam.txComBuf.getFastCom();
-    if (rcom != com) {
-        EXPECT_EQ(rcom, com);
+    if (rctrl != ctrl) {
+        EXPECT_EQ(rctrl, ctrl);
         check = false;
     }
 
-    if (rcom != GB_COM_NO) {
-        uint8_t byte = mObj->sParam.txComBuf.getInt8();
-        if (byte != rbyte) {
-            EXPECT_EQ(rbyte, byte);
-            check = false;
-        }
+    if (key != KEY_NO) {
+        EXPECT_EQ(KEY_NO, key);
+        check = false;
     }
 
     return check;
@@ -178,7 +174,8 @@ TEST_F(clMenu_Test, onFnButton)
 
         SCOPED_TRACE("key " + to_string(i));
 
-        ASSERT_EQ(result, mObj->onFnButton(key));
+        mObj->onFnButton(key);
+        ASSERT_EQ(result, key);
     }
 }
 
@@ -187,7 +184,7 @@ TEST_F(clMenu_Test, onFnButton_call)
 {
     eKEY key = KEY_CALL;
 
-    ASSERT_TRUE(testFnButton(KEY_CALL, GB_COM_SET_CONTROL, GB_CONTROL_CALL));
+    ASSERT_TRUE(testFnButton(KEY_CALL, TControl::CTRL_Call));
 }
 
 //
@@ -199,13 +196,13 @@ TEST_F(clMenu_Test, onFnButton_puskUd)
     mObj->sParam.def.status.setEnable(true);
 
     mObj->sParam.glb.setNumDevices(GB_NUM_DEVICES_2);
-    ASSERT_TRUE(testFnButton(key, GB_COM_SET_CONTROL, GB_CONTROL_PUSK_UD_1));
+    ASSERT_TRUE(testFnButton(key, TControl::CTRL_RemotePusk1));
     mObj->sParam.glb.setNumDevices(GB_NUM_DEVICES_3);
-    ASSERT_TRUE(testFnButton(key, GB_COM_SET_CONTROL, GB_CONTROL_PUSK_UD_ALL));
+    ASSERT_TRUE(testFnButton(key, TControl::CTRL_RemotePuskAll));
 
     mObj->sParam.def.status.setEnable(false);
 
-    ASSERT_TRUE(testFnButton(key, GB_COM_NO, 0));
+    ASSERT_TRUE(testFnButton(key, TControl::CTRL_NO));
 }
 
 //
@@ -214,10 +211,10 @@ TEST_F(clMenu_Test, onFnButton_acPuskUd)
     eKEY key = KEY_AC_PUSK_UD;
 
     mObj->sParam.def.status.setEnable(true);
-    ASSERT_TRUE(testFnButton(key, GB_COM_SET_CONTROL, GB_CONTROL_PUSK_AC_UD));
+    ASSERT_TRUE(testFnButton(key, TControl::CTRL_RemoteAcPusk));
 
     mObj->sParam.def.status.setEnable(false);
-    ASSERT_TRUE(testFnButton(key, GB_COM_NO, 0));
+    ASSERT_TRUE(testFnButton(key, TControl::CTRL_NO));
 }
 
 //
@@ -228,13 +225,13 @@ TEST_F(clMenu_Test, onFnButton_puskNalad)
     mObj->sParam.def.status.setEnable(true);
 
     mObj->sParam.def.status.setState(7);
-    ASSERT_TRUE(testFnButton(key, GB_COM_SET_CONTROL, GB_CONTROL_PUSK_OFF));
+    ASSERT_TRUE(testFnButton(key, TControl::CTRL_PuskAdjOff));
     mObj->sParam.def.status.setState(6);
-    ASSERT_TRUE(testFnButton(key, GB_COM_SET_CONTROL, GB_CONTROL_PUSK_ON));
+    ASSERT_TRUE(testFnButton(key, TControl::CTRL_PuskAdjOn));
 
     mObj->sParam.def.status.setEnable(false);
 
-    ASSERT_TRUE(testFnButton(key, GB_COM_NO, 0));
+    ASSERT_TRUE(testFnButton(key, TControl::CTRL_NO));
 }
 
 //
@@ -243,10 +240,10 @@ TEST_F(clMenu_Test, onFnButton_acReset)
     eKEY key = KEY_AC_RESET;
 
     mObj->sParam.def.status.setEnable(true);
-    ASSERT_TRUE(testFnButton(key, GB_COM_SET_CONTROL, GB_CONTROL_RESET_AC));
+    ASSERT_TRUE(testFnButton(key, TControl::CTRL_AcReset));
 
     mObj->sParam.def.status.setEnable(false);
-    ASSERT_TRUE(testFnButton(key, GB_COM_NO, 0));
+    ASSERT_TRUE(testFnButton(key, TControl::CTRL_NO));
 }
 
 TEST_F(clMenu_Test, onFnButton_acPusk)
@@ -257,31 +254,31 @@ TEST_F(clMenu_Test, onFnButton_acPusk)
 
     mObj->sParam.typeDevice = AVANT_R400M;
     mObj->sParam.glb.setCompatibility(GB_COMP_R400M_LINER);
-    ASSERT_TRUE(testFnButton(key, GB_COM_NO, 0));
+    ASSERT_TRUE(testFnButton(key, TControl::CTRL_NO));
     mObj->sParam.glb.setCompatibility(GB_COMP_R400M_AVZK80);
-    ASSERT_TRUE(testFnButton(key, GB_COM_DEF_SET_TYPE_AC, GB_TYPE_AC_PUSK));
+    ASSERT_TRUE(testFnButton(key, TControl::CTRL_AcPusk));
     mObj->sParam.glb.setCompatibility(GB_COMP_R400M_PVZ90);
-    ASSERT_TRUE(testFnButton(key, GB_COM_DEF_SET_TYPE_AC, GB_TYPE_AC_PUSK));
+    ASSERT_TRUE(testFnButton(key, TControl::CTRL_AcPusk));
     mObj->sParam.glb.setCompatibility(GB_COMP_R400M_AVANT);
-    ASSERT_TRUE(testFnButton(key, GB_COM_DEF_SET_TYPE_AC, GB_TYPE_AC_PUSK_SELF));
+    ASSERT_TRUE(testFnButton(key, TControl::CTRL_AcPuskSelf));
     mObj->sParam.glb.setCompatibility(GB_COMP_R400M_PVZUE);
-    ASSERT_TRUE(testFnButton(key, GB_COM_DEF_SET_TYPE_AC, GB_TYPE_AC_PUSK_SELF));
+    ASSERT_TRUE(testFnButton(key, TControl::CTRL_AcPuskSelf));
     mObj->sParam.glb.setCompatibility(GB_COMP_R400M_PVZL);
-    ASSERT_TRUE(testFnButton(key, GB_COM_DEF_SET_TYPE_AC, GB_TYPE_AC_PUSK_SELF));
+    ASSERT_TRUE(testFnButton(key, TControl::CTRL_AcPuskSelf));
     mObj->sParam.glb.setCompatibility(GB_COMP_R400M_PVZK);
-    ASSERT_TRUE(testFnButton(key, GB_COM_DEF_SET_TYPE_AC, GB_TYPE_AC_PUSK_SELF));
+    ASSERT_TRUE(testFnButton(key, TControl::CTRL_AcPuskSelf));
 
     mObj->sParam.typeDevice = AVANT_RZSK;
     mObj->sParam.glb.setCompatibility(GB_COMP_RZSK);
-    ASSERT_TRUE(testFnButton(key, GB_COM_NO, 0));
+    ASSERT_TRUE(testFnButton(key, TControl::CTRL_NO));
     mObj->sParam.glb.setCompatibility(GB_COMP_RZSK_M);
-    ASSERT_TRUE(testFnButton(key, GB_COM_DEF_SET_TYPE_AC, GB_TYPE_AC_PUSK_SELF));
+    ASSERT_TRUE(testFnButton(key, TControl::CTRL_AcPuskSelf));
     mObj->sParam.glb.setCompatibility(GB_COMP_RZSK_3E8);
-    ASSERT_TRUE(testFnButton(key, GB_COM_NO, 0));
+    ASSERT_TRUE(testFnButton(key, TControl::CTRL_NO));
 
     mObj->sParam.def.status.setEnable(false);
 
-    ASSERT_TRUE(testFnButton(key, GB_COM_NO, 0));
+    ASSERT_TRUE(testFnButton(key, TControl::CTRL_NO));
 }
 
 //
@@ -290,10 +287,10 @@ TEST_F(clMenu_Test, onFnButton_acRegime)
     eKEY key = KEY_AC_REGIME;
 
     mObj->sParam.def.status.setEnable(true);
-    ASSERT_TRUE(testFnButton(key, GB_COM_SET_CONTROL, GB_CONTROL_REG_AC));
+    ASSERT_TRUE(testFnButton(key, TControl::CTRL_AcRegime));
 
     mObj->sParam.def.status.setEnable(false);
-    ASSERT_TRUE(testFnButton(key, GB_COM_NO, 0));
+    ASSERT_TRUE(testFnButton(key, TControl::CTRL_NO));
 }
 
 //
@@ -304,22 +301,22 @@ TEST_F(clMenu_Test, onFnButton_resetInd)
     mObj->sParam.def.status.setEnable(true);
     mObj->sParam.prd.status.setEnable(false);
     mObj->sParam.prm.status.setEnable(false);
-    ASSERT_TRUE(testFnButton(key, GB_COM_NO, 0));
+    ASSERT_TRUE(testFnButton(key, TControl::CTRL_NO));
 
     mObj->sParam.def.status.setEnable(false);
     mObj->sParam.prd.status.setEnable(true);
     mObj->sParam.prm.status.setEnable(false);
-    ASSERT_TRUE(testFnButton(key, GB_COM_PRM_RES_IND, 0));
+    ASSERT_TRUE(testFnButton(key, TControl::CTRL_IndReset));
 
     mObj->sParam.def.status.setEnable(false);
     mObj->sParam.prd.status.setEnable(false);
     mObj->sParam.prm.status.setEnable(true);
-    ASSERT_TRUE(testFnButton(key, GB_COM_PRM_RES_IND, 0));
+    ASSERT_TRUE(testFnButton(key, TControl::CTRL_IndReset));
 
     mObj->sParam.def.status.setEnable(true);
     mObj->sParam.prd.status.setEnable(true);
     mObj->sParam.prm.status.setEnable(true);
-    ASSERT_TRUE(testFnButton(key, GB_COM_PRM_RES_IND, 0));
+    ASSERT_TRUE(testFnButton(key, TControl::CTRL_IndReset));
 }
 
 //
@@ -328,10 +325,10 @@ TEST_F(clMenu_Test, onFnButton_pusk)
     eKEY key = KEY_PUSK;
 
     mObj->sParam.prm.status.setEnable(true);
-    ASSERT_TRUE(testFnButton(key, GB_COM_PRM_ENTER, 0));
+    ASSERT_TRUE(testFnButton(key, TControl::CTRL_PuskPrm));
 
     mObj->sParam.prm.status.setEnable(false);
-    ASSERT_TRUE(testFnButton(key, GB_COM_NO, 0));
+    ASSERT_TRUE(testFnButton(key, TControl::CTRL_NO));
 }
 
 //
@@ -339,7 +336,7 @@ TEST_F(clMenu_Test, onFnButton_reset)
 {
     eKEY key = KEY_RESET;
 
-    ASSERT_TRUE(testFnButton(key, GB_COM_SET_CONTROL, GB_CONTROL_RESET_SELF));
+    ASSERT_TRUE(testFnButton(key, TControl::CTRL_Reset));
 }
 
 //
@@ -408,4 +405,21 @@ TEST_F(clMenu_Test, getKeyboardLayout)
     ASSERT_EQ(AVANT_K400, mObj->getKeyboardLayout());
     mObj->sParam.typeDevice = AVANT_MAX;
     ASSERT_EQ(AVANT_K400, mObj->getKeyboardLayout());
+}
+
+//
+TEST_F(clMenu_Test, addControlToSend)
+{
+    mObj->addControlToSend(TControl::CTRL_Call);
+    ASSERT_EQ(GB_COM_SET_CONTROL, mObj->sParam.txComBuf.getFastCom());
+    ASSERT_EQ(7, mObj->sParam.txComBuf.getInt8());
+
+    mObj->addControlToSend(TControl::CTRL_PuskPrm);
+    ASSERT_EQ(GB_COM_PRM_ENTER, mObj->sParam.txComBuf.getFastCom());
+
+    mObj->addControlToSend(TControl::CTRL_NO);
+    ASSERT_EQ(GB_COM_NO, mObj->sParam.txComBuf.getFastCom());
+
+    mObj->addControlToSend(TControl::CTRL_MAX);
+    ASSERT_EQ(GB_COM_NO, mObj->sParam.txComBuf.getFastCom());
 }
