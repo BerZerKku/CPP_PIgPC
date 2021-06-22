@@ -1998,8 +1998,8 @@ static const Param fOtherTestSignal PROGMEM = {
     Param::CHANGE_REG_DISABLE // условие для изменения параметра
 };
 
-// Режим работы
-// Создан для удобства вывода текущего значения.
+// Ввод режима работы
+// Создан для удобства ввода
 static const Param fOtherRegime PROGMEM = {
     "Режим",                // название параметра
     GB_COM_NO,              // команда стандартного протокола

@@ -147,8 +147,12 @@ void MainWindow::initView()
     addViewItem(top, "Совместимость Р400", &view.typeCompatibility);
     addViewItem(top, "Тип оптики", &view.typeOpto);
 
+    // Обновление расскладки клавиатуры при смене аппарата или совместимости
+    // задержка в 200мс нужна для обновления расскладки в ПИ
     connect(&view.typeDevice, &QLineEdit::textChanged,
-            [=]() {initKeyboard();});
+            [=]() {QTimer::singleShot(200, this, &MainWindow::initKeyboard);});
+    connect(&view.typeCompatibility, &QLineEdit::textChanged,
+            [=]() {QTimer::singleShot(200, this, &MainWindow::initKeyboard);});
 
     ui->treeWidget->expandAll();
     ui->treeWidget->resizeColumnToContents(0);

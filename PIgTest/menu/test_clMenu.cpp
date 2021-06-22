@@ -1,5 +1,6 @@
 #include "gtest/gtest.h"
 #include <algorithm>
+#include <functional>
 #include <cstdio>
 #include <iostream>
 
@@ -9,7 +10,9 @@ using namespace std;
     friend class clMenu_Test; \
     FRIEND_TEST(clMenu_Test, checkLedOn); \
     FRIEND_TEST(clMenu_Test, onFnButton); \
-    FRIEND_TEST(clMenu_Test, isRzskM);
+    FRIEND_TEST(clMenu_Test, isRzskM); \
+    FRIEND_TEST(clMenu_Test, getKeyboardLayout);
+
 
 #include "menu/menu.h"
 
@@ -354,4 +357,55 @@ TEST_F(clMenu_Test, isRzskM)
             ASSERT_EQ(isRzsk, mObj->isRzskM());
         }
     }
+}
+
+//
+TEST_F(clMenu_Test, getKeyboardLayout)
+{
+    // По умолчанию устанавливается расскладка для К400
+    ASSERT_EQ(AVANT_K400, mObj->getKeyboardLayout());
+
+    // Р400, Р400м
+    mObj->sParam.typeDevice = AVANT_R400M;
+    ASSERT_EQ(AVANT_R400M, mObj->getKeyboardLayout());
+    mObj->sParam.typeDevice = AVANT_R400;
+    ASSERT_EQ(AVANT_R400M, mObj->getKeyboardLayout());
+
+    // К400
+    mObj->sParam.typeDevice = AVANT_K400;
+    ASSERT_EQ(AVANT_K400, mObj->getKeyboardLayout());
+
+    // РЗСК
+    mObj->sParam.typeDevice = AVANT_RZSK;
+    mObj->sParam.glb.setCompatibility(GB_COMP_RZSK);
+    ASSERT_EQ(AVANT_RZSK, mObj->getKeyboardLayout());
+    mObj->sParam.glb.setCompatibility(GB_COMP_RZSK_M);
+    ASSERT_EQ(AVANT_R400M, mObj->getKeyboardLayout());
+    mObj->sParam.glb.setCompatibility(GB_COMP_RZSK_3E8);
+    ASSERT_EQ(AVANT_K400, mObj->getKeyboardLayout());
+    // Чтобы не забыть добавить тесты в случае добавления новой совместимости
+    ASSERT_EQ(GB_COMP_RZSK_MAX, GB_COMP_RZSK_3E8 + 1);
+
+    // ОПТИКА
+    mObj->sParam.typeDevice = AVANT_OPTO;
+    mObj->sParam.def.status.setEnable(true);
+    mObj->sParam.prd.status.setEnable(false);
+    mObj->sParam.prm.status.setEnable(false);
+    ASSERT_EQ(AVANT_R400M, mObj->getKeyboardLayout()); // защ
+    mObj->sParam.prd.status.setEnable(true);
+    ASSERT_EQ(AVANT_RZSK, mObj->getKeyboardLayout());  // защ + прд
+    mObj->sParam.prd.status.setEnable(false);
+    mObj->sParam.prm.status.setEnable(true);
+    ASSERT_EQ(AVANT_RZSK, mObj->getKeyboardLayout());  // защ + прм
+    mObj->sParam.def.status.setEnable(false);
+    ASSERT_EQ(AVANT_K400, mObj->getKeyboardLayout());  // прм
+    mObj->sParam.prd.status.setEnable(true);
+    ASSERT_EQ(AVANT_K400, mObj->getKeyboardLayout());  // прм + прд
+    mObj->sParam.prm.status.setEnable(false);
+    ASSERT_EQ(AVANT_K400, mObj->getKeyboardLayout());  // прд
+
+    mObj->sParam.typeDevice = AVANT_NO;
+    ASSERT_EQ(AVANT_K400, mObj->getKeyboardLayout());
+    mObj->sParam.typeDevice = AVANT_MAX;
+    ASSERT_EQ(AVANT_K400, mObj->getKeyboardLayout());
 }

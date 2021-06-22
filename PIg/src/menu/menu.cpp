@@ -238,7 +238,6 @@ void clMenu::proc(void) {
 bool clMenu::setDeviceK400() {
     sParam.typeDevice = AVANT_K400;
     sParam.glb.setTypeDevice(AVANT_K400);
-    vKEYset(AVANT_K400);
 
     // включение/отключение параметров в зависимости от текущей совместимости
     eGB_COMP_K400 comp = sParam.glb.getCompK400();
@@ -443,12 +442,6 @@ bool clMenu::setDeviceRZSK() {
     sParam.typeDevice = AVANT_RZSK;
     sParam.glb.setTypeDevice(AVANT_RZSK);
 
-    if (comp == GB_COMP_RZSK_M) {
-        vKEYset(AVANT_R400M);
-    } else {
-        vKEYset(AVANT_RZSK);
-    }
-
     sParam.prm.status.setEnable(sParam.prm.getNumCom() != 0);
     sParam.prd.status.setEnable(sParam.prd.getNumCom() != 0);
 
@@ -607,7 +600,6 @@ bool clMenu::setDeviceR400M() {
 
     sParam.typeDevice = AVANT_R400M;
     sParam.glb.setTypeDevice(AVANT_R400M);
-    vKEYset(AVANT_R400M);
 
     // состояния
     sParam.def.status.stateText[9] = fcDefSost09;
@@ -715,17 +707,6 @@ bool clMenu::setDeviceOPTO() {
 
     sParam.prm.status.setEnable(sParam.prm.getNumCom() != 0);
     sParam.prd.status.setEnable(sParam.prd.getNumCom() != 0);
-
-    if (sParam.def.status.isEnable()) {
-        // в РЗСК будет клавиатура от РЗСК, иначе от Р400м
-        if (sParam.prm.status.isEnable() || sParam.prd.status.isEnable()) {
-            vKEYset(AVANT_RZSK);
-        } else {
-            vKEYset(AVANT_R400M);
-        }
-    } else {
-        vKEYset(AVANT_K400);
-    }
 
     // состояния
     sParam.def.status.stateText[9] = fcDefSost09opto;
@@ -928,6 +909,8 @@ bool clMenu::setDevice(eGB_TYPE_DEVICE device) {
 
         lvlMenu = &clMenu::lvlError;
     }
+
+    vKEYset(getKeyboardLayout());
 
     // "сброс" флага необходимости проверки типа аппарата
     sParam.device = true;
@@ -5163,4 +5146,48 @@ eKEY clMenu::onFnButton(eKEY key) {
     }
 
     return key;
+}
+
+//
+eGB_TYPE_DEVICE clMenu::getKeyboardLayout()
+{
+    eGB_TYPE_DEVICE layout = AVANT_K400;
+
+    switch (sParam.typeDevice) {
+        case AVANT_K400: {
+            layout = AVANT_K400;
+        } break;
+
+        case AVANT_R400:
+        case AVANT_R400M: {
+            layout = AVANT_R400M;
+        } break;
+
+        case AVANT_RZSK: {
+            eGB_COMP_RZSK comp = sParam.glb.getCompRZSK();
+            if (comp == GB_COMP_RZSK_M) {
+                layout = AVANT_R400M;
+            } else if (comp == GB_COMP_RZSK_3E8) {
+                layout = AVANT_K400;
+            } else {
+                layout = AVANT_RZSK;
+            }
+        } break;
+
+        case AVANT_OPTO: {
+            if (sParam.def.status.isEnable()) {
+                bool hasprm = sParam.prm.status.isEnable();
+                bool hasprd = sParam.prd.status.isEnable();
+
+                layout = hasprd || hasprm ? AVANT_RZSK : AVANT_R400M;
+            } else {
+                layout = AVANT_K400;
+            }
+        } break;
+
+        case AVANT_NO: break;
+        case AVANT_MAX: break;
+    }
+
+    return layout;
 }

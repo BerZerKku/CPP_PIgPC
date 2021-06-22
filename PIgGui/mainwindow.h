@@ -70,8 +70,6 @@ class MainWindow : public QMainWindow
         QLineEdit numDevices;
         QLineEdit typeCommLine;
         QLineEdit typeCompatibility;
-        QLineEdit typeCompK400;
-        QLineEdit typeCompRZSK;
         QLineEdit typeOpto;
     } view;
 
