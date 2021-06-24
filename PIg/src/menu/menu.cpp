@@ -3850,10 +3850,10 @@ void clMenu::lvlTest1() {
                     sParam.test.addSignalToList(eGB_TEST_SIGNAL(signal));
                 }
             } else {
-                sParam.test.addSignalToList(GB_SIGNAL_CF_NO_RZ);
-                sParam.test.addSignalToList(GB_SIGNAL_CF2_NO_RZ);
+                sParam.test.addSignalToList(GB_SIGNAL_CF1);
+                sParam.test.addSignalToList(GB_SIGNAL_CF2);
                 for(uint8_t i = 0; i < num_com; i++) {
-                    uint8_t signal = GB_SIGNAL_COM1_NO_RZ + i;
+                    uint8_t signal = GB_SIGNAL_COM1 + i;
                     sParam.test.addSignalToList(eGB_TEST_SIGNAL(signal));
                 }
             }
@@ -3962,7 +3962,6 @@ void clMenu::lvlTest1() {
             EnterParam.setEnable(MENU_ENTER_PARAM_LIST_2);
             EnterParam.setValueRange(0, sParam.test.getNumSignals() - 1);
             EnterParam.listValue = sParam.test.signalList;
-            //            EnterParam.list = fcTest1K400[0];
             EnterParam.com = GB_COM_SET_REG_TEST_1;
             break;
 

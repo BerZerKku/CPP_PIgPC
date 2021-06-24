@@ -18,10 +18,7 @@ class TTest_Test: public ::testing::Test
 public:
     TTest *mObj;
 
-    TTest_Test()
-    {
-
-    }
+    TTest_Test() {}
 
     virtual ~TTest_Test() override = default;
 
@@ -103,9 +100,9 @@ TEST_F(TTest_Test, setCurrentSignal_RzskHf)
     // РЗ2 - есть блокировка
     // Структура данных:
     // Байты: [b1] ... [b6]
-    // бит:        4      3      2      1
-    // b1/b4 :  [рз2]  [рз1]  [кч2]  [кч1]
-    // b2/b5 : [ком4] [ком3] [ком2] [ком1]
+    // бит:        8      7      6      5      4      3      2      1
+    // b1/b4 :    [x]    [x]    [x]    [x]  [рз2]  [рз1]  [кч2]  [кч1]
+    // b2/b5 : [ком8] [ком7] [ком6] [ком5] [ком4] [ком3] [ком2] [ком1]
 
     // проверка первого сигнала
 
@@ -122,33 +119,47 @@ TEST_F(TTest_Test, setCurrentSignal_RzskHf)
         {"data02", {0x09, 0x00, 0xFF}, GB_SIGNAL_CF_RZ,       "КЧ1 с блок"},
         {"data03", {0x06, 0x00, 0xFF}, GB_SIGNAL_CF2_NO_RZ,   "КЧ2"},
         {"data04", {0x0A, 0x00, 0xFF}, GB_SIGNAL_CF2_RZ,      "КЧ2 с блок"},
-        {"data05", {0x04, 0x01, 0xFF}, GB_SIGNAL_COM1_NO_RZ,  "Команда1"},
-        {"data06", {0x04, 0x02, 0xFF}, GB_SIGNAL_COM2_NO_RZ,  "Команда2"},
-        {"data07", {0x04, 0x04, 0xFF}, GB_SIGNAL_COM3_NO_RZ,  "Команда3"},
-        {"data08", {0x04, 0x08, 0xFF}, GB_SIGNAL_COM4_NO_RZ,  "Команда4"},
-        {"data09", {0x04, 0x10, 0xFF}, GB_SIGNAL_COM5_NO_RZ,  "Команда5"},
-        {"data10", {0x04, 0x20, 0xFF}, GB_SIGNAL_COM6_NO_RZ,  "Команда6"},
-        {"data11", {0x04, 0x40, 0xFF}, GB_SIGNAL_COM7_NO_RZ,  "Команда7"},
-        {"data12", {0x04, 0x80, 0xFF}, GB_SIGNAL_COM8_NO_RZ,  "Команда8"},
-        {"data13", {0x08, 0x01, 0xFF}, GB_SIGNAL_COM1_RZ,     "Ком1+блок"},
-        {"data14", {0x08, 0x02, 0xFF}, GB_SIGNAL_COM2_RZ,     "Ком2+блок"},
-        {"data15", {0x08, 0x04, 0xFF}, GB_SIGNAL_COM3_RZ,     "Ком3+блок"},
-        {"data16", {0x08, 0x08, 0xFF}, GB_SIGNAL_COM4_RZ,     "Ком4+блок"},
-        {"data17", {0x08, 0x10, 0xFF}, GB_SIGNAL_COM5_RZ,     "Ком5+блок"},
-        {"data18", {0x08, 0x20, 0xFF}, GB_SIGNAL_COM6_RZ,     "Ком6+блок"},
-        {"data19", {0x08, 0x40, 0xFF}, GB_SIGNAL_COM7_RZ,     "Ком7+блок"},
-        {"data20", {0x08, 0x80, 0xFF}, GB_SIGNAL_COM8_RZ,     "Ком8+блок"},
+        {"data05", {0x01, 0x00, 0xFF}, GB_SIGNAL_CF1,         "КЧ1"},
+        {"data06", {0x02, 0x00, 0xFF}, GB_SIGNAL_CF2,         "КЧ2"},
+        {"data07", {0x04, 0x01, 0xFF}, GB_SIGNAL_COM1_NO_RZ,  "Команда1"},
+        {"data08", {0x04, 0x02, 0xFF}, GB_SIGNAL_COM2_NO_RZ,  "Команда2"},
+        {"data09", {0x04, 0x04, 0xFF}, GB_SIGNAL_COM3_NO_RZ,  "Команда3"},
+        {"data10", {0x04, 0x08, 0xFF}, GB_SIGNAL_COM4_NO_RZ,  "Команда4"},
+        {"data11", {0x04, 0x10, 0xFF}, GB_SIGNAL_COM5_NO_RZ,  "Команда5"},
+        {"data12", {0x04, 0x20, 0xFF}, GB_SIGNAL_COM6_NO_RZ,  "Команда6"},
+        {"data13", {0x04, 0x40, 0xFF}, GB_SIGNAL_COM7_NO_RZ,  "Команда7"},
+        {"data14", {0x04, 0x80, 0xFF}, GB_SIGNAL_COM8_NO_RZ,  "Команда8"},
+        {"data15", {0x08, 0x01, 0xFF}, GB_SIGNAL_COM1_RZ,     "Ком1+блок"},
+        {"data16", {0x08, 0x02, 0xFF}, GB_SIGNAL_COM2_RZ,     "Ком2+блок"},
+        {"data17", {0x08, 0x04, 0xFF}, GB_SIGNAL_COM3_RZ,     "Ком3+блок"},
+        {"data18", {0x08, 0x08, 0xFF}, GB_SIGNAL_COM4_RZ,     "Ком4+блок"},
+        {"data19", {0x08, 0x10, 0xFF}, GB_SIGNAL_COM5_RZ,     "Ком5+блок"},
+        {"data20", {0x08, 0x20, 0xFF}, GB_SIGNAL_COM6_RZ,     "Ком6+блок"},
+        {"data21", {0x08, 0x40, 0xFF}, GB_SIGNAL_COM7_RZ,     "Ком7+блок"},
+        {"data22", {0x08, 0x80, 0xFF}, GB_SIGNAL_COM8_RZ,     "Ком8+блок"},
+        {"data23", {0x00, 0x01, 0xFF}, GB_SIGNAL_COM1,        "Команда1"},
+        {"data24", {0x00, 0x02, 0xFF}, GB_SIGNAL_COM2,        "Команда2"},
+        {"data25", {0x00, 0x04, 0xFF}, GB_SIGNAL_COM3,        "Команда3"},
+        {"data26", {0x00, 0x08, 0xFF}, GB_SIGNAL_COM4,        "Команда4"},
+        {"data27", {0x00, 0x10, 0xFF}, GB_SIGNAL_COM5,        "Команда5"},
+        {"data28", {0x00, 0x20, 0xFF}, GB_SIGNAL_COM6,        "Команда6"},
+        {"data29", {0x00, 0x40, 0xFF}, GB_SIGNAL_COM7,        "Команда7"},
+        {"data30", {0x00, 0x80, 0xFF}, GB_SIGNAL_COM8,        "Команда8"},
         // поиск начинается с первой команды, выводится первая найденная
-        {"data21", {0x04, 0x0F, 0xFF}, GB_SIGNAL_COM1_NO_RZ,  "Команда1"},
-        {"data22", {0x08, 0x0F, 0xFF}, GB_SIGNAL_COM1_RZ,     "Ком1+блок"},
-        {"data23", {0x0F, 0x0F, 0xFF}, GB_SIGNAL_COM1_NO_RZ,  "Команда1"},
+        {"data31", {0x04, 0xFF, 0xFF}, GB_SIGNAL_COM1_NO_RZ,  "Команда1"},
+        {"data32", {0x08, 0xFF, 0xFF}, GB_SIGNAL_COM1_RZ,     "Ком1+блок"},
+        {"data33", {0x0F, 0xFF, 0xFF}, GB_SIGNAL_COM1_NO_RZ,  "Команда1"},
+        {"data34", {0x00, 0xFF, 0xFF}, GB_SIGNAL_COM1,        "Команда1"},
         // поиск блокировки с командой начинается с РЗ1 (не блок)
-        {"data24", {0x0C, 0x0E, 0xFF}, GB_SIGNAL_COM2_NO_RZ,  "Команда2"},
-        // без команды перебирается: РЗ1 + КЧ2, РЗ2 + КЧ2, РЗ1 + КЧ1, РЗ1 + КЧ1
-        {"data25", {0xFF, 0x00, 0xFF}, GB_SIGNAL_CF2_NO_RZ,   "КЧ2"},
-        {"data26", {0xFB, 0x00, 0xFF}, GB_SIGNAL_CF2_RZ,      "КЧ2 с блок"},
-        {"data27", {0xFD, 0x00, 0xFF}, GB_SIGNAL_CF_NO_RZ,    "КЧ1"},
-        {"data28", {0xF0, 0x00, 0xFF}, GB_SIGNAL_OFF,         "выкл."}
+        {"data35", {0x0C, 0x0E, 0xFF}, GB_SIGNAL_COM2_NO_RZ,  "Команда2"},
+        // без команды перебирается:
+        // РЗ1 + КЧ2, РЗ2 + КЧ2, КЧ2, РЗ1 + КЧ1, РЗ1 + КЧ1, КЧ1
+        {"data36", {0xFF, 0x00, 0xFF}, GB_SIGNAL_CF2_NO_RZ,   "КЧ2"},
+        {"data37", {0xFB, 0x00, 0xFF}, GB_SIGNAL_CF2_RZ,      "КЧ2 с блок"},
+        {"data38", {0xF3, 0x00, 0xFF}, GB_SIGNAL_CF2,         "КЧ2"},
+        {"data39", {0xFD, 0x00, 0xFF}, GB_SIGNAL_CF_NO_RZ,    "КЧ1"},
+        {"data40", {0xF1, 0x00, 0xFF}, GB_SIGNAL_CF1,         "КЧ1"},
+        {"data41", {0xF0, 0x00, 0xFF}, GB_SIGNAL_OFF,         "выкл."}
     };
 
     for(auto &item : testdata) {

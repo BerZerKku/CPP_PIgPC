@@ -170,17 +170,26 @@ eGB_TEST_SIGNAL TTest::getCurrentSignalRZSK(const uint8_t *s)
             signal = static_cast<eGB_TEST_SIGNAL> (b2 + GB_SIGNAL_COM1_NO_RZ);
         } else if (b1 & 0x08) {
             signal = static_cast<eGB_TEST_SIGNAL> (b2 + GB_SIGNAL_COM1_RZ);
+        } else {
+            signal = static_cast<eGB_TEST_SIGNAL> (b2 + GB_SIGNAL_COM1);
         }
     } else if (b1) {
-        // если есть РЗ, то есть и КЧ
-        if ((b1 & 0x06) == 0x06) {
-            signal = GB_SIGNAL_CF2_NO_RZ;
-        } else if ((b1 & 0x0A) == 0x0A) {
-            signal = GB_SIGNAL_CF2_RZ;
-        } else if ((b1 & 0x05) == 0x05) {
-            signal = GB_SIGNAL_CF_NO_RZ;
-        } else if ((b1 & 0x09) == 0x09)  {
-            signal = GB_SIGNAL_CF_RZ;
+        if (b1 & 0x02) {
+            if (b1 & 0x04) {
+                signal = GB_SIGNAL_CF2_NO_RZ;
+            } else if (b1 & 0x08) {
+                signal = GB_SIGNAL_CF2_RZ;
+            } else {
+                signal = GB_SIGNAL_CF2;
+            }
+        } else if (b1 & 0x01) {
+            if (b1 & 0x04) {
+                signal = GB_SIGNAL_CF_NO_RZ;
+            } else if (b1 & 0x08) {
+                signal = GB_SIGNAL_CF_RZ;
+            } else {
+                signal = GB_SIGNAL_CF1;
+            }
         }
     }
 
