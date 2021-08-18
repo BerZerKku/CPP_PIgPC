@@ -13,26 +13,28 @@
 /**
  * @brief Класс для работы с сигналами управления, в том числе и с АК.
  */
-class TControl {
+class TControl
+{
 
 public:
     /// Сигналы управления.
-    enum ctrl_t {
-        CTRL_NO = -1,           ///< Нет сигнала
+    enum ctrl_t
+    {
+        CTRL_NO = -1,  ///< Нет сигнала
         //
-        CTRL_Call = 0,          ///< Вызов
-        CTRL_AcPusk,            ///< Пуск АК
-        CTRL_AcPuskSelf,        ///< Пуск АК своего ?!
-        CTRL_AcRegime,          ///< Смена режима АК
-        CTRL_AcReset,           ///< Сброс АК
-        CTRL_IndReset,          ///< Сброс индикации
-        CTRL_PuskAdjOn,         ///< Пуск своего вкл.
-        CTRL_PuskAdjOff,        ///< Пуск своего выкл.
-        CTRL_PuskPrm,           ///< Пуск приемника
-        CTRL_RemoteAcPusk,      ///< Пуск АК удаленного
-        CTRL_RemotePusk1,       ///< Пуск удаленного 1
-        CTRL_RemotePuskAll,     ///< Пуск удаленных
-        CTRL_Reset,             ///< Сброс
+        CTRL_Call = 0,       ///< Вызов
+        CTRL_AcPusk,         ///< Пуск АК
+        CTRL_AcPuskSelf,     ///< Пуск АК своего ?!
+        CTRL_AcRegime,       ///< Смена режима АК
+        CTRL_AcReset,        ///< Сброс АК
+        CTRL_IndReset,       ///< Сброс индикации
+        CTRL_PuskAdjOn,      ///< Пуск своего вкл.
+        CTRL_PuskAdjOff,     ///< Пуск своего выкл.
+        CTRL_PuskPrm,        ///< Пуск приемника
+        CTRL_RemoteAcPusk,   ///< Пуск АК удаленного
+        CTRL_RemotePusk1,    ///< Пуск удаленного 1
+        CTRL_RemotePuskAll,  ///< Пуск удаленных
+        CTRL_Reset,          ///< Сброс
         //
         CTRL_MAX
     };
@@ -57,13 +59,13 @@ public:
     bool getData(ctrl_t ctrl, eGB_COM &com, bool &isbyte, uint8_t &byte) const;
 
 private:
-
     /// Структруа сигнала управления.
-    struct data_t {
-        char text[20];  ///< Название синала.
-        eGB_COM com;    ///< Команда стандратного протокола АВАНТ.
-        bool isbyte;    ///< Наличие байта данных в команде.
-        uint8_t byte;   ///< Байт данных.
+    struct data_t
+    {
+        char    text[20];  ///< Название синала.
+        eGB_COM com;     ///< Команда стандратного протокола АВАНТ.
+        bool    isbyte;  ///< Наличие байта данных в команде.
+        uint8_t byte;    ///< Байт данных.
     };
 
     static const data_t mData[TControl::CTRL_MAX] PROGMEM;

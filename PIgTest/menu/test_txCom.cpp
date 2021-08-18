@@ -9,32 +9,34 @@ using namespace std;
 // размер массива
 #define SIZE_ARRAY(arr) (sizeof(arr) / sizeof(arr[0]))
 
-class TTxCom_Test: public ::testing::Test
+class TTxCom_Test : public ::testing::Test
 {
 public:
     const uint8_t kSizeBufComFast = 3;
-    const uint8_t kSizeBufCom1 = 10;
-    const uint8_t kSizeBufCom2 = 4;
-    const uint8_t kSizeDataBuf = 16;
+    const uint8_t kSizeBufCom1    = 10;
+    const uint8_t kSizeBufCom2    = 4;
+    const uint8_t kSizeDataBuf    = 16;
 
 
-    TTxCom *mTxCom = nullptr;
-    const uint8_t *mBuf = nullptr;
+    TTxCom *       mTxCom = nullptr;
+    const uint8_t *mBuf   = nullptr;
 
-    TTxCom_Test() {}
+    TTxCom_Test() { }
     virtual ~TTxCom_Test() override = default;
 
 protected:
-    virtual void SetUp() override {
+    virtual void SetUp() override
+    {
         mTxCom = new TTxCom;
-        mBuf = mTxCom->getBuferAddress();
+        mBuf   = mTxCom->getBuferAddress();
     }
 
-    virtual void TearDown() override {
+    virtual void TearDown() override
+    {
         delete mTxCom;
 
         mTxCom = nullptr;
-        mBuf = nullptr;
+        mBuf   = nullptr;
     }
 };
 
@@ -47,14 +49,14 @@ TEST_F(TTxCom_Test, int8)
     ASSERT_EQ(0, mTxCom->getInt8(1));
     ASSERT_EQ(0, mBuf[1]);
 
-    ASSERT_EQ(0, mTxCom->getInt8(kSizeDataBuf-1));
-    ASSERT_EQ(0, mBuf[kSizeDataBuf-1]);
+    ASSERT_EQ(0, mTxCom->getInt8(kSizeDataBuf - 1));
+    ASSERT_EQ(0, mBuf[kSizeDataBuf - 1]);
 
     ASSERT_EQ(0, mTxCom->getInt8(kSizeDataBuf));
 
     mTxCom->setInt8(1, 0);
     mTxCom->setInt8(2, 1);
-    mTxCom->setInt8(16, kSizeDataBuf-1);
+    mTxCom->setInt8(16, kSizeDataBuf - 1);
     mTxCom->setInt8(17, kSizeDataBuf);
 
     ASSERT_EQ(1, mTxCom->getInt8(0));
@@ -63,13 +65,14 @@ TEST_F(TTxCom_Test, int8)
     ASSERT_EQ(2, mTxCom->getInt8(1));
     ASSERT_EQ(2, mBuf[1]);
 
-    ASSERT_EQ(16, mTxCom->getInt8(kSizeDataBuf-1));
-    ASSERT_EQ(16, mBuf[kSizeDataBuf-1]);
+    ASSERT_EQ(16, mTxCom->getInt8(kSizeDataBuf - 1));
+    ASSERT_EQ(16, mBuf[kSizeDataBuf - 1]);
 
     ASSERT_EQ(0, mTxCom->getInt8(kSizeDataBuf));
 }
 
-TEST_F(TTxCom_Test, int16) {
+TEST_F(TTxCom_Test, int16)
+{
 
     ASSERT_EQ(0, mTxCom->getInt16());
     ASSERT_EQ(0, mBuf[0]);
@@ -96,20 +99,24 @@ TEST_F(TTxCom_Test, int16) {
 //
 TEST_F(TTxCom_Test, com1)
 {
-    for(int i = 0; i < kSizeBufCom1 + 5; i++) {
-        if (mTxCom->getCom1() != GB_COM_NO) {
+    for (int i = 0; i < kSizeBufCom1 + 5; i++)
+    {
+        if (mTxCom->getCom1() != GB_COM_NO)
+        {
             ASSERT_TRUE(false) << "number " << i;
         }
     }
 
-    for(int i = 0; i < kSizeBufCom1; i++) {
-        ASSERT_TRUE(mTxCom->addCom1(static_cast<eGB_COM> (i))) << "number " << i;
+    for (int i = 0; i < kSizeBufCom1; i++)
+    {
+        ASSERT_TRUE(mTxCom->addCom1(static_cast<eGB_COM>(i))) << "number " << i;
     }
 
-    ASSERT_FALSE(mTxCom->addCom1(static_cast<eGB_COM> (kSizeBufCom1)));
+    ASSERT_FALSE(mTxCom->addCom1(static_cast<eGB_COM>(kSizeBufCom1)));
 
-    for(int i = 0; i < kSizeBufCom1; i++) {
-        ASSERT_EQ(static_cast<eGB_COM> (i), mTxCom->getCom1()) << "number " << i;
+    for (int i = 0; i < kSizeBufCom1; i++)
+    {
+        ASSERT_EQ(static_cast<eGB_COM>(i), mTxCom->getCom1()) << "number " << i;
     }
 
     ASSERT_EQ(GB_COM_NO, mTxCom->getCom1());
@@ -127,7 +134,7 @@ TEST_F(TTxCom_Test, fastCom)
 
     mTxCom->setInt8(1, 0);
     mTxCom->setInt8(2, 1);
-    mTxCom->setInt8(kSizeDataBuf, kSizeDataBuf-1);
+    mTxCom->setInt8(kSizeDataBuf, kSizeDataBuf - 1);
     mTxCom->addFastCom(GB_COM_SET_TIME);
     mTxCom->setSendType(GB_SEND_INT8);
 
@@ -159,7 +166,7 @@ TEST_F(TTxCom_Test, fastCom)
     ASSERT_EQ(GB_COM_SET_TIME, mTxCom->getFastCom());
     ASSERT_EQ(1, mTxCom->getInt8(0));
     ASSERT_EQ(2, mTxCom->getInt8(1));
-    ASSERT_EQ(kSizeDataBuf, mTxCom->getInt8(kSizeDataBuf-1));
+    ASSERT_EQ(kSizeDataBuf, mTxCom->getInt8(kSizeDataBuf - 1));
     ASSERT_EQ(GB_SEND_INT8, mTxCom->getSendType());
 
 

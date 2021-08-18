@@ -8,12 +8,12 @@
 #ifndef MENU_H_
 #define MENU_H_
 
-#include "glbDefine.h"
-#include "paramBsp.h"
 #include "drivers/keyboard.h"
-#include "menu/menuPunkt.h"
-#include "menu/enterParam.h"
+#include "glbDefine.h"
 #include "menu/control.h"
+#include "menu/enterParam.h"
+#include "menu/menuPunkt.h"
+#include "paramBsp.h"
 #include "parameter/LocalParams.h"
 
 
@@ -42,34 +42,34 @@
 #define TIME_RETURN_LVL_START (5 * 60 * (1000 / MENU_TIME_CYLCE))
 
 /// Измеряемые параметры
-enum eMENU_MEAS_PARAM {
-    MENU_MEAS_PARAM_NO,			///< нет измеряемого параметра
-    MENU_MEAS_PARAM_DATE,		///< дата
-    MENU_MEAS_PARAM_TIME,		///< время
-    MENU_MEAS_PARAM_UZ,			///< запас по зщаите
-    MENU_MEAS_PARAM_UZ1,		///< запас по защите 1 (для 3-х концевой)
-    MENU_MEAS_PARAM_UZ2,		///< запас по защите 2 (для 3-х концевой)
-    MENU_MEAS_PARAM_UC,			///< запас по КЧ
-    MENU_MEAS_PARAM_UC1,		///< запас по КЧ 1 (для 3-х концевой)
-    MENU_MEAS_PARAM_UC2,		///< запас по КЧ 2 (для 3-х концевой)
-    MENU_MEAS_PARAM_UN,			///< уровень шумов
-    MENU_MEAS_PARAM_UN1,		///< уровень шумов 1 (для 3-х концевой)
-    MENU_MEAS_PARAM_UN2,		///< уровень шумов 2 (для 3-х концевой)
-    MENU_MEAS_PARAM_UOUT,		///< напряжени выхода
-    MENU_MEAS_PARAM_IOUT,		///< ток выхода
-    MENU_MEAS_PARAM_ROUT,		///< сопротивление линии
-    MENU_MEAS_PARAM_SD,			///< просечки в сигнале
-    MENU_MEAS_PARAM_D,			///< Запас по тест.команде (двухчаст) или Отношение сигнал/помеха (одночаст)
-    MENU_MEAS_PARAM_TEMPERATURE,///< Температура на плате БСП-ПИ
-    MENU_MEAS_PARAM_DF			///< Отклонение частоты КС на ПРМ (К400)
+enum eMENU_MEAS_PARAM
+{
+    MENU_MEAS_PARAM_NO,    ///< нет измеряемого параметра
+    MENU_MEAS_PARAM_DATE,  ///< дата
+    MENU_MEAS_PARAM_TIME,  ///< время
+    MENU_MEAS_PARAM_UZ,    ///< запас по зщаите
+    MENU_MEAS_PARAM_UZ1,   ///< запас по защите 1 (для 3-х концевой)
+    MENU_MEAS_PARAM_UZ2,   ///< запас по защите 2 (для 3-х концевой)
+    MENU_MEAS_PARAM_UC,    ///< запас по КЧ
+    MENU_MEAS_PARAM_UC1,   ///< запас по КЧ 1 (для 3-х концевой)
+    MENU_MEAS_PARAM_UC2,   ///< запас по КЧ 2 (для 3-х концевой)
+    MENU_MEAS_PARAM_UN,    ///< уровень шумов
+    MENU_MEAS_PARAM_UN1,   ///< уровень шумов 1 (для 3-х концевой)
+    MENU_MEAS_PARAM_UN2,   ///< уровень шумов 2 (для 3-х концевой)
+    MENU_MEAS_PARAM_UOUT,  ///< напряжени выхода
+    MENU_MEAS_PARAM_IOUT,  ///< ток выхода
+    MENU_MEAS_PARAM_ROUT,  ///< сопротивление линии
+    MENU_MEAS_PARAM_SD,    ///< просечки в сигнале
+    MENU_MEAS_PARAM_D,  ///< Запас по тест.команде (двухчаст) или Отношение сигнал/помеха (одночаст)
+    MENU_MEAS_PARAM_TEMPERATURE,  ///< Температура на плате БСП-ПИ
+    MENU_MEAS_PARAM_DF            ///< Отклонение частоты КС на ПРМ (К400)
 };
 
 
-
 // класс меню
-class clMenu {
+class clMenu
+{
 public:
-
     /** Конструктор.
      *
      * Устнанавливается по умолчанию неопределеныый тип аппарата.
@@ -216,13 +216,15 @@ private:
     eMENU_ENTER_PARAM enterPassword();
 
     /// перемещение курсора вверх
-    void cursorLineUp() {
-        cursorLine_=(cursorLine_>1)? cursorLine_-1 : Punkts_.getMaxNumPunkts();
+    void cursorLineUp()
+    {
+        cursorLine_ = (cursorLine_ > 1) ? cursorLine_ - 1 : Punkts_.getMaxNumPunkts();
     }
 
     /// пермещение курсора вниз
-    void cursorLineDown() {
-        cursorLine_=(cursorLine_<Punkts_.getMaxNumPunkts())? cursorLine_+1 : 1;
+    void cursorLineDown()
+    {
+        cursorLine_ = (cursorLine_ < Punkts_.getMaxNumPunkts()) ? cursorLine_ + 1 : 1;
     }
 
     /// вывод на экран текущих пунктов меню и курсора

@@ -17,12 +17,11 @@
  * сигнал теста ПРД преобразуется в коды для передачи в БСП и хранится список
  * текущих сигналов в тесте ПРД.
  */
-class TTest {
+class TTest
+{
 
 public:
-    TTest() {
-        clear();
-    }
+    TTest() { clear(); }
 
     /// Очищает список сигналов передатчика.
     void clear();
@@ -46,9 +45,7 @@ public:
      * @brief Возвращает максимальное количество сигналов в тесте передатчика.
      * @return Количество сигналов в тесте передатчика.
      */
-    uint8_t getNumSignals() const {
-        return num_;
-    }
+    uint8_t getNumSignals() const { return num_; }
 
     /**
      * @brief Преобразует сообщение из БСП в сигнал теста.
@@ -62,25 +59,21 @@ public:
      * @brief Возвращает текущий сигнал в тесте для передатчика или первого приемника.
      * @return Сигнал передатчика или первого приемника.
      */
-    eGB_TEST_SIGNAL getCurrentSignal() const {
-        return currentSignal_;
-    }
+    eGB_TEST_SIGNAL getCurrentSignal() const { return currentSignal_; }
 
     /**
      * @brief Возвращает текущий сигнал в тесте для второго приемника.
      * @return Сигнал второго приемника.
      */
-    eGB_TEST_SIGNAL getCurrentSignal2() const {
-        return currentSignal2_;
-    }
+    eGB_TEST_SIGNAL getCurrentSignal2() const { return currentSignal2_; }
 
     /// Список сигналов в тесте передатчика
     uint8_t signalList[MAX_NUM_TEST_SIGNAL];
 
 private:
-    uint8_t num_;   ///< Количество сигналов в тесте передатчика.
+    uint8_t num_;  ///< Количество сигналов в тесте передатчика.
     eGB_TEST_SIGNAL currentSignal_;  ///< Сигнал передатчика или первого приемника.
-    eGB_TEST_SIGNAL currentSignal2_; ///< Сигнал второго приемника.
+    eGB_TEST_SIGNAL currentSignal2_;  ///< Сигнал второго приемника.
 
     /**
      * @brief Возвращает номер младшего установленного бита.

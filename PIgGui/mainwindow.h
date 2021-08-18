@@ -1,26 +1,29 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "wrapper.h"
 #include <QDateTime>
 #include <QElapsedTimer>
 #include <QLineEdit>
 #include <QMainWindow>
 #include <QPointer>
 #include <QTextCodec>
-#include <QTimer>
 #include <QThread>
+#include <QTimer>
 #include <QTreeWidgetItem>
-#include "wrapper.h"
 
 #include "PIg/src/drivers/ks0108.h"
 #include "PIg/src/menu/menu.h"
+#include "PIg/src/protocols/iec101/protocolPcI.h"
+#include "PIg/src/protocols/modbus/protocolPcM.h"
 #include "PIg/src/protocols/standart/protocolBspS.h"
 #include "PIg/src/protocols/standart/protocolPcS.h"
-#include "PIg/src/protocols/modbus/protocolPcM.h"
-#include "PIg/src/protocols/iec101/protocolPcI.h"
 
 QT_BEGIN_NAMESPACE
-namespace Ui { class MainWindow; }
+namespace Ui
+{
+class MainWindow;
+}
 QT_END_NAMESPACE
 
 /// Период вызова cycleMenu()
@@ -39,19 +42,20 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
-    friend void vKEYmain(void);
+    friend void    vKEYmain(void);
     friend uint8_t eKEYget(void);
     friend uint8_t timePressKey();
-    friend void vLCDclear(void);
-    friend void vLCDinit(void);
-    friend void vLCDmain(void);
-    friend void vLCDrefresh(void);
-    friend bool vLCDdrawBoard(uint8_t num);
-    friend bool vLCDputchar(const char* buf, uint8_t num);
-    friend void vLCDsetLed(eLCD_LED val);
-    friend void vLCDled();
+    friend void    vLCDclear(void);
+    friend void    vLCDinit(void);
+    friend void    vLCDmain(void);
+    friend void    vLCDrefresh(void);
+    friend bool    vLCDdrawBoard(uint8_t num);
+    friend bool    vLCDputchar(const char *buf, uint8_t num);
+    friend void    vLCDsetLed(eLCD_LED val);
+    friend void    vLCDled();
 
-    struct view_t {
+    struct view_t
+    {
         QLineEdit userPwd;
         QLineEdit admPwd;
         QLineEdit lnProtocol;
@@ -84,11 +88,11 @@ signals:
 
 private:
     Ui::MainWindow *ui;
-    QTextCodec *codec;
+    QTextCodec *    codec;
 
-    QPalette pred;
-    QPalette pblue;
-    QPalette pdefault;
+    QPalette      pred;
+    QPalette      pblue;
+    QPalette      pdefault;
     QElapsedTimer etimer;
 
     /// Инициализация параметров из EEPROM
@@ -104,12 +108,12 @@ private:
     /// Настраивает элемент отображаемых параметров.
     void addViewItem(QTreeWidgetItem *top, std::string name, QLineEdit *lineedit);
     /// Обработчик событий.
-    bool eventFilter(QObject* object, QEvent* event) override;
+    bool eventFilter(QObject *object, QEvent *event) override;
     /// Обработчик события после отображения формы.
-    void showEvent( QShowEvent* event ) override;
+    void showEvent(QShowEvent *event) override;
 
 private slots:
-    void cycleMenu();  ///< Цикл 200 мс.
+    void cycleMenu();       ///< Цикл 200 мс.
     void clearSelection();  ///< Очистка выделения в textEdit.
     void setBacklight(bool enable);
 
@@ -120,12 +124,12 @@ private slots:
 
     QString getDeviceName(eGB_TYPE_DEVICE type) const;
     QString getTypeLine(eGB_TYPE_LINE type) const;
-    void viewNumComPrd();
-    void viewNumComPrm();
-    void viewTypeComp();
+    void    viewNumComPrd();
+    void    viewNumComPrm();
+    void    viewTypeComp();
     QString getTypeOpto(eGB_TYPE_OPTO type) const;
 };
 
 // Для использвоании в wrapper
 extern MainWindow *w;
-#endif // MAINWINDOW_H
+#endif  // MAINWINDOW_H

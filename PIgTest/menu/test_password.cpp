@@ -9,12 +9,12 @@ using namespace std;
 // размер массива
 #define SIZE_ARRAY(arr) (sizeof(arr) / sizeof(arr[0]))
 
-class TPassword_Test: public ::testing::Test
+class TPassword_Test : public ::testing::Test
 {
 public:
     TPassword *mObj = nullptr;
 
-    TPassword_Test() {}
+    TPassword_Test() { }
     virtual ~TPassword_Test() override = default;
 
 protected:
