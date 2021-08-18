@@ -1,13 +1,13 @@
 #include "combobox.h"
 
-TComboBox::TComboBox(QWidget *parent) : QComboBox(parent) {
-
+TComboBox::TComboBox(QWidget *parent) : QComboBox(parent)
+{
 }
 
 //
-void
-TComboBox::showPopup() {
-  emit popuped();
+void TComboBox::showPopup()
+{
+    emit popuped();
 
-  QComboBox::showPopup();
+    QComboBox::showPopup();
 }

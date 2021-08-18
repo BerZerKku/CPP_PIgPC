@@ -3,7 +3,6 @@
 
 #include <QDebug>
 
-#define COMPILE_TIME_ASSERT(expression) \
-    Q_STATIC_ASSERT_X(expression, "Error")
+#define COMPILE_TIME_ASSERT(expression) Q_STATIC_ASSERT_X(expression, "Error")
 
-#endif // WRAPPER_HPP
+#endif  // WRAPPER_HPP

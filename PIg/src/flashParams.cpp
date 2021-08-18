@@ -307,6 +307,86 @@ static const Param fFreq PROGMEM = {
     Param::CHANGE_REG_DISABLE  // условие для изменения параметра
 };
 
+// частота ПРД (для разнесенных ПРМ/ПРД)
+static const Param fFreqPrd PROGMEM = {
+    "Частота ПРД",     // название параметра
+    GB_COM_GET_FREQ,   // команда стандартного протокола
+    Param::PARAM_INT,  // тип параметра
+    Param::RANGE_INT,  // диапазон измнения
+    Param::DIM_KHZ,    // размерность
+    fcNullBuf,         // массив значений
+    1,                 // кол-во повторений параметра
+    0,                 // минимальное значение
+    1000,              // максимальное значение
+    1,                 // дискретность
+    1,                 // множитель для стандартного протокола
+    GB_SEND_INT16_BE_DOP,  // тип параметра для сохранения новго значения
+    1,  // байт дополнительной информации для сохранения
+    Param::DEPEND_MAX_NO,      // заивимость максимума
+    Param::DEPEND_SAME_NO,     // зависимость повторений
+    Param::CHANGE_REG_DISABLE  // условие для изменения параметра
+};
+
+// частота ПРМ (для разнесенных ПРМ/ПРД)
+static const Param fFreqPrm PROGMEM = {
+    "Частота ПРМ",     // название параметра
+    GB_COM_GET_FREQ,   // команда стандартного протокола
+    Param::PARAM_INT,  // тип параметра
+    Param::RANGE_INT,  // диапазон измнения
+    Param::DIM_KHZ,    // размерность
+    fcNullBuf,         // массив значений
+    1,                 // кол-во повторений параметра
+    0,                 // минимальное значение
+    1000,              // максимальное значение
+    1,                 // дискретность
+    1,                 // множитель для стандартного протокола
+    GB_SEND_INT16_BE_DOP,  // тип параметра для сохранения новго значения
+    2,  // байт дополнительной информации для сохранения
+    Param::DEPEND_MAX_NO,      // заивимость максимума
+    Param::DEPEND_SAME_NO,     // зависимость повторений
+    Param::CHANGE_REG_DISABLE  // условие для изменения параметра
+};
+
+// инверсия частоты передатчика (для разнесенных ПРМ/ПРД)
+static const Param fInvSpectrumPrd PROGMEM = {
+    "Инверсия спектра ПРД",   // название параметра
+    GB_COM_GET_COM_PRD_KEEP,  // команда стандартного протокола
+    Param::PARAM_LIST,        // тип параметра
+    Param::RANGE_ON_OFF,      // диапазон измнения
+    Param::DIM_NO,            // размерность
+    fcOnOff[0],               // массив значений
+    1,                        // кол-во повторений параметра
+    0,                        // минимальное значение
+    SIZE_OF(fcOnOff),         // максимальное значение
+    1,                        // дискретность
+    1,                 // множитель для стандартного протокола
+    GB_SEND_INT8_DOP,  // тип параметра для сохранения новго значения
+    24,  // байт дополнительной информации для сохранения
+    Param::DEPEND_MAX_NO,      // заивимость максимума
+    Param::DEPEND_SAME_NO,     // зависимость повторений
+    Param::CHANGE_REG_DISABLE  // условие для изменения параметра
+};
+
+// инверсия частоты приемника (для разнесенных ПРМ/ПРД)
+static const Param fInvSpectrumPrm PROGMEM = {
+    "Инверсия спектра ПРМ",   // название параметра
+    GB_COM_GET_COM_PRD_KEEP,  // команда стандартного протокола
+    Param::PARAM_LIST,        // тип параметра
+    Param::RANGE_ON_OFF,      // диапазон измнения
+    Param::DIM_NO,            // размерность
+    fcOnOff[0],               // массив значений
+    1,                        // кол-во повторений параметра
+    0,                        // минимальное значение
+    SIZE_OF(fcOnOff),         // максимальное значение
+    1,                        // дискретность
+    1,                 // множитель для стандартного протокола
+    GB_SEND_INT8_DOP,  // тип параметра для сохранения новго значения
+    25,  // байт дополнительной информации для сохранения
+    Param::DEPEND_MAX_NO,      // заивимость максимума
+    Param::DEPEND_SAME_NO,     // зависимость повторений
+    Param::CHANGE_REG_DISABLE  // условие для изменения параметра
+};
+
 // совместимость (Р400, Р400м)
 static const Param fCompP400 PROGMEM = {
     "Совместимость",           // название параметра
@@ -1028,7 +1108,7 @@ static const Param fAcInDec PROGMEM = {
 };
 
 // частота ПРД
-static const Param fFreqPrd PROGMEM = {
+static const Param fFreqShiftPrd PROGMEM = {
     "Частота ПРД",            // название параметра
     GB_COM_DEF_GET_FREQ_PRD,  // команда стандартного протокола
     Param::PARAM_LIST,        // тип параметра
@@ -1048,7 +1128,7 @@ static const Param fFreqPrd PROGMEM = {
 };
 
 // частота ПРМ
-static const Param fFreqPrm PROGMEM = {
+static const Param fFreqShiftPrm PROGMEM = {
     "Частота ПРМ",             // название параметра
     GB_COM_DEF_GET_RZ_THRESH,  // команда стандартного протокола
     Param::PARAM_LIST,         // тип параметра
@@ -2034,6 +2114,10 @@ const Param* fParams[] PROGMEM = { &fNullParam,
                                    &fNetAddress,
                                    &fUOutNom,
                                    &fFreq,
+                                   &fFreqPrd,
+                                   &fFreqPrm,
+                                   &fInvSpectrumPrd,
+                                   &fInvSpectrumPrm,
                                    &fCompP400,
                                    &fInDecAcAnswer,
                                    &fDetector,
@@ -2071,8 +2155,8 @@ const Param* fParams[] PROGMEM = { &fNullParam,
                                    &fSensDecRz,
                                    &fPrmType,
                                    &fAcInDec,
-                                   &fFreqPrd,
-                                   &fFreqPrm,
+                                   &fFreqShiftPrd,
+                                   &fFreqShiftPrm,
                                    &fShiftFront,
                                    &fShiftBack,
                                    &fShiftPrm,

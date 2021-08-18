@@ -424,6 +424,106 @@ TEST_F(FlashParam_Test, gbParam_Freq)
 }
 
 //
+TEST_F(FlashParam_Test, gbParam_FreqPrd)
+{
+    Param prop = {
+        "Частота ПРД",     // название параметра
+        GB_COM_GET_FREQ,   // команда стандартного протокола
+        Param::PARAM_INT,  // тип параметра
+        Param::RANGE_INT,  // диапазон измнения
+        Param::DIM_KHZ,    // размерность
+        fcNullBuf,         // массив значений
+        1,                 // кол-во повторений параметра
+        0,                 // минимальное значение
+        1000,              // максимальное значение
+        1,                 // дискретность
+        1,                 // множитель для стандартного протокола
+        GB_SEND_INT16_BE_DOP,  // тип параметра для сохранения новго значения
+        1,  // байт дополнительной информации для сохранения
+        Param::DEPEND_MAX_NO,      // заивимость максимума
+        Param::DEPEND_SAME_NO,     // зависимость повторений
+        Param::CHANGE_REG_DISABLE  // условие для изменения параметра
+    };
+
+    ASSERT_TRUE(checkParam(GB_PARAM_FREQ_PRD, prop));
+}
+
+//
+TEST_F(FlashParam_Test, gbParam_FreqPrm)
+{
+    Param prop = {
+        "Частота ПРМ",     // название параметра
+        GB_COM_GET_FREQ,   // команда стандартного протокола
+        Param::PARAM_INT,  // тип параметра
+        Param::RANGE_INT,  // диапазон измнения
+        Param::DIM_KHZ,    // размерность
+        fcNullBuf,         // массив значений
+        1,                 // кол-во повторений параметра
+        0,                 // минимальное значение
+        1000,              // максимальное значение
+        1,                 // дискретность
+        1,                 // множитель для стандартного протокола
+        GB_SEND_INT16_BE_DOP,  // тип параметра для сохранения новго значения
+        2,  // байт дополнительной информации для сохранения
+        Param::DEPEND_MAX_NO,      // заивимость максимума
+        Param::DEPEND_SAME_NO,     // зависимость повторений
+        Param::CHANGE_REG_DISABLE  // условие для изменения параметра
+    };
+
+    ASSERT_TRUE(checkParam(GB_PARAM_FREQ_PRM, prop));
+}
+
+//
+TEST_F(FlashParam_Test, gbParam_InvSpectrumPrd)
+{
+    Param prop = {
+        "Инверсия спектра ПРД",   // название параметра
+        GB_COM_GET_COM_PRD_KEEP,  // команда стандартного протокола
+        Param::PARAM_LIST,        // тип параметра
+        Param::RANGE_ON_OFF,      // диапазон измнения
+        Param::DIM_NO,            // размерность
+        fcOnOff[0],               // массив значений
+        1,                        // кол-во повторений параметра
+        0,                        // минимальное значение
+        SIZE_OF(fcOnOff),         // максимальное значение
+        1,                        // дискретность
+        1,                 // множитель для стандартного протокола
+        GB_SEND_INT8_DOP,  // тип параметра для сохранения новго значения
+        24,  // байт дополнительной информации для сохранения
+        Param::DEPEND_MAX_NO,      // заивимость максимума
+        Param::DEPEND_SAME_NO,     // зависимость повторений
+        Param::CHANGE_REG_DISABLE  // условие для изменения параметра
+    };
+
+    ASSERT_TRUE(checkParam(GB_PARAM_INV_SPECTRUM_PRD, prop));
+}
+
+//
+TEST_F(FlashParam_Test, gbParam_InvSpectrumPrm)
+{
+    Param prop = {
+        "Инверсия спектра ПРМ",   // название параметра
+        GB_COM_GET_COM_PRD_KEEP,  // команда стандартного протокола
+        Param::PARAM_LIST,        // тип параметра
+        Param::RANGE_ON_OFF,      // диапазон измнения
+        Param::DIM_NO,            // размерность
+        fcOnOff[0],               // массив значений
+        1,                        // кол-во повторений параметра
+        0,                        // минимальное значение
+        SIZE_OF(fcOnOff),         // максимальное значение
+        1,                        // дискретность
+        1,                 // множитель для стандартного протокола
+        GB_SEND_INT8_DOP,  // тип параметра для сохранения новго значения
+        25,  // байт дополнительной информации для сохранения
+        Param::DEPEND_MAX_NO,      // заивимость максимума
+        Param::DEPEND_SAME_NO,     // зависимость повторений
+        Param::CHANGE_REG_DISABLE  // условие для изменения параметра
+    };
+
+    ASSERT_TRUE(checkParam(GB_PARAM_INV_SPECTRUM_PRM, prop));
+}
+
+//
 TEST_F(FlashParam_Test, gbParam_CompP400)
 {
     Param prop = {
@@ -1324,7 +1424,7 @@ TEST_F(FlashParam_Test, gbParam_AcInDec)
 }
 
 //
-TEST_F(FlashParam_Test, gbParam_FreqPrd)
+TEST_F(FlashParam_Test, gbParam_FreqShiftPrd)
 {
     Param prop = {
         "Частота ПРД",            // название параметра
@@ -1345,11 +1445,11 @@ TEST_F(FlashParam_Test, gbParam_FreqPrd)
         Param::CHANGE_REG_DISABLE  // условие для изменения параметра
     };
 
-    ASSERT_TRUE(checkParam(GB_PARAM_FREQ_PRD, prop));
+    ASSERT_TRUE(checkParam(GB_PARAM_FREQ_SHIFT_PRD, prop));
 }
 
 //
-TEST_F(FlashParam_Test, gbParam_FreqPrm)
+TEST_F(FlashParam_Test, gbParam_FreqShiftPrm)
 {
     Param prop = {
         "Частота ПРМ",             // название параметра
@@ -1370,7 +1470,7 @@ TEST_F(FlashParam_Test, gbParam_FreqPrm)
         Param::CHANGE_REG_DISABLE  // условие для изменения параметра
     };
 
-    ASSERT_TRUE(checkParam(GB_PARAM_FREQ_PRM, prop));
+    ASSERT_TRUE(checkParam(GB_PARAM_FREQ_SHIFT_PRM, prop));
 }
 
 //

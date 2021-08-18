@@ -3,6 +3,7 @@
 
 #include <QComboBox>
 
+#include "PIg/src/glbDefine.h"
 #include <QDateTime>
 #include <QLineEdit>
 #include <QMap>
@@ -12,7 +13,6 @@
 #include <QStringList>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
-#include "PIg/src/glbDefine.h"
 
 typedef QVector<uint8_t> pkg_t;
 
@@ -23,27 +23,30 @@ class Bsp : public QTreeWidget
     static const QString msgSizeError;
     static const QString msgTimeSourceError;
 
-    struct state_t {
-        QComboBox *regime = nullptr;
-        QSpinBox *state = nullptr;
-        QSpinBox *dopByte = nullptr;
+    struct state_t
+    {
+        QComboBox *regime  = nullptr;
+        QSpinBox * state   = nullptr;
+        QSpinBox * dopByte = nullptr;
         QLineEdit *warning = nullptr;
-        QLineEdit *fault = nullptr;
+        QLineEdit *fault   = nullptr;
     };
 
-    struct device_t {
-        QComboBox *isDef = nullptr;
+    struct device_t
+    {
+        QComboBox *isDef      = nullptr;
         QComboBox *typeDevice = nullptr;
-        QComboBox *typeLine = nullptr;
-        QComboBox *typeOpto = nullptr;
+        QComboBox *typeLine   = nullptr;
+        QComboBox *typeOpto   = nullptr;
     };
 
-    struct test_t {
-        QLineEdit* byte1;
-        QLineEdit* byte2;
-        QLineEdit* byte3;
-        QLineEdit* byte4;
-        QLineEdit* byte5;
+    struct test_t
+    {
+        QLineEdit *byte1;
+        QLineEdit *byte2;
+        QLineEdit *byte3;
+        QLineEdit *byte4;
+        QLineEdit *byte5;
     };
 
     static const QString kTimeFormat;
@@ -71,38 +74,38 @@ public:
     void crtJournals();
     void crtTest();
 
-    static QMap<eGB_PARAM, QVector<QComboBox*>> mapCombobox;
-    static QMap<eGB_PARAM, QLineEdit*> mapLineEdit;
-    static QMap<eGB_PARAM, QVector<QSpinBox*>> mapSpinBox;
+    static QMap<eGB_PARAM, QVector<QComboBox *>> mapCombobox;
+    static QMap<eGB_PARAM, QLineEdit *>          mapLineEdit;
+    static QMap<eGB_PARAM, QVector<QSpinBox *>>  mapSpinBox;
 
     static QTextCodec *codec;  ///< Кодек.
-    static QString getParamName(eGB_PARAM param);
+    static QString     getParamName(eGB_PARAM param);
 
-    static pkg_t pkgRx; ///< Данные на приеме.
-    static pkg_t pkgTx; ///< Данные для передачи.
+    static pkg_t pkgRx;  ///< Данные на приеме.
+    static pkg_t pkgTx;  ///< Данные для передачи.
 
-    static quint8 getComboBoxValue(eGB_PARAM param, uint8_t number=1);
+    static quint8 getComboBoxValue(eGB_PARAM param, uint8_t number = 1);
     static quint8 getComboBoxValue(QComboBox *combobox);
-    static void setComboBoxValue(eGB_PARAM param, quint8 value, uint8_t number=1);
-    static void setComboBoxValueBits(eGB_PARAM param, quint8 value, uint8_t number=1);
-    static int setComboBoxValue(QComboBox *combobox, quint8 value);
+    static void   setComboBoxValue(eGB_PARAM param, quint8 value, uint8_t number = 1);
+    static void   setComboBoxValueBits(eGB_PARAM param, quint8 value, uint8_t number = 1);
+    static int    setComboBoxValue(QComboBox *combobox, quint8 value);
 
     static QString getLineEditValue(eGB_PARAM param);
     static QString getLineEditValue(QLineEdit *lineedit);
-    static void setLineEditValue(eGB_PARAM param, std::string value);
-    static int setLineEditValue(QLineEdit *lineedit, std::string value);
+    static void    setLineEditValue(eGB_PARAM param, std::string value);
+    static int     setLineEditValue(QLineEdit *lineedit, std::string value);
 
-    static qint16 getSpinBoxValue(eGB_PARAM param, uint8_t number=1);
+    static qint16 getSpinBoxValue(eGB_PARAM param, uint8_t number = 1);
     static qint16 getSpinBoxValue(QSpinBox *spinbox);
-    static void setSpinBoxValue(eGB_PARAM param, qint16 value, uint8_t number=1);
-    static int setSpinBoxValue(QSpinBox *spinbox, qint16 value);
+    static void   setSpinBoxValue(eGB_PARAM param, qint16 value, uint8_t number = 1);
+    static int    setSpinBoxValue(QSpinBox *spinbox, qint16 value);
 
     static device_t device;
-    static state_t stateDef;
-    static state_t stateGlb;
-    static state_t statePrm;
-    static state_t statePrd;
-    static test_t test;
+    static state_t  stateDef;
+    static state_t  stateGlb;
+    static state_t  statePrm;
+    static state_t  statePrd;
+    static test_t   test;
 
     /// Обработка команды.
     static void procCommand(eGB_COM com, pkg_t &data);
@@ -113,11 +116,11 @@ signals:
     void writeByte(int value);
 
 private:
-    static QDateTime *dt;   ///< Дата и время.
+    static QDateTime *dt;  ///< Дата и время.
 
-    QRegExp pwdRegExp;
+    QRegExp          pwdRegExp;
     QRegExpValidator pwdValidator;
-    QRegExp errRegExp;
+    QRegExp          errRegExp;
     QRegExpValidator errValidator;
 
     void crtComboBox(eGB_PARAM param);
@@ -148,12 +151,15 @@ private:
     /// Обработка команд записи режима.
     static void procCommandWriteRegime(eGB_COM com, pkg_t &data);
 
-    static void hdlrComGetVers(eGB_COM com, pkg_t &data);
+    static void hdlrComControlSet(eGB_COM com, pkg_t &data);
+    static void hdlrComFreqGet(eGB_COM com, pkg_t &data);
+    static void hdlrComFreqSet(eGB_COM com, pkg_t &data);
     static void hdlrComNetAdrGet(eGB_COM com, pkg_t &data);
     static void hdlrComNetAdrSet(eGB_COM com, pkg_t &data);
-    static void hdlrComSetControl(eGB_COM com, pkg_t &data);
-
-    static void hdlrComGetTest(eGB_COM com, pkg_t &data);
+    static void hdlrComPrdKeepGet(eGB_COM com, pkg_t &data);
+    static void hdlrComPrdKeepSet(eGB_COM com, pkg_t &data);
+    static void hdlrComTestGet(eGB_COM com, pkg_t &data);
+    static void hdlrComVersGet(eGB_COM com, pkg_t &data);
 
     static uint8_t getCompatibility(eGB_TYPE_DEVICE typedevice);
 
@@ -165,4 +171,4 @@ private slots:
     static void updateCompatibility(int index);
 };
 
-#endif // BSP_H
+#endif  // BSP_H

@@ -87,6 +87,8 @@ bool clProtocolBspS::getData(bool pc)
             {
             case GB_PARAM_IN_DEC: val = buf[B2 + lp->getNumOfCurrSameParam() - 1]; break;
             case GB_PARAM_FREQ: val = TO_INT16(buf[B1], buf[B2]); break;
+            case GB_PARAM_FREQ_PRD: val = TO_INT16(buf[B1], buf[B2]); break;
+            case GB_PARAM_FREQ_PRM: val = TO_INT16(buf[B3], buf[B4]); break;
             case GB_PARAM_COR_U:
                 val = ((int8_t) buf[B1]) * 10;
                 val += ((int8_t) buf[B2]) / 10;
@@ -173,9 +175,16 @@ uint8_t clProtocolBspS::sendData(eGB_COM com)
             case GB_SEND_DOP_BITES: num = addCom(com, dop, val); break;
             case GB_SEND_INT16_BE: num = addCom(com, val, dop); break;
             case GB_SEND_COR_U:
-            case GB_SEND_COR_I:  // DOWN
-                num = addCom(com, 3, sParam_->txComBuf.getBuferAddress());
-                break;
+            case GB_SEND_COR_I: num = addCom(com, 3, sParam_->txComBuf.getBuferAddress()); break;
+            case GB_SEND_INT16_BE_DOP:
+                {
+                    uint8_t data[3];
+                    data[0] = sParam_->txComBuf.getInt8(0);  // старший байт int
+                    data[1] = sParam_->txComBuf.getInt8(1);  // младший байт int
+                    data[2] = sParam_->txComBuf.getInt8(2);  // доп. байт
+                    num     = addCom(com, SIZE_OF(data), data);
+                    break;
+                }
             case GB_SEND_NO: break;
             }
         }
@@ -316,7 +325,7 @@ bool clProtocolBspS::getDefCommand(eGB_COM com, bool pc)
                 sParam_->jrnEntry.dateTime.setMsSecond(t);
                 //
                 //				sParam_->jrnEntry.setDeviceJrn((eGB_DEVICE_K400)
-                //buf[B1]);
+                // buf[B1]);
                 // sParam_->jrnEntry.setNumCom(buf[B2]);
                 sParam_->jrnEntry.setSignalDef((buf[B1] << 4) + (buf[B2] & 0x0F));
                 //				sParam_->jrnEntry.setEventType(buf[B3]);

@@ -36,7 +36,7 @@
 #define MAX_NUM_COM_RING 96
 
 /// преобразование двух CHAR в INT
-#define TO_INT16(high, low) (((uint16_t) (high) << 8) + (low))
+#define TO_INT16(high, low) static_cast<uint16_t>(((high) << 8) + (low))
 
 /// преобразование двоично-десятичного числа в целое
 #define BCD_TO_BIN(val) ((val >> 4) * 10 + (val & 0x0F))
@@ -178,6 +178,7 @@ enum eGB_SEND_TYPE
     GB_SEND_INT8_DOP,  ///< Передается два байта данных (значение, доп.байт).
     GB_SEND_DOP_INT8,  ///< Передается два байта данных (доп.байт, значение).
     GB_SEND_INT16_BE,  ///< Передается два байта данных (in16>>8, int16&0xFF).
+    GB_SEND_INT16_BE_DOP,  ///< Передается два байта данных и доп.байт (in16>>8, int16&0xFF, доп).
     GB_SEND_DOP_BITES,  ///< Передается битовая переменная (доп.байт, значение).
     GB_SEND_BITES_DOP,  ///< Передается битовая переменная (значение, доп.байт).
     GB_SEND_COR_U,  ///< Передается коррекция напряжения.
@@ -376,21 +377,24 @@ enum posComNetAdr_t
 /// Последовательность параметров в команде COM_PRD_KEEP (0x37)
 enum posComPrdKeep_t
 {
-    POS_COM_PRD_KEEP_prdKeep = 1,
-    POS_COM_PRD_KEEP_compK400,
-    POS_COM_PRD_KEEP_tmK400,
-    POS_COM_PRD_KEEP_warnD,
-    POS_COM_PRD_KEEP_alarmD,
-    POS_COM_PRD_KEEP_tempMonitor,
-    POS_COM_PRD_KEEP_tempThrHi,
-    POS_COM_PRD_KEEP_tempThrLow,
-    POS_COM_PRD_KEEP_tmSpeed,
-    POS_COM_PRD_KEEP_ringTimeWait,
-    POS_COM_PRD_KEEP_ringComTransit
+    POS_COM_PRD_KEEP_prdKeep = 1,     // 1
+    POS_COM_PRD_KEEP_compK400,        // 2
+    POS_COM_PRD_KEEP_tmK400,          // 3
+    POS_COM_PRD_KEEP_warnD,           // 4
+    POS_COM_PRD_KEEP_alarmD,          // 5
+    POS_COM_PRD_KEEP_tempMonitor,     // 6
+    POS_COM_PRD_KEEP_tempThrHi,       // 7
+    POS_COM_PRD_KEEP_tempThrLow,      // 8
+    POS_COM_PRD_KEEP_tmSpeed,         // 9
+    POS_COM_PRD_KEEP_ringTimeWait,    // 10
+    POS_COM_PRD_KEEP_ringComTransit,  // 11, всего 12 байт для 96 бит значений
+    POS_COM_PRD_KEEP_alarmResetMode = POS_COM_PRD_KEEP_ringComTransit + 12,
+    POS_COM_PRD_KEEP_invSpectrumPrd,  // 24
+    POS_COM_PRD_KEEP_invSpectrumPrm   // 25
 };
 
 /// Параметры (связаны с fParams)
-typedef enum
+enum eGB_PARAM
 {
     GB_PARAM_NULL_PARAM = 0,  ///< параметр заглушка
     // общие параметры
@@ -408,7 +412,11 @@ typedef enum
     GB_PARAM_NET_ADDRESS,   ///< адрес в локальной сети
     GB_PARAM_U_OUT_NOM,     ///< номинальноые выходное напряжение
     GB_PARAM_FREQ,          ///< частота
-    GB_PARAM_COMP_P400,     ///< совместимость (Р400, Р400м)
+    GB_PARAM_FREQ_PRD,      ///< частота ПРД (для разнесенных ПРМ/ПРД)
+    GB_PARAM_FREQ_PRM,      ///< частота ПРМ (для разнесенных ПРМ/ПРД)
+    GB_PARAM_INV_SPECTRUM_PRD,  ///< инверсия частоты передатчика (для разнесенных ПРМ/ПРД)
+    GB_PARAM_INV_SPECTRUM_PRM,  ///< инверсия частоты приемника (для разнесенных ПРМ/ПРД)
+    GB_PARAM_COMP_P400,         ///< совместимость (Р400, Р400м)
     GB_PARAM_IN_DEC_AC_ANSWER,  ///< снижение ответа АК (ПВЗЛ)
     GB_PARAM_DETECTOR,          ///< тип детектора
     GB_PARAM_COR_U,             ///< коррекция напряжения
@@ -445,17 +453,17 @@ typedef enum
     GB_PARAM_SENS_DEC_RZ,   ///< загрубленеи чувствительности по РЗ
     GB_PARAM_PRM_TYPE,      ///< тип приемника
     GB_PARAM_AC_IN_DEC,     ///< снижение уровня АК
-    GB_PARAM_FREQ_PRD,      ///< частота ПРД
-    GB_PARAM_FREQ_PRM,      ///< частота ПРМ
-    GB_PARAM_SHIFT_FRONT,   ///< сдвиг переднего фронта ПРД
-    GB_PARAM_SHIFT_BACK,    ///< сдвиг заднего фронта ПРД
-    GB_PARAM_SHIFT_PRM,     ///< сдвиг ПРМ
-    GB_PARAM_SHIFT_PRD,     ///< сдвиг ВЧ ПРД от ПУСК
-    GB_PARAM_LIMIT_PRD,     ///< ограничение полосы передатчика
-    GB_PARAM_DELAY_OFF_PRM,  ///< задержка выключения ПРМ
-    GB_PARAM_DELAY_ON_PRM,   ///< задержка включения ПРМ
-    GB_PARAM_DELAY_ON_PRD,   ///< задержка включения ПРД
-    GB_PARAM_MIN_TIME_PRD,   ///< минимальная длительность ПРД
+    GB_PARAM_FREQ_SHIFT_PRD,  ///< частота ПРД (сдвиг)
+    GB_PARAM_FREQ_SHIFT_PRM,  ///< частота ПРМ (сдвиг)
+    GB_PARAM_SHIFT_FRONT,     ///< сдвиг переднего фронта ПРД
+    GB_PARAM_SHIFT_BACK,      ///< сдвиг заднего фронта ПРД
+    GB_PARAM_SHIFT_PRM,       ///< сдвиг ПРМ
+    GB_PARAM_SHIFT_PRD,       ///< сдвиг ВЧ ПРД от ПУСК
+    GB_PARAM_LIMIT_PRD,       ///< ограничение полосы передатчика
+    GB_PARAM_DELAY_OFF_PRM,   ///< задержка выключения ПРМ
+    GB_PARAM_DELAY_ON_PRM,    ///< задержка включения ПРМ
+    GB_PARAM_DELAY_ON_PRD,    ///< задержка включения ПРД
+    GB_PARAM_MIN_TIME_PRD,    ///< минимальная длительность ПРД
     // параметры передатчика
     GB_PARAM_PRD_IN_DELAY,  ///< время включения (задержка срабатывания дискретного входа)
     GB_PARAM_PRD_DURATION_L,    ///< длительность команды ВЧ
@@ -501,7 +509,7 @@ typedef enum
     GB_PARAM_OTHER_REGIME,       ///< Режим
     //
     GB_PARAM_MAX
-} eGB_PARAM;
+};
 
 /// Значения команд управления
 enum eGB_CONTROL

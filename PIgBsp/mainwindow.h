@@ -7,13 +7,14 @@
 #include <QPushButton>
 #include <QSerialPort>
 #include <QSerialPortInfo>
-#include <QTimer>
 #include <QThread>
+#include <QTimer>
 #include <QWidget>
 #include <serial.h>
 
 
-class MainWindow : public QWidget {
+class MainWindow : public QWidget
+{
     Q_OBJECT
 
 public:
@@ -24,19 +25,19 @@ signals:
     void writeByte(int value);
 
 private:
-    Bsp mBsp;
+    Bsp              mBsp;
     QVector<eGB_COM> viewCom;
 
-    QComboBox *cmbPort;
+    QComboBox *  cmbPort;
     QPushButton *pbRefresh;
     QPushButton *pbPort;
 
     QPointer<TSerial> port;
     QPointer<QThread> thread;
-    QTimer timer;
+    QTimer            timer;
 
     /// Обработчик события после отображения формы.
-    void showEvent( QShowEvent* event ) override;
+    void showEvent(QShowEvent *event) override;
 
     /** Получает пакет данных из БСП
      *
@@ -56,4 +57,4 @@ private:
 private slots:
     void readByte(int value);
 };
-#endif // MAINWINDOW_H
+#endif  // MAINWINDOW_H

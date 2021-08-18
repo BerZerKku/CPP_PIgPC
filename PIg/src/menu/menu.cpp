@@ -3493,8 +3493,8 @@ void clMenu::lvlSetupParamDef()
                 // Снижение уровня АК есть только в совместимости АВАНТ
                 sParam.local.addParam(GB_PARAM_AC_IN_DEC);
             }
-            sParam.local.addParam(GB_PARAM_FREQ_PRD);
-            sParam.local.addParam(GB_PARAM_FREQ_PRM);
+            sParam.local.addParam(GB_PARAM_FREQ_SHIFT_PRD);
+            sParam.local.addParam(GB_PARAM_FREQ_SHIFT_PRM);
             //          sParam.local.addParam(GB_PARAM_LIMIT_PRD);
             //          sParam.local.addParam(GB_PARAM_DELAY_ON_PRM);
             //          sParam.local.addParam(GB_PARAM_DELAY_OFF_PRM);
@@ -3764,10 +3764,11 @@ void clMenu::lvlSetupParamGlb()
             sParam.local.addParam(GB_PARAM_COMP_K400);
             sParam.local.addParam(GB_PARAM_TIME_SYNCH);
             sParam.local.addParam(GB_PARAM_NUM_OF_DEVICE);
-            //          TODO На данный момент в ПО БСП проверка выходного сигнала не отключается в
-            //          ПРД. Поэтому параметр есть всегда! if (sParam.prd.status.isEnable()) {
+            // TODO На данный момент в ПО БСП проверка выходного сигнала не
+            // отключается в ПРД. Поэтому параметр есть всегда!
+            // if (sParam.prd.status.isEnable()) {
             sParam.local.addParam(GB_PARAM_OUT_CHECK);
-            //          }
+            // }
             if (sParam.prm.status.isEnable())
             {
                 sParam.local.addParam(GB_PARAM_WARN_THD);
@@ -3782,7 +3783,11 @@ void clMenu::lvlSetupParamGlb()
                 sParam.local.addParam(GB_PARAM_COM_PRM_KEEP);
                 sParam.local.addParam(GB_PARAM_IN_DEC);
             }
-            sParam.local.addParam(GB_PARAM_FREQ);
+            //            sParam.local.addParam(GB_PARAM_FREQ);
+            sParam.local.addParam(GB_PARAM_FREQ_PRD);
+            sParam.local.addParam(GB_PARAM_INV_SPECTRUM_PRD);
+            sParam.local.addParam(GB_PARAM_FREQ_PRM);
+            sParam.local.addParam(GB_PARAM_INV_SPECTRUM_PRM);
             if (sParam.prd.status.isEnable())
             {
                 sParam.local.addParam(GB_PARAM_COR_U);
@@ -5574,12 +5579,11 @@ void clMenu::enterParameter()
 // Работа в меню настройки параметров.
 void clMenu::setupParam()
 {
-
     if (isMessage())
     {
         // Вывод на экран сообщения о невозможности изменения параметра,
         // при этом нажатые кнопки будут проигнорированы.
-        static char message[3][21] PROGMEM = { // 2345678901234567890
+        static char message[3][21] PROGMEM = { // 345678901234567890
                                                " Изменить параметр  ",
                                                "  можно только в    ",
                                                "  режиме ВЫВЕДЕН    "
@@ -5626,6 +5630,8 @@ void clMenu::setupParam()
                     sParam.txComBuf.setInt8(pos + dop, 1);
                     break;
 
+                case GB_SEND_INT16_BE_DOP:  // DOWN
+                    sParam.txComBuf.setInt8(getSendDop(param), 2);
                 case GB_SEND_INT16_BE:
                     sParam.txComBuf.setInt8(EnterParam.getValue() >> 8, 0);
                     sParam.txComBuf.setInt8(EnterParam.getValue(), 1);

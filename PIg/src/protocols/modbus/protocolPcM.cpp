@@ -310,7 +310,7 @@ TProtocolModbus::CHECK_ERR TProtocolPcM::readID(char* buf, uint8_t& size)
     // В К400 выводится кол-во команд на прд, кол-во команд на прм
     // и по идее должен выводится тип совместимости и тип линии ?!
     static const char k400[] PROGMEM = "АВАНТ К400-%d%dВ";
-    // TODO В Оптике, надо выводить реалльный тип аппарата !!!
+    // TODO В Оптике, надо выводить реальный тип аппарата !!!
     static const char opto[] PROGMEM = "АВАНТ ОПТО-%d%d%d-О";
     // Неизвестное устройство
     static const char unknown[] PROGMEM = "АВАНТ -%d%d%d-X";
