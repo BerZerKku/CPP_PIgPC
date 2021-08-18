@@ -12,9 +12,7 @@
 #include "PIg/src/menu/base.h"
 
 //
-MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
-      , ui(new Ui::MainWindow)
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
 
@@ -33,29 +31,26 @@ MainWindow::MainWindow(QWidget *parent)
     ui->serialBsp->addDefaultPort("COM20");
     ui->serialBsp->addDefaultPort("tnt0");
 
-    connect(ui->serialBsp, &TSerial::read,
-            [=](int byte) {bspPushByteFrom(byte, false);});
+    connect(ui->serialBsp, &TSerial::read, [=](int byte) { bspPushByteFrom(byte, false); });
     connect(this, &MainWindow::writeByteToBsp, ui->serialBsp, &TSerial::write);
-    connect(ui->serialBsp, &TSerial::sendFinished, [=]() {bspTxEnd();} );
+    connect(ui->serialBsp, &TSerial::sendFinished, [=]() { bspTxEnd(); });
 
     ui->serialPc->setLabelText("Port PC:");
     ui->serialPc->setup(19200, QSerialPort::NoParity, QSerialPort::TwoStop);
     ui->serialPc->addDefaultPort("COM8");
     ui->serialPc->addDefaultPort("tnt2");
 
-    connect(ui->serialPc, &TSerial::read,
-            [=](int byte) {pcPushByteFrom(byte, false);});
+    connect(ui->serialPc, &TSerial::read, [=](int byte) { pcPushByteFrom(byte, false); });
     connect(this, &MainWindow::writeByteToPc, ui->serialPc, &TSerial::write);
-    connect(ui->serialPc, &TSerial::sendFinished, [=]() {pcTxEnd();} );
+    connect(ui->serialPc, &TSerial::sendFinished, [=]() { pcTxEnd(); });
 
     codec = QTextCodec::codecForName("CP1251");
-    connect(ui->textEdit, &QTextEdit::selectionChanged,
-            this, &MainWindow::clearSelection);
+    connect(ui->textEdit, &QTextEdit::selectionChanged, this, &MainWindow::clearSelection);
 
     // палитры
     QLineEdit lineedit;
     pdefault = lineedit.palette();
-    pred = pdefault;
+    pred     = pdefault;
     pred.setColor(QPalette::Text, Qt::red);
     pblue = pdefault;
     pblue.setColor(QPalette::Text, Qt::blue);
@@ -73,10 +68,10 @@ MainWindow::MainWindow(QWidget *parent)
     ui->textEdit->setFont(font);
 
     QFontMetrics mfont(font);
-    QSize size = mfont.size(Qt::TextSingleLine, "12345678901234567890");
+    QSize        size = mfont.size(Qt::TextSingleLine, "12345678901234567890");
 
     // FIXME Разобраться почему константы именно такие
-    ui->textEdit->setFixedSize(size.width() + 12, size.height()*7 + 10);
+    ui->textEdit->setFixedSize(size.width() + 12, size.height() * 7 + 10);
     ui->kbd->setFixedSize(ui->textEdit->width(), ui->textEdit->width());
 
     // Удаляет движение содержимого при прокрутке колесика мышки над testEdit
@@ -103,7 +98,7 @@ void MainWindow::initEeprom()
 //
 void MainWindow::initView()
 {
-    QTreeWidgetItem *top = nullptr;
+    QTreeWidgetItem *top  = nullptr;
     QTreeWidgetItem *item = nullptr;
 
     ui->treeWidget->header()->setSectionResizeMode(0, QHeaderView::Fixed);
@@ -149,10 +144,12 @@ void MainWindow::initView()
 
     // Обновление расскладки клавиатуры при смене аппарата или совместимости
     // задержка в 200мс нужна для обновления расскладки в ПИ
-    connect(&view.typeDevice, &QLineEdit::textChanged,
-            [=]() {QTimer::singleShot(200, this, &MainWindow::initKeyboard);});
-    connect(&view.typeCompatibility, &QLineEdit::textChanged,
-            [=]() {QTimer::singleShot(200, this, &MainWindow::initKeyboard);});
+    connect(&view.typeDevice,
+            &QLineEdit::textChanged,
+            [=]() { QTimer::singleShot(200, this, &MainWindow::initKeyboard); });
+    connect(&view.typeCompatibility,
+            &QLineEdit::textChanged,
+            [=]() { QTimer::singleShot(200, this, &MainWindow::initKeyboard); });
 
     ui->treeWidget->expandAll();
     ui->treeWidget->resizeColumnToContents(0);
@@ -161,7 +158,8 @@ void MainWindow::initView()
 
 void MainWindow::initKeyboard()
 {
-    for(uint8_t i = 1; i <= 2*NUM_KEY_IN_LAYOUT; i++) {
+    for (uint8_t i = 1; i <= 2 * NUM_KEY_IN_LAYOUT; i++)
+    {
         ui->kbd->setLayoutButton(i, vKEYgetButtonLayout(i));
     }
 }
@@ -186,8 +184,8 @@ void MainWindow::setupTestButtons()
 void MainWindow::hdlrView()
 {
     std::string text;
-    quint8 value8  = 0;
-    quint16 value16 = 0;
+    quint8      value8  = 0;
+    quint16     value16 = 0;
 
     value16 = menu.sParam.password.get();
     view.userPwd.setText(QString::number(value16));
@@ -226,8 +224,7 @@ void MainWindow::hdlrView()
 }
 
 //
-void MainWindow::addViewItem(QTreeWidgetItem *top, std::string name,
-                             QLineEdit *lineedit)
+void MainWindow::addViewItem(QTreeWidgetItem *top, std::string name, QLineEdit *lineedit)
 {
     QTreeWidgetItem *item = new QTreeWidgetItem();
 
@@ -236,17 +233,18 @@ void MainWindow::addViewItem(QTreeWidgetItem *top, std::string name,
     ui->treeWidget->setItemWidget(item, 1, lineedit);
     lineedit->setReadOnly(true);
     lineedit->setFocusPolicy(Qt::NoFocus);
-    connect(lineedit, &QLineEdit::selectionChanged,
-            lineedit, &QLineEdit::deselect);
+    connect(lineedit, &QLineEdit::selectionChanged, lineedit, &QLineEdit::deselect);
 }
 
 //
 bool MainWindow::eventFilter(QObject *object, QEvent *event)
 {
-    if (event->type() == QEvent::KeyRelease) {
+    if (event->type() == QEvent::KeyRelease)
+    {
         // У элементов созданных на вкладке Bsp имен нет.
-        if (!focusWidget()->objectName().isEmpty()) {
-            ui->kbd->keyPressed(static_cast<QKeyEvent*>(event)->key());
+        if (!focusWidget()->objectName().isEmpty())
+        {
+            ui->kbd->keyPressed(static_cast<QKeyEvent *>(event)->key());
         }
     }
 
@@ -259,7 +257,7 @@ void MainWindow::showEvent(QShowEvent *event)
     QWidget::showEvent(event);
 
     mainInit();
-    ui->treeWidget->setFixedWidth(ui->treeWidget->columnWidth(0)*2.2);
+    ui->treeWidget->setFixedWidth(ui->treeWidget->columnWidth(0) * 2.2);
     setFixedSize(sizeHint());
 }
 
@@ -268,9 +266,9 @@ void MainWindow::cycleMenu()
 {
     uint8_t len = 0;
 
-    static uint8_t cnt1s = 0;
-    static uint8_t cntsendtobsp = 0;
-    static uint8_t cntsendtopc = 0;
+    static uint8_t   cnt1s        = 0;
+    static uint8_t   cntsendtobsp = 0;
+    static uint8_t   cntsendtopc  = 0;
     QVector<uint8_t> pkg;
 
     vLCDled();
@@ -282,41 +280,46 @@ void MainWindow::cycleMenu()
 
     pkg.clear();
     len = pcWrite();
-    for(uint8_t i = 0; i < len; i++) {
+    for (uint8_t i = 0; i < len; i++)
+    {
         pkg.append(uBufUartPc[i]);
         emit writeByteToPc(uBufUartPc[i]);
     }
 
-    if (len > 0) {
-//        qDebug() << "Pkg to PC: " << Qt::showbase << Qt::hex << pkg;
+    if (len > 0)
+    {
+        //        qDebug() << "Pkg to PC: " << Qt::showbase << Qt::hex << pkg;
         cntsendtopc++;
     }
 
     pkg.clear();
     len = bspWrite();
-    for(uint8_t i = 0; i < len; i++) {
+    for (uint8_t i = 0; i < len; i++)
+    {
         pkg.append(uBufUartBsp[i]);
         emit writeByteToBsp(uBufUartBsp[i]);
     }
 
-    if (len > 0) {
-//        if ((pkg.at(2) == GB_COM_SET_CONTROL) ||
-//            (pkg.at(2) == GB_COM_PRD_RES_IND) ||
-//            (pkg.at(2) == GB_COM_PRM_RES_IND) ||
-//            (pkg.at(2) == GB_COM_PRM_ENTER) ||
-//            (pkg.at(2) == GB_COM_DEF_SET_TYPE_AC)) {
-//            qDebug() << "Pkg to BSP: " << Qt::showbase << Qt::hex << pkg;
-//        }
+    if (len > 0)
+    {
+        //        if ((pkg.at(2) == GB_COM_SET_CONTROL) ||
+        //            (pkg.at(2) == GB_COM_PRD_RES_IND) ||
+        //            (pkg.at(2) == GB_COM_PRM_RES_IND) ||
+        //            (pkg.at(2) == GB_COM_PRM_ENTER) ||
+        //            (pkg.at(2) == GB_COM_DEF_SET_TYPE_AC)) {
+        //            qDebug() << "Pkg to BSP: " << Qt::showbase << Qt::hex << pkg;
+        //        }
         cntsendtobsp++;
     }
 
     cnt1s++;
-    if (cnt1s >= 10) {
-//                qDebug() << "Send " << cntsendtobsp << " packet to BSP per second.";
-//                qDebug() << "Send " << cntsendtopc << " packet to PC per second.";
-        cntsendtopc = 0;
+    if (cnt1s >= 10)
+    {
+        //                qDebug() << "Send " << cntsendtobsp << " packet to BSP per second.";
+        //                qDebug() << "Send " << cntsendtopc << " packet to PC per second.";
+        cntsendtopc  = 0;
         cntsendtobsp = 0;
-        cnt1s = 0;
+        cnt1s        = 0;
     }
 
     hdlrView();
@@ -338,7 +341,8 @@ void MainWindow::setBacklight(bool enable)
 {
     QColor color = enable ? Qt::green : Qt::gray;
 
-    if (color.isValid()) {
+    if (color.isValid())
+    {
         QString qss = QString("background-color: %1").arg(color.name());
         ui->textEdit->setStyleSheet(qss);
     }
@@ -359,7 +363,7 @@ void MainWindow::test2()
 //
 void MainWindow::test3()
 {
-   qDebug() << "test3 button pressed";
+    qDebug() << "test3 button pressed";
 }
 
 //
@@ -370,157 +374,136 @@ void MainWindow::test4()
 }
 
 //
-QString
-MainWindow::getDeviceName(eGB_TYPE_DEVICE type) const
+QString MainWindow::getDeviceName(eGB_TYPE_DEVICE type) const
 {
     QString typeName = codec->toUnicode("Ошибка");
 
-    if (type <= AVANT_MAX){
-        switch(type) {
-            case AVANT_NO:
-                typeName = codec->toUnicode("Нет");
-                break;
-            case AVANT_R400:
-                typeName = codec->toUnicode("Р400");
-                break;
-            case AVANT_RZSK:
-                typeName = codec->toUnicode("РЗСК");
-                break;
-            case AVANT_K400:
-                typeName = codec->toUnicode("К400");
-                break;
-            case AVANT_R400M:
-                typeName = codec->toUnicode("Р400М");
-                break;
-            case AVANT_OPTO:
-                typeName = codec->toUnicode("Оптика");
-                break;
-            case AVANT_MAX:
-                typeName = codec->toUnicode("MAX");
-                break;
+    if (type <= AVANT_MAX)
+    {
+        switch (type)
+        {
+        case AVANT_NO: typeName = codec->toUnicode("Нет"); break;
+        case AVANT_R400: typeName = codec->toUnicode("Р400"); break;
+        case AVANT_RZSK: typeName = codec->toUnicode("РЗСК"); break;
+        case AVANT_K400: typeName = codec->toUnicode("К400"); break;
+        case AVANT_R400M: typeName = codec->toUnicode("Р400М"); break;
+        case AVANT_OPTO: typeName = codec->toUnicode("Оптика"); break;
+        case AVANT_MAX: typeName = codec->toUnicode("MAX"); break;
         }
-
-    } else {
-
+    }
+    else
+    {
     }
 
     return typeName;
 }
 
 //
-QString
-MainWindow::getTypeLine(eGB_TYPE_LINE type) const
+QString MainWindow::getTypeLine(eGB_TYPE_LINE type) const
 {
     QString typeName = codec->toUnicode("Ошибка");
 
-    switch(type) {
-        case GB_TYPE_LINE_UM:
-            typeName = codec->toUnicode("ВЧ");
-            break;
-        case GB_TYPE_LINE_OPTO:
-            typeName = codec->toUnicode("Оптика");
-            break;
-        case GB_TYPE_LINE_E1:
-            typeName = codec->toUnicode("Е1");
-            break;
-        case GB_TYPE_LINE_MAX:
-            typeName = codec->toUnicode("MAX");
-            break;
+    switch (type)
+    {
+    case GB_TYPE_LINE_UM: typeName = codec->toUnicode("ВЧ"); break;
+    case GB_TYPE_LINE_OPTO: typeName = codec->toUnicode("Оптика"); break;
+    case GB_TYPE_LINE_E1: typeName = codec->toUnicode("Е1"); break;
+    case GB_TYPE_LINE_MAX: typeName = codec->toUnicode("MAX"); break;
     }
 
     return typeName;
 }
 
 //
-void
-MainWindow::viewNumComPrd()
+void MainWindow::viewNumComPrd()
 {
     uint8_t number = menu.sParam.prd.getNumCom();
-    bool enable = menu.sParam.prd.status.isEnable();
+    bool    enable = menu.sParam.prd.status.isEnable();
 
     view.numComPrd.setText(QString::number(number));
     view.numComPrd.setPalette((enable == (number > 0)) ? pblue : pred);
 }
 
 //
-void
-MainWindow::viewNumComPrm()
+void MainWindow::viewNumComPrm()
 {
     uint8_t number = menu.sParam.prm.getNumCom();
-    bool enable = menu.sParam.prm.status.isEnable();
+    bool    enable = menu.sParam.prm.status.isEnable();
 
     view.numComPrm.setText(QString::number(number));
     view.numComPrm.setPalette((enable == (number > 0)) ? pblue : pred);
 }
 
 //
-void
-MainWindow::viewTypeComp()
+void MainWindow::viewTypeComp()
 {
-    eGB_PARAM pn = GB_PARAM_MAX;
-    uint8_t min = 0;
-    uint8_t max = 0;
-    uint8_t value = 0;
+    eGB_PARAM pn    = GB_PARAM_MAX;
+    uint8_t   min   = 0;
+    uint8_t   max   = 0;
+    uint8_t   value = 0;
 
-    switch(menu.sParam.typeDevice) {
-        case AVANT_K400: {
-            pn = GB_PARAM_COMP_K400;
+    switch (menu.sParam.typeDevice)
+    {
+    case AVANT_K400:
+        {
+            pn    = GB_PARAM_COMP_K400;
             value = menu.sParam.glb.getCompK400();
-        } break;
+        }
+        break;
 
-        case AVANT_RZSK: {
-            pn = GB_PARAM_COMP_RZSK;
+    case AVANT_RZSK:
+        {
+            pn    = GB_PARAM_COMP_RZSK;
             value = menu.sParam.glb.getCompRZSK();
-        } break;
+        }
+        break;
 
-        case AVANT_R400: // DOWN
-        case AVANT_R400M: {
-            pn = GB_PARAM_COMP_P400;
+    case AVANT_R400:  // DOWN
+    case AVANT_R400M:
+        {
+            pn    = GB_PARAM_COMP_P400;
             value = menu.sParam.glb.getCompR400m();
-        } break;
+        }
+        break;
 
-        case AVANT_OPTO: break;
-        case AVANT_NO: break;
-        case AVANT_MAX: break;
+    case AVANT_OPTO: break;
+    case AVANT_NO: break;
+    case AVANT_MAX: break;
     }
 
     std::string text = "---";
-    if (pn < GB_PARAM_MAX) {
-        if (value < getAbsMax(pn)) {
+    if (pn < GB_PARAM_MAX)
+    {
+        if (value < getAbsMax(pn))
+        {
             text = getTextValue(pn, value);
             view.typeCompatibility.setPalette(pblue);
-        } else {
+        }
+        else
+        {
             text = std::to_string(value);
             view.typeCompatibility.setPalette(pred);
         }
-    } else {
+    }
+    else
+    {
         view.typeCompatibility.setPalette(pdefault);
     }
     view.typeCompatibility.setText(codec->toUnicode(text.c_str()));
-
 }
 
 //
-QString
-MainWindow::getTypeOpto(eGB_TYPE_OPTO type) const
+QString MainWindow::getTypeOpto(eGB_TYPE_OPTO type) const
 {
     QString typeName = codec->toUnicode("Ошибка");
 
-    switch(type) {
-        case TYPE_OPTO_STANDART:
-            typeName = codec->toUnicode("Стандартная");
-            break;
-        case TYPE_OPTO_RING_UNI:
-            typeName = codec->toUnicode("Кольцо однонапр.");
-            break;
-        case TYPE_OPTO_RING_BI:
-            typeName = codec->toUnicode("Кольцо двунапр.");
-            break;
-        case TYPE_OPTO_MAX:
-            typeName = codec->toUnicode("MAX");
-            break;
+    switch (type)
+    {
+    case TYPE_OPTO_STANDART: typeName = codec->toUnicode("Стандартная"); break;
+    case TYPE_OPTO_RING_UNI: typeName = codec->toUnicode("Кольцо однонапр."); break;
+    case TYPE_OPTO_RING_BI: typeName = codec->toUnicode("Кольцо двунапр."); break;
+    case TYPE_OPTO_MAX: typeName = codec->toUnicode("MAX"); break;
     }
 
     return typeName;
 }
-

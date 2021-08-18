@@ -9,12 +9,12 @@ using namespace std;
 // размер массива
 #define SIZE_ARRAY(arr) (sizeof(arr) / sizeof(arr[0]))
 
-class TMeasure_Test: public ::testing::Test
+class TMeasure_Test : public ::testing::Test
 {
 public:
     TMeasure *mObj;
 
-    TMeasure_Test() {}
+    TMeasure_Test() { }
     virtual ~TMeasure_Test() override = default;
 
 protected:
@@ -42,14 +42,14 @@ TEST_F(TMeasure_Test, common)
     ASSERT_TRUE(mObj->setTemperature(13));
     ASSERT_TRUE(mObj->setFreqDev(14));
 
-    ASSERT_EQ(1,  mObj->getVoltageDef());
-    ASSERT_EQ(2,  mObj->getVoltageDef2());
-    ASSERT_EQ(3,  mObj->getVoltageCf());
-    ASSERT_EQ(4,  mObj->getVoltageCf2());
-    ASSERT_EQ(5,  mObj->getVoltageNoise());
-    ASSERT_EQ(6,  mObj->getVoltageNoise2());
+    ASSERT_EQ(1, mObj->getVoltageDef());
+    ASSERT_EQ(2, mObj->getVoltageDef2());
+    ASSERT_EQ(3, mObj->getVoltageCf());
+    ASSERT_EQ(4, mObj->getVoltageCf2());
+    ASSERT_EQ(5, mObj->getVoltageNoise());
+    ASSERT_EQ(6, mObj->getVoltageNoise2());
     ASSERT_EQ(78, mObj->getVoltageOut());
-    ASSERT_EQ(9,  mObj->getCurrentOut());
+    ASSERT_EQ(9, mObj->getCurrentOut());
     ASSERT_EQ(10, mObj->getResistOut());
     ASSERT_EQ(11, mObj->getPulseWidth());
     ASSERT_EQ(12, mObj->getD());
@@ -63,38 +63,38 @@ TEST_F(TMeasure_Test, voltageDef)
     const int8_t min = -99;
     const int8_t max = 99;
 
-    struct result_t {
-        bool set;
+    struct result_t
+    {
+        bool   set;
         int8_t value;
     };
 
-    struct testData_t {
-        string testName;
-        int8_t value;
+    struct testData_t
+    {
+        string   testName;
+        int8_t   value;
         result_t result;
     };
 
     std::vector<testData_t> testdata = {
-        {"data00", min - 1, {false, 0}},
-        {"data01", min,     {true,  min}},
-        {"data02", -1,      {true,  -1}},
-        {"data03", 0,       {true,  0}},
-        {"data04", 1,       {true,  1}},
-        {"data05", max,     {true,  max}},
-        {"data06", 15,      {true,  15}},
-        {"data07", max + 1, {false, 15}}
+        { "data00", min - 1, { false, 0 } }, { "data01", min, { true, min } },
+        { "data02", -1, { true, -1 } },      { "data03", 0, { true, 0 } },
+        { "data04", 1, { true, 1 } },        { "data05", max, { true, max } },
+        { "data06", 15, { true, 15 } },      { "data07", max + 1, { false, 15 } }
     };
 
     ASSERT_EQ(0U, mObj->getVoltageDef());
 
-    for(testData_t &item : testdata) {
+    for (testData_t &item : testdata)
+    {
         ASSERT_EQ(item.result.set, mObj->setVoltageDef(item.value));
         ASSERT_EQ(item.result.value, mObj->getVoltageDef());
     }
 
     ASSERT_EQ(0U, mObj->getVoltageDef2());
 
-    for(testData_t &item : testdata) {
+    for (testData_t &item : testdata)
+    {
         ASSERT_EQ(item.result.set, mObj->setVoltageDef2(item.value));
         ASSERT_EQ(item.result.value, mObj->getVoltageDef2());
     }
@@ -106,31 +106,30 @@ TEST_F(TMeasure_Test, voltageCf)
     const int8_t min = -99;
     const int8_t max = 99;
 
-    struct result_t {
-        bool set;
+    struct result_t
+    {
+        bool   set;
         int8_t value;
     };
 
-    struct testData_t {
-        string testName;
-        int8_t value;
+    struct testData_t
+    {
+        string   testName;
+        int8_t   value;
         result_t result;
     };
 
     std::vector<testData_t> testdata = {
-        {"data00", min - 1, {false, 0}},
-        {"data01", min,     {true,  min}},
-        {"data02", -1,      {true,  -1}},
-        {"data03", 0,       {true,  0}},
-        {"data04", 1,       {true,  1}},
-        {"data05", max,     {true,  max}},
-        {"data06", 15,      {true,  15}},
-        {"data07", max + 1, {false, 15}}
+        { "data00", min - 1, { false, 0 } }, { "data01", min, { true, min } },
+        { "data02", -1, { true, -1 } },      { "data03", 0, { true, 0 } },
+        { "data04", 1, { true, 1 } },        { "data05", max, { true, max } },
+        { "data06", 15, { true, 15 } },      { "data07", max + 1, { false, 15 } }
     };
 
     ASSERT_EQ(0U, mObj->getVoltageCf());
 
-    for(testData_t &item : testdata) {
+    for (testData_t &item : testdata)
+    {
         SCOPED_TRACE(item.testName);
 
         ASSERT_EQ(item.result.set, mObj->setVoltageCf(item.value));
@@ -139,7 +138,8 @@ TEST_F(TMeasure_Test, voltageCf)
 
     ASSERT_EQ(0U, mObj->getVoltageCf2());
 
-    for(testData_t &item : testdata) {
+    for (testData_t &item : testdata)
+    {
         SCOPED_TRACE(item.testName);
 
         ASSERT_EQ(item.result.set, mObj->setVoltageCf2(item.value));
@@ -153,40 +153,41 @@ TEST_F(TMeasure_Test, voltageOut)
     const uint8_t maxInt = 99;
     const uint8_t maxFrt = 9;
 
-    struct result_t {
-        bool set;
+    struct result_t
+    {
+        bool     set;
         uint16_t value;
     };
 
-    struct testData_t {
-        string testName;
-        uint8_t valueInt;
-        uint8_t valueFrt;
+    struct testData_t
+    {
+        string   testName;
+        uint8_t  valueInt;
+        uint8_t  valueFrt;
         result_t result;
     };
 
-    std::vector<testData_t> testdata = {
-        {"data00", 1, 2,            {true,  12}},
-        {"data01", 0, 0,            {true,  0}},
-        {"data02", 0, 9,            {true,  9}},
-        {"data03", 9, 0,            {true,  90}},
-        {"data04", maxInt, maxFrt,  {true,  999}},
-        {"data05", 65, 8,           {true,  658}},
-        {"data06", maxInt+1, 0,     {false, 658}},
-        {"data07", 0, maxFrt+1,     {false, 658}}
-    };
+    std::vector<testData_t> testdata = { { "data00", 1, 2, { true, 12 } },
+                                         { "data01", 0, 0, { true, 0 } },
+                                         { "data02", 0, 9, { true, 9 } },
+                                         { "data03", 9, 0, { true, 90 } },
+                                         { "data04", maxInt, maxFrt, { true, 999 } },
+                                         { "data05", 65, 8, { true, 658 } },
+                                         { "data06", maxInt + 1, 0, { false, 658 } },
+                                         { "data07", 0, maxFrt + 1, { false, 658 } } };
 
     ASSERT_EQ(0U, mObj->getVoltageOut());
     ASSERT_EQ(0U, mObj->getVoltageOutInt());
     ASSERT_EQ(0U, mObj->getVoltageOutFract());
 
-    for(testData_t &item : testdata) {
+    for (testData_t &item : testdata)
+    {
         SCOPED_TRACE(item.testName);
 
         ASSERT_EQ(item.result.set, mObj->setVoltageOut(item.valueInt, item.valueFrt));
         ASSERT_EQ(item.result.value, mObj->getVoltageOut());
-        ASSERT_EQ(item.result.value/10, mObj->getVoltageOutInt());
-        ASSERT_EQ(item.result.value%10, mObj->getVoltageOutFract());
+        ASSERT_EQ(item.result.value / 10, mObj->getVoltageOutInt());
+        ASSERT_EQ(item.result.value % 10, mObj->getVoltageOutFract());
     }
 }
 
@@ -195,29 +196,29 @@ TEST_F(TMeasure_Test, currentOut)
 {
     const uint16_t max = 999;
 
-    struct result_t {
-        bool set;
+    struct result_t
+    {
+        bool     set;
         uint16_t value;
     };
 
-    struct testData_t {
-        string testName;
+    struct testData_t
+    {
+        string   testName;
         uint16_t value;
         result_t result;
     };
 
     std::vector<testData_t> testdata = {
-        {"data00", 1,     {true,  1}},
-        {"data01", 0,     {true,  0}},
-        {"data02", 613,   {true,  613}},
-        {"data03", max,   {true,  max}},
-        {"data04", 37,    {true,  37}},
-        {"data05", max+1, {false, 37}}
+        { "data00", 1, { true, 1 } },     { "data01", 0, { true, 0 } },
+        { "data02", 613, { true, 613 } }, { "data03", max, { true, max } },
+        { "data04", 37, { true, 37 } },   { "data05", max + 1, { false, 37 } }
     };
 
     ASSERT_EQ(0U, mObj->getCurrentOut());
 
-    for(testData_t &item : testdata) {
+    for (testData_t &item : testdata)
+    {
         SCOPED_TRACE(item.testName);
 
         ASSERT_EQ(item.result.set, mObj->setCurrentOut(item.value));
@@ -230,29 +231,29 @@ TEST_F(TMeasure_Test, resistOut)
 {
     const uint16_t max = 999;
 
-    struct result_t {
-        bool set;
+    struct result_t
+    {
+        bool     set;
         uint16_t value;
     };
 
-    struct testData_t {
-        string testName;
+    struct testData_t
+    {
+        string   testName;
         uint16_t value;
         result_t result;
     };
 
     std::vector<testData_t> testdata = {
-        {"data00", 1,     {true,  1}},
-        {"data01", 0,     {true,  0}},
-        {"data02", 613,   {true,  613}},
-        {"data03", max,   {true,  max}},
-        {"data04", 37,    {true,  37}},
-        {"data05", max+1, {false, 37}}
+        { "data00", 1, { true, 1 } },     { "data01", 0, { true, 0 } },
+        { "data02", 613, { true, 613 } }, { "data03", max, { true, max } },
+        { "data04", 37, { true, 37 } },   { "data05", max + 1, { false, 37 } }
     };
 
     ASSERT_EQ(0U, mObj->getResistOut());
 
-    for(testData_t &item : testdata) {
+    for (testData_t &item : testdata)
+    {
         SCOPED_TRACE(item.testName);
 
         ASSERT_EQ(item.result.set, mObj->setResistOut(item.value));
@@ -266,31 +267,30 @@ TEST_F(TMeasure_Test, voltageNoise)
     const int8_t min = -99;
     const int8_t max = 99;
 
-    struct result_t {
-        bool set;
+    struct result_t
+    {
+        bool   set;
         int8_t value;
     };
 
-    struct testData_t {
-        string testName;
-        int8_t value;
+    struct testData_t
+    {
+        string   testName;
+        int8_t   value;
         result_t result;
     };
 
     std::vector<testData_t> testdata = {
-        {"data00", min - 1, {false, 0}},
-        {"data01", min,     {true,  min}},
-        {"data02", -1,      {true,  -1}},
-        {"data03", 0,       {true,  0}},
-        {"data04", 1,       {true,  1}},
-        {"data05", max,     {true,  max}},
-        {"data06", 15,      {true,  15}},
-        {"data07", max + 1, {false, 15}}
+        { "data00", min - 1, { false, 0 } }, { "data01", min, { true, min } },
+        { "data02", -1, { true, -1 } },      { "data03", 0, { true, 0 } },
+        { "data04", 1, { true, 1 } },        { "data05", max, { true, max } },
+        { "data06", 15, { true, 15 } },      { "data07", max + 1, { false, 15 } }
     };
 
     ASSERT_EQ(0U, mObj->getVoltageNoise());
 
-    for(testData_t &item : testdata) {
+    for (testData_t &item : testdata)
+    {
         SCOPED_TRACE(item.testName);
 
         ASSERT_EQ(item.result.set, mObj->setVoltageNoise(item.value));
@@ -299,7 +299,8 @@ TEST_F(TMeasure_Test, voltageNoise)
 
     ASSERT_EQ(0U, mObj->getVoltageNoise2());
 
-    for(testData_t &item : testdata) {
+    for (testData_t &item : testdata)
+    {
         SCOPED_TRACE(item.testName);
 
         ASSERT_EQ(item.result.set, mObj->setVoltageNoise2(item.value));
@@ -312,29 +313,29 @@ TEST_F(TMeasure_Test, pulseWidth)
 {
     const uint16_t max = 360;
 
-    struct result_t {
-        bool set;
+    struct result_t
+    {
+        bool     set;
         uint16_t value;
     };
 
-    struct testData_t {
-        string testName;
+    struct testData_t
+    {
+        string   testName;
         uint16_t value;
         result_t result;
     };
 
     std::vector<testData_t> testdata = {
-        {"data00", 1,     {true,  1}},
-        {"data01", 0,     {true,  0}},
-        {"data02", 271,   {true,  271}},
-        {"data03", max,   {true,  max}},
-        {"data04", 37,    {true,  37}},
-        {"data05", max+1, {false, 37}}
+        { "data00", 1, { true, 1 } },     { "data01", 0, { true, 0 } },
+        { "data02", 271, { true, 271 } }, { "data03", max, { true, max } },
+        { "data04", 37, { true, 37 } },   { "data05", max + 1, { false, 37 } }
     };
 
     ASSERT_EQ(0U, mObj->getPulseWidth());
 
-    for(testData_t &item : testdata) {
+    for (testData_t &item : testdata)
+    {
         SCOPED_TRACE(item.testName);
 
         ASSERT_EQ(item.result.set, mObj->setPulseWidth(item.value));
@@ -348,31 +349,30 @@ TEST_F(TMeasure_Test, D)
     const int8_t min = -64;
     const int8_t max = 64;
 
-    struct result_t {
-        bool set;
+    struct result_t
+    {
+        bool   set;
         int8_t value;
     };
 
-    struct testData_t {
-        string testName;
-        int8_t value;
+    struct testData_t
+    {
+        string   testName;
+        int8_t   value;
         result_t result;
     };
 
     std::vector<testData_t> testdata = {
-        {"data00", min - 1, {false, 0}},
-        {"data01", min,     {true,  min}},
-        {"data02", -1,      {true,  -1}},
-        {"data03", 0,       {true,  0}},
-        {"data04", 1,       {true,  1}},
-        {"data05", max,     {true,  max}},
-        {"data06", 15,      {true,  15}},
-        {"data07", max + 1, {false, 15}}
+        { "data00", min - 1, { false, 0 } }, { "data01", min, { true, min } },
+        { "data02", -1, { true, -1 } },      { "data03", 0, { true, 0 } },
+        { "data04", 1, { true, 1 } },        { "data05", max, { true, max } },
+        { "data06", 15, { true, 15 } },      { "data07", max + 1, { false, 15 } }
     };
 
     ASSERT_EQ(0U, mObj->getD());
 
-    for(testData_t &item : testdata) {
+    for (testData_t &item : testdata)
+    {
         SCOPED_TRACE(item.testName);
 
         ASSERT_EQ(item.result.set, mObj->setD(item.value));
@@ -386,31 +386,30 @@ TEST_F(TMeasure_Test, Temperature)
     const int8_t min = -100;
     const int8_t max = 125;
 
-    struct result_t {
-        bool set;
+    struct result_t
+    {
+        bool   set;
         int8_t value;
     };
 
-    struct testData_t {
-        string testName;
-        int8_t value;
+    struct testData_t
+    {
+        string   testName;
+        int8_t   value;
         result_t result;
     };
 
     std::vector<testData_t> testdata = {
-        {"data00", min - 1, {false, -100}},
-        {"data01", min,     {true,  min}},
-        {"data02", -1,      {true,  -1}},
-        {"data03", 0,       {true,  0}},
-        {"data04", 1,       {true,  1}},
-        {"data05", max,     {true,  max}},
-        {"data06", 15,      {true,  15}},
-        {"data07", max + 1, {false, 15}}
+        { "data00", min - 1, { false, -100 } }, { "data01", min, { true, min } },
+        { "data02", -1, { true, -1 } },         { "data03", 0, { true, 0 } },
+        { "data04", 1, { true, 1 } },           { "data05", max, { true, max } },
+        { "data06", 15, { true, 15 } },         { "data07", max + 1, { false, 15 } }
     };
 
     ASSERT_EQ(min, mObj->getTemperature());
 
-    for(testData_t &item : testdata) {
+    for (testData_t &item : testdata)
+    {
         SCOPED_TRACE(item.testName);
 
         ASSERT_EQ(item.result.set, mObj->setTemperature(item.value));
@@ -423,29 +422,29 @@ TEST_F(TMeasure_Test, freqDiv)
 {
     const uint8_t max = 100;
 
-    struct result_t {
-        bool set;
+    struct result_t
+    {
+        bool    set;
         uint8_t value;
     };
 
-    struct testData_t {
-        string testName;
-        uint8_t value;
+    struct testData_t
+    {
+        string   testName;
+        uint8_t  value;
         result_t result;
     };
 
     std::vector<testData_t> testdata = {
-        {"data00", 1,     {true,  1}},
-        {"data01", 0,     {true,  0}},
-        {"data02", 56,    {true,  56}},
-        {"data03", max,   {true,  max}},
-        {"data04", 37,    {true,  37}},
-        {"data05", max+1, {false, 37}}
+        { "data00", 1, { true, 1 } },   { "data01", 0, { true, 0 } },
+        { "data02", 56, { true, 56 } }, { "data03", max, { true, max } },
+        { "data04", 37, { true, 37 } }, { "data05", max + 1, { false, 37 } }
     };
 
     ASSERT_EQ(0U, mObj->getFreqDev());
 
-    for(testData_t &item : testdata) {
+    for (testData_t &item : testdata)
+    {
         SCOPED_TRACE(item.testName);
 
         ASSERT_EQ(item.result.set, mObj->setFreqDev(item.value));

@@ -11,21 +11,23 @@
 #include "glbDefine.h"
 
 // класс для передачи команд
-class TTxCom {
+class TTxCom
+{
 
     /// NOTE Размер буфера для быстрых команд больше 3 лучше не делать!
     /// NOTE Размер буфера для команд 2 больше 4 лучше не делать!
 
-    static const uint8_t kSizeBufComFast = 3;   ///< Размер буфера для быстрых команд.
-    static const uint8_t kSizeBufCom1 = 10;     ///< Размер буфера для команд 1.
-    static const uint8_t kSizeBufCom2 = 4;      ///< Размер буфера для команд 2. Не делать больше 4!
-    static const uint8_t kSizeDataBuf = 16;     ///< Размер буфера данных.
+    static const uint8_t kSizeBufComFast = 3;  ///< Размер буфера для быстрых команд.
+    static const uint8_t kSizeBufCom1 = 10;  ///< Размер буфера для команд 1.
+    static const uint8_t kSizeBufCom2 = 4;  ///< Размер буфера для команд 2. Не делать больше 4!
+    static const uint8_t kSizeDataBuf = 16;  ///< Размер буфера данных.
 
     /// Структура быстрых команд.
-    struct fastCom_t {
-        eGB_COM command;            ///< Команда.
-        eGB_SEND_TYPE sendType;     ///< Тип команды.
-        uint8_t data[kSizeDataBuf]; ///< Данные.
+    struct fastCom_t
+    {
+        eGB_COM       command;             ///< Команда.
+        eGB_SEND_TYPE sendType;            ///< Тип команды.
+        uint8_t       data[kSizeDataBuf];  ///< Данные.
     };
 
 public:
@@ -102,7 +104,8 @@ public:
      *  @param byte Байт данных.
      *  @param num Индекс элемента массива.
      */
-    void setInt8(uint8_t byte, uint8_t num = 0) {
+    void setInt8(uint8_t byte, uint8_t num = 0)
+    {
         if (num < kSizeDataBuf)
             data_[num] = byte;
     }
@@ -111,32 +114,24 @@ public:
      *  @param num Индекс элемента массива.
      *  @return Байт данных.
      */
-    uint8_t getInt8(uint8_t num = 0) const {
-        return (num < kSizeDataBuf) ? data_[num] : 0;
-    }
+    uint8_t getInt8(uint8_t num = 0) const { return (num < kSizeDataBuf) ? data_[num] : 0; }
 
     /** Запись 2-х байтного числа (uint16_t).
      *  В буфере данные записываются в 1 и 2 элемент массива uint8_t.
      *  @param val Данные.
      */
-    void setInt16(uint16_t val) {
-        *((uint16_t *) (&data_[1])) = val;
-    }
+    void setInt16(uint16_t val) { *((uint16_t *) (&data_[1])) = val; }
 
     /** Считывание 2-х байтного числа (uint16_t).
      *  Данные хранятся в 1 и 2 элементах массива uint8_t.
      *  @return Данные.
      */
-    uint16_t getInt16() const {
-        return *((uint16_t *) (&data_[1]));
-    }
+    uint16_t getInt16() const { return *((uint16_t *) (&data_[1])); }
 
     /** Возвращает указатель на буфер данных.
      *  @return Указатель на буфер данных.
      */
-    uint8_t* getBuferAddress() {
-        return &data_[0];
-    }
+    uint8_t *getBuferAddress() { return &data_[0]; }
 
     /** Возвращает тип текущей команды на передачу.
      *
@@ -173,7 +168,7 @@ private:
     // номер текущей команды во втором буфере
     uint8_t cnt2_;
     // буфер данных (для каждой быстрой команды и основной )
-    uint8_t data_ [kSizeDataBuf];
+    uint8_t data_[kSizeDataBuf];
 };
 
 #endif /* TX_COM_H_ */

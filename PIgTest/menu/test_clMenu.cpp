@@ -1,17 +1,17 @@
 #include "gtest/gtest.h"
 #include <algorithm>
-#include <functional>
 #include <cstdio>
+#include <functional>
 #include <iostream>
 
 using namespace std;
 
-#define TEST_FRIENDS \
-    friend class clMenu_Test; \
-    FRIEND_TEST(clMenu_Test, checkLedOn); \
-    FRIEND_TEST(clMenu_Test, onFnButton); \
+#define TEST_FRIENDS                            \
+    friend class clMenu_Test;                   \
+    FRIEND_TEST(clMenu_Test, checkLedOn);       \
+    FRIEND_TEST(clMenu_Test, onFnButton);       \
     FRIEND_TEST(clMenu_Test, addControlToSend); \
-    FRIEND_TEST(clMenu_Test, isRzskM); \
+    FRIEND_TEST(clMenu_Test, isRzskM);          \
     FRIEND_TEST(clMenu_Test, getKeyboardLayout);
 
 
@@ -20,12 +20,12 @@ using namespace std;
 // размер массива
 #define SIZE_ARRAY(arr) (sizeof(arr) / sizeof(arr[0]))
 
-class clMenu_Test: public ::testing::Test
+class clMenu_Test : public ::testing::Test
 {
 public:
     clMenu *mObj = nullptr;
 
-    clMenu_Test() {}
+    clMenu_Test() { }
     virtual ~clMenu_Test() override = default;
 
     bool testFnButton(eKEY key, TControl::ctrl_t rctrl) const;
@@ -46,15 +46,17 @@ protected:
 //
 bool clMenu_Test::testFnButton(eKEY key, TControl::ctrl_t rctrl) const
 {
-    bool check = true;
-    TControl::ctrl_t ctrl = mObj->onFnButton(key);
+    bool             check = true;
+    TControl::ctrl_t ctrl  = mObj->onFnButton(key);
 
-    if (rctrl != ctrl) {
+    if (rctrl != ctrl)
+    {
         EXPECT_EQ(rctrl, ctrl);
         check = false;
     }
 
-    if (key != KEY_NO) {
+    if (key != KEY_NO)
+    {
         EXPECT_EQ(KEY_NO, key);
         check = false;
     }
@@ -67,44 +69,98 @@ bool clMenu_Test::testCheckLedOn(TDeviceStatus &status) const
 {
     bool check = true;
 
-    if (mObj->checkLedOn()) {check = false; EXPECT_FALSE(mObj->checkLedOn());}
+    if (mObj->checkLedOn())
+    {
+        check = false;
+        EXPECT_FALSE(mObj->checkLedOn());
+    }
 
     status.setEnable(true);
     status.setWarning(0);
     status.setFault(0);
     status.setState(1);
 
-    if (mObj->checkLedOn()) {check = false; EXPECT_FALSE(mObj->checkLedOn());}
-
-    status.setState(0);
-    if (!mObj->checkLedOn()) {check = false; EXPECT_TRUE(mObj->checkLedOn());}
-    status.setState(2);
-    if (!mObj->checkLedOn()) {check = false; EXPECT_TRUE(mObj->checkLedOn());}
-    status.setState(1);
-    if (mObj->checkLedOn()) {check = false; EXPECT_FALSE(mObj->checkLedOn());}
-
-    status.setWarning(1);
-    if (!mObj->checkLedOn()) {check = false; EXPECT_TRUE(mObj->checkLedOn());}
-    status.setWarning(0);
-    if (mObj->checkLedOn()) {check = false; EXPECT_FALSE(mObj->checkLedOn());}
-
-    status.setFault(1);
-    if (!mObj->checkLedOn()) {check = false; EXPECT_TRUE(mObj->checkLedOn());}
-    status.setFault(0);
-    if (mObj->checkLedOn()) {check = false; EXPECT_FALSE(mObj->checkLedOn());}
-
-    if (&status == &mObj->sParam.prd.status) {
-        mObj->sParam.prd.setIndCom8(0, 1);
-        if (!mObj->checkLedOn()) {check = false; EXPECT_TRUE(mObj->checkLedOn());}
-        mObj->sParam.prd.setIndCom8(0, 0);
-        if (mObj->checkLedOn()) {check = false; EXPECT_FALSE(mObj->checkLedOn());}
+    if (mObj->checkLedOn())
+    {
+        check = false;
+        EXPECT_FALSE(mObj->checkLedOn());
     }
 
-    if (&status == &mObj->sParam.prm.status) {
+    status.setState(0);
+    if (!mObj->checkLedOn())
+    {
+        check = false;
+        EXPECT_TRUE(mObj->checkLedOn());
+    }
+    status.setState(2);
+    if (!mObj->checkLedOn())
+    {
+        check = false;
+        EXPECT_TRUE(mObj->checkLedOn());
+    }
+    status.setState(1);
+    if (mObj->checkLedOn())
+    {
+        check = false;
+        EXPECT_FALSE(mObj->checkLedOn());
+    }
+
+    status.setWarning(1);
+    if (!mObj->checkLedOn())
+    {
+        check = false;
+        EXPECT_TRUE(mObj->checkLedOn());
+    }
+    status.setWarning(0);
+    if (mObj->checkLedOn())
+    {
+        check = false;
+        EXPECT_FALSE(mObj->checkLedOn());
+    }
+
+    status.setFault(1);
+    if (!mObj->checkLedOn())
+    {
+        check = false;
+        EXPECT_TRUE(mObj->checkLedOn());
+    }
+    status.setFault(0);
+    if (mObj->checkLedOn())
+    {
+        check = false;
+        EXPECT_FALSE(mObj->checkLedOn());
+    }
+
+    if (&status == &mObj->sParam.prd.status)
+    {
+        mObj->sParam.prd.setIndCom8(0, 1);
+        if (!mObj->checkLedOn())
+        {
+            check = false;
+            EXPECT_TRUE(mObj->checkLedOn());
+        }
+        mObj->sParam.prd.setIndCom8(0, 0);
+        if (mObj->checkLedOn())
+        {
+            check = false;
+            EXPECT_FALSE(mObj->checkLedOn());
+        }
+    }
+
+    if (&status == &mObj->sParam.prm.status)
+    {
         mObj->sParam.prm.setIndCom8(0, 1);
-        if (!mObj->checkLedOn()) {check = false; EXPECT_TRUE(mObj->checkLedOn());}
+        if (!mObj->checkLedOn())
+        {
+            check = false;
+            EXPECT_TRUE(mObj->checkLedOn());
+        }
         mObj->sParam.prm.setIndCom8(0, 0);
-        if (mObj->checkLedOn()) {check = false; EXPECT_FALSE(mObj->checkLedOn());}
+        if (mObj->checkLedOn())
+        {
+            check = false;
+            EXPECT_FALSE(mObj->checkLedOn());
+        }
     }
 
     status.setEnable(false);
@@ -153,23 +209,15 @@ TEST_F(clMenu_Test, checkLedOn)
 //
 TEST_F(clMenu_Test, onFnButton)
 {
-    std::vector<eKEY> fnkeys = {
-        KEY_CALL,
-        KEY_PUSK_UD,
-        KEY_AC_PUSK_UD,
-        KEY_PUSK_NALAD,
-        KEY_AC_RESET,
-        KEY_AC_PUSK,
-        KEY_AC_REGIME,
-        KEY_RESET_IND,
-        KEY_PUSK,
-        KEY_RESET
-    };
+    std::vector<eKEY> fnkeys = { KEY_CALL,     KEY_PUSK_UD, KEY_AC_PUSK_UD, KEY_PUSK_NALAD,
+                                 KEY_AC_RESET, KEY_AC_PUSK, KEY_AC_REGIME,  KEY_RESET_IND,
+                                 KEY_PUSK,     KEY_RESET };
 
     ASSERT_EQ(0, KEY_NO);
-    for(int i = KEY_NO; i <= KEY_MAX; i++) {
-        eKEY key = static_cast<eKEY> (i);
-        bool isfn = std::find(fnkeys.begin(), fnkeys.end(), key) != fnkeys.end();
+    for (int i = KEY_NO; i <= KEY_MAX; i++)
+    {
+        eKEY key    = static_cast<eKEY>(i);
+        bool isfn   = std::find(fnkeys.begin(), fnkeys.end(), key) != fnkeys.end();
         eKEY result = isfn ? KEY_NO : key;
 
         SCOPED_TRACE("key " + to_string(i));
@@ -342,13 +390,15 @@ TEST_F(clMenu_Test, onFnButton_reset)
 //
 TEST_F(clMenu_Test, isRzskM)
 {
-    for(int device = 0; device <= AVANT_MAX; device++) {
-        for(int comp = GB_COMP_RZSK_MIN; comp <= GB_COMP_RZSK_MAX; comp++) {
-            SCOPED_TRACE("typeDevice = " + to_string(device) +
-                         ", compatibility = " + to_string(comp));
+    for (int device = 0; device <= AVANT_MAX; device++)
+    {
+        for (int comp = GB_COMP_RZSK_MIN; comp <= GB_COMP_RZSK_MAX; comp++)
+        {
+            SCOPED_TRACE("typeDevice = " + to_string(device)
+                         + ", compatibility = " + to_string(comp));
             bool isRzsk = (device == AVANT_RZSK) && (comp == GB_COMP_RZSK_M);
 
-            mObj->sParam.typeDevice = static_cast<eGB_TYPE_DEVICE> (device);
+            mObj->sParam.typeDevice = static_cast<eGB_TYPE_DEVICE>(device);
             mObj->sParam.glb.setCompatibility(comp);
 
             ASSERT_EQ(isRzsk, mObj->isRzskM());
@@ -388,7 +438,7 @@ TEST_F(clMenu_Test, getKeyboardLayout)
     mObj->sParam.def.status.setEnable(true);
     mObj->sParam.prd.status.setEnable(false);
     mObj->sParam.prm.status.setEnable(false);
-    ASSERT_EQ(AVANT_R400M, mObj->getKeyboardLayout()); // защ
+    ASSERT_EQ(AVANT_R400M, mObj->getKeyboardLayout());  // защ
     mObj->sParam.prd.status.setEnable(true);
     ASSERT_EQ(AVANT_RZSK, mObj->getKeyboardLayout());  // защ + прд
     mObj->sParam.prd.status.setEnable(false);
