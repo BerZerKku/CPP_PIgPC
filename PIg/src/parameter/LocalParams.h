@@ -188,11 +188,13 @@ public:
 
     /**	Установка количества аппаратов в линии
      *
-     * 	@param numDevices Количество аппаратов в линии
+     * В случае ошибочного значения будет установлено 2.
+     *
+     * 	@param[in] numDevices Количество аппаратов в линии
      * 	@argval 2
      * 	@argval 3
      */
-    void setNumDevices(uint8_t numDevices) { this->numDevices = numDevices; }
+    void setNumDevices(uint8_t numDevices) { this->numDevices = (numDevices == 3) ? (3) : (2); }
 
 private:
     prop_t  param[MAX_NUM_OF_PARAMS];  ///< Массив параметров.

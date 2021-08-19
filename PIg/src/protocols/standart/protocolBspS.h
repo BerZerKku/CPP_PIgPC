@@ -30,6 +30,12 @@ private:
     uint8_t sendModifGlbCommand(eGB_COM com);
 
     uint8_t sendReadJrnCommand(eGB_COM com);
+
+    bool getLocalParam(eGB_COM com);
+
+#ifdef TEST_FRIENDS
+    TEST_FRIENDS
+#endif
 };
 
 

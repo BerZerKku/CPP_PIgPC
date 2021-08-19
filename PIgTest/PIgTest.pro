@@ -38,5 +38,6 @@ SOURCES += \
     menu/test_test.cpp \
     menu/test_txCom.cpp \
     protocols/iec101/test_CIec101.cpp \
-    protocols/modbus/test_protocolModbus.cpp
+    protocols/modbus/test_protocolModbus.cpp \
+    protocols/standart/test_protocolBspS.cpp
 
