@@ -150,125 +150,129 @@ public:
      *
      *  Следующий кадр должен прийти с fcb = 0.
      */
-    void resetRemoteLink() { { printTestName(" Запрос о соcтоянии канала. \n");
-    uint8_t mas[]  = FIX_FRAME_IN(9, false);  // REQUEST_STATUS_OF_LINK
-    uint8_t resp[] = {
-        FRAME_START_CHARACTER_FIX, 11, 0x01, 0x0C, FRAME_STOP_CHARCTER
-    };  // RESPOND_STATUS_OF_LINK
-    putData(iec101, mas, sizeof(mas));
-    iec101->readData();
-    ASSERT_TRUE(iec101->checkState(CIec101::STATE_WRITE_READY)) << msg << " " << iec101->getState();
-    ASSERT_TRUE(checkMass(buf, iec101->getNumOfBytes(), resp, sizeof(resp))) << msg;
-    ASSERT_TRUE(!iec101->isReset());
-}
-
-{
-    printTestName(" Сброс удаленного канала. \n");
-    uint8_t mas[]  = FIX_FRAME_IN(0, false);  // RESET_REMOTE_LINK
-    uint8_t resp[] = { FRAME_START_CHARACTER_FIX,
-                       0x00,
-                       0x01,
-                       0x01,
-                       FRAME_STOP_CHARCTER };  // CONFIRM_ACK
-    putData(iec101, mas, sizeof(mas));
-    iec101->readData();
-    ASSERT_TRUE(iec101->checkState(CIec101::STATE_WRITE_READY)) << msg << " " << iec101->getState();
-    ASSERT_TRUE(checkMass(buf, iec101->getNumOfBytes(), resp, sizeof(resp))) << msg;
-    ASSERT_TRUE(iec101->isReset()) << msg;
-}
-
-{
-    printTestName(" Запрос данных класса 1 с неверным битом счета кадров. \n");
-    uint8_t mas[]  = FIX_FRAME_IN(10, false);  // REQUEST_USER_DATA_CLASS_1
-    uint8_t resp[] = { FRAME_START_CHARACTER_FIX,
-                       0x09,
-                       0x01,
-                       0x0A,
-                       FRAME_STOP_CHARCTER };  // RESPOND_NACK
-    putData(iec101, mas, sizeof(mas));
-    iec101->readData();
-    ASSERT_TRUE(iec101->checkState(CIec101::STATE_WRITE_READY)) << msg << " " << iec101->getState();
-    ASSERT_TRUE(checkMass(buf, iec101->getNumOfBytes(), resp, sizeof(resp))) << msg;
-    ASSERT_TRUE(iec101->isReset()) << msg;
-}
-
-{
-    printTestName(" Запрос данных класса 1 с верным битом счета кадров. \n");
-    uint8_t mas[] = FIX_FRAME_IN(10, true);  // REQUEST_USER_DATA_CLASS_1, fcb = 1
-    printMassive("MAS", mas, sizeof(mas));
-    uint8_t resp[] = { FRAME_START_CHARACTER_VAR,
-                       0x09,
-                       0x09,
-                       FRAME_START_CHARACTER_VAR,
-                       0x08,  // control = RESPOND_USER_DATA, prm = 0, acd = 0
-                       0x01,  // link address
-                       0x46,  // TYPE_ID_M_EI_NA_1
-                       0x01,  // variableStructureQualifier
-                       0x04,  // COT = COT_INIT
-                       0x01,  // common address
-                       0x00,
-                       0x00,  // information object address
-                       0x01,  // COI = COI_LOCAL_MANUAL_RESET
-                       0x56,  // crc
-                       FRAME_STOP_CHARCTER };
-    putData(iec101, mas, sizeof(mas));
-    iec101->readData();
-    ASSERT_TRUE(iec101->checkState(CIec101::STATE_WRITE_READY)) << msg << " " << iec101->getState();
-    ASSERT_TRUE(checkMass(buf, iec101->getNumOfBytes(), resp, sizeof(resp))) << msg;
-    ASSERT_TRUE(iec101->isReset()) << msg;
-}
-}
-;
-
-/** Возвращает новое значение бита счета кадров.
- *
- *  Изначально будет возвращена 1 (для сброса).
- *
- *  @param v Если True - возвращает новое значнеие, False - предыдущее.
- *  @retval 0x20
- *  @retval 0x00
- */
-uint8_t getFcb(bool v)
-{
-    if (v)
+    void resetRemoteLink()
     {
-        fcb = (fcb == 0x30) ? 0x10 : 0x30;
+        {
+            printTestName(" Запрос о соcтоянии канала. \n");
+            uint8_t mas[]  = FIX_FRAME_IN(9, false);  // REQUEST_STATUS_OF_LINK
+            uint8_t resp[] = { FRAME_START_CHARACTER_FIX,
+                               11,
+                               0x01,
+                               0x0C,
+                               FRAME_STOP_CHARCTER };  // RESPOND_STATUS_OF_LINK
+            putData(iec101, mas, sizeof(mas));
+            iec101->readData();
+            ASSERT_TRUE(iec101->checkState(CIec101::STATE_WRITE_READY))
+                << msg << " " << iec101->getState();
+            ASSERT_TRUE(checkMass(buf, iec101->getNumOfBytes(), resp, sizeof(resp))) << msg;
+            ASSERT_TRUE(!iec101->isReset());
+        }
+
+        {
+            printTestName(" Сброс удаленного канала. \n");
+            uint8_t mas[]  = FIX_FRAME_IN(0, false);  // RESET_REMOTE_LINK
+            uint8_t resp[] = { FRAME_START_CHARACTER_FIX,
+                               0x00,
+                               0x01,
+                               0x01,
+                               FRAME_STOP_CHARCTER };  // CONFIRM_ACK
+            putData(iec101, mas, sizeof(mas));
+            iec101->readData();
+            ASSERT_TRUE(iec101->checkState(CIec101::STATE_WRITE_READY))
+                << msg << " " << iec101->getState();
+            ASSERT_TRUE(checkMass(buf, iec101->getNumOfBytes(), resp, sizeof(resp))) << msg;
+            ASSERT_TRUE(iec101->isReset()) << msg;
+        }
+
+        {
+            printTestName(" Запрос данных класса 1 с неверным битом счета кадров. \n");
+            uint8_t mas[]  = FIX_FRAME_IN(10, false);  // REQUEST_USER_DATA_CLASS_1
+            uint8_t resp[] = { FRAME_START_CHARACTER_FIX,
+                               0x09,
+                               0x01,
+                               0x0A,
+                               FRAME_STOP_CHARCTER };  // RESPOND_NACK
+            putData(iec101, mas, sizeof(mas));
+            iec101->readData();
+            ASSERT_TRUE(iec101->checkState(CIec101::STATE_WRITE_READY))
+                << msg << " " << iec101->getState();
+            ASSERT_TRUE(checkMass(buf, iec101->getNumOfBytes(), resp, sizeof(resp))) << msg;
+            ASSERT_TRUE(iec101->isReset()) << msg;
+        }
+
+        {
+            printTestName(" Запрос данных класса 1 с верным битом счета кадров. \n");
+            uint8_t mas[] = FIX_FRAME_IN(10, true);  // REQUEST_USER_DATA_CLASS_1, fcb = 1
+            printMassive("MAS", mas, sizeof(mas));
+            uint8_t resp[] = { FRAME_START_CHARACTER_VAR,
+                               0x09,
+                               0x09,
+                               FRAME_START_CHARACTER_VAR,
+                               0x08,  // control = RESPOND_USER_DATA, prm = 0, acd = 0
+                               0x01,  // link address
+                               0x46,  // TYPE_ID_M_EI_NA_1
+                               0x01,  // variableStructureQualifier
+                               0x04,  // COT = COT_INIT
+                               0x01,  // common address
+                               0x00,
+                               0x00,  // information object address
+                               0x01,  // COI = COI_LOCAL_MANUAL_RESET
+                               0x56,  // crc
+                               FRAME_STOP_CHARCTER };
+            putData(iec101, mas, sizeof(mas));
+            iec101->readData();
+            ASSERT_TRUE(iec101->checkState(CIec101::STATE_WRITE_READY))
+                << msg << " " << iec101->getState();
+            ASSERT_TRUE(checkMass(buf, iec101->getNumOfBytes(), resp, sizeof(resp))) << msg;
+            ASSERT_TRUE(iec101->isReset()) << msg;
+        }
     }
-    return fcb;
-}
 
-/** Подсчет контрольной суммы кадра переменной длины.
- *
- *  @param[in] mas Массив данных
- *  @return Контрольную сумму.
- */
-uint8_t getCrcVarLenght(uint8_t mas[])
-{
-    uint8_t crc = 0;
-    uint8_t len = mas[1];
-
-    for (uint8_t i = 0; i < len; i++)
+    /** Возвращает новое значение бита счета кадров.
+     *
+     *  Изначально будет возвращена 1 (для сброса).
+     *
+     *  @param v Если True - возвращает новое значнеие, False - предыдущее.
+     *  @retval 0x20
+     *  @retval 0x00
+     */
+    uint8_t getFcb(bool v)
     {
-        crc += mas[4 + i];
+        if (v)
+        {
+            fcb = (fcb == 0x30) ? 0x10 : 0x30;
+        }
+        return fcb;
     }
-    return crc;
-}
+
+    /** Подсчет контрольной суммы кадра переменной длины.
+     *
+     *  @param[in] mas Массив данных
+     *  @return Контрольную сумму.
+     */
+    uint8_t getCrcVarLenght(uint8_t mas[])
+    {
+        uint8_t crc = 0;
+        uint8_t len = mas[1];
+
+        for (uint8_t i = 0; i < len; i++)
+        {
+            crc += mas[4 + i];
+        }
+        return crc;
+    }
 
 private:
-virtual void SetUp()
-{
-    fcb    = 0;
-    posMsg = 0;
-    msg[0] = 0x00;
-    iec101 = new CIec101(buf, SIZE);
-}
+    virtual void SetUp()
+    {
+        fcb    = 0;
+        posMsg = 0;
+        msg[0] = 0x00;
+        iec101 = new CIec101(buf, SIZE);
+    }
 
-virtual void TearDown()
-{
-    delete iec101;
-}
-}
-;
+    virtual void TearDown() { delete iec101; }
+};
 
 TEST_F(TIec101_Test, constants)
 {

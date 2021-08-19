@@ -9,6 +9,7 @@
 
 LocalParams::LocalParams()
 {
+    numDevices = 2;
     clearParams();
 }
 

@@ -75,54 +75,7 @@ bool clProtocolBspS::getData(bool pc)
         else
             stat = getGlbCommand(com, pc);  // команды общие
 
-        LocalParams* lp     = &sParam_->local;
-        eGB_PARAM    lparam = lp->getParam();
-
-        if (getCom(lparam) == com)
-        {
-            // по умолчанию загружается значение первого байта,
-            // на отличные от этого параметры далее ведется проверка
-            int16_t val = -1000;
-            switch (lp->getParam())
-            {
-            case GB_PARAM_IN_DEC: val = buf[B2 + lp->getNumOfCurrSameParam() - 1]; break;
-            case GB_PARAM_FREQ: val = TO_INT16(buf[B1], buf[B2]); break;
-            case GB_PARAM_FREQ_PRD: val = TO_INT16(buf[B1], buf[B2]); break;
-            case GB_PARAM_FREQ_PRM: val = TO_INT16(buf[B3], buf[B4]); break;
-            case GB_PARAM_COR_U:
-                val = ((int8_t) buf[B1]) * 10;
-                val += ((int8_t) buf[B2]) / 10;
-                break;
-            case GB_PARAM_COR_I: val = TO_INT16(buf[B3], buf[B4]); break;
-            default:
-                uint8_t pos = B1;
-
-                // смещение в зависимости от номера однотипного параметра
-                if (getParamType(lparam) == Param::PARAM_BITES)
-                {
-                    pos += (lp->getNumOfCurrSameParam() - 1) / 8;
-                }
-                else
-                {
-                    pos += lp->getNumOfCurrSameParam() - 1;
-                }
-
-                if (getSendDop(lparam) != 0)
-                {
-                    pos += getSendDop(lparam) - 1;
-                }
-
-                // приведение к знаковому типу, в случае если возможно
-                // отрицательное значение параметра
-                val = (lp->getMin() < 0) ? (int8_t) buf[pos] : buf[pos];
-
-                break;
-            }
-
-            // Для битовых переменных передается указатель на начало данных,
-            // а для остальных текущее значение.
-            lp->setValue(val);
-        }
+        getLocalParam(com);
     }
 
     return stat;
@@ -999,4 +952,60 @@ uint8_t clProtocolBspS::sendReadJrnCommand(eGB_COM com)
     }
 
     return num;
+}
+
+//
+bool clProtocolBspS::getLocalParam(eGB_COM com)
+{
+    LocalParams* local       = &sParam_->local;
+    eGB_PARAM    local_param = local->getParam();
+    bool         is_param    = (getCom(local_param) == com);
+
+    if (is_param)
+    {
+        // по умолчанию загружается значение первого байта,
+        // на отличные от этого параметры далее ведется проверка
+        int16_t val = -1000;
+        switch (local_param)
+        {
+        case GB_PARAM_IN_DEC: val = buf[B2 + local->getNumOfCurrSameParam() - 1]; break;
+        case GB_PARAM_FREQ: val = TO_INT16(buf[B1], buf[B2]); break;
+        case GB_PARAM_FREQ_PRD: val = TO_INT16(buf[B1], buf[B2]); break;
+        case GB_PARAM_FREQ_PRM: val = TO_INT16(buf[B3], buf[B4]); break;
+        case GB_PARAM_COR_U:
+            val = ((int8_t) buf[B1]) * 10;
+            val += ((int8_t) buf[B2]) / 10;
+            break;
+        case GB_PARAM_COR_I: val = TO_INT16(buf[B3], buf[B4]); break;
+        default:
+            uint8_t pos = B1;
+
+            // смещение в зависимости от номера однотипного параметра
+            if (getParamType(local_param) == Param::PARAM_BITES)
+            {
+                pos += (local->getNumOfCurrSameParam() - 1) / 8;
+            }
+            else
+            {
+                pos += local->getNumOfCurrSameParam() - 1;
+            }
+
+            if (getSendDop(local_param) != 0)
+            {
+                pos += getSendDop(local_param) - 1;
+            }
+
+            // приведение к знаковому типу, в случае если возможно
+            // отрицательное значение параметра
+            val = (local->getMin() < 0) ? (int8_t) buf[pos] : buf[pos];
+
+            break;
+        }
+
+        // Для битовых переменных передается указатель на начало данных,
+        // а для остальных текущее значение.
+        local->setValue(val);
+    }
+
+    return is_param;
 }
