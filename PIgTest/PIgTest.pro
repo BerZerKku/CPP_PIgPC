@@ -18,6 +18,7 @@ INCLUDEPATH += \
     googletest \
     $${PIG_PATH}/src/ \
     $${PIG_PATH}/src/menu \
+    $${PIG_PATH}/src/parameter \
     $${PIG_PATH}/src/protocols/iec101 \
     $${PIG_PATH}/src/protocols/modbus
 
@@ -37,6 +38,7 @@ SOURCES += \
     menu/test_password.cpp \
     menu/test_test.cpp \
     menu/test_txCom.cpp \
+    parameter/test_LocalParams.cpp \
     protocols/iec101/test_CIec101.cpp \
     protocols/modbus/test_protocolModbus.cpp \
     protocols/standart/test_protocolBspS.cpp

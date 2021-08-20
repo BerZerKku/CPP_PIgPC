@@ -7,9 +7,8 @@
 
 #include "LocalParams.h"
 
-LocalParams::LocalParams()
+LocalParams::LocalParams() : numComPrm(0), numComPrd(0), numDevices(2)
 {
-    numDevices = 2;
     clearParams();
 }
 

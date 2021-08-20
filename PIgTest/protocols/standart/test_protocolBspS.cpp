@@ -39,56 +39,6 @@ protected:
     static void TearDownTestCase() { }
 };
 
-
-// \todo ѕеренести тесты локальных параметров в свой файл!!!!
-
-//
-TEST_F(clProtocolBspS_Test, setNumDevices)
-{
-    eGB_PARAM pn = GB_PARAM_IN_DEC;
-    m_params.local.clearParams();
-    m_params.local.addParam(pn);
-
-    ASSERT_EQ(Param::DEPEND_SAME_ON_NUM_DEVS, getDependSame(pn));
-    ASSERT_EQ(1, m_params.local.getNumOfSameParams());
-
-    m_params.local.setNumDevices(3);
-    ASSERT_EQ(2, m_params.local.getNumOfSameParams());
-
-    m_params.local.setNumDevices(2);
-    ASSERT_EQ(1, m_params.local.getNumOfSameParams());
-
-    m_params.local.setNumDevices(3);
-    m_params.local.setNumDevices(0);
-    ASSERT_EQ(1, m_params.local.getNumOfSameParams());
-
-    m_params.local.setNumDevices(3);
-    m_params.local.setNumDevices(4);
-    ASSERT_EQ(1, m_params.local.getNumOfSameParams());
-}
-
-//
-TEST_F(clProtocolBspS_Test, getNumOfSameParams)
-{
-    m_params.local.clearParams();
-    m_params.local.addParam(GB_PARAM_PRD_COM_LONG);
-    ASSERT_EQ(int(0), m_params.local.getNumOfSameParams());
-    m_params.local.setNumComPrd(32);
-    ASSERT_EQ(32, m_params.local.getNumOfSameParams());
-
-    m_params.local.clearParams();
-    m_params.local.addParam(GB_PARAM_PRM_COM_BLOCK);
-    ASSERT_EQ(int(0), m_params.local.getNumOfSameParams());
-    m_params.local.setNumComPrm(31);
-    ASSERT_EQ(31, m_params.local.getNumOfSameParams());
-
-    m_params.local.clearParams();
-    m_params.local.addParam(GB_PARAM_IN_DEC);
-    ASSERT_EQ(1, m_params.local.getNumOfSameParams());
-    m_params.local.setNumDevices(3);
-    ASSERT_EQ(2, m_params.local.getNumOfSameParams());
-}
-
 //
 TEST_F(clProtocolBspS_Test, getLocalParam)
 {
@@ -99,6 +49,7 @@ TEST_F(clProtocolBspS_Test, getLocalParam)
     pn = GB_PARAM_IN_DEC;
     m_params.local.clearParams();
     m_params.local.addParam(pn);
+    m_params.local.setNumDevices(3);
     ASSERT_EQ(pn, m_params.local.getParam());
 
     buf[B1] = 10;
@@ -157,6 +108,7 @@ TEST_F(clProtocolBspS_Test, getLocalParam)
     pn = GB_PARAM_COR_I;
     m_params.local.clearParams();
     m_params.local.addParam(pn);
+
     ASSERT_EQ(pn, m_params.local.getParam());
 
     cor_i   = 999;
@@ -179,27 +131,90 @@ TEST_F(clProtocolBspS_Test, getLocalParam)
     m_params.local.clearParams();
     m_params.local.addParam(pn);
     m_params.local.setNumComPrd(32);
-    ASSERT_EQ(32, m_params.local.getNumOfCurrSameParam());
+
+    ASSERT_EQ(Param::PARAM_BITES, getParamType(pn));
     ASSERT_EQ(pn, m_params.local.getParam());
 
-    buf[B1] = 0x01;
+    buf[B1] = 0x05;
     buf[B2] = 0x02;
     buf[B3] = 0x04;
     buf[B4] = 0x80;
 
+    ASSERT_EQ(1, m_params.local.getNumOfCurrSameParam());
     ASSERT_TRUE(m_obj->getLocalParam(getCom(pn)));
-    ASSERT_EQ(buf[B1], m_params.local.getValue());
+    ASSERT_EQ(1, m_params.local.getValue());
 
     m_params.local.nextSameParam();
 
+    ASSERT_EQ(2, m_params.local.getNumOfCurrSameParam());
     ASSERT_TRUE(m_obj->getLocalParam(getCom(pn)));
-    ASSERT_EQ(buf[B1], m_params.local.getValue());
+    ASSERT_EQ(int(0), m_params.local.getValue());
 
-    for (int i = 3; i <= 16; i++)
+    m_params.local.nextSameParam();
+
+    ASSERT_EQ(3, m_params.local.getNumOfCurrSameParam());
+    ASSERT_TRUE(m_obj->getLocalParam(getCom(pn)));
+    ASSERT_EQ(1, m_params.local.getValue());
+
+    for (int i = 4; i <= 18; i++)
     {
         m_params.local.nextSameParam();
     }
 
+    ASSERT_EQ(18, m_params.local.getNumOfCurrSameParam());
     ASSERT_TRUE(m_obj->getLocalParam(getCom(pn)));
-    ASSERT_EQ(buf[B3], m_params.local.getValue());
+    ASSERT_EQ(int(0), m_params.local.getValue());
+
+    m_params.local.nextSameParam();
+
+    ASSERT_EQ(19, m_params.local.getNumOfCurrSameParam());
+    ASSERT_TRUE(m_obj->getLocalParam(getCom(pn)));
+    ASSERT_EQ(1, m_params.local.getValue());
+
+    // ќстальные параметры, т.е. простые однобайтные одиночные и повтор€ющиес€
+
+    pn = GB_PARAM_PRM_TIME_OFF;
+    m_params.local.clearParams();
+    m_params.local.addParam(pn);
+    m_params.local.setNumComPrm(32);
+
+    ASSERT_FALSE(Param::PARAM_BITES == getParamType(pn));
+    ASSERT_FALSE(Param::DEPEND_SAME_NO == getDependSame(pn));
+    ASSERT_EQ(pn, m_params.local.getParam());
+
+    buf[B1] = 5;
+    buf[B2] = 15;
+    buf[B3] = 100;
+
+    ASSERT_EQ(1, m_params.local.getNumOfCurrSameParam());
+    ASSERT_TRUE(m_obj->getLocalParam(getCom(pn)));
+    ASSERT_EQ(50, m_params.local.getValue());
+
+    m_params.local.nextSameParam();
+
+    ASSERT_EQ(2, m_params.local.getNumOfCurrSameParam());
+    ASSERT_TRUE(m_obj->getLocalParam(getCom(pn)));
+    ASSERT_EQ(150, m_params.local.getValue());
+
+    m_params.local.nextSameParam();
+
+    ASSERT_EQ(3, m_params.local.getNumOfCurrSameParam());
+    ASSERT_TRUE(m_obj->getLocalParam(getCom(pn)));
+    ASSERT_EQ(1000, m_params.local.getValue());
+
+
+    pn = GB_PARAM_PRD_DEC_CF;
+    m_params.local.clearParams();
+    m_params.local.addParam(pn);
+
+    ASSERT_FALSE(Param::PARAM_BITES == getParamType(pn));
+    ASSERT_TRUE(Param::DEPEND_SAME_NO == getDependSame(pn));
+    ASSERT_EQ(pn, m_params.local.getParam());
+
+    buf[B1] = 2;
+    buf[B2] = 3;
+    buf[B3] = 4;
+
+    ASSERT_TRUE(m_obj->getLocalParam(getCom(pn)));
+    ASSERT_EQ(buf[B1], m_params.local.getValue());
 }
