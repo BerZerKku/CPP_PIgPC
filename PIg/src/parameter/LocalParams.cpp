@@ -73,7 +73,7 @@ void LocalParams::prevSameParam()
 // ƒобавление в список нового параметра.
 bool LocalParams::addParam(eGB_PARAM newParam, bool readonly)
 {
-    if (numOfParams >= (MAX_NUM_OF_PARAMS - 1))
+    if (numOfParams > (MAX_NUM_OF_PARAMS - 1))
         return false;
 
     param[numOfParams].param    = newParam;
@@ -189,6 +189,7 @@ uint8_t LocalParams::getNumOfSameParams() const
     case Param::DEPEND_SAME_ON_NUM_DEVS: num = numDevices - 1; break;
     case Param::DEPEND_SAME_ON_COM_PRD: num = numComPrd; break;
     case Param::DEPEND_SAME_ON_COM_PRM: num = numComPrm; break;
+    case Param::DEPEND_SAME_MAX: break;
     }
 
     return num;
