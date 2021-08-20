@@ -73,7 +73,7 @@ void LocalParams::prevSameParam()
 // ƒобавление в список нового параметра.
 bool LocalParams::addParam(eGB_PARAM newParam, bool readonly)
 {
-    if (numOfParams > (MAX_NUM_OF_PARAMS - 1))
+    if (numOfParams >= MAX_NUM_OF_PARAMS)
         return false;
 
     param[numOfParams].param    = newParam;
