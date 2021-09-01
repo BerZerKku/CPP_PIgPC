@@ -32,7 +32,7 @@ CIec101::CIec101(uint8_t* pBuf, uint8_t u8Size) : m_pBuf(pBuf), m_u8Size(u8Size)
     class2 = 0;
 #endif
 
-#ifndef NDEBUG
+#if !defined(NDEBUG)
     // Проверка размера поля управления.
     enum
     {
@@ -513,7 +513,7 @@ void CIec101::prepareFrameFixLenght(EFcSecondary eFunction)
     m_stFrameFix.startCharacter                  = FRAME_START_CHARACTER_FIX;
     m_stFrameFix.controlField.common             = 0;
     m_stFrameFix.controlField.secondary.function = eFunction;
-    m_stFrameFix.controlField.secondary.dfc = 0;  // прием сообщений всегда возможен
+    m_stFrameFix.controlField.secondary.dfc      = 0;  // прием сообщений всегда возможен
     //	m_stFrameFix.controlField.secondary.acd = isAcd();
     m_stFrameFix.controlField.secondary.prm = 0;  // направление передачи от вторичной станции = 0
     m_stFrameFix.controlField.secondary.res = 0;  // резерв всегда 0
@@ -535,7 +535,7 @@ void CIec101::prepareFrameVarLenght(ETypeId eId, ECot eCot, uint8_t u8SizeAsdu)
 
     m_stFrameVar.controlField.common             = 0;
     m_stFrameVar.controlField.secondary.function = RESPOND_USER_DATA;
-    m_stFrameVar.controlField.secondary.dfc = 0;  // прием сообщений всегда возможен
+    m_stFrameVar.controlField.secondary.dfc      = 0;  // прием сообщений всегда возможен
     //	m_stFrameVar.controlField.secondary.acd = isAcd();	// сообщение для отправки
     m_stFrameVar.controlField.secondary.prm = 0;  // направление передачи от вторичной станции = 0
     m_stFrameVar.controlField.secondary.res = 0;  // резерв всегда 0
@@ -546,9 +546,9 @@ void CIec101::prepareFrameVarLenght(ETypeId eId, ECot eCot, uint8_t u8SizeAsdu)
     m_stFrameVar.asdu.common.dataUnitId.variableStructureQualifier =
         s_u8VariableStructureQualifier;  // всегда передается 1 объект информации
     m_stFrameVar.asdu.common.dataUnitId.causeOfTramsmission.cot = eCot;  // причина
-    m_stFrameVar.asdu.common.dataUnitId.causeOfTramsmission.pN = 0;  // не используется
-    m_stFrameVar.asdu.common.dataUnitId.causeOfTramsmission.t  = 0;  // всегда не тест
-    m_stFrameVar.asdu.common.dataUnitId.commonAddressOfASDU    = s_u8CommonAddressOfAsdu;
+    m_stFrameVar.asdu.common.dataUnitId.causeOfTramsmission.pN  = 0;     // не используется
+    m_stFrameVar.asdu.common.dataUnitId.causeOfTramsmission.t   = 0;     // всегда не тест
+    m_stFrameVar.asdu.common.dataUnitId.commonAddressOfASDU     = s_u8CommonAddressOfAsdu;
 
     // Остальные данные ASDU уже должны быть на месете.
 

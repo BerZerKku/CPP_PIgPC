@@ -6,12 +6,10 @@
  */
 #include <stdio.h>
 
-#ifdef DEBUG
-
 #include "debug.hpp"
+
+#if !defined(NDEBUG)
 
 stDebug sDebug;
 
 #endif
-
-

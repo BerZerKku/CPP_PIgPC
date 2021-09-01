@@ -117,10 +117,10 @@ void clMenu::proc(void)
 
     static const char fcNoConnectBsp[] PROGMEM = " Нет связи с БСП!!! ";
 
-    static uint8_t cntInitLcd = 0;  // Счетчик времени до переинициализации ЖКИ
-    static uint8_t cntBlinkMeas = 0;  // Счетчик времени смены измерений
-    static uint8_t cntBlinkText = 0;  // Счетчик времени смены надписей
-    static uint16_t cntReturn = 0;  // Счетчик времени до возврата на начальный уровень
+    static uint8_t  cntInitLcd   = 0;  // Счетчик времени до переинициализации ЖКИ
+    static uint8_t  cntBlinkMeas = 0;  // Счетчик времени смены измерений
+    static uint8_t  cntBlinkText = 0;  // Счетчик времени смены надписей
+    static uint16_t cntReturn    = 0;  // Счетчик времени до возврата на начальный уровень
     // предыдущее состояние флага наличия связи с БСП
     static bool lastConnection = false;
 
@@ -152,12 +152,15 @@ void clMenu::proc(void)
 
     // Считаем код с клавиатуры
     // Если нажата любая кнопка - включится кратковременная подсветка
-    eKEY tmp = vKEYgetButton(eKEYget());
-    if (tmp != KEY_NO)
+    uint8_t key_code = eKEYget();
+    SET_DEBUG_BYTE(1, key_code);
+    eKEY key = vKEYgetButton(key_code);
+    SET_DEBUG_BYTE(2, key);
+    if (key != KEY_NO)
     {
-        if (tmp == KEY_EMPTY)
-            tmp = KEY_NO;
-        key_ = tmp;
+        if (key == KEY_EMPTY)
+            key = KEY_NO;
+        key_ = key;
 
         vLCDsetLed(LED_SWITCH);
         cntReturn = 0;
@@ -188,6 +191,8 @@ void clMenu::proc(void)
     if ((key_ != KEY_NO) && !EnterParam.isEnable())
     {
         TControl::ctrl_t ctrl = onFnButton(key_);
+        INC_DEBUG_BYTE(3);
+        SET_DEBUG_BYTE(4, ctrl);
         addControlToSend(ctrl);
     }
 
@@ -208,7 +213,7 @@ void clMenu::proc(void)
     (this->*lvlMenu)();
     key_ = KEY_NO;
 
-#ifdef VIEW_DEBUG_PARAM
+#if defined(VIEW_DEBUG_PARAM)
     // вывод отладочной информации
     if (this->lvlMenu == &clMenu::lvlStart)
     {
@@ -4431,10 +4436,10 @@ void clMenu::lvlTest()
  */
 void clMenu::lvlTest1()
 {
-    static char    title[] PROGMEM  = "Тесты\\Передатчик";
-    static char    punkt1[] PROGMEM = "Сигналы передатчика";
-    static uint8_t cnt = 0;  // счетчик до выхода при ошибочном режиме
-    eGB_TYPE_DEVICE device = sParam.typeDevice;
+    static char     title[] PROGMEM  = "Тесты\\Передатчик";
+    static char     punkt1[] PROGMEM = "Сигналы передатчика";
+    static uint8_t  cnt              = 0;  // счетчик до выхода при ошибочном режиме
+    eGB_TYPE_DEVICE device           = sParam.typeDevice;
 
     if (lvlCreate_)
     {
@@ -4655,7 +4660,7 @@ void clMenu::lvlTest2()
     static char prm1[] PROGMEM   = "ПРМ1: ";
     static char prm2[] PROGMEM   = "ПРМ2: ";
 
-    static uint8_t cnt = 0;  // счетчик до выхода при ошибочном режиме
+    static uint8_t  cnt    = 0;  // счетчик до выхода при ошибочном режиме
     eGB_TYPE_DEVICE device = sParam.typeDevice;
 
     if (lvlCreate_)
@@ -5013,21 +5018,21 @@ void clMenu::printPunkts()
  */
 void clMenu::printMeasParam(uint8_t poz, eMENU_MEAS_PARAM par)
 {
-    static const char fcUout[] PROGMEM = "U=%02u.%01uВ";  // Напряжение выхода.
-    static const char fcIout[] PROGMEM = "I=%03uмА";      // Ток выхода.
-    static const char fcRout[] PROGMEM = "R=%03uОм";      // Сопротивление линии.
-    static const char fcUz[] PROGMEM   = "Uз=%02dдБ";     // Запас по защите.
-    static const char fcUzx[] PROGMEM = "Uз%u=%02dдБ";  // Запас по защите с номером.
-    static const char fcUcf[] PROGMEM  = "Uк=%02dдБ";    // Запас по КC.
-    static const char fcUcfx[] PROGMEM = "Uк%u=%02dдБ";  // Запас по КC с номером.
-    static const char fcUn[] PROGMEM   = "Uш=%02dдБ";    // Уровень шумов.
-    static const char fcUnx[] PROGMEM = "Uш%u=%02dдБ";  // Уровень шумов с номером.
+    static const char fcUout[] PROGMEM = "U=%02u.%01uВ";    // Напряжение выхода.
+    static const char fcIout[] PROGMEM = "I=%03uмА";        // Ток выхода.
+    static const char fcRout[] PROGMEM = "R=%03uОм";        // Сопротивление линии.
+    static const char fcUz[] PROGMEM   = "Uз=%02dдБ";       // Запас по защите.
+    static const char fcUzx[] PROGMEM  = "Uз%u=%02dдБ";     // Запас по защите с номером.
+    static const char fcUcf[] PROGMEM  = "Uк=%02dдБ";       // Запас по КC.
+    static const char fcUcfx[] PROGMEM = "Uк%u=%02dдБ";     // Запас по КC с номером.
+    static const char fcUn[] PROGMEM   = "Uш=%02dдБ";       // Уровень шумов.
+    static const char fcUnx[] PROGMEM  = "Uш%u=%02dдБ";     // Уровень шумов с номером.
     static const char fcSd[] PROGMEM   = "Sд=%02u°";        // Просечки в сигнале.
     static const char fcDate[] PROGMEM = "%02u.%02u.%02u";  // Дата.
     static const char fcTime[] PROGMEM = "%02u:%02u:%02u";  // Время.
     static const char fcD[] PROGMEM =
         "D=%02dдБ";  // Запас по тест.команде (двухчаст) или Отношение сигнал/помеха (одночаст)
-    static const char fcTemper[] PROGMEM = "T=%02d°C";  // Температура
+    static const char fcTemper[] PROGMEM  = "T=%02d°C";   // Температура
     static const char fcFreqDev[] PROGMEM = "dF=%02dГц";  // Отклонение часоты КС на ПРМ
 
     // В трехконцевом аппарате РЗСК номера у измерений зависят от
@@ -5988,18 +5993,10 @@ eGB_TYPE_DEVICE clMenu::getKeyboardLayout()
 
     switch (sParam.typeDevice)
     {
-    case AVANT_K400:
-        {
-            layout = AVANT_K400;
-        }
-        break;
+    case AVANT_K400: layout = AVANT_K400; break;
 
     case AVANT_R400:
-    case AVANT_R400M:
-        {
-            layout = AVANT_R400M;
-        }
-        break;
+    case AVANT_R400M: layout = AVANT_R400M; break;
 
     case AVANT_RZSK:
         {
@@ -6016,8 +6013,8 @@ eGB_TYPE_DEVICE clMenu::getKeyboardLayout()
             {
                 layout = AVANT_RZSK;
             }
+            break;
         }
-        break;
 
     case AVANT_OPTO:
         {
@@ -6032,8 +6029,9 @@ eGB_TYPE_DEVICE clMenu::getKeyboardLayout()
             {
                 layout = AVANT_K400;
             }
+            break;
         }
-        break;
+
 
     case AVANT_NO: break;
     case AVANT_MAX: break;
@@ -6050,6 +6048,10 @@ void clMenu::addControlToSend(TControl::ctrl_t ctrl)
 
     if (mControl.getData(ctrl, com, hasbyte, byte))
     {
+        INC_DEBUG_BYTE(5);
+        SET_DEBUG_BYTE(6, ctrl);
+        SET_DEBUG_BYTE(7, com);
+
         if (com != GB_COM_NO)
         {
             if (hasbyte)

@@ -39,9 +39,9 @@ bool TControl::getData(TControl::ctrl_t ctrl, eGB_COM& com, bool& isbyte, uint8_
     {
         const data_t& data = mData[ctrl];
 
-        com    = data.com;
-        isbyte = data.isbyte;
-        byte   = data.byte;
+        com    = static_cast<eGB_COM>(pgm_read_byte((PGM_P) &data.com));
+        isbyte = pgm_read_byte((PGM_P) &data.isbyte);
+        byte   = pgm_read_byte((PGM_P) &data.byte);
     }
 
     return check;

@@ -14,10 +14,6 @@
 
 #include <avr/io.h>
 
-// вывод отладочной информации на экран
-//#define VIEW_DEBUG_PARAM
-//#define IEC101
-
 // тестовые пины
 #define DDR_DBG  DDRE
 #define PORT_DBG PORTE
@@ -43,6 +39,9 @@
 #define QDINFO(x)                       (void(0))
 #define QWARNING(x)                     (void(0))
 #define QCRITICAL(x)                    (void(0))
+
+#define SET_DEBUG_BYTE(number, value) (void(0))
+#define INC_DEBUG_BYTE(number)        (void(0))
 
 #if !defined(Q_ASSERT)
 #define Q_ASSERT(x) (void(0))
@@ -75,6 +74,10 @@
 #warning "Включен режим отладки!!!"
 #endif  // defined(QT_CORE_LIB)
 
+// вывод отладочной информации на экран
+#define VIEW_DEBUG_PARAM
+//#define IEC101
+
 // отладочная информация
 struct stDebug
 {
@@ -89,6 +92,9 @@ struct stDebug
 };
 
 extern stDebug sDebug;
+
+#define SET_DEBUG_BYTE(number, value) (sDebug.byte##number = value)
+#define INC_DEBUG_BYTE(number)        (sDebug.byte##number = sDebug.byte##number + 1)
 
 #endif  // defined(NDEBUG)
 
