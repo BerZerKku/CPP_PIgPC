@@ -4855,8 +4855,8 @@ eMENU_ENTER_PARAM clMenu::enterValue()
         key_ = KEY_MENU;
         break;
 
-    case KEY_UP: EnterParam.incValue(); break;
-    case KEY_DOWN: EnterParam.decValue(); break;
+    case KEY_UP: EnterParam.incValue(timePressKey()); break;
+    case KEY_DOWN: EnterParam.decValue(timePressKey()); break;
 
     case KEY_ENTER: EnterParam.setEnterValueReady(); break;
 

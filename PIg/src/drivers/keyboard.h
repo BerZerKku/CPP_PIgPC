@@ -13,5 +13,6 @@
 
 void    vKEYmain(void);
 uint8_t eKEYget(void);
+uint8_t timePressKey();
 
 #endif /* KEYBOARD_H_ */
