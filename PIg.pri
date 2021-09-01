@@ -45,6 +45,7 @@ HEADERS += \
 SOURCES += \
     $${PIG_PATH}/src/drivers/kbdLayout.cpp \
     $${PIG_PATH}/src/flashParams.cpp \
+    $${PIG_PATH}/src/debug/debug.cpp \
     $${PIG_PATH}/src/menu/base.cpp \
     $${PIG_PATH}/src/menu/control.cpp \
     $${PIG_PATH}/src/menu/dateTime.cpp \
