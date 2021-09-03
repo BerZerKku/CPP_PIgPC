@@ -568,11 +568,7 @@ bool clMenu::setDeviceRZSK()
     sParam.def.status.faultText[0] = fcDefFault0001;
     sParam.def.status.faultText[1] = fcDefFault0002;
     sParam.def.status.faultText[2] = fcDefFault0004;
-    // 3 : 0x0008 - ÌÂÚ
-    sParam.def.status.faultText[4] = fcGlbFault0400;       // 0x0010 –«— Ï
-    sParam.def.status.faultText[5] = fcGlbFault4000;       // 0x0020 –«— Ï
-    sParam.def.status.faultText[6] = fcDefFault0040rzskm;  // 0x0040 –«— Ï
-    sParam.def.status.faultText[7] = fcDefFault0080rzskm;  // 0x0080 –«— Ï
+    // 3-7
     sParam.def.status.faultText[8] = fcDefFault0100;
     sParam.def.status.faultText[9] = fcDefFault0200;
     // 10 ÌÂÚ
