@@ -123,6 +123,7 @@ static const char fcDefSost10[] PROGMEM     = "Речь";      ///<
 static const char fcDefSost11[] PROGMEM     = "ПРД";       ///<
 static const char fcDefSost12[] PROGMEM     = "ПРМ";       ///<
 static const char fcDefSost13[] PROGMEM     = "Упр. ТМ";   ///<
+static const char fcDefSost14[] PROGMEM     = "Одност.";   ///<
 // состояния Приемника
 static const char fcPrmSost00[] PROGMEM     = "Исходн.";     ///<
 static const char fcPrmSost01[] PROGMEM     = "ПРМ КЧ%01u";  ///<
@@ -140,6 +141,7 @@ static const char fcPrmSost10[] PROGMEM     = "Речь";        ///<
 static const char fcPrmSost11[] PROGMEM     = "ПРД";         ///<
 static const char fcPrmSost12[] PROGMEM     = "ПРМ";         ///<
 static const char fcPrmSost13[] PROGMEM     = "Упр. ТМ";     ///<
+static const char fcPrmSost14[] PROGMEM     = "Одност.";     ///<
 // состояния Передатчика
 static const char fcPrdSost00[] PROGMEM     = "Исходн.";     ///<
 static const char fcPrdSost01[] PROGMEM     = "ПРД КЧ%01u";  ///<

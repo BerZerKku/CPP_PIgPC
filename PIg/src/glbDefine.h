@@ -45,7 +45,7 @@
 #define BIN_TO_BCD(val) (((val / 10) << 4) + (val % 10))
 
 /// максимально возможное кол-во состояний устройств
-#define MAX_NUM_DEVICE_STATE 14
+#define MAX_NUM_DEVICE_STATE 15
 
 /// максимальное кол-во неисправностей для любого устройства
 #define MAX_NUM_FAULTS 16

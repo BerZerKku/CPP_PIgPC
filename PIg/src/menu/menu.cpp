@@ -65,6 +65,7 @@ clMenu::clMenu()
     sParam.def.status.stateText[11]                   = fcDefSost11;
     sParam.def.status.stateText[12]                   = fcDefSost12;
     sParam.def.status.stateText[13]                   = fcDefSost13;
+    sParam.def.status.stateText[14]                   = fcUnknownSost;
     sParam.def.status.stateText[MAX_NUM_DEVICE_STATE] = fcUnknownSost;
 
     sParam.prm.status.stateText[0]                    = fcPrmSost00;
@@ -81,6 +82,7 @@ clMenu::clMenu()
     sParam.prm.status.stateText[11]                   = fcPrmSost11;
     sParam.prm.status.stateText[12]                   = fcPrmSost12;
     sParam.prm.status.stateText[13]                   = fcPrmSost13;
+    sParam.prm.status.stateText[13]                   = fcUnknownSost;
     sParam.prm.status.stateText[MAX_NUM_DEVICE_STATE] = fcUnknownSost;
 
     sParam.prd.status.stateText[0]                    = fcPrdSost00;
@@ -97,6 +99,7 @@ clMenu::clMenu()
     sParam.prd.status.stateText[11]                   = fcPrdSost11;
     sParam.prd.status.stateText[12]                   = fcPrdSost12;
     sParam.prd.status.stateText[13]                   = fcPrdSost13;
+    sParam.prd.status.stateText[14]                   = fcUnknownSost;
     sParam.prd.status.stateText[MAX_NUM_DEVICE_STATE] = fcUnknownSost;
 
     // назначим имена устройствам
@@ -294,15 +297,6 @@ bool clMenu::setDeviceK400()
     sParam.prd.status.setEnable(prd);
     sParam.prm.status.setEnable(prm);
 
-    // состояния
-    sParam.def.status.stateText[9] = fcDefSost09;
-
-    sParam.prd.status.stateText[1] = fcPrdSost01;
-    sParam.prd.status.stateText[3] = fcPrdSost03;
-
-    sParam.prm.status.stateText[1] = fcPrmSost01;
-    sParam.prm.status.stateText[3] = fcPrmSost03;
-
     // дата и время выводятся во всех вариантах
     measParam[0]                      = MENU_MEAS_PARAM_TIME;
     measParam[MAX_NUM_MEAS_PARAM]     = MENU_MEAS_PARAM_TIME;
@@ -467,13 +461,9 @@ bool clMenu::setDeviceRZSK()
     sParam.prd.status.setEnable(sParam.prd.getNumCom() != 0);
 
     // состояния
-    sParam.def.status.stateText[9] = fcDefSost09;
+    sParam.def.status.stateText[14] = fcDefSost14;
 
-    sParam.prd.status.stateText[1] = fcPrdSost01;
-    sParam.prd.status.stateText[3] = fcPrdSost03;
-
-    sParam.prm.status.stateText[1] = fcPrmSost01;
-    sParam.prm.status.stateText[3] = fcPrmSost03;
+    sParam.prm.status.stateText[14] = fcPrmSost14;
 
     if (sParam.def.status.isEnable())
     {
@@ -642,15 +632,6 @@ bool clMenu::setDeviceR400M()
 
     sParam.typeDevice = AVANT_R400M;
     sParam.glb.setTypeDevice(AVANT_R400M);
-
-    // состояния
-    sParam.def.status.stateText[9] = fcDefSost09;
-
-    sParam.prd.status.stateText[1] = fcPrdSost01;
-    sParam.prd.status.stateText[3] = fcPrdSost03;
-
-    sParam.prm.status.stateText[1] = fcPrmSost01;
-    sParam.prm.status.stateText[3] = fcPrmSost03;
 
     // первый столбец параметров
     measParam[0]                  = MENU_MEAS_PARAM_TIME;  // дата <-> время
@@ -952,6 +933,18 @@ bool clMenu::setDevice(eGB_TYPE_DEVICE device)
     // предварительная очистка массива отображаемых параметров в "Измерение"
     for (uint_fast8_t i = 0; i < MAX_NUM_MEAS_PARAM_LVL; i++)
         measParamLvl[i] = MENU_MEAS_PARAM_NO;
+
+    // состояния которые могут измениться в устройствах
+    sParam.def.status.stateText[9]  = fcDefSost09;
+    sParam.def.status.stateText[14] = fcUnknownSost;
+
+    sParam.prd.status.stateText[1] = fcPrdSost01;
+    sParam.prd.status.stateText[3] = fcPrdSost03;
+
+    sParam.prm.status.stateText[1]  = fcPrmSost01;
+    sParam.prm.status.stateText[3]  = fcPrmSost03;
+    sParam.prm.status.stateText[14] = fcUnknownSost;
+
 
     if (device == AVANT_K400)
     {
@@ -5479,7 +5472,7 @@ void clMenu::setupParam()
                     if (param == GB_PARAM_INTF_INTERFACE)
                     {
                         TInterface::INTERFACE val;
-                        val = (TInterface::INTERFACE) (tmp);
+                        val = (TInterface::INTERFACE)(tmp);
                         // если интерфейс сменился, обновим меню
                         if (val != sParam.Uart.Interface.get())
                         {
@@ -5489,23 +5482,23 @@ void clMenu::setupParam()
                     }
                     else if (param == GB_PARAM_INTF_PROTOCOL)
                     {
-                        sParam.Uart.Protocol.set((TProtocol::PROTOCOL) (tmp));
+                        sParam.Uart.Protocol.set((TProtocol::PROTOCOL)(tmp));
                     }
                     else if (param == GB_PARAM_INTF_BAUDRATE)
                     {
-                        sParam.Uart.BaudRate.set((TBaudRate::BAUD_RATE) (tmp));
+                        sParam.Uart.BaudRate.set((TBaudRate::BAUD_RATE)(tmp));
                     }
                     else if (param == GB_PARAM_INTF_DATA_BITS)
                     {
-                        sParam.Uart.DataBits.set((TDataBits::DATA_BITS) (tmp));
+                        sParam.Uart.DataBits.set((TDataBits::DATA_BITS)(tmp));
                     }
                     else if (param == GB_PARAM_INTF_PARITY)
                     {
-                        sParam.Uart.Parity.set((TParity::PARITY) (tmp));
+                        sParam.Uart.Parity.set((TParity::PARITY)(tmp));
                     }
                     else if (param == GB_PARAM_INTF_STOP_BITS)
                     {
-                        sParam.Uart.StopBits.set((TStopBits::STOP_BITS) (tmp));
+                        sParam.Uart.StopBits.set((TStopBits::STOP_BITS)(tmp));
                     }
                 }
             }
