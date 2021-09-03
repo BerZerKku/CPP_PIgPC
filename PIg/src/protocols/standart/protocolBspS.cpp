@@ -268,7 +268,7 @@ bool clProtocolBspS::getDefCommand(eGB_COM com, bool pc)
                 sParam_->jrnEntry.dateTime.setMsSecond(t);
                 //
                 //				sParam_->jrnEntry.setDeviceJrn((eGB_DEVICE_K400)
-                //buf[B1]);
+                // buf[B1]);
                 // sParam_->jrnEntry.setNumCom(buf[B2]);
                 sParam_->jrnEntry.setSignalDef((buf[B1] << 4) + (buf[B2] & 0x0F));
                 //				sParam_->jrnEntry.setEventType(buf[B3]);
@@ -960,8 +960,6 @@ bool clProtocolBspS::getLocalParam(eGB_COM com)
         {
         case GB_PARAM_IN_DEC: val = buf[B2 + local->getNumOfCurrSameParam() - 1]; break;
         case GB_PARAM_FREQ: val = TO_INT16(buf[B1], buf[B2]); break;
-        case GB_PARAM_FREQ_PRD: val = TO_INT16(buf[B1], buf[B2]); break;
-        case GB_PARAM_FREQ_PRM: val = TO_INT16(buf[B3], buf[B4]); break;
         case GB_PARAM_COR_U:
             val = ((int8_t) buf[B1]) * 10;
             val += ((int8_t) buf[B2]) / 10;

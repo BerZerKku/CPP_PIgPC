@@ -129,34 +129,6 @@ TEST_F(clProtocolBspS_Test, getLocalParam)
     ASSERT_TRUE(m_obj->getLocalParam(getCom(pn)));
     ASSERT_EQ(freq, m_params.local.getValue());
 
-    // Частота ПРД
-
-    pn = GB_PARAM_FREQ_PRD;
-    m_params.local.clearParams();
-    m_params.local.addParam(pn);
-    ASSERT_EQ(pn, m_params.local.getParam());
-
-    freq    = 415;
-    buf[B1] = static_cast<uint8_t>(freq >> 8);
-    buf[B2] = static_cast<uint8_t>(freq);
-
-    ASSERT_TRUE(m_obj->getLocalParam(getCom(pn)));
-    ASSERT_EQ(freq, m_params.local.getValue());
-
-    // Частота ПРМ
-
-    pn = GB_PARAM_FREQ_PRM;
-    m_params.local.clearParams();
-    m_params.local.addParam(pn);
-    ASSERT_EQ(pn, m_params.local.getParam());
-
-    freq    = 917;
-    buf[B3] = static_cast<uint8_t>(freq >> 8);
-    buf[B4] = static_cast<uint8_t>(freq);
-
-    ASSERT_TRUE(m_obj->getLocalParam(getCom(pn)));
-    ASSERT_EQ(freq, m_params.local.getValue());
-
     // Коррекция напряжения
 
     int16_t cor_u;
