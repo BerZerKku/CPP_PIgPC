@@ -1136,7 +1136,7 @@ void clMenu::lvlStart()
         sParam.txComBuf.addCom2(GB_COM_GET_FAULT);
         if (sParam.glb.getTypeLine() == GB_TYPE_LINE_UM)
             sParam.txComBuf.addCom2(GB_COM_GET_MEAS);
-        if ((sParam.typeDevice == AVANT_R400M) || isRzskM())
+        if (sParam.typeDevice == AVANT_R400M)
         {
             sParam.txComBuf.addCom2(GB_COM_DEF_GET_TYPE_AC);
         }
@@ -1243,7 +1243,6 @@ void clMenu::lvlFirst()
     static char punkt4[] PROGMEM = "%d. Тесты";
     static char punkt5[] PROGMEM = "%d. Информация";
     static char punkt6[] PROGMEM = "%d. Измерения";
-    static char punkt7[] PROGMEM = "%d. Режим АК";
 
     if (lvlCreate_)
     {
@@ -1260,12 +1259,6 @@ void clMenu::lvlFirst()
         Punkts_.add(punkt1);
         Punkts_.add(punkt2);
         Punkts_.add(punkt3);
-
-        if (isRzskM())
-        {
-            Punkts_.add(punkt7);
-        }
-
         Punkts_.add(punkt4);
         Punkts_.add(punkt5);
 
@@ -1322,11 +1315,6 @@ void clMenu::lvlFirst()
         else if (name == punkt6)
         {
             lvlMenu    = &clMenu::lvlMeasure;
-            lvlCreate_ = true;
-        }
-        else if (name == punkt7)
-        {
-            lvlMenu    = &clMenu::lvlRegimeAc;
             lvlCreate_ = true;
         }
         break;
@@ -2424,8 +2412,6 @@ void clMenu::lvlControl()
     static char punkt34[] PROGMEM = "%d. Сброс удален. 3";
     static char punkt35[] PROGMEM = "%d. Сброс индикации";
     static char punkt36[] PROGMEM = "%d. Сброс всех";
-    static char punkt37[] PROGMEM = "%d. Пуск АК";
-    static char punkt38[] PROGMEM = "%d. Удал. Пуск АК";
 
     eGB_TYPE_DEVICE device = sParam.typeDevice;
 
@@ -2588,12 +2574,6 @@ void clMenu::lvlControl()
                     Punkts_.add(punkt22);
                 }
                 Punkts_.add(punkt35);
-            }
-            if (sParam.glb.getCompRZSK() == GB_COMP_RZSK_M)
-            {
-                Punkts_.add(punkt37);
-                Punkts_.add(punkt38);
-                Punkts_.add(punkt11);
             }
         }
         else if (device == AVANT_K400)
@@ -2823,12 +2803,12 @@ void clMenu::lvlControl()
                 sParam.txComBuf.setInt8(GB_CONTROL_RESET_AC);
                 sParam.txComBuf.addFastCom(GB_COM_SET_CONTROL);
             }
-            else if ((name == punkt12) || (name == punkt37))
+            else if (name == punkt12)
             {
                 sParam.txComBuf.setInt8(GB_TYPE_AC_PUSK_SELF);
                 sParam.txComBuf.addFastCom(GB_COM_DEF_SET_TYPE_AC);
             }
-            else if ((name == punkt13) || (name == punkt38))
+            else if (name == punkt13)
             {
                 sParam.txComBuf.setInt8(GB_CONTROL_PUSK_AC_UD);
                 sParam.txComBuf.addFastCom(GB_COM_SET_CONTROL);
@@ -3218,124 +3198,6 @@ void clMenu::lvlRegime()
         {
         }
         break;
-    }
-}
-
-/** Уровень меню. Управление.
- *  @param Нет
- *  @return Нет
- */
-void clMenu::lvlRegimeAc()
-{
-
-    static char title[] PROGMEM = "Меню\\Режим АК";
-    // %d - может быть двухзначным, учесть для макс. кол-ва символов !
-    //                              "01234567890123456789"
-    static char punkt1[] PROGMEM = "%d. АК автоматическ.";
-    static char punkt2[] PROGMEM = "%d. АК ускоренный";
-    static char punkt3[] PROGMEM = "%d. АК выключен";
-    static char punkt4[] PROGMEM = "%d. АК испытания";
-    static char punkt5[] PROGMEM = "%d. АК нормальный";
-    static char punkt6[] PROGMEM = "%d. АК беглый";
-    //  static char punkt21[] PROGMEM = "%d. АК односторонний";
-
-    if (lvlCreate_)
-    {
-        lvlCreate_    = false;
-        cursorLine_   = 1;
-        cursorEnable_ = true;
-        lineParam_    = 2;
-
-        vLCDclear();
-        vLCDdrawBoard(lineParam_);
-
-        Punkts_.clear();
-        if (isRzskM())
-        {
-            Punkts_.add(punkt5);
-            Punkts_.add(punkt2);
-            Punkts_.add(punkt3);
-        }
-        else
-        {
-            key_ = KEY_CANCEL;
-        }
-
-        // доплнительные команды
-        sParam.txComBuf.clear();
-        // совместимость
-        sParam.txComBuf.addCom1(GB_COM_GET_COM_PRD_KEEP);
-        sParam.txComBuf.addCom1(GB_COM_DEF_GET_TYPE_AC);
-    }
-
-    if (!isRzskM())
-    {
-        key_ = KEY_CANCEL;
-    }
-
-    uint8_t pos = 0;
-    snprintf_P(&vLCDbuf[pos], 21, title);
-
-    pos += 20;
-    printAc(pos);
-
-    PGM_P name = Punkts_.getName(cursorLine_ - 1);
-    printPunkts();
-
-    switch (key_)
-    {
-    case KEY_UP: cursorLineUp(); break;
-    case KEY_DOWN: cursorLineDown(); break;
-
-    case KEY_CANCEL:
-        lvlMenu    = &clMenu::lvlFirst;
-        lvlCreate_ = true;
-        break;
-    case KEY_MENU:
-        lvlMenu    = &clMenu::lvlStart;
-        lvlCreate_ = true;
-        break;
-
-    case KEY_ENTER:
-        {
-            if (name == punkt1)
-            {
-                sParam.txComBuf.setInt8(GB_TYPE_AC_AUTO_NORM);
-                sParam.txComBuf.addFastCom(GB_COM_DEF_SET_TYPE_AC);
-            }
-            else if (name == punkt2)
-            {
-                sParam.txComBuf.setInt8(GB_TYPE_AC_FAST);
-                sParam.txComBuf.addFastCom(GB_COM_DEF_SET_TYPE_AC);
-            }
-            else if (name == punkt3)
-            {
-                sParam.txComBuf.setInt8(GB_TYPE_AC_OFF);
-                sParam.txComBuf.addFastCom(GB_COM_DEF_SET_TYPE_AC);
-            }
-            else if (name == punkt4)
-            {
-                sParam.txComBuf.setInt8(GB_TYPE_AC_PUSK_SELF);
-                sParam.txComBuf.addFastCom(GB_COM_DEF_SET_TYPE_AC);
-            }
-            else if (name == punkt5)
-            {
-                sParam.txComBuf.setInt8(GB_TYPE_AC_AUTO_NORM);
-                sParam.txComBuf.addFastCom(GB_COM_DEF_SET_TYPE_AC);
-            }
-            else if (name == punkt6)
-            {
-                sParam.txComBuf.setInt8(GB_TYPE_AC_CHECK);
-                sParam.txComBuf.addFastCom(GB_COM_DEF_SET_TYPE_AC);
-            }
-            //          else if (p == punkt21) {
-            //              sParam.txComBuf.setInt8(GB_TYPE_AC_CHECK);
-            //              sParam.txComBuf.addFastCom(GB_COM_DEF_SET_TYPE_AC);
-            //          }
-        }
-        break;
-
-    default: break;
     }
 }
 
@@ -5237,15 +5099,7 @@ void clMenu::printDevicesStatus(uint8_t poz, TDeviceStatus* device)
         poz += 1 + snprintf_P(&vLCDbuf[poz], 9, fcRegime[device->getRegime()]);
 
         uint8_t state = device->getState();
-        if (isRzskM() && (state == 1) && (device == &sParam.def.status))
-        {
-            eGB_TYPE_AC ac = sParam.def.getTypeAC();
-            snprintf_P(&vLCDbuf[poz], 9, fcAcType[static_cast<uint8_t>(ac)]);
-        }
-        else
-        {
-            snprintf_P(&vLCDbuf[poz], 9, text[state], device->getDopByte());
-        }
+        snprintf_P(&vLCDbuf[poz], 9, text[state], device->getDopByte());
     }
 }
 
@@ -5944,10 +5798,6 @@ TControl::ctrl_t clMenu::onFnButton(eKEY& key)
                         ctrl = TControl::CTRL_AcPuskSelf;
                     }
                 }
-            }
-            else if (isRzskM())
-            {
-                ctrl = TControl::CTRL_AcPuskSelf;
             }
         }
         break;

@@ -320,7 +320,7 @@ TEST_F(clMenu_Test, onFnButton_acPusk)
     mObj->sParam.glb.setCompatibility(GB_COMP_RZSK);
     ASSERT_TRUE(testFnButton(key, TControl::CTRL_NO));
     mObj->sParam.glb.setCompatibility(GB_COMP_RZSK_M);
-    ASSERT_TRUE(testFnButton(key, TControl::CTRL_AcPuskSelf));
+    ASSERT_TRUE(testFnButton(key, TControl::CTRL_NO));
     mObj->sParam.glb.setCompatibility(GB_COMP_RZSK_3E8);
     ASSERT_TRUE(testFnButton(key, TControl::CTRL_NO));
 
