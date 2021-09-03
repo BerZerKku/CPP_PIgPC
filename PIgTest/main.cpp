@@ -4,7 +4,7 @@
  *  Created on: 17.09.2014
  *      Author: Shcheblykin
  */
-#include "gtest\gtest.h"
+#include "gtest/gtest.h"
 
 int main(int argc, char* argv[])
 {

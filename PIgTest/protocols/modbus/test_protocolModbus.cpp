@@ -1,5 +1,5 @@
-#include "gtest\gtest.h"
 #include "protocolModbus.h"
+#include "gtest/gtest.h"
 #include <cstdio>
 #include <iostream>
 using namespace std;

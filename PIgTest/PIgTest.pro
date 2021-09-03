@@ -15,7 +15,7 @@ DEFINES += \
     MY_TESTS
 
 INCLUDEPATH += \
-    googletest \
+    googletest/ \
     $${PIG_PATH}/src/ \
     $${PIG_PATH}/src/menu \
     $${PIG_PATH}/src/parameter \
