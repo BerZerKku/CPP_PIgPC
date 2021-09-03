@@ -64,6 +64,7 @@ public:
     /// Проверка пакета.
     static bool checkPkg(pkg_t &pkg, eGB_COM &com);
 
+    void crtTreeDef();
     void crtTreeDevice();
     void crtTreeGlb();
     void crtTreeInterface();
@@ -151,8 +152,10 @@ private:
     /// Обработка команд записи режима.
     static void procCommandWriteRegime(eGB_COM com, pkg_t &data);
 
-    static void hdlrComDevieNumGet(eGB_COM com, pkg_t &data);
-    static void hdlrComDevieNumSet(eGB_COM com, pkg_t &data);
+    static void hdlrComDefTypeAcGet(eGB_COM com, pkg_t &data);
+    static void hdlrComDefTypeAcSet(eGB_COM com, pkg_t &data);
+    static void hdlrComDeviceNumGet(eGB_COM com, pkg_t &data);
+    static void hdlrComDeviceNumSet(eGB_COM com, pkg_t &data);
     static void hdlrComGetVers(eGB_COM com, pkg_t &data);
     static void hdlrComNetAdrGet(eGB_COM com, pkg_t &data);
     static void hdlrComNetAdrSet(eGB_COM com, pkg_t &data);

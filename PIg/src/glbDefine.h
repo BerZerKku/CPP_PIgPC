@@ -456,6 +456,7 @@ typedef enum
     GB_PARAM_DELAY_ON_PRM,   ///< задержка включения ПРМ
     GB_PARAM_DELAY_ON_PRD,   ///< задержка включения ПРД
     GB_PARAM_MIN_TIME_PRD,   ///< минимальная длительность ПРД
+    GB_PARAM_DEF_ONE_SIDE,   ///< односторонний режим
     // параметры передатчика
     GB_PARAM_PRD_IN_DELAY,  ///< время включения (задержка срабатывания дискретного входа)
     GB_PARAM_PRD_DURATION_L,    ///< длительность команды ВЧ

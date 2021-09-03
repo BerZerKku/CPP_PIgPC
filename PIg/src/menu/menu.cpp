@@ -2399,6 +2399,8 @@ void clMenu::lvlControl()
     static char punkt34[] PROGMEM = "%d. Сброс удален. 3";
     static char punkt35[] PROGMEM = "%d. Сброс индикации";
     static char punkt36[] PROGMEM = "%d. Сброс всех";
+    static char punkt37[] PROGMEM = "%d. Одност.реж. выкл";
+    static char punkt38[] PROGMEM = "%d. Одност.реж. вкл";
 
     eGB_TYPE_DEVICE device = sParam.typeDevice;
 
@@ -2547,6 +2549,11 @@ void clMenu::lvlControl()
                 }
                 Punkts_.addName(punkt35);
                 Punkts_.addName(punkt05);
+
+                if (isRzskM())
+                {
+                    Punkts_.addName(punkt38);
+                }
             }
             else
             {
@@ -2607,29 +2614,44 @@ void clMenu::lvlControl()
             sParam.txComBuf.addCom1(GB_COM_GET_COM_PRD_KEEP);
             sParam.txComBuf.addCom1(GB_COM_GET_DEVICE_NUM);
         }
+        if (isRzskM())
+        {
+            // режим односторонний
+            sParam.txComBuf.addCom1(GB_COM_DEF_GET_TYPE_AC);
+            sParam.local.addParam(GB_PARAM_DEF_ONE_SIDE);
+        }
     }
 
     snprintf_P(&vLCDbuf[0], 21, title);
 
     if (sParam.def.status.isEnable())
     {
-        uint8_t position;
-        uint8_t device_number = sParam.glb.getDeviceNum();
-
         // выбор вкл./выкл. наладочного пуска
         Punkts_.choose(punkt06, punkt07, sParam.def.status.getState() != 7);
 
-        // выбор Пуск удаленн. 1/2/3
-        position = Punkts_.choose(punkt24, punkt23, device_number == 1);
-        Punkts_.choose(punkt24, punkt25, device_number == 3, position + 1);
+        if (sParam.glb.getMaxNumDevices() != 2)
+        {
+            uint8_t position;
+            uint8_t device_number = sParam.glb.getDeviceNum();
 
-        // выбор Пуск удал. МАН. 1/2/3
-        position = Punkts_.choose(punkt28, punkt27, device_number == 1);
-        Punkts_.choose(punkt28, punkt29, device_number == 3, position + 1);
+            // выбор Пуск удаленн. 1/2/3
+            position = Punkts_.choose(punkt24, punkt23, device_number == 1);
+            Punkts_.choose(punkt24, punkt25, device_number == 3, position + 1);
 
-        // выбор Сброс удален. 1/2/3
-        position = Punkts_.choose(punkt33, punkt32, device_number == 1);
-        Punkts_.choose(punkt33, punkt34, device_number == 3, position + 1);
+            // выбор Пуск удал. МАН. 1/2/3
+            position = Punkts_.choose(punkt28, punkt27, device_number == 1);
+            Punkts_.choose(punkt28, punkt29, device_number == 3, position + 1);
+
+            // выбор Сброс удален. 1/2/3
+            position = Punkts_.choose(punkt33, punkt32, device_number == 1);
+            Punkts_.choose(punkt33, punkt34, device_number == 3, position + 1);
+        }
+    }
+
+    if (isRzskM())
+    {
+        // выбор вкл./выкл. режима Одност. выкл/вкл
+        Punkts_.choose(punkt38, punkt37, sParam.local.getValue() != 1);
     }
 
     PGM_P name = Punkts_.getName(cursorLine_ - 1);
@@ -2822,6 +2844,16 @@ void clMenu::lvlControl()
             {
                 sParam.txComBuf.setInt8(GB_CONTROL_RESET_UD);
                 sParam.txComBuf.addFastCom(GB_COM_SET_CONTROL);
+            }
+            else if (name == punkt37)
+            {
+                sParam.txComBuf.setInt8(0);
+                sParam.txComBuf.addFastCom(GB_COM_DEF_SET_TYPE_AC);
+            }
+            else if (name == punkt38)
+            {
+                sParam.txComBuf.setInt8(1);
+                sParam.txComBuf.addFastCom(GB_COM_DEF_SET_TYPE_AC);
             }
         }
         break;

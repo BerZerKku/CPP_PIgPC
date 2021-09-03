@@ -230,17 +230,15 @@ bool clProtocolBspS::getDefCommand(eGB_COM com, bool pc)
     }
     else if (com == GB_COM_DEF_GET_TYPE_AC)
     {
-        // 1 байт - тип АК
-        // 2-5 - время до АК
-        stat = sParam_->def.setTypeAC((eGB_TYPE_AC) buf[B1]);
-        //				uint32_t t = buf[B2];
-        //				t <<= 8;
-        //				t += buf[B3];
-        //				t <<= 8;
-        //				t += buf[B4];
-        //				t <<= 8;
-        //				t += buf[B5];
-        stat |= sParam_->def.setTimeToAC(*((uint32_t*) &buf[B2]));
+        // В РЗСК тут передается 1 байт для параметра односторонний режим
+        if (buf[NUM] >= 5)
+        {
+            // 1 байт - тип АК
+            // 2-5 - время до АК
+            stat = sParam_->def.setTypeAC((eGB_TYPE_AC) buf[B1]);
+            // uint32_t t = (buf[B2]<<24) + (buf[B3]<<16) + (buf[B4]<<8) + buf[B5];
+            stat |= sParam_->def.setTimeToAC(*((uint32_t*) &buf[B2]));
+        }
     }
     else if (com == GB_COM_DEF_GET_JRN_CNT)
     {
@@ -990,8 +988,6 @@ bool clProtocolBspS::getLocalParam(eGB_COM com)
             break;
         }
 
-        // Для битовых переменных передается указатель на начало данных,
-        // а для остальных текущее значение.
         local->setValue(val);
     }
 

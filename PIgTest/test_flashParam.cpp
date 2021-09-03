@@ -1599,6 +1599,31 @@ TEST_F(FlashParam_Test, gbParam_MinTimePrd)
 }
 
 //
+TEST_F(FlashParam_Test, gbParam_DefOneSide)
+{
+    Param prop = {
+        "Односторонний режим",   // название параметра
+        GB_COM_DEF_GET_TYPE_AC,  // команда стандартного протокола
+        Param::PARAM_LIST,       // тип параметра
+        Param::RANGE_ON_OFF,     // диапазон измнения
+        Param::DIM_NO,           // размерность
+        fcOnOff[0],              // массив значений
+        1,                       // кол-во повторений параметра
+        0,                       // минимальное значение
+        SIZE_OF(fcOnOff),        // максимальное значение
+        1,                       // дискретность
+        1,             // множитель для стандартного протокола
+        GB_SEND_INT8,  // тип параметра для сохранения новго значения
+        1,  // байт дополнительной информации для сохранения
+        Param::DEPEND_MAX_NO,   // заивимость максимума
+        Param::DEPEND_SAME_NO,  // зависимость повторений
+        Param::CHANGE_REG_NO    // условие для изменения параметра
+    };
+
+    ASSERT_TRUE(checkParam(GB_PARAM_DEF_ONE_SIDE, prop));
+}
+
+//
 TEST_F(FlashParam_Test, gbParam_PrdInDelay)
 {
     Param prop = {

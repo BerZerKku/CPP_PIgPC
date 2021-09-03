@@ -88,14 +88,16 @@ void Bsp::initParam()
         setSpinBoxValue(GB_PARAM_PRM_TIME_OFF, value / getFract(param), i);
     }
 
-    setComboBoxValue(device.isDef, 0);
-    setSpinBoxValue(GB_PARAM_PRM_COM_NUMS, 8);  // количество команд = num*4
-    setSpinBoxValue(GB_PARAM_PRD_COM_NUMS, 8);  // количество команд = num*4
+    setComboBoxValue(device.isDef, 1);
+    setSpinBoxValue(GB_PARAM_PRM_COM_NUMS, 1);  // количество команд = num*4
+    setSpinBoxValue(GB_PARAM_PRD_COM_NUMS, 1);  // количество команд = num*4
     setComboBoxValue(GB_PARAM_NUM_OF_DEVICES, GB_NUM_DEVICES_2);
-    setComboBoxValue(device.typeLine, GB_TYPE_LINE_OPTO);
-    setComboBoxValue(GB_PARAM_COMP_K400, 0);
-    setComboBoxValue(device.typeDevice, AVANT_K400);
+    setComboBoxValue(device.typeLine, GB_TYPE_LINE_UM);
+    setComboBoxValue(device.typeDevice, AVANT_RZSK);
     setComboBoxValue(device.typeOpto, TYPE_OPTO_STANDART);
+    setComboBoxValue(GB_PARAM_COMP_RZSK, GB_COMP_RZSK_M);
+
+    setComboBoxValue(GB_PARAM_DEF_ONE_SIDE, 0);
 }
 
 void Bsp::initClock()
@@ -156,6 +158,17 @@ bool Bsp::checkPkg(QVector<uint8_t> &pkg, eGB_COM &com)
     }
 
     return true;
+}
+
+void Bsp::crtTreeDef()
+{
+    QTreeWidgetItem *top = new QTreeWidgetItem();
+    insertTopLevelItem(topLevelItemCount(), top);
+
+    top->setText(0, codec->toUnicode("Защита"));
+    crtComboBox(GB_PARAM_DEF_ONE_SIDE);
+
+    top->setExpanded(false);
 }
 
 void Bsp::crtTreeDevice()
@@ -1395,7 +1408,8 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data)
         break;
 
     case GB_COM_GET_VERS: hdlrComGetVers(com, data); break;
-    case GB_COM_GET_DEVICE_NUM: hdlrComDevieNumGet(com, data); break;
+    case GB_COM_GET_DEVICE_NUM: hdlrComDeviceNumGet(com, data); break;
+    case GB_COM_DEF_GET_TYPE_AC: hdlrComDefTypeAcGet(com, data); break;
 
     default:
         {
@@ -1626,7 +1640,8 @@ void Bsp::procCommandWriteParam(eGB_COM com, pkg_t &data)
         break;
 
     case GB_COM_SET_NET_ADR: hdlrComNetAdrSet(com, data); break;
-    case GB_COM_SET_DEVICE_NUM: hdlrComDevieNumSet(com, data); break;
+    case GB_COM_SET_DEVICE_NUM: hdlrComDeviceNumSet(com, data); break;
+    case GB_COM_DEF_SET_TYPE_AC: hdlrComDefTypeAcSet(com, data); break;
 
     default:
         {
@@ -1744,7 +1759,39 @@ void Bsp::procCommandWriteRegime(eGB_COM com, pkg_t &data)
     }
 }
 
-void Bsp::hdlrComDevieNumGet(eGB_COM com, pkg_t &data)
+void Bsp::hdlrComDefTypeAcGet(eGB_COM com, pkg_t &data)
+{
+    if (data.size() != 0)
+    {
+        qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
+    }
+
+    if ((device.typeDevice->currentData().toUInt() == AVANT_RZSK)
+        && (getComboBoxValue(GB_PARAM_COMP_RZSK) == GB_COMP_RZSK_M))
+    {
+        pkgTx.append(com);
+        pkgTx.append(getComboBoxValue(GB_PARAM_DEF_ONE_SIDE));
+    }
+    else
+    {
+        qWarning() << "Добавить команду чтения АК и времени до АК";
+    }
+}
+
+void Bsp::hdlrComDefTypeAcSet(eGB_COM com, pkg_t &data)
+{
+    if (data.size() == 1)
+    {
+        setComboBoxValue(GB_PARAM_DEF_ONE_SIDE, data.takeFirst());
+    }
+    else
+    {
+        // установки времени до АК нет!
+        qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
+    }
+}
+
+void Bsp::hdlrComDeviceNumGet(eGB_COM com, pkg_t &data)
 {
     if (data.size() != 0)
     {
@@ -1755,7 +1802,7 @@ void Bsp::hdlrComDevieNumGet(eGB_COM com, pkg_t &data)
     pkgTx.append(getSpinBoxValue(GB_PARAM_NUM_OF_DEVICE));
 }
 
-void Bsp::hdlrComDevieNumSet(eGB_COM com, pkg_t &data)
+void Bsp::hdlrComDeviceNumSet(eGB_COM com, pkg_t &data)
 {
     if (data.size() != 1)
     {
