@@ -2625,112 +2625,23 @@ void clMenu::lvlControl()
 
     if (sParam.def.status.isEnable())
     {
-        // выбор вкл./выкл. наладочного пуска
-        if (sParam.def.status.getState() != 7)
-            Punkts_.change(punkt06, 0);
-        else
-            Punkts_.change(punkt07, 0);
+        uint8_t position;
+        uint8_t device_number = sParam.glb.getDeviceNum();
 
-        // выбор пуск удаленного
-        if (device == AVANT_RZSK)
-        {
-            if (sParam.def.status.isEnable())
-            {
-                if (sParam.def.getNumDevices() == GB_NUM_DEVICES_3)
-                {
-                    uint8_t num = sParam.glb.getDeviceNum();
-                    if (num == 1)
-                    {
-                        Punkts_.change(punkt24, 3);
-                        Punkts_.change(punkt25, 4);
-                    }
-                    else if (num == 2)
-                    {
-                        Punkts_.change(punkt23, 3);
-                        Punkts_.change(punkt25, 4);
-                    }
-                    else if (num == 3)
-                    {
-                        Punkts_.change(punkt23, 3);
-                        Punkts_.change(punkt24, 4);
-                    }
-                }
-            }
-        }
-        else if (device == AVANT_R400M)
-        {
-            if (sParam.def.getNumDevices() == GB_NUM_DEVICES_3)
-            {
-                eGB_COMP_R400M comp = sParam.glb.getCompR400m();
-                uint8_t        num  = sParam.glb.getDeviceNum();
-                if (comp == GB_COMP_R400M_AVANT)
-                {
-                    if (num == 1)
-                    {
-                        Punkts_.change(punkt24, 3);
-                        Punkts_.change(punkt25, 4);
-                    }
-                    else if (num == 2)
-                    {
-                        Punkts_.change(punkt23, 3);
-                        Punkts_.change(punkt25, 4);
-                    }
-                    else if (num == 3)
-                    {
-                        Punkts_.change(punkt23, 3);
-                        Punkts_.change(punkt24, 4);
-                    }
-                }
-                else if (comp == GB_COMP_R400M_PVZUE)
-                {
-                    if (num == 1)
-                    {
-                        Punkts_.change(punkt24, 2);
-                        Punkts_.change(punkt25, 3);
-                        Punkts_.change(punkt28, 5);
-                        Punkts_.change(punkt29, 6);
-                    }
-                    else if (num == 2)
-                    {
-                        Punkts_.change(punkt23, 2);
-                        Punkts_.change(punkt25, 3);
-                        Punkts_.change(punkt27, 5);
-                        Punkts_.change(punkt29, 6);
-                    }
-                    else if (num == 3)
-                    {
-                        Punkts_.change(punkt23, 2);
-                        Punkts_.change(punkt24, 3);
-                        Punkts_.change(punkt27, 5);
-                        Punkts_.change(punkt28, 6);
-                    }
-                }
-                else if (comp == GB_COMP_R400M_LINER)
-                {
-                    if (num == 1)
-                    {
-                        Punkts_.change(punkt33, 2);
-                        Punkts_.change(punkt34, 3);
-                        Punkts_.change(punkt24, 4);
-                        Punkts_.change(punkt25, 5);
-                    }
-                    else if (num == 2)
-                    {
-                        Punkts_.change(punkt32, 2);
-                        Punkts_.change(punkt34, 3);
-                        Punkts_.change(punkt23, 4);
-                        Punkts_.change(punkt25, 5);
-                    }
-                    else if (num == 3)
-                    {
-                        Punkts_.change(punkt32, 2);
-                        Punkts_.change(punkt33, 3);
-                        Punkts_.change(punkt23, 4);
-                        Punkts_.change(punkt24, 5);
-                    }
-                }
-            }
-        }
+        // выбор вкл./выкл. наладочного пуска
+        Punkts_.choose(punkt06, punkt07, sParam.def.status.getState() != 7);
+
+        // выбор Пуск удаленн. 1/2/3
+        position = Punkts_.choose(punkt24, punkt23, device_number == 1);
+        Punkts_.choose(punkt24, punkt25, device_number == 3, position + 1);
+
+        // выбор Пуск удал. МАН. 1/2/3
+        position = Punkts_.choose(punkt28, punkt27, device_number == 1);
+        Punkts_.choose(punkt28, punkt29, device_number == 3, position + 1);
+
+        // выбор Сброс удален. 1/2/3
+        position = Punkts_.choose(punkt33, punkt32, device_number == 1);
+        Punkts_.choose(punkt33, punkt34, device_number == 3, position + 1);
     }
 
     PGM_P name = Punkts_.getName(cursorLine_ - 1);

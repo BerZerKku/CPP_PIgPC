@@ -71,6 +71,7 @@ class MainWindow : public QMainWindow
         QLineEdit def;
         QLineEdit numComPrm;
         QLineEdit numComPrd;
+        QLineEdit deviceNumber;
         QLineEdit numDevices;
         QLineEdit typeCommLine;
         QLineEdit typeCompatibility;

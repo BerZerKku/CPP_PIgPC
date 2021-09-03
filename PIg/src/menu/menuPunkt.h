@@ -63,63 +63,26 @@ public:
      */
     void clear() { cnt_ = 0; }
 
-    /** Замена указанного номера пункта меню.
-     *
-     * 	@param name Имя пунка.
-     * 	@param num Номер пункта.
-     * 	@retval True В случае успешного добавления.
-     * 	@retval False В случае ошибки добавления. Например, не верный номер.
-     */
-    bool change(PGM_P const name, uint8_t num)
-    {
-        bool stat = false;
-        if (num < cnt_)
-        {
-            name_[num] = name;
-            stat       = true;
-        }
-        return stat;
-    }
-
     /** Выбор одного из указанных номеров пункта меню.
      *
      *  @param[in] first Первый пункт.
      *  @param[in] second Второй пункт.
      *  @param[in] is_first Если true, то надо выбрать первый пункт, иначе второй.
-     *  @return true если пункт для замены был найден, иначе false.
+     *  @param[in] start Начальная позиция для поиска.
+     *  @return Позиция на которой был найден параметр.
      */
-    bool choose(PGM_P const first, PGM_P const second, bool is_first)
+    uint8_t choose(PGM_P const first, PGM_P const second, bool is_first, uint8_t start = 0)
     {
-        for (uint8_t i = 0; i < cnt_; i++)
+        for (uint8_t i = start; i < cnt_; i++)
         {
             if ((name_[i] == first) || (name_[i] == second))
             {
-                name_[i] = is_first ? first : second;
-                return true;
+                name_[i] = (is_first) ? (first) : (second);
+                return i;
             }
         }
 
-        return false;
-    }
-
-    /** Замена указанного номера пункта меню.
-     *
-     * 	@param name Имя пункта.
-     * 	@param num Номер пункта.
-     * 	@retval True В случае успешного добавления.
-     * 	@retval False В случае ошибки добавления. Например, не верный номер.
-     */
-    bool changeName(PGM_P const dest, PGM_P const src)
-    {
-        for (uint8_t i = 0; i < cnt_; i++)
-        {
-            if (name_[i] == dest)
-            {
-                name_[i] = src;
-                return true;
-            }
-        }
-        return false;
+        return 0;
     }
 
     /** Возвращает название укзанного пункта меню.

@@ -142,6 +142,11 @@ void MainWindow::initView()
     addViewItem(top, "Совместимость Р400", &view.typeCompatibility);
     addViewItem(top, "Тип оптики", &view.typeOpto);
 
+    top = new QTreeWidgetItem();
+    ui->treeWidget->addTopLevelItem(top);
+    top->setText(0, codec->toUnicode("Параметры общие"));
+    addViewItem(top, "Номер аппарата", &view.deviceNumber);
+
     // Обновление расскладки клавиатуры при смене аппарата или совместимости
     // задержка в 200мс нужна для обновления расскладки в ПИ
     connect(&view.typeDevice,
@@ -221,6 +226,8 @@ void MainWindow::hdlrView()
     view.typeCommLine.setText(getTypeLine(menu.sParam.glb.getTypeLine()));
     viewTypeComp();
     view.typeOpto.setText(getTypeOpto(menu.sParam.glb.getTypeOpto()));
+
+    view.deviceNumber.setText(QString::number(menu.sParam.glb.getDeviceNum()));
 }
 
 //
