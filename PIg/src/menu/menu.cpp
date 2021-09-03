@@ -1256,15 +1256,15 @@ void clMenu::lvlFirst()
         vLCDdrawBoard(lineParam_);
 
         Punkts_.clear();
-        Punkts_.add(punkt1);
-        Punkts_.add(punkt2);
-        Punkts_.add(punkt3);
-        Punkts_.add(punkt4);
-        Punkts_.add(punkt5);
+        Punkts_.addName(punkt1);
+        Punkts_.addName(punkt2);
+        Punkts_.addName(punkt3);
+        Punkts_.addName(punkt4);
+        Punkts_.addName(punkt5);
 
         if (sParam.glb.getTypeDevice() != AVANT_OPTO)
         {
-            Punkts_.add(punkt6);
+            Punkts_.addName(punkt6);
         }
 
         // доплнительные команды
@@ -1351,36 +1351,36 @@ void clMenu::lvlInfo()
         vLCDdrawBoard(lineParam_);
 
         Punkts_.clear();
-        Punkts_.add(GB_IC_BSP_MCU);
+        Punkts_.addNumber(GB_IC_BSP_MCU);
         if (sParam.typeDevice != AVANT_OPTO)
         {
-            Punkts_.add(GB_IC_BSP_DSP);  // только в оптике нет DSP
+            Punkts_.addNumber(GB_IC_BSP_DSP);  // только в оптике нет DSP
 
             if (sParam.typeDevice == AVANT_K400)
             {  // в  400 отдельно прошивка DSP
-                Punkts_.add(GB_IC_BSP_DSP_PLIS);
+                Punkts_.addNumber(GB_IC_BSP_DSP_PLIS);
             }
         }
-        Punkts_.add(GB_IC_PI_MCU);
+        Punkts_.addNumber(GB_IC_PI_MCU);
         if (sParam.prd.status.isEnable())
         {
-            Punkts_.add(GB_IC_BSK_PLIS_PRD1);
+            Punkts_.addNumber(GB_IC_BSK_PLIS_PRD1);
             if (sParam.prd.getNumCom() > 16)
             {
-                Punkts_.add(GB_IC_BSK_PLIS_PRD2);
+                Punkts_.addNumber(GB_IC_BSK_PLIS_PRD2);
             }
         }
         if (sParam.prm.status.isEnable())
         {
-            Punkts_.add(GB_IC_BSK_PLIS_PRM1);
+            Punkts_.addNumber(GB_IC_BSK_PLIS_PRM1);
             if (sParam.prm.getNumCom() > 16)
             {
-                Punkts_.add(GB_IC_BSK_PLIS_PRM2);
+                Punkts_.addNumber(GB_IC_BSK_PLIS_PRM2);
             }
         }
         if (sParam.def.status.isEnable())
         {
-            Punkts_.add(GB_IC_BSZ_PLIS);
+            Punkts_.addNumber(GB_IC_BSZ_PLIS);
         }
 
         // доплнительные команды
@@ -1395,14 +1395,13 @@ void clMenu::lvlInfo()
     uint8_t cntPunkts = cursorLine_;
     for (uint_fast8_t line = lineParam_; line < NUM_TEXT_LINES; line++)
     {
-        uint8_t ic = Punkts_.getNumber(cntPunkts);
-
         uint8_t pos = 20 * line;
-        uint8_t len = snprintf_P(&vLCDbuf[pos], 21, fcIC[ic]);
+        eGB_IC  ic  = static_cast<eGB_IC>(Punkts_.getNumber(cntPunkts));
 
-        uint16_t vers = sParam.glb.getVersProgIC((eGB_IC) ic);
+        uint8_t  len  = snprintf_P(&vLCDbuf[pos], 21, fcIC[ic]);
+        uint16_t vers = sParam.glb.getVersProgIC(ic);
         snprintf_P(&vLCDbuf[pos + len],
-                   21 - len,
+                   NAME_PARAM_LENGHT - len,
                    PSTR(": %02X.%02X"),
                    (uint8_t) (vers >> 8),
                    (uint8_t) vers);
@@ -1468,21 +1467,21 @@ void clMenu::lvlJournal()
 
         // активаци€ необходимых пунктов меню и соответствующих им команд
         Punkts_.clear();
-        Punkts_.add(punkt1);
+        Punkts_.addName(punkt1);
 
         if (sParam.def.status.isEnable())
         {
-            Punkts_.add(punkt2);
+            Punkts_.addName(punkt2);
         }
 
         if (sParam.prm.status.isEnable())
         {
-            Punkts_.add(punkt3);
+            Punkts_.addName(punkt3);
         }
 
         if (sParam.prd.status.isEnable())
         {
-            Punkts_.add(punkt4);
+            Punkts_.addName(punkt4);
         }
     }
 
@@ -2431,112 +2430,112 @@ void clMenu::lvlControl()
             eGB_NUM_DEVICES numDevices    = sParam.def.getNumDevices();
             eGB_COMP_R400M  compatibility = sParam.glb.getCompR400m();
             // первым всегда идет пуск наладочный
-            Punkts_.add(punkt07);  // далее выбираетс€ в зависимости от текущего
+            Punkts_.addName(punkt07);  // далее выбираетс€ в зависимости от текущего
             // сброс своего есть во всех аппаратах и совместимост€х
-            Punkts_.add(punkt03);
+            Punkts_.addName(punkt03);
             // TODO дл€ ѕ¬« 
             if (compatibility == GB_COMP_R400M_AVANT)
             {
                 if (numDevices == GB_NUM_DEVICES_2)
                 {
-                    Punkts_.add(punkt04);
-                    Punkts_.add(punkt02);
-                    Punkts_.add(punkt11);
-                    Punkts_.add(punkt12);
-                    Punkts_.add(punkt13);
-                    Punkts_.add(punkt19);
-                    Punkts_.add(punkt16);
-                    Punkts_.add(punkt17);
+                    Punkts_.addName(punkt04);
+                    Punkts_.addName(punkt02);
+                    Punkts_.addName(punkt11);
+                    Punkts_.addName(punkt12);
+                    Punkts_.addName(punkt13);
+                    Punkts_.addName(punkt19);
+                    Punkts_.addName(punkt16);
+                    Punkts_.addName(punkt17);
                 }
                 else if (numDevices == GB_NUM_DEVICES_3)
                 {
-                    Punkts_.add(punkt22);
-                    Punkts_.add(punkt23);
-                    Punkts_.add(punkt24);
-                    Punkts_.add(punkt26);
-                    Punkts_.add(punkt11);
-                    Punkts_.add(punkt12);
-                    Punkts_.add(punkt13);
-                    Punkts_.add(punkt19);
-                    Punkts_.add(punkt16);
-                    Punkts_.add(punkt17);
+                    Punkts_.addName(punkt22);
+                    Punkts_.addName(punkt23);
+                    Punkts_.addName(punkt24);
+                    Punkts_.addName(punkt26);
+                    Punkts_.addName(punkt11);
+                    Punkts_.addName(punkt12);
+                    Punkts_.addName(punkt13);
+                    Punkts_.addName(punkt19);
+                    Punkts_.addName(punkt16);
+                    Punkts_.addName(punkt17);
                 }
-                Punkts_.add(punkt05);
+                Punkts_.addName(punkt05);
             }
             else if (compatibility == GB_COMP_R400M_PVZ90)
             {
-                Punkts_.add(punkt04);
-                Punkts_.add(punkt19);
-                Punkts_.add(punkt16);
-                Punkts_.add(punkt17);
-                Punkts_.add(punkt18);
-                Punkts_.add(punkt08);
+                Punkts_.addName(punkt04);
+                Punkts_.addName(punkt19);
+                Punkts_.addName(punkt16);
+                Punkts_.addName(punkt17);
+                Punkts_.addName(punkt18);
+                Punkts_.addName(punkt08);
             }
             else if (compatibility == GB_COMP_R400M_PVZUE)
             {
                 if (numDevices == GB_NUM_DEVICES_2)
                 {
-                    Punkts_.add(punkt02);
-                    Punkts_.add(punkt09);
-                    Punkts_.add(punkt30);
-                    Punkts_.add(punkt19);
-                    Punkts_.add(punkt16);
-                    Punkts_.add(punkt20);
-                    Punkts_.add(punkt10);
-                    Punkts_.add(punkt17);
+                    Punkts_.addName(punkt02);
+                    Punkts_.addName(punkt09);
+                    Punkts_.addName(punkt30);
+                    Punkts_.addName(punkt19);
+                    Punkts_.addName(punkt16);
+                    Punkts_.addName(punkt20);
+                    Punkts_.addName(punkt10);
+                    Punkts_.addName(punkt17);
                 }
                 else if (numDevices == GB_NUM_DEVICES_3)
                 {
-                    Punkts_.add(punkt23);
-                    Punkts_.add(punkt24);
-                    Punkts_.add(punkt27);
-                    Punkts_.add(punkt28);
-                    Punkts_.add(punkt30);
-                    Punkts_.add(punkt19);
-                    Punkts_.add(punkt16);
-                    Punkts_.add(punkt20);
-                    Punkts_.add(punkt10);
-                    Punkts_.add(punkt17);
+                    Punkts_.addName(punkt23);
+                    Punkts_.addName(punkt24);
+                    Punkts_.addName(punkt27);
+                    Punkts_.addName(punkt28);
+                    Punkts_.addName(punkt30);
+                    Punkts_.addName(punkt19);
+                    Punkts_.addName(punkt16);
+                    Punkts_.addName(punkt20);
+                    Punkts_.addName(punkt10);
+                    Punkts_.addName(punkt17);
                 }
-                Punkts_.add(punkt05);
+                Punkts_.addName(punkt05);
             }
             else if (compatibility == GB_COMP_R400M_AVZK80)
             {
-                Punkts_.add(punkt19);
-                Punkts_.add(punkt16);
-                Punkts_.add(punkt17);
-                Punkts_.add(punkt18);
-                Punkts_.add(punkt08);
+                Punkts_.addName(punkt19);
+                Punkts_.addName(punkt16);
+                Punkts_.addName(punkt17);
+                Punkts_.addName(punkt18);
+                Punkts_.addName(punkt08);
             }
             else if (compatibility == GB_COMP_R400M_PVZL)
             {
-                Punkts_.add(punkt11);
-                Punkts_.add(punkt12);
-                Punkts_.add(punkt13);
-                Punkts_.add(punkt14);
-                Punkts_.add(punkt31);
-                Punkts_.add(punkt17);
-                Punkts_.add(punkt05);
+                Punkts_.addName(punkt11);
+                Punkts_.addName(punkt12);
+                Punkts_.addName(punkt13);
+                Punkts_.addName(punkt14);
+                Punkts_.addName(punkt31);
+                Punkts_.addName(punkt17);
+                Punkts_.addName(punkt05);
             }
             else if (compatibility == GB_COMP_R400M_LINER)
             {
                 if (numDevices == GB_NUM_DEVICES_2)
                 {
-                    Punkts_.add(punkt04);
-                    Punkts_.add(punkt02);
+                    Punkts_.addName(punkt04);
+                    Punkts_.addName(punkt02);
                 }
                 else if (numDevices == GB_NUM_DEVICES_3)
                 {
-                    Punkts_.add(punkt33);  // далее выбираетс€ в зависимости от номера
-                    Punkts_.add(punkt34);  // далее выбираетс€ в зависимости от номера
-                    Punkts_.add(punkt23);  // далее выбираетс€ в зависимости от номера
-                    Punkts_.add(punkt24);  // далее выбираетс€ в зависимости от номера
-                    Punkts_.add(punkt26);
+                    Punkts_.addName(punkt33);  // далее выбираетс€ в зависимости от номера
+                    Punkts_.addName(punkt34);  // далее выбираетс€ в зависимости от номера
+                    Punkts_.addName(punkt23);  // далее выбираетс€ в зависимости от номера
+                    Punkts_.addName(punkt24);  // далее выбираетс€ в зависимости от номера
+                    Punkts_.addName(punkt26);
                 }
-                Punkts_.add(punkt15);
-                Punkts_.add(punkt16);
-                Punkts_.add(punkt17);
-                Punkts_.add(punkt05);
+                Punkts_.addName(punkt15);
+                Punkts_.addName(punkt16);
+                Punkts_.addName(punkt17);
+                Punkts_.addName(punkt05);
             }
         }
         else if (device == AVANT_RZSK)
@@ -2544,69 +2543,69 @@ void clMenu::lvlControl()
             eGB_NUM_DEVICES numDevices = sParam.def.getNumDevices();
             if (sParam.def.status.isEnable())
             {
-                Punkts_.add(punkt07);  // далее выбираетс€ в зависимости от текущего
-                Punkts_.add(punkt03);
+                Punkts_.addName(punkt07);  // далее выбираетс€ в зависимости от текущего
+                Punkts_.addName(punkt03);
                 if (numDevices == GB_NUM_DEVICES_2)
                 {
-                    Punkts_.add(punkt04);
-                    Punkts_.add(punkt02);
+                    Punkts_.addName(punkt04);
+                    Punkts_.addName(punkt02);
                 }
                 else if (numDevices == GB_NUM_DEVICES_3)
                 {
-                    Punkts_.add(punkt22);
-                    Punkts_.add(punkt23);  // далее выбираетс€ в зависимости от номера
-                    Punkts_.add(punkt24);  // далее выбираетс€ в зависимости от номера
-                    Punkts_.add(punkt26);
+                    Punkts_.addName(punkt22);
+                    Punkts_.addName(punkt23);  // далее выбираетс€ в зависимости от номера
+                    Punkts_.addName(punkt24);  // далее выбираетс€ в зависимости от номера
+                    Punkts_.addName(punkt26);
                 }
-                Punkts_.add(punkt35);
-                Punkts_.add(punkt05);
+                Punkts_.addName(punkt35);
+                Punkts_.addName(punkt05);
             }
             else
             {
                 // –«—  без поста
-                Punkts_.add(punkt03);
+                Punkts_.addName(punkt03);
                 if (numDevices == GB_NUM_DEVICES_2)
                 {
-                    Punkts_.add(punkt04);
+                    Punkts_.addName(punkt04);
                 }
                 else if (numDevices == GB_NUM_DEVICES_3)
                 {
-                    Punkts_.add(punkt22);
+                    Punkts_.addName(punkt22);
                 }
-                Punkts_.add(punkt35);
+                Punkts_.addName(punkt35);
             }
         }
         else if (device == AVANT_K400)
         {
-            Punkts_.add(punkt03);
-            Punkts_.add(punkt35);
+            Punkts_.addName(punkt03);
+            Punkts_.addName(punkt35);
         }
         else if (device == AVANT_OPTO)
         {
             if (sParam.def.status.isEnable())
             {
-                Punkts_.add(punkt07);  // далее выбираетс€ в зависимости от текущего
+                Punkts_.addName(punkt07);  // далее выбираетс€ в зависимости от текущего
             }
-            Punkts_.add(punkt03);
+            Punkts_.addName(punkt03);
             if (sParam.glb.getTypeOpto() == TYPE_OPTO_STANDART)
             {
-                Punkts_.add(punkt04);
+                Punkts_.addName(punkt04);
             }
             else
             {
-                Punkts_.add(punkt36);
+                Punkts_.addName(punkt36);
             }
             if (sParam.prd.status.isEnable() || sParam.prm.status.isEnable())
             {
-                Punkts_.add(punkt35);
+                Punkts_.addName(punkt35);
             }
             if (sParam.def.status.isEnable())
             {
-                Punkts_.add(punkt02);
+                Punkts_.addName(punkt02);
                 if (!sParam.prd.status.isEnable() && !sParam.prm.status.isEnable())
                 {
                     // "—брос ј " есть в –400 и нет в –«— 
-                    Punkts_.add(punkt11);
+                    Punkts_.addName(punkt11);
                 }
             }
         }
@@ -2628,9 +2627,9 @@ void clMenu::lvlControl()
     {
         // выбор вкл./выкл. наладочного пуска
         if (sParam.def.status.getState() != 7)
-            Punkts_.change(punkt06, GB_COM_NO, 0);
+            Punkts_.change(punkt06, 0);
         else
-            Punkts_.change(punkt07, GB_COM_NO, 0);
+            Punkts_.change(punkt07, 0);
 
         // выбор пуск удаленного
         if (device == AVANT_RZSK)
@@ -2642,18 +2641,18 @@ void clMenu::lvlControl()
                     uint8_t num = sParam.glb.getDeviceNum();
                     if (num == 1)
                     {
-                        Punkts_.change(punkt24, GB_COM_NO, 3);
-                        Punkts_.change(punkt25, GB_COM_NO, 4);
+                        Punkts_.change(punkt24, 3);
+                        Punkts_.change(punkt25, 4);
                     }
                     else if (num == 2)
                     {
-                        Punkts_.change(punkt23, GB_COM_NO, 3);
-                        Punkts_.change(punkt25, GB_COM_NO, 4);
+                        Punkts_.change(punkt23, 3);
+                        Punkts_.change(punkt25, 4);
                     }
                     else if (num == 3)
                     {
-                        Punkts_.change(punkt23, GB_COM_NO, 3);
-                        Punkts_.change(punkt24, GB_COM_NO, 4);
+                        Punkts_.change(punkt23, 3);
+                        Punkts_.change(punkt24, 4);
                     }
                 }
             }
@@ -2668,66 +2667,66 @@ void clMenu::lvlControl()
                 {
                     if (num == 1)
                     {
-                        Punkts_.change(punkt24, GB_COM_NO, 3);
-                        Punkts_.change(punkt25, GB_COM_NO, 4);
+                        Punkts_.change(punkt24, 3);
+                        Punkts_.change(punkt25, 4);
                     }
                     else if (num == 2)
                     {
-                        Punkts_.change(punkt23, GB_COM_NO, 3);
-                        Punkts_.change(punkt25, GB_COM_NO, 4);
+                        Punkts_.change(punkt23, 3);
+                        Punkts_.change(punkt25, 4);
                     }
                     else if (num == 3)
                     {
-                        Punkts_.change(punkt23, GB_COM_NO, 3);
-                        Punkts_.change(punkt24, GB_COM_NO, 4);
+                        Punkts_.change(punkt23, 3);
+                        Punkts_.change(punkt24, 4);
                     }
                 }
                 else if (comp == GB_COMP_R400M_PVZUE)
                 {
                     if (num == 1)
                     {
-                        Punkts_.change(punkt24, GB_COM_NO, 2);
-                        Punkts_.change(punkt25, GB_COM_NO, 3);
-                        Punkts_.change(punkt28, GB_COM_NO, 5);
-                        Punkts_.change(punkt29, GB_COM_NO, 6);
+                        Punkts_.change(punkt24, 2);
+                        Punkts_.change(punkt25, 3);
+                        Punkts_.change(punkt28, 5);
+                        Punkts_.change(punkt29, 6);
                     }
                     else if (num == 2)
                     {
-                        Punkts_.change(punkt23, GB_COM_NO, 2);
-                        Punkts_.change(punkt25, GB_COM_NO, 3);
-                        Punkts_.change(punkt27, GB_COM_NO, 5);
-                        Punkts_.change(punkt29, GB_COM_NO, 6);
+                        Punkts_.change(punkt23, 2);
+                        Punkts_.change(punkt25, 3);
+                        Punkts_.change(punkt27, 5);
+                        Punkts_.change(punkt29, 6);
                     }
                     else if (num == 3)
                     {
-                        Punkts_.change(punkt23, GB_COM_NO, 2);
-                        Punkts_.change(punkt24, GB_COM_NO, 3);
-                        Punkts_.change(punkt27, GB_COM_NO, 5);
-                        Punkts_.change(punkt28, GB_COM_NO, 6);
+                        Punkts_.change(punkt23, 2);
+                        Punkts_.change(punkt24, 3);
+                        Punkts_.change(punkt27, 5);
+                        Punkts_.change(punkt28, 6);
                     }
                 }
                 else if (comp == GB_COMP_R400M_LINER)
                 {
                     if (num == 1)
                     {
-                        Punkts_.change(punkt33, GB_COM_NO, 2);
-                        Punkts_.change(punkt34, GB_COM_NO, 3);
-                        Punkts_.change(punkt24, GB_COM_NO, 4);
-                        Punkts_.change(punkt25, GB_COM_NO, 5);
+                        Punkts_.change(punkt33, 2);
+                        Punkts_.change(punkt34, 3);
+                        Punkts_.change(punkt24, 4);
+                        Punkts_.change(punkt25, 5);
                     }
                     else if (num == 2)
                     {
-                        Punkts_.change(punkt32, GB_COM_NO, 2);
-                        Punkts_.change(punkt34, GB_COM_NO, 3);
-                        Punkts_.change(punkt23, GB_COM_NO, 4);
-                        Punkts_.change(punkt25, GB_COM_NO, 5);
+                        Punkts_.change(punkt32, 2);
+                        Punkts_.change(punkt34, 3);
+                        Punkts_.change(punkt23, 4);
+                        Punkts_.change(punkt25, 5);
                     }
                     else if (num == 3)
                     {
-                        Punkts_.change(punkt32, GB_COM_NO, 2);
-                        Punkts_.change(punkt33, GB_COM_NO, 3);
-                        Punkts_.change(punkt23, GB_COM_NO, 4);
-                        Punkts_.change(punkt24, GB_COM_NO, 5);
+                        Punkts_.change(punkt32, 2);
+                        Punkts_.change(punkt33, 3);
+                        Punkts_.change(punkt23, 4);
+                        Punkts_.change(punkt24, 5);
                     }
                 }
             }
@@ -2956,11 +2955,11 @@ void clMenu::lvlSetup()
         vLCDdrawBoard(lineParam_);
 
         Punkts_.clear();
-        Punkts_.add(punkt1);
-        Punkts_.add(punkt2);
-        Punkts_.add(punkt3);
-        Punkts_.add(punkt4);
-        Punkts_.add(punkt5);
+        Punkts_.addName(punkt1);
+        Punkts_.addName(punkt2);
+        Punkts_.addName(punkt3);
+        Punkts_.addName(punkt4);
+        Punkts_.addName(punkt5);
 
         // доплнительные команды
         sParam.txComBuf.clear();
@@ -3228,24 +3227,24 @@ void clMenu::lvlSetupParam()
         Punkts_.clear();
         if (sParam.def.status.isEnable())
         {
-            Punkts_.add(punkt1);
+            Punkts_.addName(punkt1);
         }
         if (sParam.prm.status.isEnable())
         {
-            Punkts_.add(punkt2);
+            Punkts_.addName(punkt2);
         }
         if (sParam.prd.status.isEnable())
         {
-            Punkts_.add(punkt3);
+            Punkts_.addName(punkt3);
         }
-        Punkts_.add(punkt4);
+        Punkts_.addName(punkt4);
 
         // в оптике дл€ кольца добавл€ютс€ новые параметры
         if (sParam.glb.getTypeDevice() == AVANT_OPTO)
         {
             if (sParam.glb.getTypeOpto() != TYPE_OPTO_STANDART)
             {
-                Punkts_.add(punkt5);
+                Punkts_.addName(punkt5);
             }
         }
 
@@ -3954,12 +3953,12 @@ void clMenu::lvlSetupDT()
         vLCDdrawBoard(lineParam_);
 
         Punkts_.clear();
-        Punkts_.add(punkt1);
-        Punkts_.add(punkt2);
-        Punkts_.add(punkt3);
-        Punkts_.add(punkt4);
-        Punkts_.add(punkt5);
-        Punkts_.add(punkt6);
+        Punkts_.addName(punkt1);
+        Punkts_.addName(punkt2);
+        Punkts_.addName(punkt3);
+        Punkts_.addName(punkt4);
+        Punkts_.addName(punkt5);
+        Punkts_.addName(punkt6);
 
         // доплнительные команды
         sParam.txComBuf.clear();
@@ -4197,12 +4196,12 @@ void clMenu::lvlTest()
         // тест передатчика при наличии передатчика или защиты
         if ((sParam.prd.status.isEnable()) || (sParam.def.status.isEnable()))
         {
-            Punkts_.add(punkt1);
+            Punkts_.addName(punkt1);
         }
         // тест приемника при наличии приемника или защиты
         if ((sParam.prm.status.isEnable()) || (sParam.def.status.isEnable()))
         {
-            Punkts_.add(punkt2);
+            Punkts_.addName(punkt2);
         }
 
         // дополнительные команды

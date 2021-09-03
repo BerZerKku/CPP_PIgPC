@@ -35,6 +35,7 @@ SOURCES += \
     menu/test_control.cpp \
     menu/test_dateTime.cpp \
     menu/test_measure.cpp \
+    menu/test_menuPunkt.cpp \
     menu/test_password.cpp \
     menu/test_test.cpp \
     menu/test_txCom.cpp \
