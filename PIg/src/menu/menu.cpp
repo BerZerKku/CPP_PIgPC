@@ -581,8 +581,7 @@ bool clMenu::setDeviceRZSK()
     // заполнение массива предупреждений защиты
     sParam.def.status.warningText[0] = fcDefWarning01rzsk;
     sParam.def.status.warningText[1] = fcDefWarning02;
-    sParam.def.status.warningText[2] = fcDefWarning04rzskm;  // 0x0004 РЗСКм
-    // 3-15 нет
+    // 2-15 нет
 
     // ПРИЕМНИК
     // заполнение массива неисправностей приемника
