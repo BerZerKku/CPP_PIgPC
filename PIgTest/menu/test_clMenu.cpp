@@ -427,7 +427,7 @@ TEST_F(clMenu_Test, getKeyboardLayout)
     mObj->sParam.glb.setCompatibility(GB_COMP_RZSK);
     ASSERT_EQ(AVANT_RZSK, mObj->getKeyboardLayout());
     mObj->sParam.glb.setCompatibility(GB_COMP_RZSK_M);
-    ASSERT_EQ(AVANT_R400M, mObj->getKeyboardLayout());
+    ASSERT_EQ(AVANT_RZSK, mObj->getKeyboardLayout());
     mObj->sParam.glb.setCompatibility(GB_COMP_RZSK_3E8);
     ASSERT_EQ(AVANT_K400, mObj->getKeyboardLayout());
     // „тобы не забыть добавить тесты в случае добавлени€ новой совместимости

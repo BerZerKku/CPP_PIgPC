@@ -5996,18 +5996,8 @@ eGB_TYPE_DEVICE clMenu::getKeyboardLayout()
     case AVANT_RZSK:
         {
             eGB_COMP_RZSK comp = sParam.glb.getCompRZSK();
-            if (comp == GB_COMP_RZSK_M)
-            {
-                layout = AVANT_R400M;
-            }
-            else if (comp == GB_COMP_RZSK_3E8)
-            {
-                layout = AVANT_K400;
-            }
-            else
-            {
-                layout = AVANT_RZSK;
-            }
+
+            layout = (comp == GB_COMP_RZSK_3E8) ? AVANT_K400 : AVANT_RZSK;
             break;
         }
 
