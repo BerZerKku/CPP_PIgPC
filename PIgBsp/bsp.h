@@ -38,6 +38,16 @@ class Bsp : public QTreeWidget
         QComboBox *typeDevice = nullptr;
         QComboBox *typeLine   = nullptr;
         QComboBox *typeOpto   = nullptr;
+        //
+        QSpinBox *versionPiMcu       = nullptr;
+        QSpinBox *versionBspMcu      = nullptr;
+        QSpinBox *versionBspDsp      = nullptr;
+        QSpinBox *versionBspDspPlis  = nullptr;
+        QSpinBox *versionBsk1PrmPlis = nullptr;
+        QSpinBox *versionBsk1PrdPlis = nullptr;
+        QSpinBox *versionBsk2PrmPlis = nullptr;
+        QSpinBox *versionBsk2PrdPlis = nullptr;
+        QSpinBox *versionBszPlis     = nullptr;
     };
 
     struct test_t
@@ -66,6 +76,7 @@ public:
 
     void crtTreeDef();
     void crtTreeDevice();
+    void crtTreeDevieVersions(QTreeWidgetItem *top);
     void crtTreeGlb();
     void crtTreeInterface();
     void crtTreePrd();

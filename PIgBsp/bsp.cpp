@@ -56,6 +56,16 @@ void Bsp::initParam()
     void (QComboBox::*signal)(int) = &QComboBox::currentIndexChanged;
     connect(device.typeDevice, signal, this, &Bsp::updateCompatibility);
 
+    setSpinBoxValue(device.versionBspMcu, 0x203);
+    setSpinBoxValue(device.versionBspDsp, 0x330D);
+    setSpinBoxValue(device.versionBspDspPlis, 0x3333);
+    setSpinBoxValue(device.versionPiMcu, 0x151);
+    setSpinBoxValue(device.versionBsk1PrdPlis, 0x25);
+    setSpinBoxValue(device.versionBsk2PrdPlis, 0x25);
+    setSpinBoxValue(device.versionBsk1PrmPlis, 0x23);
+    setSpinBoxValue(device.versionBsk2PrmPlis, 0x23);
+    setSpinBoxValue(device.versionBszPlis, 0x52);
+
     setComboBoxValue(stateGlb.regime, eGB_REGIME::GB_REGIME_ENABLED);
     setSpinBoxValue(stateGlb.state, 1);
     setSpinBoxValue(stateGlb.dopByte, 1);
@@ -216,6 +226,93 @@ void Bsp::crtTreeDevice()
     setItemWidget(item, 1, device.typeOpto);
 
     top->setExpanded(true);
+
+    crtTreeDevieVersions(top);
+}
+
+void Bsp::crtTreeDevieVersions(QTreeWidgetItem *top)
+{
+    QTreeWidgetItem *branch = new QTreeWidgetItem();
+    top->addChild(branch);
+    branch->setText(0, codec->toUnicode("Версии ПО"));
+
+    QTreeWidgetItem *item = nullptr;
+
+    item                 = new QTreeWidgetItem();
+    device.versionBspMcu = new QSpinBox();
+    device.versionBspMcu->setDisplayIntegerBase(16);
+    device.versionBspMcu->setRange(0, 0xFFFF);
+    item->setText(0, codec->toUnicode("БСП МК"));
+    branch->addChild(item);
+    setItemWidget(item, 1, device.versionBspMcu);
+
+    // \todo Версия DSP в К400 состоит из 2 байт, иначе (версия плис, версия дсп)
+    item                 = new QTreeWidgetItem();
+    device.versionBspDsp = new QSpinBox();
+    device.versionBspDsp->setDisplayIntegerBase(16);
+    device.versionBspDsp->setRange(0, 0xFFFF);
+    item->setText(0, codec->toUnicode("БСП ЦСП"));
+    branch->addChild(item);
+    setItemWidget(item, 1, device.versionBspDsp);
+
+    // \todo Версия плис отдельно передается только в К400
+    item                     = new QTreeWidgetItem();
+    device.versionBspDspPlis = new QSpinBox();
+    device.versionBspDspPlis->setDisplayIntegerBase(16);
+    device.versionBspDspPlis->setRange(0, 0xFFFF);
+    item->setText(0, codec->toUnicode("ЦСП ПЛИС"));
+    branch->addChild(item);
+    setItemWidget(item, 1, device.versionBspDspPlis);
+
+    item                = new QTreeWidgetItem();
+    device.versionPiMcu = new QSpinBox();
+    device.versionPiMcu->setDisplayIntegerBase(16);
+    device.versionPiMcu->setRange(0, 0xFFFF);
+    item->setText(0, codec->toUnicode("ПИ МК"));
+    branch->addChild(item);
+    setItemWidget(item, 1, device.versionPiMcu);
+
+    item                      = new QTreeWidgetItem();
+    device.versionBsk1PrdPlis = new QSpinBox();
+    device.versionBsk1PrdPlis->setDisplayIntegerBase(16);
+    device.versionBsk1PrdPlis->setRange(0, 0xFF);
+    item->setText(0, codec->toUnicode("БСК ПРД1"));
+    branch->addChild(item);
+    setItemWidget(item, 1, device.versionBsk1PrdPlis);
+
+    item                      = new QTreeWidgetItem();
+    device.versionBsk2PrdPlis = new QSpinBox();
+    device.versionBsk2PrdPlis->setDisplayIntegerBase(16);
+    device.versionBsk2PrdPlis->setRange(0, 0xFF);
+    item->setText(0, codec->toUnicode("БСК ПРД2"));
+    branch->addChild(item);
+    setItemWidget(item, 1, device.versionBsk2PrdPlis);
+
+    item                      = new QTreeWidgetItem();
+    device.versionBsk1PrmPlis = new QSpinBox();
+    device.versionBsk1PrmPlis->setDisplayIntegerBase(16);
+    device.versionBsk1PrmPlis->setRange(0, 0xFF);
+    item->setText(0, codec->toUnicode("БСК ПРМ1"));
+    branch->addChild(item);
+    setItemWidget(item, 1, device.versionBsk1PrmPlis);
+
+    item                      = new QTreeWidgetItem();
+    device.versionBsk2PrmPlis = new QSpinBox();
+    device.versionBsk2PrmPlis->setDisplayIntegerBase(16);
+    device.versionBsk2PrmPlis->setRange(0, 0xFF);
+    item->setText(0, codec->toUnicode("БСК ПРМ2"));
+    branch->addChild(item);
+    setItemWidget(item, 1, device.versionBsk2PrmPlis);
+
+    item                  = new QTreeWidgetItem();
+    device.versionBszPlis = new QSpinBox();
+    device.versionBszPlis->setDisplayIntegerBase(16);
+    device.versionBszPlis->setRange(0, 0xFF);
+    item->setText(0, codec->toUnicode("БСЗ ПЛИС"));
+    branch->addChild(item);
+    setItemWidget(item, 1, device.versionBszPlis);
+
+    branch->setExpanded(false);
 }
 
 void Bsp::crtTreeGlb()
@@ -1814,7 +1911,7 @@ void Bsp::hdlrComDeviceNumSet(eGB_COM com, pkg_t &data)
 
 void Bsp::hdlrComGetVers(eGB_COM com, pkg_t &data)
 {
-    uint16_t        vers = 0;
+    quint16         vers = 0;
     eGB_TYPE_DEVICE typedevice;
 
     typedevice = static_cast<eGB_TYPE_DEVICE>(getComboBoxValue(device.typeDevice));
@@ -1842,31 +1939,31 @@ void Bsp::hdlrComGetVers(eGB_COM com, pkg_t &data)
     pkgTx.append(getComboBoxValue(GB_PARAM_NUM_OF_DEVICES) + 1);
     pkgTx.append(getComboBoxValue(device.typeLine));
 
-    vers = 0x0111;  // GB_IC_BSP_MCU
-    pkgTx.append(vers >> 8);
-    pkgTx.append(vers);
-    vers = 0x2002;  // GB_IC_BSP_DSP
-    pkgTx.append(vers >> 8);
-    pkgTx.append(vers);
+    vers = static_cast<quint16>(getSpinBoxValue(device.versionBspMcu));
+    pkgTx.append(static_cast<quint8>(vers >> 8));
+    pkgTx.append(static_cast<quint8>(vers));
+    vers = static_cast<quint16>(getSpinBoxValue(device.versionBspDsp));
+    pkgTx.append(static_cast<quint8>(vers >> 8));
+    pkgTx.append(static_cast<quint8>(vers));
 
     pkgTx.append(getCompatibility(typedevice));
 
-    vers = 0x33;  // GB_IC_BSK_PLIS_PRD1
-    pkgTx.append(vers);
-    vers = 0x44;  // GB_IC_BSK_PLIS_PRD2
-    pkgTx.append(vers);
-    vers = 0x55;  // GB_IC_BSK_PLIS_PRM1
-    pkgTx.append(vers);
-    vers = 0x66;  // GB_IC_BSK_PLIS_PRM2
-    pkgTx.append(vers);
-    vers = 0x77;  // GB_IC_BSZ_PLIS
-    pkgTx.append(vers);
+    vers = static_cast<quint8>(getSpinBoxValue(device.versionBsk1PrdPlis));
+    pkgTx.append(static_cast<quint8>(vers));
+    vers = static_cast<quint8>(getSpinBoxValue(device.versionBsk2PrdPlis));
+    pkgTx.append(static_cast<quint8>(vers));
+    vers = static_cast<quint8>(getSpinBoxValue(device.versionBsk1PrmPlis));
+    pkgTx.append(static_cast<quint8>(vers));
+    vers = static_cast<quint8>(getSpinBoxValue(device.versionBsk1PrmPlis));
+    pkgTx.append(static_cast<quint8>(vers));
+    vers = static_cast<quint8>(getSpinBoxValue(device.versionBszPlis));
+    pkgTx.append(static_cast<quint8>(vers));
 
     pkgTx.append(typedevice);
 
-    vers = 0x0128;  // GB_IC_PI_MCU
-    pkgTx.append(vers >> 8);
-    pkgTx.append(vers);
+    vers = static_cast<quint16>(getSpinBoxValue(device.versionPiMcu));
+    pkgTx.append(static_cast<quint8>(vers >> 8));
+    pkgTx.append(static_cast<quint8>(vers));
 
     // FIXME В случае любого кольца передается 0xAB, иначе любое другое значение
     uint8_t typeopto = getComboBoxValue(device.typeOpto);
@@ -1876,9 +1973,9 @@ void Bsp::hdlrComGetVers(eGB_COM com, pkg_t &data)
     }
     pkgTx.append(typeopto);
 
-    vers = 0x9009;  // GB_IC_BSP_DSP
-    pkgTx.append(vers >> 8);
-    pkgTx.append(vers);
+    vers = static_cast<quint16>(getSpinBoxValue(device.versionBspDspPlis));
+    pkgTx.append(static_cast<quint8>(vers >> 8));
+    pkgTx.append(static_cast<quint8>(vers));
 }
 
 //
