@@ -36,6 +36,7 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent)
     mBsp.crtTreeInterface();
     mBsp.crtTest();
     mBsp.crtTreeDef();
+    mBsp.crtTreeMeasure();
 
     mBsp.initParam();
 
@@ -76,6 +77,7 @@ void MainWindow::initViewCommands()
 
     viewCom.append(GB_COM_DEF_GET_TYPE_AC);
     viewCom.append(GB_COM_DEF_SET_TYPE_AC);
+    viewCom.append(GB_COM_GET_MEAS);
 }
 
 //

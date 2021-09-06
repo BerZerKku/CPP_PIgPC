@@ -17,12 +17,13 @@ QMap<eGB_PARAM, QVector<QSpinBox *>>  Bsp::mapSpinBox;
 QTextCodec *  Bsp::codec       = QTextCodec::codecForName("CP1251");
 const QString Bsp::kTimeFormat = "dd.MM.yyyy hh:mm:ss.zzz";
 
-Bsp::device_t Bsp::device;
-Bsp::state_t  Bsp::stateDef;
-Bsp::state_t  Bsp::stateGlb;
-Bsp::state_t  Bsp::statePrm;
-Bsp::state_t  Bsp::statePrd;
-Bsp::test_t   Bsp::test;
+Bsp::device_t  Bsp::device;
+Bsp::state_t   Bsp::stateDef;
+Bsp::state_t   Bsp::stateGlb;
+Bsp::state_t   Bsp::statePrm;
+Bsp::state_t   Bsp::statePrd;
+Bsp::test_t    Bsp::test;
+Bsp::measure_t Bsp::m_measure;
 
 QDateTime *Bsp::dt = nullptr;
 pkg_t      Bsp::pkgTx;
@@ -108,6 +109,19 @@ void Bsp::initParam()
     setComboBoxValue(GB_PARAM_COMP_RZSK, GB_COMP_RZSK_M);
 
     setComboBoxValue(GB_PARAM_DEF_ONE_SIDE, 0);
+
+    setSpinBoxValue(m_measure.R, 999);
+    setSpinBoxValue(m_measure.I, 101);
+    setSpinBoxValue(m_measure.U, 251);
+    setSpinBoxValue(m_measure.Udef1, -32);
+    setSpinBoxValue(m_measure.Udef2, 32);
+    setSpinBoxValue(m_measure.Ucf1, -16);
+    setSpinBoxValue(m_measure.Ucf2, 16);
+    setSpinBoxValue(m_measure.Un1, -7);
+    setSpinBoxValue(m_measure.Un2, 7);
+    setSpinBoxValue(m_measure.Sd, 321);
+    setSpinBoxValue(m_measure.T, 24);
+    setSpinBoxValue(m_measure.dF, 3);
 }
 
 void Bsp::initClock()
@@ -338,6 +352,131 @@ void Bsp::crtTreeInterface()
     top->setText(0, codec->toUnicode("Интерфейс"));
 
     crtSpinBox(GB_PARAM_NET_ADDRESS);
+
+    top->setExpanded(false);
+}
+
+void Bsp::crtTreeMeasure()
+{
+    QTreeWidgetItem *item   = nullptr;
+    QSpinBox *       widget = nullptr;
+
+    QTreeWidgetItem *top = new QTreeWidgetItem();
+    insertTopLevelItem(topLevelItemCount(), top);
+
+    // \todo Сделать измерения в оптике неактивными
+
+    top->setText(0, codec->toUnicode("Измерения"));
+
+    item   = new QTreeWidgetItem();
+    widget = new QSpinBox();
+    widget->setRange(0, 999);
+    widget->setToolTip(QString("[%1, %2] Ohm").arg(widget->minimum()).arg(widget->maximum()));
+    item->setText(0, codec->toUnicode("R"));
+    top->addChild(item);
+    setItemWidget(item, 1, widget);
+    m_measure.R = widget;
+
+    item   = new QTreeWidgetItem();
+    widget = new QSpinBox();
+    widget->setRange(0, 999);
+    widget->setToolTip(QString("[%1, %2] mA").arg(widget->minimum()).arg(widget->maximum()));
+    item->setText(0, codec->toUnicode("I"));
+    top->addChild(item);
+    setItemWidget(item, 1, widget);
+    m_measure.I = widget;
+
+    item   = new QTreeWidgetItem();
+    widget = new QSpinBox();
+    widget->setRange(0, 999);
+    widget->setToolTip(QString("[%1, %2] * 0.1V").arg(widget->minimum()).arg(widget->maximum()));
+    item->setText(0, codec->toUnicode("U"));
+    top->addChild(item);
+    setItemWidget(item, 1, widget);
+    m_measure.U = widget;
+
+    // \todo В К400 вместо Uз1 передается D со значениями от -64 до 64.
+
+    item   = new QTreeWidgetItem();
+    widget = new QSpinBox();
+    widget->setRange(-99, 99);
+    widget->setToolTip(QString("[%1, %2] dB").arg(widget->minimum()).arg(widget->maximum()));
+    item->setText(0, codec->toUnicode("Uз1 / D"));
+    top->addChild(item);
+    setItemWidget(item, 1, widget);
+    m_measure.Udef1 = widget;
+
+    item   = new QTreeWidgetItem();
+    widget = new QSpinBox();
+    widget->setRange(-99, 99);
+    widget->setToolTip(QString("[%1, %2] dB").arg(widget->minimum()).arg(widget->maximum()));
+    item->setText(0, codec->toUnicode("Uз2"));
+    top->addChild(item);
+    setItemWidget(item, 1, widget);
+    m_measure.Udef2 = widget;
+
+    item   = new QTreeWidgetItem();
+    widget = new QSpinBox();
+    widget->setRange(-99, 99);
+    widget->setToolTip(QString("[%1, %2] dB").arg(widget->minimum()).arg(widget->maximum()));
+    item->setText(0, codec->toUnicode("Uк1"));
+    top->addChild(item);
+    setItemWidget(item, 1, widget);
+    m_measure.Ucf1 = widget;
+
+    item   = new QTreeWidgetItem();
+    widget = new QSpinBox();
+    widget->setRange(-99, 99);
+    widget->setToolTip(QString("[%1, %2] dB").arg(widget->minimum()).arg(widget->maximum()));
+    item->setText(0, codec->toUnicode("Uк2"));
+    top->addChild(item);
+    setItemWidget(item, 1, widget);
+    m_measure.Ucf2 = widget;
+
+    item   = new QTreeWidgetItem();
+    widget = new QSpinBox();
+    widget->setRange(-99, 99);
+    widget->setToolTip(QString("[%1, %2] dB").arg(widget->minimum()).arg(widget->maximum()));
+    item->setText(0, codec->toUnicode("Uш1"));
+    top->addChild(item);
+    setItemWidget(item, 1, widget);
+    m_measure.Un1 = widget;
+
+    item   = new QTreeWidgetItem();
+    widget = new QSpinBox();
+    widget->setRange(-99, 99);
+    widget->setToolTip(QString("[%1, %2] dB").arg(widget->minimum()).arg(widget->maximum()));
+    item->setText(0, codec->toUnicode("Uш2"));
+    top->addChild(item);
+    setItemWidget(item, 1, widget);
+    m_measure.Un2 = widget;
+
+    item   = new QTreeWidgetItem();
+    widget = new QSpinBox();
+    widget->setRange(0, 360);
+    widget->setToolTip(QString("[%1, %2] deg").arg(widget->minimum()).arg(widget->maximum()));
+    item->setText(0, codec->toUnicode("Sд"));
+    top->addChild(item);
+    setItemWidget(item, 1, widget);
+    m_measure.Sd = widget;
+
+    item   = new QTreeWidgetItem();
+    widget = new QSpinBox();
+    widget->setRange(0, 100);
+    widget->setToolTip(QString("[%1, %2] deg").arg(widget->minimum()).arg(widget->maximum()));
+    item->setText(0, codec->toUnicode("T"));
+    top->addChild(item);
+    setItemWidget(item, 1, widget);
+    m_measure.T = widget;
+
+    item   = new QTreeWidgetItem();
+    widget = new QSpinBox();
+    widget->setRange(0, 100);
+    widget->setToolTip(QString("[%1, %2] Hz").arg(widget->minimum()).arg(widget->maximum()));
+    item->setText(0, codec->toUnicode("dF"));
+    top->addChild(item);
+    setItemWidget(item, 1, widget);
+    m_measure.dF = widget;
 
     top->setExpanded(false);
 }
@@ -1507,6 +1646,7 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data)
     case GB_COM_GET_VERS: hdlrComGetVers(com, data); break;
     case GB_COM_GET_DEVICE_NUM: hdlrComDeviceNumGet(com, data); break;
     case GB_COM_DEF_GET_TYPE_AC: hdlrComDefTypeAcGet(com, data); break;
+    case GB_COM_GET_MEAS: hdlrComMeasGet(com, data); break;
 
     default:
         {
@@ -1976,6 +2116,68 @@ void Bsp::hdlrComGetVers(eGB_COM com, pkg_t &data)
     vers = static_cast<quint16>(getSpinBoxValue(device.versionBspDspPlis));
     pkgTx.append(static_cast<quint8>(vers >> 8));
     pkgTx.append(static_cast<quint8>(vers));
+}
+
+void Bsp::hdlrComMeasGet(eGB_COM com, pkg_t &data)
+{
+    qint16          value = 0;
+    eGB_TYPE_DEVICE typedevice;
+
+    typedevice = static_cast<eGB_TYPE_DEVICE>(getComboBoxValue(device.typeDevice));
+
+    if (data.size() != 1)
+    {
+        qWarning() << msgSizeError.arg(com, 2, 16).arg(data.size());
+    }
+
+    // \todo Добавить передачу D в К400, вместо Uз1.
+
+    qDebug() << "MEAS RX DATA" << data;
+
+    pkgTx.append(com);
+    pkgTx.append(0);
+
+    value = getSpinBoxValue(m_measure.R);
+    pkgTx.append(static_cast<quint8>(value >> 8));
+    pkgTx.append(static_cast<quint8>(value));
+
+    value = getSpinBoxValue(m_measure.I);
+    pkgTx.append(static_cast<quint8>(value >> 8));
+    pkgTx.append(static_cast<quint8>(value));
+
+    value = getSpinBoxValue(m_measure.U);
+    pkgTx.append(static_cast<quint8>(value / 10));
+    pkgTx.append(static_cast<quint8>((value % 10) * 10));
+
+    value = getSpinBoxValue(m_measure.Udef1);
+    pkgTx.append(static_cast<quint8>(value));
+
+    value = getSpinBoxValue(m_measure.Udef2);
+    pkgTx.append(static_cast<quint8>(value));
+
+    value = getSpinBoxValue(m_measure.Ucf1);
+    pkgTx.append(static_cast<quint8>(value));
+
+    value = getSpinBoxValue(m_measure.Ucf2);
+    pkgTx.append(static_cast<quint8>(value));
+
+    value = getSpinBoxValue(m_measure.Un1);
+    pkgTx.append(static_cast<quint8>(value));
+
+    value = getSpinBoxValue(m_measure.Un2);
+    pkgTx.append(static_cast<quint8>(value));
+
+    value = getSpinBoxValue(m_measure.Sd);
+    pkgTx.append(static_cast<quint8>(value >> 8));
+    pkgTx.append(static_cast<quint8>(value));
+
+    value = getSpinBoxValue(m_measure.T);
+    pkgTx.append(static_cast<quint8>(value));
+
+    value = getSpinBoxValue(m_measure.dF);
+    pkgTx.append(static_cast<quint8>(value));
+
+    qDebug() << "MEAS TX DATA" << pkgTx;
 }
 
 //

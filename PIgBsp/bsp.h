@@ -59,6 +59,22 @@ class Bsp : public QTreeWidget
         QLineEdit *byte5;
     };
 
+    struct measure_t
+    {
+        QSpinBox *R;
+        QSpinBox *I;
+        QSpinBox *U;
+        QSpinBox *Udef1;
+        QSpinBox *Udef2;
+        QSpinBox *Ucf1;
+        QSpinBox *Ucf2;
+        QSpinBox *Un1;
+        QSpinBox *Un2;
+        QSpinBox *Sd;
+        QSpinBox *T;
+        QSpinBox *dF;
+    };
+
     static const QString kTimeFormat;
 
 public:
@@ -79,6 +95,7 @@ public:
     void crtTreeDevieVersions(QTreeWidgetItem *top);
     void crtTreeGlb();
     void crtTreeInterface();
+    void crtTreeMeasure();
     void crtTreePrd();
     void crtTreePrm();
     void crtTreeState();
@@ -112,12 +129,13 @@ public:
     static void   setSpinBoxValue(eGB_PARAM param, qint16 value, uint8_t number = 1);
     static int    setSpinBoxValue(QSpinBox *spinbox, qint16 value);
 
-    static device_t device;
-    static state_t  stateDef;
-    static state_t  stateGlb;
-    static state_t  statePrm;
-    static state_t  statePrd;
-    static test_t   test;
+    static device_t  device;
+    static state_t   stateDef;
+    static state_t   stateGlb;
+    static state_t   statePrm;
+    static state_t   statePrd;
+    static test_t    test;
+    static measure_t m_measure;
 
     /// Обработка команды.
     static void procCommand(eGB_COM com, pkg_t &data);
@@ -168,6 +186,7 @@ private:
     static void hdlrComDeviceNumGet(eGB_COM com, pkg_t &data);
     static void hdlrComDeviceNumSet(eGB_COM com, pkg_t &data);
     static void hdlrComGetVers(eGB_COM com, pkg_t &data);
+    static void hdlrComMeasGet(eGB_COM com, pkg_t &data);
     static void hdlrComNetAdrGet(eGB_COM com, pkg_t &data);
     static void hdlrComNetAdrSet(eGB_COM com, pkg_t &data);
     static void hdlrComSetControl(eGB_COM com, pkg_t &data);
