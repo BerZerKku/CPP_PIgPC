@@ -2413,6 +2413,7 @@ void clMenu::lvlControl()
         vLCDdrawBoard(lineParam_);
 
         Punkts_.clear();
+        sParam.local.clearParams();
         if (device == AVANT_R400M)
         {
             eGB_NUM_DEVICES numDevices    = sParam.def.getNumDevices();
