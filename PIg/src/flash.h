@@ -204,13 +204,12 @@ static const char fcDefFault0001[] PROGMEM      = "Нет блока БСЗ";     ///<
 static const char fcDefFault0002[] PROGMEM      = "Неиспр.верс.БСЗ";   ///<
 static const char fcDefFault0004[] PROGMEM      = "Неиспр.перекл.";    ///<
 static const char fcDefFault0008[] PROGMEM      = "Неиспр.зап. БСЗ";   ///<
+static const char fcDefFault0008rzskm[] PROGMEM = "ВЧ тракт восст.";   ///<
 static const char fcDefFault0010[] PROGMEM      = "АК-Нет ответа%s";   ///<
 static const char fcDefFault0010opto[] PROGMEM  = "Нет КС";            ///<
 static const char fcDefFault0020[] PROGMEM      = "Низкий ур. РЗ";     ///<
 static const char fcDefFault0040[] PROGMEM      = "Неиспр.уд.ДФЗ%s";   ///<
-static const char fcDefFault0040rzskm[] PROGMEM = "Прием дальний";     ///<
 static const char fcDefFault0080[] PROGMEM      = "Неиспр.уд.ВЫХ%s";   ///<
-static const char fcDefFault0080rzskm[] PROGMEM = "Автоконтроль";      ///<
 static const char fcDefFault0100[] PROGMEM      = "Неиспр.вход.ПУСК";  ///<
 static const char fcDefFault0200[] PROGMEM      = "Неиспр.вход.СТОП";  ///<
 static const char fcDefFault0400[] PROGMEM      = "Удал.без отв.%s";   ///<
@@ -223,13 +222,13 @@ static const char fcDefFault8000[] PROGMEM      = "Неиспр. ДФЗ";       ///<
 static const char fcDefFault8000rzsk[] PROGMEM  = "Удал. неисправен";  ///<
 
 // предупреждения защиты
-static const char fcDefWarning01[] PROGMEM      = "АК-Сн.запаса %s";  ///<
-static const char fcDefWarning01rzsk[] PROGMEM  = "Низкий уров. РЗ";  ///<
-static const char fcDefWarning01opto[] PROGMEM  = "Нет КС";           ///<
-static const char fcDefWarning02[] PROGMEM      = "Нет сигнала МАН";  ///<
-static const char fcDefWarning04[] PROGMEM      = "Порог по помехе";  ///<
-static const char fcDefWarning04rzskm[] PROGMEM = "Малый запас";      ///<
-static const char fcDefWarning08[] PROGMEM      = "Автоконтроль";     ///<
+static const char fcDefWarning01[] PROGMEM      = "АК-Сн.запаса %s";   ///<
+static const char fcDefWarning01rzsk[] PROGMEM  = "Низкий уров. РЗ";   ///<
+static const char fcDefWarning01opto[] PROGMEM  = "Нет КС";            ///<
+static const char fcDefWarning02[] PROGMEM      = "Нет сигнала МАН";   ///<
+static const char fcDefWarning04[] PROGMEM      = "Порог по помехе";   ///<
+static const char fcDefWarning04rzskm[] PROGMEM = "Прием РЗ в однос";  ///<
+static const char fcDefWarning08[] PROGMEM      = "Автоконтроль";      ///<
 
 // неисправности приемника
 static const char fcPrmFault0001rzsk[] PROGMEM = "Нет блока БСК";     ///<
@@ -351,6 +350,9 @@ static char fcJrnEventK400[MAX_JRN_EVENT_VALUE + 1][21] PROGMEM = {
     "Нормал. температура",   ///< 35
     "Неиспр.датчик темпер",  ///< 36
     "Исправ.датчик темпер",  ///< 37
+    "Событие - %d",          ///< 38
+    "Событие - %d",          ///< 39
+    "Событие - %d",          ///< 40
     "Событие - %d"           ///< ошибочное значение
 };
 
@@ -392,9 +394,12 @@ static char fcJrnEventRZSK[MAX_JRN_EVENT_VALUE + 1][21] PROGMEM = {
     "Восст. ур.РЗ на %s",    ///< 32
     "Изменение параметров",  ///< 33
     "Изменение дата/время",  ///< 34
-    "Событие - %d",          ///< 35
-    "Событие - %d",          ///< 36
-    "Событие - %d",          ///< 37
+    "Прием РЗ в одностор.",  ///< 35
+    "Нет РЗ в одностор.",    ///< 36
+    "ВЧ тракт восстановл.",  ///< 37
+    "Вкл. одностор. режим",  ///< 38
+    "Выкл одностор. режим",  ///< 39
+    "Сброс ВЧ тракт восст",  ///< 40
     "Событие - %d"           ///< ошибочное значение
 };
 
@@ -439,6 +444,9 @@ static char fcJrnEventR400_MSK[MAX_JRN_EVENT_VALUE + 1][21] PROGMEM = {
     "Событие - %d",          ///< 35
     "Событие - %d",          ///< 36
     "Событие - %d",          ///< 37
+    "Событие - %d",          ///< 38
+    "Событие - %d",          ///< 39
+    "Событие - %d",          ///< 40
     "Событие - %d"           ///< ошибочное значение
 };
 
@@ -483,6 +491,9 @@ static char fcJrnEventOPTO[MAX_JRN_EVENT_VALUE + 1][21] PROGMEM = {
     "Событие - %d",          ///< 35
     "Событие - %d",          ///< 36
     "Событие - %d",          ///< 37
+    "Событие - %d",          ///< 38
+    "Событие - %d",          ///< 39
+    "Событие - %d",          ///< 40
     "Событие - %d"           ///< ошибочное значение
 };
 
@@ -527,5 +538,8 @@ static char fcJrnEventOPTOring[MAX_JRN_EVENT_VALUE + 1][21] PROGMEM = {
     "Событие - %d",          ///< 35
     "Событие - %d",          ///< 36
     "Событие - %d",          ///< 37
+    "Событие - %d",          ///< 38
+    "Событие - %d",          ///< 39
+    "Событие - %d",          ///< 40
     "Событие - %d"           ///< ошибочное значение
 };

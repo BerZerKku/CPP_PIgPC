@@ -567,7 +567,8 @@ bool clMenu::setDeviceRZSK()
     sParam.def.status.faultText[0] = fcDefFault0001;
     sParam.def.status.faultText[1] = fcDefFault0002;
     sParam.def.status.faultText[2] = fcDefFault0004;
-    // 3-7
+    sParam.def.status.faultText[3] = fcDefFault0008rzskm;
+    // 4-7
     sParam.def.status.faultText[8] = fcDefFault0100;
     sParam.def.status.faultText[9] = fcDefFault0200;
     // 10 нет
@@ -580,7 +581,8 @@ bool clMenu::setDeviceRZSK()
     // заполнение массива предупреждений защиты
     sParam.def.status.warningText[0] = fcDefWarning01rzsk;
     sParam.def.status.warningText[1] = fcDefWarning02;
-    // 2-15 нет
+    sParam.def.status.warningText[2] = fcDefWarning04rzskm;
+    // 3-15 нет
 
     // ПРИЕМНИК
     // заполнение массива неисправностей приемника
@@ -1673,8 +1675,9 @@ void clMenu::lvlJournalEvent()
         {
             if (event < MAX_JRN_EVENT_VALUE)
             {
-                uint8_t dev                            = (uint8_t) sParam.jrnEntry.getDeviceJrn();
-                char    tmp[SIZE_OF(fcDevicesK400[0])] = "";
+                uint8_t dev = (uint8_t) sParam.jrnEntry.getDeviceJrn();
+
+                char tmp[SIZE_OF(fcDevicesK400[0])] = "";
                 strncpy_P(tmp, fcDevicesK400[dev], SIZE_OF(tmp) - 1);
                 snprintf_P(&vLCDbuf[poz], 21, fcJrnEventRZSK[event], tmp);
             }
