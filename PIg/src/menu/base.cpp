@@ -1,10 +1,10 @@
-#include "base.hpp"
-#include "src/avr.h"
-#include "src/drivers/ks0108.h"
-#include "src/protocols/standart/protocolBspS.h"
-#include "src/protocols/standart/protocolPcS.h"
-#include "src/protocols/modbus/protocolPcM.h"
-#include "src/protocols/iec101/protocolPcI.h"
+#include "base.h"
+#include "avr.h"
+#include "drivers/ks0108.h"
+#include "protocols/iec101/protocolPcI.h"
+#include "protocols/modbus/protocolPcM.h"
+#include "protocols/standart/protocolBspS.h"
+#include "protocols/standart/protocolPcS.h"
 
 /// Время работы одного цикла (зависит от настройки таймеров), мс
 #define TIME_CYLCE 100
@@ -39,66 +39,79 @@ static void checkInterface();
 static void checkNetAddress();
 static void setProtocol(TProtocol::PROTOCOL protocol, uint16_t baud);
 
-void bspRead() {
+void bspRead()
+{
     // кол-во неполученных сообщений с БСП
     static uint8_t cntLostCom = MAX_LOST_COM_FROM_BSP;
 
-    if (cntLostCom < MAX_LOST_COM_FROM_BSP) {
+    if (cntLostCom < MAX_LOST_COM_FROM_BSP)
+    {
         cntLostCom++;
     }
 
     // перед приемом проверим статус на залипание
     protBSPs.checkStat();
     // Проверка наличия сообщения с БСП и ее обработка
-    if (protBSPs.getCurrentStatus() == PRTS_STATUS_READ_OK) {
+    if (protBSPs.getCurrentStatus() == PRTS_STATUS_READ_OK)
+    {
         // проверка контрольной суммы полученного сообщения и
         // обработка данных если она соответствует полученной
-        if (protBSPs.checkReadData()) {
+        if (protBSPs.checkReadData())
+        {
             // обработка принятого сообщения
             protBSPs.getData(lastPcCom == protBSPs.getCurrentCom());
 
             // проверка соответствия команды запрошенной с ПК и команды
             // полученной от БСП и если совпадают пересылка сообщения на ПК
             // для команды GB_COM_GET_VERS происходит добавление версии БСП-ПИ
-            if (lastPcCom == protBSPs.getCurrentCom()) {
-                if (protPCs.isEnable()) {
+            if (lastPcCom == protBSPs.getCurrentCom())
+            {
+                if (protPCs.isEnable())
+                {
                     if (protPCs.copyCommandFrom(protBSPs.buf))
-                        protPCs.modifyCommand();
+                        protPCs.update();
                 }
             }
         }
-        lastPcCom = 0;
+        lastPcCom  = 0;
         cntLostCom = 0;
     }
 
-    menu.sParam.connectionBsp = (cntLostCom < MAX_LOST_COM_FROM_BSP);
+    menu.sParam.connectionBsp = cntLostCom < MAX_LOST_COM_FROM_BSP;
 }
 
-void pcRead() {
+void pcRead()
+{
     // кол-во неполученных сообщений с БСП
     static uint8_t cntLostCom = MAX_LOST_COM_FROM_PC;
 
-    if (cntLostCom < MAX_LOST_COM_FROM_PC) {
+    if (cntLostCom < MAX_LOST_COM_FROM_PC)
+    {
         cntLostCom++;
     }
 
-    if (protPCs.isEnable()) {
+    if (protPCs.isEnable())
+    {
         // перед приемом проверим статус на залипание
         protPCs.checkStat();
         // проверка наличия команды с ПК и ее обработка
-        if (protPCs.getCurrentStatus() == PRTS_STATUS_READ_OK) {
+        if (protPCs.getCurrentStatus() == PRTS_STATUS_READ_OK)
+        {
             // проверка контрольной суммы полученного сообщения и
             // обработка данных если она соответствует полученной
-            if (protPCs.checkReadData()) {
+            if (protPCs.checkReadData())
+            {
                 // обработка принятого сообщения
                 // если сообщение небыло обработано, перешлем его в БСП
                 // (т.е. если это не запрос/изменение пароля)
-                if (!protPCs.getData()) {
+                if (!protPCs.getData())
+                {
                     // сохранение запрашиваемой ПК команды
                     lastPcCom = protPCs.getCurrentCom();
 
                     // пересылка сообщения в БСП
-                    if (protBSPs.getCurrentStatus() == PRTS_STATUS_NO) {
+                    if (protBSPs.getCurrentStatus() == PRTS_STATUS_NO)
+                    {
                         protBSPs.copyCommandFrom(protPCs.buf);
                         protPCs.setCurrentStatus(PRTS_STATUS_WAIT_ANSWER);
                     }
@@ -106,37 +119,52 @@ void pcRead() {
             }
             cntLostCom = 0;
         }
-    } else if (protPCm.isEnable()) {
-        if (protPCm.isReadData()) {
+    }
+    else if (protPCm.isEnable())
+    {
+        if (protPCm.isReadData())
+        {
             protPCm.readData();
         }
-    } else if (protPCi.isEnable()) {
-        if (protPCi.isReadData()) {
+    }
+    else if (protPCi.isEnable())
+    {
+        if (protPCi.isReadData())
+        {
             protPCi.readData();
         }
     }
 
-    menu.sParam.connectionPc = (cntLostCom < MAX_LOST_COM_FROM_PC);
+    menu.sParam.connectionPc = cntLostCom < MAX_LOST_COM_FROM_PC;
 }
 
-uint8_t pcWrite() {
+uint8_t pcWrite()
+{
     uint8_t num = 0;
-    if (protPCs.isEnable()) {
+    if (protPCs.isEnable())
+    {
         // Перед передачей проверим статус протокола на залипание.
         protPCs.checkStat();
         // проверка необходимости передачи команды на ПК и ее отправка
         ePRTS_STATUS stat = protPCs.getCurrentStatus();
-        if (stat == PRTS_STATUS_WRITE_PC) {
+        if (stat == PRTS_STATUS_WRITE_PC)
+        {
             // пересылка ответа БСП
             num = protPCs.trCom();
-        } else if (stat == PRTS_STATUS_WRITE) {
+        }
+        else if (stat == PRTS_STATUS_WRITE)
+        {
             // отправка ответа ПИ
             num = protPCs.trCom();
         }
-    } else if (protPCm.isEnable()) {
+    }
+    else if (protPCm.isEnable())
+    {
         num = protPCm.sendData();
-    } else if (protPCi.isEnable()) {
-        num =protPCi.sendData();
+    }
+    else if (protPCi.isEnable())
+    {
+        num = protPCi.sendData();
     }
 
     return num;
@@ -151,14 +179,18 @@ uint8_t bspWrite()
     // проверим нет ли необходимости передачи команды с ПК
     // если нет, то возьмем команду с МЕНЮ
     ePRTS_STATUS stat = protBSPs.getCurrentStatus();
-    if (stat == PRTS_STATUS_WRITE_PC) {
+    if (stat == PRTS_STATUS_WRITE_PC)
+    {
         // пересылка запроса ПК
         num = protBSPs.trCom();
-    } else if (stat == PRTS_STATUS_NO) {
+    }
+    else if (stat == PRTS_STATUS_NO)
+    {
         // отправка запроса БСП
         eGB_COM com = menu.getTxCommand();
         // если есть команда, отправляем ее в БСП
-        if (com != GB_COM_NO) {
+        if (com != GB_COM_NO)
+        {
             num = protBSPs.sendData(com);
         }
     }
@@ -166,147 +198,185 @@ uint8_t bspWrite()
     return num;
 }
 
-void checkInterface() {
-    bool changed = false;
-    TInterface::INTERFACE intf = menu.sParam.Uart.Interface.get();
+void checkInterface()
+{
+    bool                  changed = false;
+    TInterface::INTERFACE intf    = menu.sParam.Uart.Interface.get();
 
-    if (menu.sParam.Uart.Interface.isChanged()) {
+    if (menu.sParam.Uart.Interface.isChanged())
+    {
         changed = true;
     }
 
-//    if (intf != TInterface::USB) {
-//        changed |= menu.sParam.Uart.Protocol.isChanged();
-//        changed |= menu.sParam.Uart.BaudRate.isChanged();
-//        changed |= menu.sParam.Uart.DataBits.isChanged();
-//        changed |= menu.sParam.Uart.Parity.isChanged();
-//        changed |= menu.sParam.Uart.StopBits.isChanged();
-//    }
+    if (intf != TInterface::USB)
+    {
+        changed |= menu.sParam.Uart.Protocol.isChanged();
+        changed |= menu.sParam.Uart.BaudRate.isChanged();
+        changed |= menu.sParam.Uart.DataBits.isChanged();
+        changed |= menu.sParam.Uart.Parity.isChanged();
+        changed |= menu.sParam.Uart.StopBits.isChanged();
+    }
 
-    if (changed) {
-//        if (intf == TInterface::USB) {
+    if (changed)
+    {
+        if (intf == TInterface::USB)
+        {
             setupUart(intf, 19200, TDataBits::_8, TParity::NONE, TStopBits::TWO);
             setProtocol(TProtocol::STANDART, 19200);
-//        } else {
-//            TProtocol::PROTOCOL protocol = menu.sParam.Uart.Protocol.get();
-//            uint16_t baudrate = menu.sParam.Uart.BaudRate.getValue();
-//            TDataBits::DATA_BITS dbits = menu.sParam.Uart.DataBits.get();
-//            TParity::PARITY parity = menu.sParam.Uart.Parity.get();
-//            TStopBits::STOP_BITS sbits = menu.sParam.Uart.StopBits.get();
+        }
+        else
+        {
+            TProtocol::PROTOCOL  protocol = menu.sParam.Uart.Protocol.get();
+            uint16_t             baudrate = menu.sParam.Uart.BaudRate.getValue();
+            TDataBits::DATA_BITS dbits    = menu.sParam.Uart.DataBits.get();
+            TParity::PARITY      parity   = menu.sParam.Uart.Parity.get();
+            TStopBits::STOP_BITS sbits    = menu.sParam.Uart.StopBits.get();
 
-//            setupUart(intf, baudrate, dbits, parity, sbits);
-//            setProtocol(protocol, baudrate);
-//        }
+            setupUart(intf, baudrate, dbits, parity, sbits);
+            setProtocol(protocol, baudrate);
+        }
     }
 }
 
-void checkNetAddress() {
-    if (menu.sParam.Uart.NetAddress.isChanged()) {
+void checkNetAddress()
+{
+    if (menu.sParam.Uart.NetAddress.isChanged())
+    {
         uint8_t nadr = menu.sParam.Uart.NetAddress.get();
-        if (protPCm.getAddressLan() != nadr) {
+        if (protPCm.getAddressLan() != nadr)
+        {
             protPCm.setAddressLan(nadr);
         }
-        if (protPCi.getAddressLan() != nadr) {
+        if (protPCi.getAddressLan() != nadr)
+        {
             protPCi.setAddressLan(nadr);
         }
     }
 }
 
-void setProtocol(TProtocol::PROTOCOL protocol, uint16_t baud) {
+void setProtocol(TProtocol::PROTOCOL protocol, uint16_t baud)
+{
     protPCs.setDisable();
     protPCi.setDisable();
     protPCm.setDisable();
 
-    switch(protocol) {
-        case TProtocol::STANDART:
-            protPCs.setEnable(PRTS_STATUS_NO);
-            menu.sParam.jrnScada.setIdle();
-            break;
-        case TProtocol::MODBUS:
-            protPCm.setTick(baud, 50);
-            protPCm.setEnable();
-            menu.sParam.jrnScada.setIdle();
-            break;
-        case TProtocol::IEC_101:
-            protPCi.setTick(baud, 50);
-            protPCi.setEnable();
-            menu.sParam.jrnScada.setReadyToRead();
-            break;
-        case TProtocol::MAX: break;
+    switch (protocol)
+    {
+    case TProtocol::STANDART:
+        protPCs.setEnable(PRTS_STATUS_NO);
+        menu.sParam.jrnScada.setIdle();
+        break;
+    case TProtocol::MODBUS:
+        protPCm.setTick(baud, 50);
+        protPCm.setEnable();
+        menu.sParam.jrnScada.setIdle();
+        break;
+    case TProtocol::IEC_101:
+        protPCi.setTick(baud, 50);
+        protPCi.setEnable();
+        menu.sParam.jrnScada.setReadyToRead();
+        break;
+    case TProtocol::MAX: break;
     }
 }
 
-void mainInit() {
+void mainInit()
+{
     protBSPs.setEnable(PRTS_STATUS_NO);
 
-//    setupUart(TInterface::BVP, 19200, TDataBits::_8, TParity::NONE, TStopBits::TWO);
-//    setProtocol(TProtocol::STANDART, 19200);
+    //    setupUart(TInterface::BVP, 19200, TDataBits::_8, TParity::NONE, TStopBits::TWO);
+    //    setProtocol(TProtocol::STANDART, 19200);
 
     vLCDinit();
     vLCDclear();
 }
 
-void mainCycle(void) {
+void mainCycle(void)
+{
     static uint8_t cnt_lcd = 0;
-    static uint8_t cnt_1s = 0;
+    static uint8_t cnt_1s  = 0;
 
     checkInterface();
-//    checkNetAddress();
+    checkNetAddress();
 
-    if (++cnt_1s >= 10) {
+    if (++cnt_1s >= 10)
+    {
         cnt_1s = 0;
     }
 
-    if (++cnt_lcd >= (MENU_TIME_CYLCE / TIME_CYLCE)) {
+    if (++cnt_lcd >= (MENU_TIME_CYLCE / TIME_CYLCE))
+    {
         cnt_lcd = 0;
         menu.proc();
     }
 }
 
 /// Прерывание по окончанию передачи данных UART1
-void pcTxEnd() {
-    if (protPCs.isEnable()) {
+void pcTxEnd()
+{
+    if (protPCs.isEnable())
+    {
         protPCs.setCurrentStatus(PRTS_STATUS_NO);
-    } else if (protPCm.isEnable()) {
+    }
+    else if (protPCm.isEnable())
+    {
         protPCm.setReadState();
-    } else if (protPCi.isEnable()) {
+    }
+    else if (protPCi.isEnable())
+    {
         protPCi.setReadState();
     }
 }
 
-
-void pcPushByteFrom(uint8_t byte, bool error) {
-    if (error) {
+void pcPushByteFrom(uint8_t byte, bool error)
+{
+    if (error)
+    {
         protPCs.setCurrentStatus(PRTS_STATUS_NO);
-    } else {
-        if (protPCs.isEnable()) {
+    }
+    else
+    {
+        if (protPCs.isEnable())
+        {
             protPCs.checkByte(byte);
-        } else if (protPCm.isEnable()) {
+        }
+        else if (protPCm.isEnable())
+        {
             // протокол MODBUS
             protPCm.push(byte);
-        } else if (protPCi.isEnable()) {
+        }
+        else if (protPCi.isEnable())
+        {
             protPCi.push(byte);
         }
     }
 }
 
-void bspTxEnd() {
+void bspTxEnd()
+{
     protBSPs.setCurrentStatus(PRTS_STATUS_NO);
 }
 
-void bspPushByteFrom(uint8_t byte, bool error) {
-    if (error) {
+void bspPushByteFrom(uint8_t byte, bool error)
+{
+    if (error)
+    {
         protBSPs.setCurrentStatus(PRTS_STATUS_NO);
-    } else {
+    }
+    else
+    {
         protBSPs.checkByte(byte);
     }
 }
 
-void timer50us() {
-    if (protPCm.isEnable()) {
+void timer50us()
+{
+    if (protPCm.isEnable())
+    {
         protPCm.tick();
-    } else if (protPCi.isEnable()) {
+    }
+    else if (protPCi.isEnable())
+    {
         protPCi.tick();
     }
 }
-
-

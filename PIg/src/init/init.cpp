@@ -5,17 +5,19 @@
  *      Author: Хозяин
  */
 
-#include "src/avr.h"
-#include "src/debug/debug.hpp"
+#include "avr.h"
+#include "debug/debug.hpp"
 
-void low_level_init() __attribute__((__naked__)) __attribute__((section(".init3")));
+void
+low_level_init() __attribute__((__naked__)) __attribute__((section(".init3")));
 
 /**	Инициализация периферии
  * 	Неиспользуемые порты по умолчанию настроены на вход с подтяжкой к +
  * 	@param Нет
  * 	@return Нет
  */
-void low_level_init()
+void
+low_level_init()
 {
 	// Включение подтяжки
 	SFIOR &= ~(1 << PUD);

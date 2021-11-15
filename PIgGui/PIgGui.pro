@@ -17,7 +17,7 @@ CONFIG(release, debug|release) {
     message(===Release===)
 
     DEFINES += \
-	    NDEBUG
+        NDEBUG
 }
 
 # The following define makes your compiler emit warnings if you use
@@ -32,7 +32,20 @@ DEFINES += \
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-INCLUDEPATH +=
+VPATH
+
+INCLUDEPATH += \
+    $$system(pwd)
+
+HEADERS += \
+    mainwindow.h \
+    qkeyboard.h \
+    serial.h \
+    serial/serialport.h \
+    widget/combobox.h \
+    widget/qledindicator.h \
+    widget/qpush1.h \
+    wrapper.h
 
 SOURCES += \
     main.cpp \
@@ -43,17 +56,7 @@ SOURCES += \
     widget/combobox.cpp \
     widget/qledindicator.cpp \
     widget/qpush1.cpp \
-    wrapper.cpp
-
-HEADERS += \
-    mainwindow.h \
-    qkeyboard.h \
-    serial.h \
-    serial/serialport.h \
-    widget/combobox.h \
-    widget/qledindicator.h \
-    widget/qpush1.h \
-    wrapper.hpp
+    wrapperGui.cpp
 
 FORMS += \
     mainwindow.ui \

@@ -9,15 +9,14 @@ CONFIG += c++11
 CONFIG(debug, debug|release) {
     message(===Debug===)
 
-#    DEFINES += \
-#        QT_MESSAGELOGCONTEXT
 }
 
 CONFIG(release, debug|release) {
     message(===Release===)
 
     DEFINES += \
-        NDEBUG
+        NDEBUG \
+#        QT_MESSAGELOGCONTEXT
 }
 
 # The following define makes your compiler emit warnings if you use
@@ -53,7 +52,7 @@ HEADERS += \
     widget/combobox.h \
     widget/qledindicator.h \
     widget/qpush1.h \
-    wrapper.hpp
+    wrapper.h
 
 FORMS += \
     mainwindow.ui \

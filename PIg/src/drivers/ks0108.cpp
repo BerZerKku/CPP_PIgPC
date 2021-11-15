@@ -1,32 +1,13 @@
 #include <math.h>
+#include <util/delay.h>
 #include <stdio.h>
 #include "ks0108.h"
-#include "src/glbDefine.h"
-#include "src/drivers/symbols.h"
+#include "symbols.h"
 
-#define PORT_RST PORTC
-#define PIN_RST (1 << 5)
-#define PORT_CS PORTC
-#define PIN_CS2 (1 << 6)
-#define PIN_CS1 (1 << 7)
-#define PIN_CS (PIN_CS1 | PIN_CS2)
-
-#define PORT_E PORTF
-#define PIN_E (1 << 3)
-#define PORT_RW PORTF
-#define PIN_RW (1 << 2)
-#define PORT_RS PORTF
-#define PIN_RS (1 << 1)
-
-// Управление подсветкой, 0 - выкл
-#define PORT_LED PORTD
-#define PIN_LED	(1 << PD5)
-
-static bool vLCDcheckBusy(void);
-static void vLCDsetXY(uint8_t x, uint8_t y);
-static void vLCDcom(uint8_t com, uint8_t cs);
-static void vLCDdata(uint8_t data, uint8_t cs);
-static void vLCDdrawSymb(uint16_t poz, uint8_t val);
+bool vLCDcheckBusy	(void);
+void vLCDsetXY		(uint8_t x, uint8_t y);
+void vLCDcom		(uint8_t com, uint8_t cs);
+void vLCDdata		(uint8_t data, uint8_t cs);
 
 /// буфер инф-ии выводимой на ЖКИ
 static uint8_t uBuf[1024];
@@ -36,8 +17,11 @@ static uint16_t uCnt = 0;
 static uint16_t uLedTimeOn = LCD_TIME_LED_ON;
 /// состояние подсветки
 static eLCD_LED eLed = LED_OFF;
+
 /// обновление информации
 static volatile bool bRefresh = false;
+
+static void vLCDdrawSymb(uint16_t poz, uint8_t val);
 
 /**	Проверка флага занятости ЖКИ
  * 	@param Нет

@@ -5,8 +5,9 @@
  *      Author: Shcheblykin
  */
 
+#include <avr/io.h>
+#include <util/delay.h>
 #include "tmp75.h"
-#include "src/glbDefine.h"
 
 // Конструктор
 TTmp75::TTmp75(uint8_t adr) {

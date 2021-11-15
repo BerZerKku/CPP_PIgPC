@@ -4,6 +4,9 @@
  *  Created on: 22.05.2012
  *      Author: Shcheblykin
  */
+#include <avr/io.h>
+#include <avr/interrupt.h>
+#include <stdlib.h>
 #include "uart.h"
 
 // конструктор

@@ -8,10 +8,11 @@
 #ifndef KEYBOARD_H_
 #define KEYBOARD_H_
 
-#include "src/glbDefine.h"
-#include "src/drivers/kbdLayout.h"
+#include "drivers/kbdLayout.h"
+#include "glbDefine.h"
 
-void vKEYmain	(void);
-uint8_t eKEYget	(void);
+void    vKEYmain(void);
+uint8_t eKEYget(void);
+uint8_t timePressKey();
 
 #endif /* KEYBOARD_H_ */

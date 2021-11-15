@@ -11,8 +11,8 @@
 #if defined(AVR)
 
 #include <avr/eeprom.h>
-#include <avr/io.h>
 #include <avr/interrupt.h>
+#include <avr/io.h>
 #include <avr/pgmspace.h>
 #include <avr/wdt.h>
 #include <util/delay.h>
@@ -26,21 +26,23 @@
 #else
 
 #include <climits>
-#include <cstdint>
 #include <cstddef>
+#include <cstdint>
+#include <cstring>
 
 #if defined(QT_CORE_LIB) && !defined(MY_TESTS)
-#include "wrapper.hpp"
+#include "wrapper.h"
 #endif
 
 #define PGM_P const char *
 #define PSTR
 #define PROGMEM
-#define snprintf_P snprintf
-#define pgm_read_byte *(uint8_t *)
-#define pgm_read_word *(uint16_t *)
-#define pgm_read_ptr(x) *(x)
-#define prog_uint8_t uint8_t
+#define prog_uint8_t     uint8_t
+#define pgm_read_ptr(x)  (*(x))
+#define pgm_read_byte(x) (*(uint8_t *) (x))
+#define pgm_read_word(x) (*(uint16_t *) (x))
+#define strncpy_P(...)   strncpy(__VA_ARGS__)
+#define snprintf_P(...)  snprintf(__VA_ARGS__)
 
 #endif
 

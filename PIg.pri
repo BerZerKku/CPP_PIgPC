@@ -2,7 +2,7 @@ PIG_PATH = $$system(pwd)/PIg
 
 INCLUDEPATH += \
     $$system(pwd) \
-	$${PIG_PATH}
+    $${PIG_PATH}/src
 
 HEADERS += \
     $${PIG_PATH}/src/avr.h \
@@ -15,15 +15,17 @@ HEADERS += \
     $${PIG_PATH}/src/flash.h \
     $${PIG_PATH}/src/flashParams.h \
     $${PIG_PATH}/src/glbDefine.h \
-    $${PIG_PATH}/src/menu/base.hpp \
-    $${PIG_PATH}/src/menu/dateTime.hpp \
-    $${PIG_PATH}/src/menu/deviceStatus.hpp \
+    $${PIG_PATH}/src/menu/base.h \
+    $${PIG_PATH}/src/menu/control.h \
+    $${PIG_PATH}/src/menu/dateTime.h \
+#    $${PIG_PATH}/src/menu/deviceStatus.h \
     $${PIG_PATH}/src/menu/enterParam.h \
-    $${PIG_PATH}/src/menu/journalEntry.hpp \
-    $${PIG_PATH}/src/menu/jrnScada.hpp \
+#    $${PIG_PATH}/src/menu/journalEntry.h \
+#    $${PIG_PATH}/src/menu/jrnScada.h \
     $${PIG_PATH}/src/menu/menu.h \
     $${PIG_PATH}/src/menu/menuPunkt.h \
-    $${PIG_PATH}/src/menu/txCom.hpp \
+    $${PIG_PATH}/src/menu/test.h \
+    $${PIG_PATH}/src/menu/txCom.h \
     $${PIG_PATH}/src/paramBsp.h \
     $${PIG_PATH}/src/paramDef.h \
     $${PIG_PATH}/src/paramGlb.h \
@@ -42,13 +44,16 @@ HEADERS += \
 
 SOURCES += \
     $${PIG_PATH}/src/drivers/kbdLayout.cpp \
-    $${PIG_PATH}/src/flashParam.cpp \
+    $${PIG_PATH}/src/flashParams.cpp \
+    $${PIG_PATH}/src/debug/debug.cpp \
     $${PIG_PATH}/src/menu/base.cpp \
+    $${PIG_PATH}/src/menu/control.cpp \
     $${PIG_PATH}/src/menu/dateTime.cpp \
     $${PIG_PATH}/src/menu/enterParam.cpp \
     $${PIG_PATH}/src/menu/menu.cpp \
+    $${PIG_PATH}/src/menu/test.cpp \
     $${PIG_PATH}/src/menu/txCom.cpp \
-    $${PIG_PATH}/src/paramGlb.cpp \
+#    $${PIG_PATH}/src/paramGlb.cpp \
     $${PIG_PATH}/src/parameter/LocalParams.cpp \
     $${PIG_PATH}/src/parameter/param.cpp \
     $${PIG_PATH}/src/protocols/iec101/CIec101.cpp \

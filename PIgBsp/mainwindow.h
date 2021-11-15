@@ -24,9 +24,7 @@ signals:
     void writeByte(int value);
 
 private:
-    Bsp glb;
-    Bsp oth;
-    Bsp jrn;
+    Bsp mBsp;
     QVector<eGB_COM> viewCom;
 
     QComboBox *cmbPort;

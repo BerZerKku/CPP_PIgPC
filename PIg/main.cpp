@@ -6,23 +6,40 @@
  */
 #include <stdlib.h>
 #include <stdio.h>
-#include "src/glbDefine.h"
-#include "src/drivers/keyboard.h"
-#include "src/drivers/ks0108.h"
-#include "src/drivers/tmp75.h"
-#include "src/drivers/uart.h"
-#include "src/menu/base.hpp"
-#include "src/menu/menu.h"
-#include "src/protocols/standart/protocolPcS.h"
-#include "src/protocols/standart/protocolBspS.h"
-#include "src/protocols/modbus/protocolPcM.h"
-#include "src/protocols/iec101/protocolPcI.h"
+#include "glbDefine.h"
+#include "drivers/keyboard.h"
+#include "drivers/ks0108.h"
+#include "drivers/tmp75.h"
+#include "drivers/uart.h"
+#include "menu/base.h"
+#include "menu/menu.h"
+#include "protocols/standart/protocolPcS.h"
+#include "protocols/standart/protocolBspS.h"
+#include "protocols/modbus/protocolPcM.h"
+#include "protocols/iec101/protocolPcI.h"
 
 /// Время работы одного цикла (зависит от настройки таймеров), мс
 #define TIME_CYLCE 100
 
 /// адрес датчика температуры
 #define TEMP_IC_ADR 0x48
+
+/// адрес пароля пользователя
+#define EEPROM_START_ADDRESS 0x10
+
+/// Структура параметров хранящихся в EEPROM
+struct sEeprom {
+	uint16_t 				password;	/// Пароль.
+	TInterface::INTERFACE 	interface;	/// Интерфейс.
+	TProtocol::PROTOCOL		protocol;	/// Протокол.
+	TBaudRate::BAUD_RATE 	baudRate;	/// Скорость.
+	TDataBits::DATA_BITS 	dataBits;	/// Кол-во бит данных.
+	TParity::PARITY 	 	parity;		/// Четность.
+	TStopBits::STOP_BITS 	stopBits;	/// Кол-во стоп-бит.
+};
+
+// параметры хранимые в ЕЕПРОМ
+static sEeprom eeprom;
 
 /// Флаг, устанавливается каждые 100мс
 static volatile bool b100ms = false;
@@ -61,6 +78,19 @@ main(void) {
 	uartBSP.open(4800, TDataBits::_8, TParity::NONE, TStopBits::TWO);
 
 	mainInit();
+
+	// установка настроек пользователя, считанных из ЕЕПРОМ
+	// проводится до включения прерываний, чтобы ничего не мешало
+	eeprom_read_block(&eeprom, (sEeprom*) EEPROM_START_ADDRESS, sizeof(eeprom));
+	EEAR = 0;	// сброс адреса ЕЕПРОМ в 0, для защиты данных
+	menu.sParam.password.init(eeprom.password);
+	menu.sParam.Uart.Interface.set(eeprom.interface);
+	menu.sParam.Uart.Protocol.set(eeprom.protocol);
+	menu.sParam.Uart.BaudRate.set(eeprom.baudRate);
+	menu.sParam.Uart.DataBits.set(eeprom.dataBits);
+	menu.sParam.Uart.Parity.set(eeprom.parity);
+	menu.sParam.Uart.StopBits.set(eeprom.stopBits);
+
 	sei();
 
 	while (1) {
@@ -74,6 +104,17 @@ main(void) {
 
 			uartPC.trData(pcWrite());
 			uartBSP.trData(bspWrite());
+
+			// TODO переделать работу с EEPROM!
+			eeprom.password = menu.sParam.password.get();
+			eeprom.interface = menu.sParam.Uart.Interface.get();
+			eeprom.protocol = menu.sParam.Uart.Protocol.get();
+			eeprom.baudRate = menu.sParam.Uart.BaudRate.get();
+			eeprom.dataBits = menu.sParam.Uart.DataBits.get();
+			eeprom.parity = menu.sParam.Uart.Parity.get();
+			eeprom.stopBits = menu.sParam.Uart.StopBits.get();
+			eeprom_update_block(&eeprom, (sEeprom*) EEPROM_START_ADDRESS,
+					sizeof(eeprom));
 
 			wdt_reset();
 
