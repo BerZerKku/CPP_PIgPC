@@ -1972,8 +1972,8 @@ void clMenu::lvlJournalPrm()
             snprintf_P(&vLCDbuf[poz], 21, fcJrnNumEntries, cur_entry, num_entries);
         }
     }
-    poz += 20;
 
+    poz += 20;
     if (num_entries == 0)
     {
         // вывод сообщения об отсутствии записей в журнале
@@ -2031,7 +2031,13 @@ void clMenu::lvlJournalPrm()
         }
         else
         {
-            snprintf_P(&vLCDbuf[poz], 21, fcNumComJrn, com);
+            uint8_t t = snprintf_P(&vLCDbuf[poz], 21, fcNumComJrn, com);
+
+            if (device == AVANT_K400)
+            {
+                uint8_t s = sParam.jrnEntry.getSourceCom();
+                snprintf_P(&vLCDbuf[poz + t + 1], 5, fcJrnSourcePrd[s]);
+            }
         }
 
         poz += 20;
