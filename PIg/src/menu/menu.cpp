@@ -612,10 +612,7 @@ bool clMenu::setDeviceRZSK()
     // 12-15 нет
 
     // заполнение массива предупреждений передатчика
-    // 0 нет
-    sParam.prd.status.warningText[1] = fcPrdWarning02k400;
-    sParam.prd.status.warningText[2] = fcPrdWarning04k400;
-    // 3-15 нет
+    // 0-15 нет
 
     return true;
 }
