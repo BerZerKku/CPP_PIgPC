@@ -1182,7 +1182,15 @@ void clMenu::lvlStart()
             if (comp != GB_COMP_R400M_AVANT)
             {
                 uint8_t len = snprintf_P(&vLCDbuf[poz], 21, PSTR("Совместим. "));
-                snprintf_P(&vLCDbuf[poz + len], 21 - len, fcCompatibility[comp]);
+
+                if (comp < GB_COMP_R400M_MAX)
+                {
+                    snprintf_P(&vLCDbuf[poz + len], 21 - len, fcCompatibility[comp]);
+                }
+                else
+                {
+                    snprintf_P(&vLCDbuf[poz + len], 21 - len, PSTR("ошибка"));
+                }
             }
 
             printAc(poz + 20);
