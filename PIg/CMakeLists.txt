@@ -9,7 +9,7 @@
 # Matthias Kleemann
 ##########################################################################
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.0)
 
 ### TOOLCHAIN SETUP AREA #################################################
 # Set any variables used in the toolchain prior project() call. In that
@@ -39,6 +39,8 @@ include(avr/generic-gcc-avr.cmake)
 # name your project
 ##########################################################################
 project(PIg)
+set(PROJECT_VERSION_MAJOR 0x01)
+set(PROJECT_VERSION_MINOR 0x52)
 
 ##########################################################################
 # status messages
@@ -50,6 +52,8 @@ message(STATUS "Current uploadtool options are: ${AVR_UPLOADTOOL_OPTIONS}")
 message(STATUS "Current MCU is set to: ${AVR_MCU}")
 message(STATUS "Current H_FUSE is set to: ${AVR_H_FUSE}")
 message(STATUS "Current L_FUSE is set to: ${AVR_L_FUSE}")
+
+configure_file(version.hpp.in ../src/version.hpp)
 
 ##########################################################################
 # set build type

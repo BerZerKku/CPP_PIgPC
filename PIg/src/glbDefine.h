@@ -23,9 +23,6 @@
 /// размер массива
 #define SIZE_OF(mas) (sizeof(mas) / sizeof(mas[0]))
 
-/// версия текущей прошивки
-#define VERS 0x0151
-
 /// максимально кол-во команд на прием (должно быть кратно 8)
 #define MAX_NUM_COM_PRM 32
 
@@ -36,7 +33,8 @@
 #define MAX_NUM_COM_RING 96
 
 /// преобразование двух CHAR в INT
-#define TO_INT16(high, low) (((uint16_t) (high) << 8) + (low))
+#define TO_INT16(high, low)  (((uint16_t) (high) << 8) + (low))
+#define TO_UINT16(high, low) ((static_cast<uint16_t>(high) << 8) + (low))
 
 /// преобразование двоично-десятичного числа в целое
 #define BCD_TO_BIN(val) ((val >> 4) * 10 + (val & 0x0F))

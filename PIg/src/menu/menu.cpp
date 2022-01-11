@@ -11,6 +11,7 @@
 #include "flash.h"
 #include "menu.h"
 #include "txCom.h"
+#include "version.hpp"
 
 /// режим подсветки по умолчанию
 #define LED_REGIME LED_SWITCH
@@ -114,6 +115,9 @@ clMenu::clMenu()
     // установка режима работы подсветки
     vLCDsetLed(LED_REGIME);
 #endif
+
+    uint16_t version = TO_UINT16(PROJECT_VER_MAJOR, PROJECT_VER_MINOR);
+    sParam.glb.setVersProgIC16(version, GB_IC_PI_MCU);
 }
 
 void clMenu::proc(void)
@@ -452,8 +456,6 @@ bool clMenu::setDeviceK400()
  */
 bool clMenu::setDeviceRZSK()
 {
-    eGB_COMP_RZSK comp = sParam.glb.getCompRZSK();
-
     sParam.typeDevice = AVANT_RZSK;
     sParam.glb.setTypeDevice(AVANT_RZSK);
 
@@ -830,6 +832,7 @@ bool clMenu::setDeviceOPTO()
 
     return true;
 }
+
 
 bool clMenu::setDevice(eGB_TYPE_DEVICE device)
 {

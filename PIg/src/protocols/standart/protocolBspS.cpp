@@ -724,7 +724,6 @@ bool clProtocolBspS::getGlbCommand(eGB_COM com, bool pc)
             glb->setVersProgIC16(TO_INT16(buf[B7], buf[B8]), GB_IC_BSP_MCU);
             glb->setVersProgIC16(TO_INT16(buf[B9], buf[B10]), GB_IC_BSP_DSP);
 
-            glb->setVersProgIC16(VERS, GB_IC_PI_MCU);
             glb->setVersProgIC8(buf[B12], GB_IC_BSK_PLIS_PRD1);
             glb->setVersProgIC8(buf[B13], GB_IC_BSK_PLIS_PRD2);
             glb->setVersProgIC8(buf[B14], GB_IC_BSK_PLIS_PRM1);
