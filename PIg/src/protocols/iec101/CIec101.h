@@ -1218,11 +1218,11 @@ public:
      *
      *	Запоминается частота вызова функции \a tick().
      *
-     *	@param[in] u16Baudrate Скорость работы последовательного порта, бит/с.
-     *	@param[in] u8Period Частота вызова функции \a tick(), мкс.
+     *	@param[in] baudrate Скорость работы последовательного порта, бит/с.
+     *	@param[in] period Частота вызова функции \a tick(), мкс.
      *	@return Рассчитанный шаг счетчика.
      */
-    uint16_t setTick(uint16_t u16Baudrate, uint8_t u8Period);
+    uint16_t setTick(uint16_t baudrate, uint8_t period);
 
     /**	Счет времени прошедшего с момента прихода последнего байта.
      *

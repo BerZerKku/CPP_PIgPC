@@ -66,7 +66,7 @@ public:
     //	bool getData	(stMNUparam *param);
 
     // буфер принятых/передаваемых данных
-    uint8_t *const buf;
+    uint8_t *const m_buf;
 
     /// Проверка флага наличия принятой посылки
     bool checkReadData();
@@ -89,7 +89,7 @@ public:
     bool isEnable() const { return (stat_ != PRTS_STATUS_OFF); }
 
     /// Текущая команда в буфере
-    uint8_t getCurrentCom() const { return buf[2]; }
+    uint8_t getCurrentCom() const { return m_buf[2]; }
 
     /// Текущий статус работы протокола
     ePRTS_STATUS getCurrentStatus() const { return stat_; }
@@ -141,7 +141,7 @@ public:
 
         if (stat_ == PRTS_STATUS_READ)
         {
-            buf[cnt] = byte;
+            m_buf[cnt] = byte;
             switch (cnt)
             {
             case 0:

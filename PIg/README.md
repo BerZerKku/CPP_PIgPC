@@ -15,5 +15,10 @@ C:\MyProgram\avr8-gnu-toolchain-win32_x86
 
 ### Настройка ОС Linux
 
-## Настройка проекта
+## Настройка QT
+
+- Добавить инструмент сборки без QT
+- Игнорирование предупреждений *avr-gcc: suppress warning "'__progmem__' attribute ignored"*:
+	- Перейти в настройки *Tools/Options/C++/Code Model* и выбрать вкладку *Diagnostic Configuration*
+	- Скопировать имеющиеся настройки, например *Check for almost everythin*, и добавить в них *-Wno-attributes*
 

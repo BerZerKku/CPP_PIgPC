@@ -33,14 +33,14 @@
 #define MAX_NUM_COM_RING 96
 
 /// преобразование двух CHAR в INT
-#define TO_INT16(high, low)  (((uint16_t) (high) << 8) + (low))
+#define TO_INT16(high, low)  ((static_cast<int16_t>(high) << 8) + (low))
 #define TO_UINT16(high, low) ((static_cast<uint16_t>(high) << 8) + (low))
 
 /// преобразование двоично-десятичного числа в целое
-#define BCD_TO_BIN(val) ((val >> 4) * 10 + (val & 0x0F))
+#define BCD_TO_BIN(val) (static_cast<uint8_t>((val >> 4) * 10 + (val & 0x0F)))
 
 /// преобразование целого числа в двоично-десятичный вид
-#define BIN_TO_BCD(val) (((val / 10) << 4) + (val % 10))
+#define BIN_TO_BCD(val) (static_cast<uint8_t>(((val / 10) << 4) + (val % 10)))
 
 /// максимально возможное кол-во состояний устройств
 #define MAX_NUM_DEVICE_STATE 15

@@ -68,7 +68,7 @@ void bspRead()
             {
                 if (protPCs.isEnable())
                 {
-                    if (protPCs.copyCommandFrom(protBSPs.buf))
+                    if (protPCs.copyCommandFrom(protBSPs.m_buf))
                         protPCs.update();
                 }
             }
@@ -112,7 +112,7 @@ void pcRead()
                     // пересылка сообщения в БСП
                     if (protBSPs.getCurrentStatus() == PRTS_STATUS_NO)
                     {
-                        protBSPs.copyCommandFrom(protPCs.buf);
+                        protBSPs.copyCommandFrom(protPCs.m_buf);
                         protPCs.setCurrentStatus(PRTS_STATUS_WAIT_ANSWER);
                     }
                 }

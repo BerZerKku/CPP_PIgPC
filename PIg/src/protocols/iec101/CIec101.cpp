@@ -8,7 +8,7 @@
 #include "CIec101.h"
 
 //  онтструктор.
-CIec101::CIec101(uint8_t* pBuf, uint8_t u8Size) : m_pBuf(pBuf), m_u8Size(u8Size)
+CIec101::CIec101(uint8_t* pBuf, uint8_t u8Size) : m_u8Size(u8Size), m_pBuf(pBuf)
 {
     m_eState    = STATE_OFF;
     m_u8Address = s_u8AddressErr;
@@ -104,11 +104,11 @@ uint8_t CIec101::push(uint8_t u8Byte)
 }
 
 // Ќастройка счетчика времени.
-uint16_t CIec101::setTick(uint16_t u16Baudrate, uint8_t u8Period)
+uint16_t CIec101::setTick(uint16_t baudrate, uint8_t period)
 {
-    m_u16TickTime  = (((11UL * 1500) / u8Period) * 1000) / u16Baudrate;
-    m_u16DelayPc   = (11000UL * (sizeof(SCCsNa1) + 8)) / u16Baudrate;  // врем€ в мс
-    m_u8TickPeriod = u8Period;
+    m_u16TickTime  = (((11UL * 1500) / period) * 1000) / baudrate;
+    m_u16DelayPc   = static_cast<uint16_t>((11000UL * (sizeof(SCCsNa1) + 8)) / baudrate);
+    m_u8TickPeriod = period;
 
     return m_u16TickTime;
 }
@@ -196,13 +196,13 @@ void CIec101::readData()
         {
         case FRAME_START_CHARACTER_FIX:
             {
-                SFrameFixLength& frame = *((SFrameFixLength*) m_pBuf);
+                SFrameFixLength& frame = *reinterpret_cast<SFrameFixLength*>(m_pBuf);
                 readFrameFixLenght(frame);
             }
             break;
         case FRAME_START_CHARACTER_VAR:
             {
-                SFrameVarLength& frame = *((SFrameVarLength*) m_pBuf);
+                SFrameVarLength& frame = *reinterpret_cast<SFrameVarLength*>(m_pBuf);
                 readFrameVarLenght(frame);
             }
             break;
@@ -248,7 +248,7 @@ uint8_t CIec101::getCrcVarFrame(SFrameVarLength& rFrame) const
     uint8_t len = rFrame.length1;
     uint8_t crc = 0;
 
-    for (uint8_t* ptr = (uint8_t*) &rFrame.controlField; len > 0; len--)
+    for (uint8_t* ptr = reinterpret_cast<uint8_t*>(&rFrame.controlField); len > 0; len--)
     {
         crc += *ptr++;
     }
@@ -267,13 +267,13 @@ CIec101::EError CIec101::checkFrame()
         {
         case FRAME_START_CHARACTER_FIX:
             {
-                SFrameFixLength& frame = *((SFrameFixLength*) m_pBuf);
+                SFrameFixLength& frame = *reinterpret_cast<SFrameFixLength*>(m_pBuf);
                 error                  = checkFrameFixLenght(frame);
             }
             break;
         case FRAME_START_CHARACTER_VAR:
             {
-                SFrameVarLength& frame = *((SFrameVarLength*) m_pBuf);
+                SFrameVarLength& frame = *reinterpret_cast<SFrameVarLength*>(m_pBuf);
                 error                  = checkFrameVarLenght(frame);
             }
             break;
@@ -471,7 +471,7 @@ void CIec101::sendFrame()
 // ќтправка кадра с фиксированной длиной.
 void CIec101::sendFrameFixLenght()
 {
-    uint8_t* ptr = (uint8_t*) &m_stFrameFix;
+    uint8_t* ptr = reinterpret_cast<uint8_t*>(&m_stFrameFix);
     uint8_t  i   = 0;
 
     m_stFrameFix.controlField.secondary.acd = isAcd();
@@ -491,7 +491,7 @@ void CIec101::sendFrameFixLenght()
 // ќтправка кадра с переменной длиной.
 void CIec101::sendFrameVarLenght()
 {
-    uint8_t* ptr = (uint8_t*) &m_stFrameVar;
+    uint8_t* ptr = reinterpret_cast<uint8_t*>(&m_stFrameVar);
     uint8_t  i   = 0;
 
     m_stFrameVar.controlField.secondary.acd = isAcd();
@@ -513,7 +513,7 @@ void CIec101::prepareFrameFixLenght(EFcSecondary eFunction)
     m_stFrameFix.startCharacter                  = FRAME_START_CHARACTER_FIX;
     m_stFrameFix.controlField.common             = 0;
     m_stFrameFix.controlField.secondary.function = eFunction;
-    m_stFrameFix.controlField.secondary.dfc      = 0;  // прием сообщений всегда возможен
+    m_stFrameFix.controlField.secondary.dfc = 0;  // прием сообщений всегда возможен
     //	m_stFrameFix.controlField.secondary.acd = isAcd();
     m_stFrameFix.controlField.secondary.prm = 0;  // направление передачи от вторичной станции = 0
     m_stFrameFix.controlField.secondary.res = 0;  // резерв всегда 0
@@ -535,7 +535,7 @@ void CIec101::prepareFrameVarLenght(ETypeId eId, ECot eCot, uint8_t u8SizeAsdu)
 
     m_stFrameVar.controlField.common             = 0;
     m_stFrameVar.controlField.secondary.function = RESPOND_USER_DATA;
-    m_stFrameVar.controlField.secondary.dfc      = 0;  // прием сообщений всегда возможен
+    m_stFrameVar.controlField.secondary.dfc = 0;  // прием сообщений всегда возможен
     //	m_stFrameVar.controlField.secondary.acd = isAcd();	// сообщение дл€ отправки
     m_stFrameVar.controlField.secondary.prm = 0;  // направление передачи от вторичной станции = 0
     m_stFrameVar.controlField.secondary.res = 0;  // резерв всегда 0
@@ -546,9 +546,9 @@ void CIec101::prepareFrameVarLenght(ETypeId eId, ECot eCot, uint8_t u8SizeAsdu)
     m_stFrameVar.asdu.common.dataUnitId.variableStructureQualifier =
         s_u8VariableStructureQualifier;  // всегда передаетс€ 1 объект информации
     m_stFrameVar.asdu.common.dataUnitId.causeOfTramsmission.cot = eCot;  // причина
-    m_stFrameVar.asdu.common.dataUnitId.causeOfTramsmission.pN  = 0;     // не используетс€
-    m_stFrameVar.asdu.common.dataUnitId.causeOfTramsmission.t   = 0;     // всегда не тест
-    m_stFrameVar.asdu.common.dataUnitId.commonAddressOfASDU     = s_u8CommonAddressOfAsdu;
+    m_stFrameVar.asdu.common.dataUnitId.causeOfTramsmission.pN = 0;  // не используетс€
+    m_stFrameVar.asdu.common.dataUnitId.causeOfTramsmission.t  = 0;  // всегда не тест
+    m_stFrameVar.asdu.common.dataUnitId.commonAddressOfASDU    = s_u8CommonAddressOfAsdu;
 
     // ќстальные данные ASDU уже должны быть на месете.
 
@@ -706,14 +706,16 @@ void CIec101::procFrameFixLenghtUserData(SFrameFixLength& rFrame)
 // ќбработка прин€того кадра с переменной длиной.
 bool CIec101::procFrameVarLenght(UAsdu asdu)
 {
+    bool state = false;
+
     switch (asdu.common.dataUnitId.typeId)
     {
     case TYPE_ID_C_IC_NA_1:  //  оманда опроса.
         // TODO проверить какой qoi приходит от сервера и сделать проверку на него ?!
-        return procFrameCIcNa1(asdu.cIcNa1);
+        state = procFrameCIcNa1(asdu.cIcNa1);
         break;
     case TYPE_ID_C_CS_NA_1:  //  оманда синхронизации часов.
-        return procFrameCCsNa1(asdu.cCsNa1);
+        state = procFrameCCsNa1(asdu.cCsNa1);
         break;
     case TYPE_ID_M_EI_NA_1:  // DOWN
     case TYPE_ID_M_SP_NA_1:  // DOWN
@@ -722,7 +724,7 @@ bool CIec101::procFrameVarLenght(UAsdu asdu)
         break;
     }
 
-    return false;
+    return state;
 }
 
 //	ѕроверка наличи€ данных класса 1 на передачу.

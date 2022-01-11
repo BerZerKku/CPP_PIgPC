@@ -53,6 +53,9 @@ message(STATUS "Current MCU is set to: ${AVR_MCU}")
 message(STATUS "Current H_FUSE is set to: ${AVR_H_FUSE}")
 message(STATUS "Current L_FUSE is set to: ${AVR_L_FUSE}")
 
+##########################################################################
+# create version file
+##########################################################################
 configure_file(version.hpp.in ../src/version.hpp)
 
 ##########################################################################
@@ -65,7 +68,7 @@ endif(NOT CMAKE_BUILD_TYPE)
 ##########################################################################
 # some cmake cross-compile necessities
 ##########################################################################
-
+set(CMAKE_CXX_STANDARD 17)
 if(DEFINED ENV{AVR_FIND_ROOT_PATH})
     set(CMAKE_FIND_ROOT_PATH $ENV{AVR_FIND_ROOT_PATH})
 else(DEFINED ENV{AVR_FIND_ROOT_PATH})
@@ -134,12 +137,12 @@ add_definitions("-c")
 ##########################################################################
 include_directories(
     src
-    )
+)
 
 ##########################################################################
 # building library and application in their subdirectories
 ##########################################################################
-add_avr_executable(PIg
+add_avr_executable( PIg
     main.cpp
     src/avr.h
     src/flash.h

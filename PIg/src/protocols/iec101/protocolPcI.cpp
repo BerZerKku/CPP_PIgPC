@@ -222,8 +222,8 @@ const uint16_t TProtocolPcI::c_adrIE2[] PROGMEM = {
 
 // Конструктор
 TProtocolPcI::TProtocolPcI(stGBparam* sParam, uint8_t* buf, uint8_t size) :
-    sParam_(sParam),
-    CIec101(buf, size)
+    CIec101(buf, size),
+    sParam_(sParam)
 {
 
     COMPILE_TIME_ASSERT(SIZE_OF(c_adrIE2) == IE2_MAX);

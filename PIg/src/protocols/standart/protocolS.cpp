@@ -7,7 +7,7 @@
 #include "protocolS.h"
 
 clProtocolS::clProtocolS(uint8_t* buf, uint8_t size, stGBparam* sParam) :
-    buf(buf),
+    m_buf(buf),
     sParam_(sParam),
     size_(size)
 {
@@ -79,7 +79,7 @@ bool clProtocolS::copyCommandFrom(uint8_t* const bufSource)
             for (uint_fast8_t i = 0; i < cnt; i++)
             {
                 if (i < size_)
-                    buf[i] = bufSource[i];
+                    m_buf[i] = bufSource[i];
             }
         }
     }
@@ -136,16 +136,16 @@ uint8_t clProtocolS::addCom()
 {
     uint8_t cnt = 0;
 
-    buf[0] = 0x55;
-    buf[1] = 0xAA;
+    m_buf[0] = 0x55;
+    m_buf[1] = 0xAA;
     // команда будет отправлена если лежит не нулевая команда и
     // под заявленное кол-во данных хватает размера буфера
-    if (buf[2] != 0)
+    if (m_buf[2] != 0)
     {
-        uint8_t len = buf[3] + 5;
+        uint8_t len = m_buf[3] + 5;
         if (len <= (size_ - 5))
         {
-            buf[len - 1] = getCRC();
+            m_buf[len - 1] = getCRC();
             cnt          = len;
             maxLen_      = len;
             setCurrentStatus(PRTS_STATUS_WRITE);
@@ -167,14 +167,14 @@ uint8_t clProtocolS::addCom(uint8_t com, uint8_t size, uint8_t b[])
 
     if (size < (this->size_ - 5))
     {
-        buf[cnt++] = 0x55;
-        buf[cnt++] = 0xAA;
-        buf[cnt++] = com;
-        buf[cnt++] = size;
+        m_buf[cnt++] = 0x55;
+        m_buf[cnt++] = 0xAA;
+        m_buf[cnt++] = com;
+        m_buf[cnt++] = size;
         // Скопируем данные в буфер передатчика
         for (uint8_t i = 0; i < size; i++, cnt++)
-            buf[cnt] = b[i];
-        buf[cnt++] = getCRC();
+            m_buf[cnt] = b[i];
+        m_buf[cnt++] = getCRC();
 
         maxLen_ = cnt;
         setCurrentStatus(PRTS_STATUS_WRITE);
@@ -193,13 +193,13 @@ uint8_t clProtocolS::addCom(uint8_t com, uint8_t byte1, uint8_t byte2)
 {
     uint8_t cnt = 0;
 
-    buf[cnt++] = 0x55;
-    buf[cnt++] = 0xAA;
-    buf[cnt++] = com;
-    buf[cnt++] = 0x02;
-    buf[cnt++] = byte1;
-    buf[cnt++] = byte2;
-    buf[cnt++] = com + 0x02 + byte1 + byte2;
+    m_buf[cnt++] = 0x55;
+    m_buf[cnt++] = 0xAA;
+    m_buf[cnt++] = com;
+    m_buf[cnt++] = 0x02;
+    m_buf[cnt++] = byte1;
+    m_buf[cnt++] = byte2;
+    m_buf[cnt++] = com + 0x02 + byte1 + byte2;
 
     maxLen_ = cnt;
     setCurrentStatus(PRTS_STATUS_WRITE);
@@ -216,12 +216,12 @@ uint8_t clProtocolS::addCom(uint8_t com, uint8_t byte)
 {
     uint8_t cnt = 0;
 
-    buf[cnt++] = 0x55;
-    buf[cnt++] = 0xAA;
-    buf[cnt++] = com;
-    buf[cnt++] = 0x01;
-    buf[cnt++] = byte;
-    buf[cnt++] = com + 0x01 + byte;
+    m_buf[cnt++] = 0x55;
+    m_buf[cnt++] = 0xAA;
+    m_buf[cnt++] = com;
+    m_buf[cnt++] = 0x01;
+    m_buf[cnt++] = byte;
+    m_buf[cnt++] = com + 0x01 + byte;
 
     maxLen_ = cnt;
     setCurrentStatus(PRTS_STATUS_WRITE);
@@ -237,11 +237,11 @@ uint8_t clProtocolS::addCom(uint8_t com)
 {
     uint8_t cnt = 0;
 
-    buf[cnt++] = 0x55;
-    buf[cnt++] = 0xAA;
-    buf[cnt++] = com;
-    buf[cnt++] = 00;
-    buf[cnt++] = com;
+    m_buf[cnt++] = 0x55;
+    m_buf[cnt++] = 0xAA;
+    m_buf[cnt++] = com;
+    m_buf[cnt++] = 00;
+    m_buf[cnt++] = com;
 
     maxLen_ = cnt;
     setCurrentStatus(PRTS_STATUS_WRITE);
@@ -260,9 +260,9 @@ bool clProtocolS::checkCRC() const
     uint8_t len  = maxLen_ - 1;
 
     for (uint8_t i = 2; i < len; i++)
-        crc += buf[i];
+        crc += m_buf[i];
 
-    if (crc == buf[len])
+    if (crc == m_buf[len])
         stat = true;
 
     return stat;
@@ -277,14 +277,14 @@ bool clProtocolS::checkCRC() const
 uint8_t clProtocolS::getCRC() const
 {
     uint8_t crc = 0;
-    uint8_t len = buf[3] + 5;
+    uint8_t len = m_buf[3] + 5;
     uint8_t i   = 2;
 
     if (len > size_)
         return 0;
 
     for (; i < (len - 1); i++)
-        crc += buf[i];
+        crc += m_buf[i];
 
     return crc;
 }

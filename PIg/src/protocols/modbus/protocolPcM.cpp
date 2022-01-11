@@ -10,8 +10,8 @@
 
 // Конструктор
 TProtocolPcM::TProtocolPcM(stGBparam* sParam, uint8_t* buf, uint8_t size) :
-    sParam_(sParam),
-    TProtocolModbus(buf, size)
+    TProtocolModbus(buf, size),
+    sParam_(sParam)
 {
     // NONE
 }
@@ -123,22 +123,22 @@ TProtocolModbus::CHECK_ERR TProtocolPcM::readRegister(uint16_t adr, uint16_t& va
     {
         if (adr == ADR_IND_COM_PRM_16)
         {
-            val = ((uint16_t) sParam_->prm.getIndCom8(1)) << 8;
+            val = static_cast<uint16_t>(sParam_->prm.getIndCom8(1)) << 8;
             val += sParam_->prm.getIndCom8(0);
         }
         else if (adr == ADR_IND_COM_PRM_32)
         {
-            val = ((uint16_t) sParam_->prm.getIndCom8(3)) << 8;
+            val = static_cast<uint16_t>(sParam_->prm.getIndCom8(3)) << 8;
             val += sParam_->prm.getIndCom8(2);
         }
         else if (adr == ADR_IND_COM_PRD_16)
         {
-            val = ((uint16_t) sParam_->prd.getIndCom8(1)) << 8;
+            val = static_cast<uint16_t>(sParam_->prd.getIndCom8(1)) << 8;
             val += sParam_->prd.getIndCom8(0);
         }
         else if (adr == ADR_IND_COM_PRD_32)
         {
-            val = ((uint16_t) sParam_->prd.getIndCom8(3)) << 8;
+            val = static_cast<uint16_t>(sParam_->prd.getIndCom8(3)) << 8;
             val += sParam_->prd.getIndCom8(2);
         }
     }
@@ -276,7 +276,9 @@ TProtocolModbus::CHECK_ERR TProtocolPcM::writeRegister(uint16_t adr, uint16_t va
             sParam_->txComBuf.addFastCom(GB_COM_SET_TIME);
             sParam_->txComBuf.setInt8(1, 8);
         }
-        sParam_->txComBuf.setInt8(val, adr - ADR_YEAR);
+
+        uint8_t byte_number = static_cast<uint8_t>(adr - ADR_YEAR);
+        sParam_->txComBuf.setInt8(static_cast<uint8_t>(val), byte_number);
     }
 
     return CHECK_ERR_NO;
@@ -301,56 +303,36 @@ TProtocolModbus::CHECK_ERR TProtocolPcM::writeRegister(uint16_t adr, uint16_t va
  */
 TProtocolModbus::CHECK_ERR TProtocolPcM::readID(char* buf, uint8_t& size)
 {
-
-    // В Р400м вариантов нет
-    static const char r400m[] PROGMEM = "АВАНТ Р400м-100-В";
-    // В РЗСК выводится наличие поста, кол-во команд на прд, кол-во команд на
-    // прм, тип линии (вч/оптика/е1).
-    static const char rzsk[] PROGMEM = "АВАНТ РЗСК-%d%d%d-В";
-    // В К400 выводится кол-во команд на прд, кол-во команд на прм
-    // и по идее должен выводится тип совместимости и тип линии ?!
-    static const char k400[] PROGMEM = "АВАНТ К400-%d%dВ";
-    // TODO В Оптике, надо выводить реалльный тип аппарата !!!
-    static const char opto[] PROGMEM = "АВАНТ ОПТО-%d%d%d-О";
+    static const char r400[] PROGMEM  = "АВАНТ Р400-100-В";
+    static const char r400m[] PROGMEM = "АВАНТ Р400М-100-В";
+    static const char rzsk[] PROGMEM  = "АВАНТ РЗСК-%d%d%d-В";
+    static const char k400[] PROGMEM  = "АВАНТ К400-0%d%d-В";
+    static const char opto[] PROGMEM  = "АВАНТ ОПТО-%d%d%d-О";
     // Неизвестное устройство
-    static const char unknown[] PROGMEM = "АВАНТ -%d%d%d-X";
+    static const char unknown[] PROGMEM = "АВАНТ %d%d%d-X";
 
-    eGB_TYPE_DEVICE device = sParam_->typeDevice;
+    int             len      = 0;
+    size_t          max_size = static_cast<size_t>(size - 1);
+    eGB_TYPE_DEVICE device   = sParam_->typeDevice;
+    uint8_t         def      = sParam_->def.status.isEnable();
+    uint8_t         prd      = sParam_->prd.getNumCom() / 4;
+    uint8_t         prm      = sParam_->prm.getNumCom() / 4;
 
-    if (device == AVANT_R400M)
+    switch (device)
     {
-        size = snprintf(buf, size - 1, r400m);
-    }
-    else if (device == AVANT_RZSK)
-    {
-        uint8_t def = sParam_->def.status.isEnable();
-        uint8_t prd = sParam_->prd.getNumCom() / 4;
-        uint8_t prm = sParam_->prm.getNumCom() / 4;
-        size        = snprintf_P(buf, size - 1, rzsk, def, prd, prm);
-    }
-    else if (device == AVANT_K400)
-    {
-        uint8_t prd = sParam_->prd.getNumCom() / 4;
-        uint8_t prm = sParam_->prm.getNumCom() / 4;
-        size        = snprintf_P(buf, size - 1, k400, prd, prm);
-    }
-    else if (device == AVANT_OPTO)
-    {
-        uint8_t def = sParam_->def.status.isEnable();
-        uint8_t prd = sParam_->prd.getNumCom() / 4;
-        uint8_t prm = sParam_->prm.getNumCom() / 4;
-        size        = snprintf_P(buf, size - 1, opto, def, prd, prm);
-    }
-    else
-    {
-        uint8_t def = sParam_->def.status.isEnable();
-        uint8_t prd = sParam_->prd.getNumCom() / 4;
-        uint8_t prm = sParam_->prm.getNumCom() / 4;
-        size        = snprintf_P(buf, size - 1, rzsk, def, prd, prm);
+    case AVANT_R400: len = snprintf_P(buf, max_size, r400); break;
+    case AVANT_RZSK: len = snprintf_P(buf, max_size, rzsk, def, prd, prm); break;
+    case AVANT_K400: len = snprintf_P(buf, max_size, k400, prd, prm); break;
+    case AVANT_R400M: len = snprintf_P(buf, max_size, r400m); break;
+    case AVANT_OPTO: len = snprintf_P(buf, max_size, opto, def, prd, prm); break;
+
+    case AVANT_NO: [[fallthrough]];
+    case AVANT_MAX: len = snprintf_P(buf, max_size, unknown, def, prd, prm); break;
     }
 
     eGB_REGIME reg = sParam_->glb.status.getRegime();
-    buf[size++]    = (reg == GB_REGIME_DISABLED) ? 0x00 : 0xFF;
+    buf[len++]     = (reg == GB_REGIME_DISABLED) ? 0x00 : 0xFF;
+    size           = static_cast<uint8_t>(len);
 
     return CHECK_ERR_NO;
 }
@@ -368,14 +350,18 @@ bool TProtocolPcM::readCoilGlb(uint16_t adr)
     {
         if (adr <= ADR_C_GLB_WARNING_16)
         {
-            val = sParam_->glb.status.isWarning(adr - ADR_C_GLB_WARNING_1);
+            uint8_t warning_bit = static_cast<uint8_t>(adr - ADR_C_GLB_WARNING_1);
+
+            val = sParam_->glb.status.isWarning(warning_bit);
         }
     }
     else if (adr >= ADR_C_GLB_FAULT_1)
     {
         if (adr <= ADR_C_GLB_FAULT_16)
         {
-            val = sParam_->glb.status.isFault(adr - ADR_C_GLB_FAULT_1);
+            uint8_t fault_bit = static_cast<uint8_t>(adr - ADR_C_GLB_FAULT_1);
+
+            val = sParam_->glb.status.isFault(fault_bit);
         }
     }
     else if (adr == ADR_C_IND_PRM)
@@ -417,21 +403,27 @@ bool TProtocolPcM::readCoilPrd(uint16_t adr)
     {
         if (adr <= ADR_C_PRD_IND_32)
         {
-            val = sParam_->prd.getIndCom(adr - ADR_C_PRD_IND_1);
+            uint8_t ind_bit = static_cast<uint8_t>(adr - ADR_C_PRD_IND_1);
+
+            val = sParam_->prd.getIndCom(ind_bit);
         }
     }
     else if (adr >= ADR_C_PRD_WARNING_1)
     {
         if (adr <= ADR_C_PRD_WARNING_16)
         {
-            val = sParam_->prd.status.isWarning(adr - ADR_C_PRD_WARNING_1);
+            uint8_t warning_bit = static_cast<uint8_t>(adr - ADR_C_PRD_WARNING_1);
+
+            val = sParam_->prd.status.isWarning(warning_bit);
         }
     }
     else if (adr >= ADR_C_PRD_FAULT_1)
     {
         if (adr <= ADR_C_PRD_FAULT_16)
         {
-            val = sParam_->prd.status.isFault(adr - ADR_C_PRD_FAULT_1);
+            uint8_t fault_bit = static_cast<uint8_t>(adr - ADR_C_PRD_FAULT_1);
+
+            val = sParam_->prd.status.isFault(fault_bit);
         }
     }
     else if (adr == ADR_C_PRD_IS)
@@ -455,21 +447,27 @@ bool TProtocolPcM::readCoilPrm(uint16_t adr)
     {
         if (adr <= ADR_C_PRM_IND_32)
         {
-            val = sParam_->prm.getIndCom(adr - ADR_C_PRM_IND_1);
+            uint8_t ind_bit = static_cast<uint8_t>(adr - ADR_C_PRM_IND_1);
+
+            val = sParam_->prm.getIndCom(ind_bit);
         }
     }
     else if (adr >= ADR_C_PRM_WARNING_1)
     {
         if (adr <= ADR_C_PRM_WARNING_16)
         {
-            val = sParam_->prm.status.isWarning(adr - ADR_C_PRM_WARNING_1);
+            uint8_t warning_bit = static_cast<uint8_t>(adr - ADR_C_PRM_WARNING_1);
+
+            val = sParam_->prm.status.isWarning(warning_bit);
         }
     }
     else if (adr >= ADR_C_PRM_FAULT_1)
     {
         if (adr <= ADR_C_PRM_FAULT_16)
         {
-            val = sParam_->prm.status.isFault(adr - ADR_C_PRM_FAULT_1);
+            uint8_t fault_bit = static_cast<uint8_t>(adr - ADR_C_PRM_FAULT_1);
+
+            val = sParam_->prm.status.isFault(fault_bit);
         }
     }
     else if (adr == ADR_C_PRM_IS)
@@ -493,14 +491,18 @@ bool TProtocolPcM::readCoilDef(uint16_t adr)
     {
         if (adr <= ADR_C_DEF_WARNING_16)
         {
-            val = sParam_->def.status.isWarning(adr - ADR_C_DEF_WARNING_1);
+            uint8_t warning_bit = static_cast<uint8_t>(adr - ADR_C_DEF_WARNING_1);
+
+            val = sParam_->def.status.isWarning(warning_bit);
         }
     }
     else if (adr >= ADR_C_DEF_FAULT_1)
     {
         if (adr <= ADR_C_DEF_FAULT_16)
         {
-            val = sParam_->def.status.isFault(adr - ADR_C_DEF_FAULT_1);
+            uint8_t fault_bit = static_cast<uint8_t>(adr - ADR_C_DEF_FAULT_1);
+
+            val = sParam_->def.status.isFault(fault_bit);
         }
     }
     else if (adr == ADR_C_DEF_IS)
@@ -640,8 +642,8 @@ uint16_t TProtocolPcM::readRegMeasure(uint16_t adr)
 
     if (adr == ADR_MEAS_U_OUT)
     {
-        val = ((uint16_t) sParam_->measParam.getVoltageOutInt() * 10);
-        val += (uint16_t) sParam_->measParam.getVoltageOutFract();
+        val = static_cast<uint16_t>(sParam_->measParam.getVoltageOutInt()) * 10;
+        val += static_cast<uint16_t>(sParam_->measParam.getVoltageOutFract());
     }
     else if (adr == ADR_MEAS_I_OUT)
     {
@@ -649,31 +651,31 @@ uint16_t TProtocolPcM::readRegMeasure(uint16_t adr)
     }
     else if (adr == ADR_MEAS_UC1)
     {
-        val = sParam_->measParam.getVoltageCf();
+        val = static_cast<uint16_t>(sParam_->measParam.getVoltageCf());
     }
     else if (adr == ADR_MEAS_UC2)
     {
-        val = sParam_->measParam.getVoltageCf2();
+        val = static_cast<uint16_t>(sParam_->measParam.getVoltageCf2());
     }
     else if (adr == ADR_MEAS_UN1)
     {
-        val = sParam_->measParam.getVoltageNoise();
+        val = static_cast<uint16_t>(sParam_->measParam.getVoltageNoise());
     }
     else if (adr == ADR_MEAS_UN2)
     {
-        val = sParam_->measParam.getVoltageNoise2();
+        val = static_cast<uint16_t>(sParam_->measParam.getVoltageNoise2());
     }
     else if (adr == ADR_MEAS_UD1)
     {
-        val = sParam_->measParam.getVoltageDef();
+        val = static_cast<uint16_t>(sParam_->measParam.getVoltageDef());
     }
     else if (adr == ADR_MEAS_UD2)
     {
-        val = sParam_->measParam.getVoltageDef2();
+        val = static_cast<uint16_t>(sParam_->measParam.getVoltageDef2());
     }
     else if (adr == ADR_MEAS_PW)
     {
-        val = sParam_->measParam.getPulseWidth();
+        val = static_cast<uint16_t>(sParam_->measParam.getPulseWidth());
     }
 
     return val;

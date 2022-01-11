@@ -1399,8 +1399,8 @@ void clMenu::lvlInfo()
         snprintf_P(&vLCDbuf[pos + len],
                    NAME_PARAM_LENGHT - len,
                    PSTR(": %02X.%02X"),
-                   (uint8_t) (vers >> 8),
-                   (uint8_t) vers);
+                   static_cast<uint8_t>(vers >> 8),
+                   static_cast<uint8_t>(vers));
 
         if (++cntPunkts >= Punkts_.getMaxNumPunkts())
         {
@@ -1535,8 +1535,9 @@ void clMenu::lvlJournalEvent()
 {
     static const char title[] PROGMEM = "Журнал\\События";
 
-    static const char opto_ring1_13[] PROGMEM = "Кольцо восстановлено";
-    static const char opto_ring1_14[] PROGMEM = "Дистанционный сброс";
+    // TODO Разобраться откуда взялись эти события и куда исчезли.
+    // static const char opto_ring1_13[] PROGMEM = "Кольцо восстановлено";
+    // static const char opto_ring1_14[] PROGMEM = "Дистанционный сброс";
 
     if (lvlCreate_)
     {
@@ -1669,8 +1670,9 @@ void clMenu::lvlJournalEvent()
         {
             if (event <= MAX_JRN_EVENT_VALUE)
             {
-                uint8_t dev                            = (uint8_t) sParam.jrnEntry.getDeviceJrn();
-                char    tmp[SIZE_OF(fcDevicesK400[0])] = "";
+                uint8_t dev = static_cast<uint8_t>(sParam.jrnEntry.getDeviceJrn());
+
+                char tmp[SIZE_OF(fcDevicesK400[0])] = "";
                 strncpy_P(tmp, fcDevicesK400[dev], SIZE_OF(tmp) - 1);
                 snprintf_P(&vLCDbuf[poz], 21, fcJrnEventK400[event], tmp);
             }
@@ -1683,7 +1685,7 @@ void clMenu::lvlJournalEvent()
         {
             if (event < MAX_JRN_EVENT_VALUE)
             {
-                uint8_t dev = (uint8_t) sParam.jrnEntry.getDeviceJrn();
+                uint8_t dev = static_cast<uint8_t>(sParam.jrnEntry.getDeviceJrn());
 
                 char tmp[SIZE_OF(fcDevicesK400[0])] = "";
                 strncpy_P(tmp, fcDevicesK400[dev], SIZE_OF(tmp) - 1);
@@ -2926,18 +2928,20 @@ void clMenu::lvlSetup()
 
         if (stat == MENU_ENTER_PASSWORD_READY)
         {
-            uint16_t val = EnterParam.getValue();
+            uint16_t val = static_cast<uint16_t>(EnterParam.getValue());
 
             if (sParam.password.check(val))
             {
                 EnterParam.setEnable(MENU_ENTER_PASSWORD_NEW);
             }
             else
+            {
                 EnterParam.setDisable();
+            }
         }
         else if (stat == MENU_ENTER_PASSWORD_N_READY)
         {
-            uint16_t val = EnterParam.getValue();
+            uint16_t val = static_cast<uint16_t>(EnterParam.getValue());
 
             sParam.password.set(val);
         }
@@ -3047,7 +3051,7 @@ void clMenu::lvlRegime()
         {
             // проверим пароль, если пытаемся перейти в режим "Выведен"
             // из режимов "Введен" и "Готов"
-            val = (eGB_REGIME_ENTER) EnterParam.getValueEnter();
+            val = static_cast<eGB_REGIME_ENTER>(EnterParam.getValueEnter());
 
             if ((reg == GB_REGIME_ENABLED) || (reg == GB_REGIME_READY))
             {
@@ -3064,7 +3068,8 @@ void clMenu::lvlRegime()
         if (stat == MENU_ENTER_PASSWORD_READY)
         {
             // проверка введеного пароля
-            if (sParam.password.check(EnterParam.getValue()))
+
+            if (sParam.password.check(static_cast<uint16_t>(EnterParam.getValue())))
             {
                 val = static_cast<eGB_REGIME_ENTER>(EnterParam.getDopValue());
             }
@@ -3929,8 +3934,8 @@ void clMenu::lvlSetupDT()
             // копирование введеного значение на свое место
             //          sParam.txComBuf.setInt8(BIN_TO_BCD(EnterParam.getValueEnter()),
             //                  EnterParam.getDopValue());
-            uint8_t t   = EnterParam.getDopValue();
-            uint8_t val = EnterParam.getValueEnter();
+            uint8_t t   = static_cast<uint8_t>(EnterParam.getDopValue());
+            uint8_t val = static_cast<uint8_t>(EnterParam.getValueEnter());
             if (t <= 2)
             {
                 // ввод даты
@@ -4322,7 +4327,7 @@ void clMenu::lvlTest1()
             uint8_t num_com = sParam.prd.getNumCom();
             for (uint_fast8_t i = 0; i < num_com; i++)
             {
-                eGB_TEST_SIGNAL signal = (eGB_TEST_SIGNAL) ((uint8_t) GB_SIGNAL_COM1 + i);
+                eGB_TEST_SIGNAL signal = static_cast<eGB_TEST_SIGNAL>(GB_SIGNAL_COM1 + i);
                 sParam.test.addSignalToList(signal);
             }
         }
@@ -4338,7 +4343,7 @@ void clMenu::lvlTest1()
             {
                 for (uint_fast8_t i = 0; i < MAX_NUM_COM_RING; i++)
                 {
-                    eGB_TEST_SIGNAL signal = (eGB_TEST_SIGNAL) ((uint8_t) GB_SIGNAL_COM1A + i);
+                    eGB_TEST_SIGNAL signal = static_cast<eGB_TEST_SIGNAL>(GB_SIGNAL_COM1A + i);
                     sParam.test.addSignalToList(signal);
                 }
             }
@@ -4347,7 +4352,7 @@ void clMenu::lvlTest1()
                 uint8_t num_com = sParam.prd.getNumCom();
                 for (uint_fast8_t i = 0; i < num_com; i++)
                 {
-                    eGB_TEST_SIGNAL signal = (eGB_TEST_SIGNAL) ((uint8_t) GB_SIGNAL_COM1 + i);
+                    eGB_TEST_SIGNAL signal = static_cast<eGB_TEST_SIGNAL>(GB_SIGNAL_COM1 + i);
                     sParam.test.addSignalToList(signal);
                 }
             }
@@ -4379,7 +4384,7 @@ void clMenu::lvlTest1()
             uint8_t rz  = 0;
             uint8_t cf  = 0;
 
-            sParam.test.getBytes(cf, rz, (eGB_TEST_SIGNAL) sig);
+            sParam.test.getBytes(cf, rz, static_cast<eGB_TEST_SIGNAL>(sig));
             // т.к. у нас для установки сигналов есть две разные группы
             // для каждой из которых требуется отправка своей команды
             // добавим в буфере команду для каждой из групп
@@ -4629,12 +4634,12 @@ eMENU_ENTER_PARAM clMenu::enterValue()
     }
     else if (status == MENU_ENTER_PARAM_U_COR)
     {
-        uint16_t val = EnterParam.getValue();
+        uint16_t val = static_cast<uint16_t>(EnterParam.getValue());
         snprintf_P(&vLCDbuf[pos], NAME_PARAM_LENGHT, enterUcor, val / 10, val % 10);
     }
     else if (status == MENU_ENTER_PARAM_LIST)
     {
-        uint8_t val = EnterParam.getValue();
+        uint8_t val = static_cast<uint8_t>(EnterParam.getValue());
         len         = snprintf_P(&vLCDbuf[pos], NAME_PARAM_LENGHT, enterList);
         snprintf_P(&vLCDbuf[pos + len],
                    NAME_PARAM_LENGHT - len,
@@ -4715,7 +4720,7 @@ eMENU_ENTER_PARAM clMenu::enterPassword()
         uint8_t poz = 100;
         clearLine(NUM_TEXT_LINES);
 
-        uint16_t val = EnterParam.getValue();
+        uint16_t val = static_cast<uint16_t>(EnterParam.getValue());
 
         if (status == MENU_ENTER_PASSWORD)
         {
@@ -5279,14 +5284,12 @@ void clMenu::printAc(uint8_t pos)
     {
         if (sParam.def.status.getRegime() == GB_REGIME_ENABLED)
         {
-            //          if (sParam.def.status.getState() == 1) {
-            uint16_t time = sParam.def.getTimeToAC();
+            uint16_t time = static_cast<uint16_t>(sParam.def.getTimeToAC());
             uint8_t  hour = time / 3600;
             uint8_t  min  = (time % 3600) / 60;
             uint8_t  sec  = time % 60;
             snprintf_P(&vLCDbuf[pos + 1], 11, fcTimeToAc, hour, min, sec);
         }
-        //      }
     }
 }
 
@@ -5336,7 +5339,7 @@ void clMenu::enterParameter()
             if (getParamType(param) == Param::PARAM_I_COR)
             {
                 min = 0;
-                val = sParam.measParam.getCurrentOut();
+                val = static_cast<int16_t>(sParam.measParam.getCurrentOut());
                 if ((val < min) || (val > max))
                 {
                     val = 0;
@@ -5350,7 +5353,7 @@ void clMenu::enterParameter()
             else if (getParamType(param) == Param::PARAM_U_COR)
             {
                 min = 0;
-                val = sParam.measParam.getVoltageOut();
+                val = static_cast<int16_t>(sParam.measParam.getVoltageOut());
                 if ((val < min) || (val > max))
                 {
                     val = 0;
@@ -5424,17 +5427,19 @@ void clMenu::setupParam()
 
                 switch (getSendType(param))
                 {
-                case GB_SEND_INT8: sParam.txComBuf.setInt8(EnterParam.getValueEnter()); break;
+                case GB_SEND_INT8:
+                    sParam.txComBuf.setInt8(static_cast<uint8_t>(EnterParam.getValueEnter()));
+                    break;
 
                 case GB_SEND_INT8_DOP:  // DOWN
                 case GB_SEND_DOP_INT8:
-                    sParam.txComBuf.setInt8(EnterParam.getValueEnter(), 0);
+                    sParam.txComBuf.setInt8(static_cast<uint8_t>(EnterParam.getValueEnter()), 0);
                     sParam.txComBuf.setInt8(pos + dop, 1);
                     break;
 
                 case GB_SEND_INT16_BE:
-                    sParam.txComBuf.setInt8(EnterParam.getValue() >> 8, 0);
-                    sParam.txComBuf.setInt8(EnterParam.getValue(), 1);
+                    sParam.txComBuf.setInt8(static_cast<uint8_t>(EnterParam.getValue() >> 8), 0);
+                    sParam.txComBuf.setInt8(static_cast<uint8_t>(EnterParam.getValue()), 1);
                     break;
 
                 case GB_SEND_BITES_DOP:  // DOWN
@@ -5459,19 +5464,19 @@ void clMenu::setupParam()
                         // если текущее значение коррекции тока равно 0
                         // то передается сообщение с под.байтом равным 4
                         // означающим сброс коррекции
-                        int16_t t = (int16_t) (EnterParam.getValue());
+                        int16_t t = EnterParam.getValue();
                         if (t == 0)
                             dop = 4;
                         else
                         {
                             // новая коррекция =
                             // напряжение прибора - (напряжение с БСП - коррекция)
-                            t -= (int16_t) (sParam.measParam.getVoltageOut());
+                            t -= static_cast<int16_t>(sParam.measParam.getVoltageOut());
                             t += sParam.local.getValue();
                         }
                         sParam.txComBuf.setInt8(dop, 0);
-                        sParam.txComBuf.setInt8(t / 10, 1);
-                        sParam.txComBuf.setInt8((t % 10) * 10, 2);
+                        sParam.txComBuf.setInt8(static_cast<uint8_t>(t / 10), 1);
+                        sParam.txComBuf.setInt8(static_cast<uint8_t>(t % 10) * 10, 2);
                     }
                     break;
 
@@ -5490,8 +5495,8 @@ void clMenu::setupParam()
                             t += sParam.local.getValue();
                         }
                         sParam.txComBuf.setInt8(dop, 0);
-                        sParam.txComBuf.setInt8((t >> 8), 1);
-                        sParam.txComBuf.setInt8((t), 2);
+                        sParam.txComBuf.setInt8(static_cast<uint8_t>(t >> 8), 1);
+                        sParam.txComBuf.setInt8(static_cast<uint8_t>(t), 2);
                     }
                     break;
 
@@ -5500,7 +5505,8 @@ void clMenu::setupParam()
 
                 if (com != GB_COM_NO)
                 {
-                    com = (eGB_COM) (com + GB_COM_MASK_GROUP_WRITE_PARAM);
+                    com = static_cast<eGB_COM>(static_cast<uint8_t>(com)
+                                               + GB_COM_MASK_GROUP_WRITE_PARAM);
                     sParam.txComBuf.addFastCom(com);
                     sParam.txComBuf.setSendType(getSendType(param));
                 }
@@ -5511,11 +5517,11 @@ void clMenu::setupParam()
                 if (param != GB_PARAM_NULL_PARAM)
                 {
                     // Запись параметров в ЕЕПРОМ.
-                    uint8_t tmp = EnterParam.getValueEnter();
+                    uint8_t tmp = static_cast<uint8_t>(EnterParam.getValueEnter());
                     if (param == GB_PARAM_INTF_INTERFACE)
                     {
                         TInterface::INTERFACE val;
-                        val = (TInterface::INTERFACE) (tmp);
+                        val = static_cast<TInterface::INTERFACE>(tmp);
                         // если интерфейс сменился, обновим меню
                         if (val != sParam.Uart.Interface.get())
                         {
@@ -5525,23 +5531,23 @@ void clMenu::setupParam()
                     }
                     else if (param == GB_PARAM_INTF_PROTOCOL)
                     {
-                        sParam.Uart.Protocol.set((TProtocol::PROTOCOL) (tmp));
+                        sParam.Uart.Protocol.set(static_cast<TProtocol::PROTOCOL>(tmp));
                     }
                     else if (param == GB_PARAM_INTF_BAUDRATE)
                     {
-                        sParam.Uart.BaudRate.set((TBaudRate::BAUD_RATE) (tmp));
+                        sParam.Uart.BaudRate.set(static_cast<TBaudRate::BAUD_RATE>(tmp));
                     }
                     else if (param == GB_PARAM_INTF_DATA_BITS)
                     {
-                        sParam.Uart.DataBits.set((TDataBits::DATA_BITS) (tmp));
+                        sParam.Uart.DataBits.set(static_cast<TDataBits::DATA_BITS>(tmp));
                     }
                     else if (param == GB_PARAM_INTF_PARITY)
                     {
-                        sParam.Uart.Parity.set((TParity::PARITY) (tmp));
+                        sParam.Uart.Parity.set(static_cast<TParity::PARITY>(tmp));
                     }
                     else if (param == GB_PARAM_INTF_STOP_BITS)
                     {
-                        sParam.Uart.StopBits.set((TStopBits::STOP_BITS) (tmp));
+                        sParam.Uart.StopBits.set(static_cast<TStopBits::STOP_BITS>(tmp));
                     }
                 }
             }
