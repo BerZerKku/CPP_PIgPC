@@ -134,7 +134,7 @@ static const char fcPvzueProtocol[][STRING_LENGHT] PROGMEM = {
 };
 
 /// Тип атоконтроля (параметр Общий).
-static char fcPvzueTypeAC[][STRING_LENGHT] PROGMEM = {
+static const char fcPvzueTypeAC[][STRING_LENGHT] PROGMEM = {
     // 234567890
     "тревожный",   ///< 1
     "нормальный",  ///< 2
@@ -142,21 +142,21 @@ static char fcPvzueTypeAC[][STRING_LENGHT] PROGMEM = {
 };
 
 /// Признак четности (параметр Общий).
-static char fcPvzueParity[][STRING_LENGHT] PROGMEM = {
+static const char fcPvzueParity[][STRING_LENGHT] PROGMEM = {
     // 234567890
     "вкл.",  ///< 1
     "выкл."  ///< 2
 };
 
 /// Интерфейс связи (параметр Интерфейс).
-static char fcInterface[TInterface::MAX][STRING_LENGHT] PROGMEM = {
+static const char fcInterface[TInterface::MAX][STRING_LENGHT] PROGMEM = {
     // 234567890
     "USB",   ///< TInterface::USB
     "RS485"  ///< TInterface::RS485
 };
 
 // Протокол (параметр Интерфейс).
-static char fcProtocol[TProtocol::MAX][STRING_LENGHT] PROGMEM = {
+static const char fcProtocol[TProtocol::MAX][STRING_LENGHT] PROGMEM = {
     // 234567890
     "СТАНДАРТ",  ///< TProtocol::STANDART
     "MODBUS",    ///< TProtocol::MODBUS
@@ -164,7 +164,7 @@ static char fcProtocol[TProtocol::MAX][STRING_LENGHT] PROGMEM = {
 };
 
 // Скорость, бит/с (параметр Интерфейс).
-static char fcBaudRate[TBaudRate::MAX][STRING_LENGHT] PROGMEM = {
+static const char fcBaudRate[TBaudRate::MAX][STRING_LENGHT] PROGMEM = {
     // 234567890
     "600",   ///< TBaudRate::_600
     "1200",  ///< TBaudRate::_1200
@@ -175,13 +175,13 @@ static char fcBaudRate[TBaudRate::MAX][STRING_LENGHT] PROGMEM = {
 };
 
 /// Количество бит данных (параметр Интерфейс).
-static char fcDataBits[TDataBits::MAX][STRING_LENGHT] PROGMEM = {
+static const char fcDataBits[TDataBits::MAX][STRING_LENGHT] PROGMEM = {
     // 234567890
     "8"  ///< TDataBits::_8
 };
 
 /// Четность (параметр Интерфейс).
-static char fcParity[TParity::MAX][STRING_LENGHT] PROGMEM = {
+static const char fcParity[TParity::MAX][STRING_LENGHT] PROGMEM = {
     // 234567890
     "нет",   ///< TParity::NONE
     "чет",   ///< TParity::EVEN
@@ -189,24 +189,24 @@ static char fcParity[TParity::MAX][STRING_LENGHT] PROGMEM = {
 };
 
 /// Стоповые биты (параметр Интерфейс).
-static char fcStopBits[TStopBits::MAX][STRING_LENGHT] PROGMEM = {
+static const char fcStopBits[TStopBits::MAX][STRING_LENGHT] PROGMEM = {
     // 234567890
     "1",  ///< TStopBits::ONE
     "2"   ///< TStopBits::TWO
 };
 
 /// Скорость ТМ
-static char fcTMSpeed[][STRING_LENGHT] PROGMEM = {
+static const char fcTMSpeed[][STRING_LENGHT] PROGMEM = {
     // 234567890
     "200",
     "400"
 };
 
 /// Сигналы КС
-static char fcCF[][STRING_LENGHT] PROGMEM = { "КС1", "КС2" };
+static const char fcCF[][STRING_LENGHT] PROGMEM = { "КС1", "КС2" };
 
 /// Переназначение команд в кольце
-static char fcRingRenumber[][STRING_LENGHT] PROGMEM = {
+static const char fcRingRenumber[][STRING_LENGHT] PROGMEM = {
     "0",   "1A",  "2A",  "3A",  "4A",  "5A",  "6A",  "7A",  "8A",  "9A",  "10A", "11A", "12A",
     "13A", "14A", "15A", "16A", "17A", "18A", "19A", "20A", "21A", "22A", "23A", "24A", "25A",
     "26A", "27A", "28A", "29A", "30A", "31A", "32A", "1B",  "2B",  "3B",  "4B",  "5B",  "6B",
@@ -218,7 +218,7 @@ static char fcRingRenumber[][STRING_LENGHT] PROGMEM = {
 };
 
 // Синхронизация времени
-static char fcTymeSynchSrc[][STRING_LENGHT] PROGMEM = {
+static const char fcTymeSynchSrc[][STRING_LENGHT] PROGMEM = {
     // 234567890
     "выкл.",
     "канал св.",

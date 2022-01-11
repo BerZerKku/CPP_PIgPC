@@ -92,7 +92,7 @@ static const char fcSrcPrm3[8][7] PROGMEM = { "      ", "(ПРМ1)", "(ПРМ2)", "   
                                               "      ", "(П1,2)", "      ", "      " };
 
 /// Номера удаленного(ых) аппарата
-static char fcRemoteNum[TDeviceStatus::GB_MAX_REM_NUM + 1][STRING_LENGHT] PROGMEM = {
+static const char fcRemoteNum[TDeviceStatus::GB_MAX_REM_NUM + 1][STRING_LENGHT] PROGMEM = {
     // 234567890
     "   ",  ///< 000
     " 1 ",  ///< 001
@@ -310,7 +310,7 @@ static const char fcJrnPrdOptoComYes[] PROGMEM = "Команда передается";
 static const char fcJrnPrmOptoComYes[] PROGMEM = "Команда принимается";
 
 /// Записи журнала событий для К400.
-static char fcJrnEventK400[MAX_JRN_EVENT_VALUE + 1][21] PROGMEM = {
+static const char fcJrnEventK400[MAX_JRN_EVENT_VALUE + 1][21] PROGMEM = {
     // 2345678901234567890
     "Событие - 0",           ///< 0 - ошибочное значение
     "Вкл. питания/перезап",  ///< 1
@@ -357,7 +357,7 @@ static char fcJrnEventK400[MAX_JRN_EVENT_VALUE + 1][21] PROGMEM = {
 };
 
 /// Записи журнала событий для РЗСК.
-static char fcJrnEventRZSK[MAX_JRN_EVENT_VALUE + 1][21] PROGMEM = {
+static const char fcJrnEventRZSK[MAX_JRN_EVENT_VALUE + 1][21] PROGMEM = {
     // 2345678901234567890
     "Событие - %d",          ///< 0 - ошибочное значение
     "Вкл. питания/перезап",  ///< 1
@@ -404,7 +404,7 @@ static char fcJrnEventRZSK[MAX_JRN_EVENT_VALUE + 1][21] PROGMEM = {
 };
 
 /// Записи журнала событий для Р400М.
-static char fcJrnEventR400_MSK[MAX_JRN_EVENT_VALUE + 1][21] PROGMEM = {
+static const char fcJrnEventR400_MSK[MAX_JRN_EVENT_VALUE + 1][21] PROGMEM = {
     // 2345678901234567890
     "Событие - %d",          ///< 0 - ошибочное значение
     "Неиспр чт/зап FLASH",   ///< 1
@@ -451,7 +451,7 @@ static char fcJrnEventR400_MSK[MAX_JRN_EVENT_VALUE + 1][21] PROGMEM = {
 };
 
 /// Записи журнала событий для ОПТИКИ.
-static char fcJrnEventOPTO[MAX_JRN_EVENT_VALUE + 1][21] PROGMEM = {
+static const char fcJrnEventOPTO[MAX_JRN_EVENT_VALUE + 1][21] PROGMEM = {
     // 2345678901234567890
     "Событие - %d",          ///< 0 - ошибочное значение
     "Неиспр чт/зап FLASH",   ///< 1
@@ -498,7 +498,7 @@ static char fcJrnEventOPTO[MAX_JRN_EVENT_VALUE + 1][21] PROGMEM = {
 };
 
 /// Записи журнала событий для ОПТИКИ кольцо однонаправленное
-static char fcJrnEventOPTOring[MAX_JRN_EVENT_VALUE + 1][21] PROGMEM = {
+static const char fcJrnEventOPTOring[MAX_JRN_EVENT_VALUE + 1][21] PROGMEM = {
     // 2345678901234567890
     "Событие - %d",          ///< 0 - ошибочное значение
     "Неиспр чт/зап FLASH",   ///< 1

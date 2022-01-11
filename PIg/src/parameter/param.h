@@ -97,11 +97,11 @@ struct Param
     CHANGE_REG changeReg;  ///< Режим для изменения параметра.
 };
 
-extern const char   fcNullBuf[] PROGMEM;
-extern const Param *fParams[] PROGMEM;
+extern const char         fcNullBuf[] PROGMEM;
+extern const Param* const fParams[] PROGMEM;
 
 // Возвращает указатель на структуру параметра.
-extern Param const *getPtrParam(eGB_PARAM pn);
+extern const Param* getPtrParam(eGB_PARAM pn);
 
 // Возвращает минимум значения параметра.
 extern int16_t getAbsMin(eGB_PARAM pn);

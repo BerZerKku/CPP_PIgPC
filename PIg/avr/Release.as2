@@ -1,5 +1,5 @@
 [Files]
-Flash=D:\Workspace\pc\cpp\PIg\PIg\Release\PIg.hex
+Flash=D:\Workspace\pc\cpp\PIg\PIg\build-PIg-GCC_AVR-Release\PIg-atmega128a.hex
 Eeprom=[Unspecified]
 FlashInvert=0
 [Settings]

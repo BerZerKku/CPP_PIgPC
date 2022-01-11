@@ -112,7 +112,7 @@ enum eMENU_ENTER_PARAM
     MENU_ENTER_PASSWORD_READY,    ///< введен верный пароль
     MENU_ENTER_PASSWORD_N_READY,  ///< новый пароль введен корректно
     MENU_ENTER_PARAM_READY,       ///< необходимо изменить параметр
-    MENU_ENTER_PARAM_MESSAGE,  ///< вывод сообщения на экран при вводе параметра
+    MENU_ENTER_PARAM_MESSAGE  ///< вывод сообщения на экран при вводе параметра
 };
 
 /// Тип аппарата
@@ -204,7 +204,7 @@ enum eGB_REGIME
     GB_REGIME_TALK,          // речь
     GB_REGIME_TEST_1,        // тест ПРД
     GB_REGIME_TEST_2,        // тест ПРМ
-    GB_REGIME_MAX,
+    GB_REGIME_MAX
 };
 
 // Режимы работы для ввода с клавиатуры

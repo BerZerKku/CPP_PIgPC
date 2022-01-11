@@ -20,7 +20,7 @@
 #include <limits.h>
 #include <stdint.h>
 
-#define pgm_read_ptr(x) (PGM_P) pgm_read_word(x)
+//#define pgm_read_ptr(x) (PGM_P) pgm_read_word(x)
 #define nullptr NULL
 
 #else

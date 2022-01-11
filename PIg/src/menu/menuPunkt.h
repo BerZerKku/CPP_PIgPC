@@ -92,7 +92,7 @@ public:
      */
     PGM_P getName(uint8_t num)
     {
-        static char unknown[] PROGMEM = "?";
+        static const char unknown[] PROGMEM = "?";
         return ((num < cnt_) ? name_[num] : unknown);
     }
 

@@ -1229,13 +1229,13 @@ void clMenu::lvlStart()
  */
 void clMenu::lvlFirst()
 {
-    static char title[] PROGMEM  = "Меню";
-    static char punkt1[] PROGMEM = "%d. Журнал";
-    static char punkt2[] PROGMEM = "%d. Управление";
-    static char punkt3[] PROGMEM = "%d. Настройка";
-    static char punkt4[] PROGMEM = "%d. Тесты";
-    static char punkt5[] PROGMEM = "%d. Информация";
-    static char punkt6[] PROGMEM = "%d. Измерения";
+    static const char title[] PROGMEM  = "Меню";
+    static const char punkt1[] PROGMEM = "%d. Журнал";
+    static const char punkt2[] PROGMEM = "%d. Управление";
+    static const char punkt3[] PROGMEM = "%d. Настройка";
+    static const char punkt4[] PROGMEM = "%d. Тесты";
+    static const char punkt5[] PROGMEM = "%d. Информация";
+    static const char punkt6[] PROGMEM = "%d. Измерения";
 
     if (lvlCreate_)
     {
@@ -1332,7 +1332,7 @@ void clMenu::lvlFirst()
  */
 void clMenu::lvlInfo()
 {
-    static char title[] PROGMEM = "Меню\\Информация";
+    static const char title[] PROGMEM = "Меню\\Информация";
 
     if (lvlCreate_)
     {
@@ -1440,11 +1440,11 @@ void clMenu::lvlInfo()
  */
 void clMenu::lvlJournal()
 {
-    static char title[] PROGMEM  = "Меню\\Журнал";
-    static char punkt1[] PROGMEM = "%d. События";
-    static char punkt2[] PROGMEM = "%d. Защита";
-    static char punkt3[] PROGMEM = "%d. Приемник";
-    static char punkt4[] PROGMEM = "%d. Передатчик";
+    static const char title[] PROGMEM  = "Меню\\Журнал";
+    static const char punkt1[] PROGMEM = "%d. События";
+    static const char punkt2[] PROGMEM = "%d. Защита";
+    static const char punkt3[] PROGMEM = "%d. Приемник";
+    static const char punkt4[] PROGMEM = "%d. Передатчик";
 
     if (lvlCreate_)
     {
@@ -1530,10 +1530,10 @@ void clMenu::lvlJournal()
  */
 void clMenu::lvlJournalEvent()
 {
-    static char title[] PROGMEM = "Журнал\\События";
+    static const char title[] PROGMEM = "Журнал\\События";
 
-    static char opto_ring1_13[] PROGMEM = "Кольцо восстановлено";
-    static char opto_ring1_14[] PROGMEM = "Дистанционный сброс";
+    static const char opto_ring1_13[] PROGMEM = "Кольцо восстановлено";
+    static const char opto_ring1_14[] PROGMEM = "Дистанционный сброс";
 
     if (lvlCreate_)
     {
@@ -1772,7 +1772,7 @@ void clMenu::lvlJournalEvent()
  */
 void clMenu::lvlJournalDef()
 {
-    static char title[] PROGMEM = "Журнал\\Защита";
+    static const char title[] PROGMEM = "Журнал\\Защита";
 
     if (lvlCreate_)
     {
@@ -1911,7 +1911,7 @@ void clMenu::lvlJournalDef()
  */
 void clMenu::lvlJournalPrm()
 {
-    static char title[] PROGMEM = "Журнал\\Приемник";
+    static const char title[] PROGMEM = "Журнал\\Приемник";
     if (lvlCreate_)
     {
         lvlCreate_    = false;
@@ -2008,9 +2008,9 @@ void clMenu::lvlJournalPrm()
 
         if ((device == AVANT_RZSK) && (sParam.glb.getMaxNumDevices() == 3))
         {
-            uint8_t src                        = sParam.jrnEntry.getSrcCom();
-            uint8_t devnum                     = sParam.glb.getDeviceNum();
-            uint8_t tmp[SIZE_OF(fcSrcPrm1[0])] = "";
+            uint8_t src    = sParam.jrnEntry.getSrcCom();
+            uint8_t devnum = sParam.glb.getDeviceNum();
+
             if (devnum == 1)
             {
                 char tmp[SIZE_OF(fcSrcPrm1[0])] = "";
@@ -2152,7 +2152,7 @@ void clMenu::lvlJournalPrm()
  */
 void clMenu::lvlJournalPrd()
 {
-    static char title[] PROGMEM = "Журнал\\Передатчик";
+    static const char title[] PROGMEM = "Журнал\\Передатчик";
 
     if (lvlCreate_)
     {
@@ -2373,46 +2373,46 @@ void clMenu::lvlJournalPrd()
 void clMenu::lvlControl()
 {
 
-    static char title[] PROGMEM = "Меню\\Управление";
+    static const char title[] PROGMEM = "Меню\\Управление";
     // %d - может быть двухзначным, учесть для макс. кол-ва символов !
     //                              "01234567890123456789"
-    static char punkt02[] PROGMEM = "%d. Пуск удаленного";
-    static char punkt03[] PROGMEM = "%d. Сброс своего";
-    static char punkt04[] PROGMEM = "%d. Сброс удаленного";
-    static char punkt05[] PROGMEM = "%d. Вызов";
-    static char punkt06[] PROGMEM = "%d. Пуск налад. вкл.";
-    static char punkt07[] PROGMEM = "%d. Пуск налад. выкл";
-    static char punkt08[] PROGMEM = "%d. АК пуск";
-    static char punkt09[] PROGMEM = "%d. Пуск удален. МАН";
-    static char punkt10[] PROGMEM = "%d. АК контр.провер.";
-    static char punkt11[] PROGMEM = "%d. Сброс АК";
-    static char punkt12[] PROGMEM = "%d. Пуск АК свой";
-    static char punkt13[] PROGMEM = "%d. Пуск АК удаленн.";
-    static char punkt14[] PROGMEM = "%d. Пуск ПРД";
-    static char punkt15[] PROGMEM = "%d. АК автоматическ.";
-    static char punkt16[] PROGMEM = "%d. АК ускоренный";
-    static char punkt17[] PROGMEM = "%d. АК выключен";
-    static char punkt18[] PROGMEM = "%d. АК испытания";
-    static char punkt19[] PROGMEM = "%d. АК нормальный";
-    static char punkt20[] PROGMEM = "%d. АК беглый";
-    //  static char punkt21[] PROGMEM = "%d. АК односторонний";
-    static char punkt22[] PROGMEM = "%d. Сброс удаленных";
-    static char punkt23[] PROGMEM = "%d. Пуск удаленн. 1";
-    static char punkt24[] PROGMEM = "%d. Пуск удаленн. 2";
-    static char punkt25[] PROGMEM = "%d. Пуск удаленн. 3";
-    static char punkt26[] PROGMEM = "%d. Пуск удаленных";
-    static char punkt27[] PROGMEM = "%d. Пуск удал. МАН 1";
-    static char punkt28[] PROGMEM = "%d. Пуск удал. МАН 2";
-    static char punkt29[] PROGMEM = "%d. Пуск удал. МАН 3";
-    static char punkt30[] PROGMEM = "%d. Пуск удал-ых МАН";
-    static char punkt31[] PROGMEM = "%d. АК включен";
-    static char punkt32[] PROGMEM = "%d. Сброс удален. 1";
-    static char punkt33[] PROGMEM = "%d. Сброс удален. 2";
-    static char punkt34[] PROGMEM = "%d. Сброс удален. 3";
-    static char punkt35[] PROGMEM = "%d. Сброс индикации";
-    static char punkt36[] PROGMEM = "%d. Сброс всех";
-    static char punkt37[] PROGMEM = "%d. Одност.реж. выкл";
-    static char punkt38[] PROGMEM = "%d. Одност.реж. вкл";
+    static const char punkt02[] PROGMEM = "%d. Пуск удаленного";
+    static const char punkt03[] PROGMEM = "%d. Сброс своего";
+    static const char punkt04[] PROGMEM = "%d. Сброс удаленного";
+    static const char punkt05[] PROGMEM = "%d. Вызов";
+    static const char punkt06[] PROGMEM = "%d. Пуск налад. вкл.";
+    static const char punkt07[] PROGMEM = "%d. Пуск налад. выкл";
+    static const char punkt08[] PROGMEM = "%d. АК пуск";
+    static const char punkt09[] PROGMEM = "%d. Пуск удален. МАН";
+    static const char punkt10[] PROGMEM = "%d. АК контр.провер.";
+    static const char punkt11[] PROGMEM = "%d. Сброс АК";
+    static const char punkt12[] PROGMEM = "%d. Пуск АК свой";
+    static const char punkt13[] PROGMEM = "%d. Пуск АК удаленн.";
+    static const char punkt14[] PROGMEM = "%d. Пуск ПРД";
+    static const char punkt15[] PROGMEM = "%d. АК автоматическ.";
+    static const char punkt16[] PROGMEM = "%d. АК ускоренный";
+    static const char punkt17[] PROGMEM = "%d. АК выключен";
+    static const char punkt18[] PROGMEM = "%d. АК испытания";
+    static const char punkt19[] PROGMEM = "%d. АК нормальный";
+    static const char punkt20[] PROGMEM = "%d. АК беглый";
+    //  static const char punkt21[] PROGMEM = "%d. АК односторонний";
+    static const char punkt22[] PROGMEM = "%d. Сброс удаленных";
+    static const char punkt23[] PROGMEM = "%d. Пуск удаленн. 1";
+    static const char punkt24[] PROGMEM = "%d. Пуск удаленн. 2";
+    static const char punkt25[] PROGMEM = "%d. Пуск удаленн. 3";
+    static const char punkt26[] PROGMEM = "%d. Пуск удаленных";
+    static const char punkt27[] PROGMEM = "%d. Пуск удал. МАН 1";
+    static const char punkt28[] PROGMEM = "%d. Пуск удал. МАН 2";
+    static const char punkt29[] PROGMEM = "%d. Пуск удал. МАН 3";
+    static const char punkt30[] PROGMEM = "%d. Пуск удал-ых МАН";
+    static const char punkt31[] PROGMEM = "%d. АК включен";
+    static const char punkt32[] PROGMEM = "%d. Сброс удален. 1";
+    static const char punkt33[] PROGMEM = "%d. Сброс удален. 2";
+    static const char punkt34[] PROGMEM = "%d. Сброс удален. 3";
+    static const char punkt35[] PROGMEM = "%d. Сброс индикации";
+    static const char punkt36[] PROGMEM = "%d. Сброс всех";
+    static const char punkt37[] PROGMEM = "%d. Одност.реж. выкл";
+    static const char punkt38[] PROGMEM = "%d. Одност.реж. вкл";
 
     eGB_TYPE_DEVICE device = sParam.typeDevice;
 
@@ -2881,12 +2881,12 @@ void clMenu::lvlControl()
  */
 void clMenu::lvlSetup()
 {
-    static char title[] PROGMEM  = "Меню\\Настройка";
-    static char punkt1[] PROGMEM = "%d. Режим";
-    static char punkt2[] PROGMEM = "%d. Время и дата";
-    static char punkt3[] PROGMEM = "%d. Параметры";
-    static char punkt4[] PROGMEM = "%d. Пароль";
-    static char punkt5[] PROGMEM = "%d. Интерфейс";
+    static const char title[] PROGMEM  = "Меню\\Настройка";
+    static const char punkt1[] PROGMEM = "%d. Режим";
+    static const char punkt2[] PROGMEM = "%d. Время и дата";
+    static const char punkt3[] PROGMEM = "%d. Параметры";
+    static const char punkt4[] PROGMEM = "%d. Пароль";
+    static const char punkt5[] PROGMEM = "%d. Интерфейс";
 
     if (lvlCreate_)
     {
@@ -2991,8 +2991,8 @@ void clMenu::lvlSetup()
 
 void clMenu::lvlRegime()
 {
-    static char title[] PROGMEM = "Настройка\\Режим";
-    eGB_REGIME  reg             = sParam.glb.status.getRegime();
+    static const char title[] PROGMEM = "Настройка\\Режим";
+    eGB_REGIME        reg             = sParam.glb.status.getRegime();
 
     if (lvlCreate_)
     {
@@ -3150,12 +3150,12 @@ void clMenu::lvlRegime()
  */
 void clMenu::lvlSetupParam()
 {
-    static char title[] PROGMEM  = "Настройка\\Параметры";
-    static char punkt1[] PROGMEM = "%d. Защита";
-    static char punkt2[] PROGMEM = "%d. Приемник";
-    static char punkt3[] PROGMEM = "%d. Передатчик";
-    static char punkt4[] PROGMEM = "%d. Общие";
-    static char punkt5[] PROGMEM = "%d. Кольцо";
+    static const char title[] PROGMEM  = "Настройка\\Параметры";
+    static const char punkt1[] PROGMEM = "%d. Защита";
+    static const char punkt2[] PROGMEM = "%d. Приемник";
+    static const char punkt3[] PROGMEM = "%d. Передатчик";
+    static const char punkt4[] PROGMEM = "%d. Общие";
+    static const char punkt5[] PROGMEM = "%d. Кольцо";
 
     if (lvlCreate_)
     {
@@ -3253,7 +3253,7 @@ void clMenu::lvlSetupParam()
  */
 void clMenu::lvlSetupParamDef()
 {
-    static char title[] PROGMEM = "Параметры\\Защита";
+    static const char title[] PROGMEM = "Параметры\\Защита";
 
     if (lvlCreate_)
     {
@@ -3352,7 +3352,7 @@ void clMenu::lvlSetupParamDef()
  */
 void clMenu::lvlSetupParamPrm()
 {
-    static char title[] PROGMEM = "Параметры\\Приемник";
+    static const char title[] PROGMEM = "Параметры\\Приемник";
 
     if (lvlCreate_)
     {
@@ -3452,7 +3452,7 @@ void clMenu::lvlSetupParamPrm()
  */
 void clMenu::lvlSetupParamPrd()
 {
-    static char title[] PROGMEM = "Параметры\\Передатчик";
+    static const char title[] PROGMEM = "Параметры\\Передатчик";
 
     if (lvlCreate_)
     {
@@ -3552,7 +3552,7 @@ void clMenu::lvlSetupParamPrd()
  */
 void clMenu::lvlSetupParamGlb()
 {
-    static char title[] PROGMEM = "Параметры\\Общие";
+    static const char title[] PROGMEM = "Параметры\\Общие";
 
     if (lvlCreate_)
     {
@@ -3728,7 +3728,7 @@ void clMenu::lvlSetupParamGlb()
  */
 void clMenu::lvlSetupParamRing()
 {
-    static char title[] PROGMEM = "Параметры\\Кольцо";
+    static const char title[] PROGMEM = "Параметры\\Кольцо";
 
     if (lvlCreate_)
     {
@@ -3791,7 +3791,7 @@ void clMenu::lvlSetupParamRing()
  */
 void clMenu::lvlSetupInterface()
 {
-    static char title[] PROGMEM = "Настройка\\Интерфейс";
+    static const char title[] PROGMEM = "Настройка\\Интерфейс";
 
     if (lvlCreate_)
     {
@@ -3878,13 +3878,13 @@ void clMenu::lvlSetupInterface()
  */
 void clMenu::lvlSetupDT()
 {
-    static char title[] PROGMEM  = "Настройка\\Время&дата";
-    static char punkt1[] PROGMEM = "%d. Год";
-    static char punkt2[] PROGMEM = "%d. Месяц";
-    static char punkt3[] PROGMEM = "%d. День";
-    static char punkt4[] PROGMEM = "%d. Часы";
-    static char punkt5[] PROGMEM = "%d. Минуты";
-    static char punkt6[] PROGMEM = "%d. Секунды";
+    static const char title[] PROGMEM  = "Настройка\\Время&дата";
+    static const char punkt1[] PROGMEM = "%d. Год";
+    static const char punkt2[] PROGMEM = "%d. Месяц";
+    static const char punkt3[] PROGMEM = "%d. День";
+    static const char punkt4[] PROGMEM = "%d. Часы";
+    static const char punkt5[] PROGMEM = "%d. Минуты";
+    static const char punkt6[] PROGMEM = "%d. Секунды";
 
     if (lvlCreate_)
     {
@@ -4059,7 +4059,7 @@ void clMenu::lvlSetupDT()
  */
 void clMenu::lvlMeasure()
 {
-    static char title[] PROGMEM = "Меню\\Измерения";
+    static const char title[] PROGMEM = "Меню\\Измерения";
 
     if (lvlCreate_)
     {
@@ -4117,10 +4117,10 @@ void clMenu::lvlMeasure()
  */
 void clMenu::lvlTest()
 {
-    static char title[] PROGMEM       = "Настройка\\Тесты";
-    static char punkt1[] PROGMEM      = "%d. Тест передатчика";
-    static char punkt2[] PROGMEM      = "%d. Тест приемника";
-    static char message[][21] PROGMEM = {
+    static const char title[] PROGMEM       = "Настройка\\Тесты";
+    static const char punkt1[] PROGMEM      = "%d. Тест передатчика";
+    static const char punkt2[] PROGMEM      = "%d. Тест приемника";
+    static const char message[][21] PROGMEM = {
         // 12345678901234567890
         "    Перейдите в     ",  //
         "   режим ВЫВЕДЕН    "   //
@@ -4237,8 +4237,8 @@ void clMenu::lvlTest()
  */
 void clMenu::lvlTest1()
 {
-    static char    title[] PROGMEM  = "Тесты\\Передатчик";
-    static char    punkt1[] PROGMEM = "Сигналы передатчика";
+    static const char title[] PROGMEM  = "Тесты\\Передатчик";
+    static const char punkt1[] PROGMEM = "Сигналы передатчика";
     static uint8_t cnt = 0;  // счетчик до выхода при ошибочном режиме
     eGB_TYPE_DEVICE device = sParam.typeDevice;
 
@@ -4456,10 +4456,10 @@ void clMenu::lvlTest1()
  */
 void clMenu::lvlTest2()
 {
-    static char title[] PROGMEM  = "Тесты\\Приемник";
-    static char punkt1[] PROGMEM = "Сигналы приемника";
-    static char prm1[] PROGMEM   = "ПРМ1: ";
-    static char prm2[] PROGMEM   = "ПРМ2: ";
+    static const char title[] PROGMEM  = "Тесты\\Приемник";
+    static const char punkt1[] PROGMEM = "Сигналы приемника";
+    static const char prm1[] PROGMEM   = "ПРМ1: ";
+    static const char prm2[] PROGMEM   = "ПРМ2: ";
 
     static uint8_t cnt = 0;  // счетчик до выхода при ошибочном режиме
     eGB_TYPE_DEVICE device = sParam.typeDevice;
@@ -4611,9 +4611,9 @@ void clMenu::lvlTest2()
  */
 eMENU_ENTER_PARAM clMenu::enterValue()
 {
-    static char enterList[] PROGMEM = "Ввод: ";
-    static char enterInt[] PROGMEM  = "Ввод: %01d";
-    static char enterUcor[] PROGMEM = "Ввод: %01u.%01u";
+    static const char enterList[] PROGMEM = "Ввод: ";
+    static const char enterInt[] PROGMEM  = "Ввод: %01d";
+    static const char enterUcor[] PROGMEM = "Ввод: %01u.%01u";
 
     uint8_t len = 0;
     uint8_t pos = 100;
@@ -4688,10 +4688,10 @@ eMENU_ENTER_PARAM clMenu::enterPassword()
         // затем возврат в исходный пункт меню
         if (EnterParam.cnt_ < TIME_MESSAGE)
         {
-            static char message[3][21] PROGMEM = { //       12345678901234567890
-                                                   "       Введен       ",  //
-                                                   "    неправильный    ",  //
-                                                   "       пароль       "
+            static const char message[3][21] PROGMEM = { //       12345678901234567890
+                                                         "       Введен       ",  //
+                                                         "    неправильный    ",  //
+                                                         "       пароль       "
             };
 
             EnterParam.cnt_++;
@@ -4716,12 +4716,12 @@ eMENU_ENTER_PARAM clMenu::enterPassword()
 
         if (status == MENU_ENTER_PASSWORD)
         {
-            static char enter[] PROGMEM = "Пароль: %04u";
+            static const char enter[] PROGMEM = "Пароль: %04u";
             snprintf_P(&vLCDbuf[poz], 21, enter, val);
         }
         else if (status == MENU_ENTER_PASSWORD_NEW)
         {
-            static char enterNew[] PROGMEM = "Новый пароль: %04u";
+            static const char enterNew[] PROGMEM = "Новый пароль: %04u";
             snprintf_P(&vLCDbuf[poz], 21, enterNew, val);
         }
         else
@@ -5063,7 +5063,7 @@ void clMenu::printDevicesRegime(uint8_t poz, TDeviceStatus* device)
 // Вывод на экран текущего номера и их колчиество для однотипных пар-ов.
 void clMenu::printParam()
 {
-    static prog_uint8_t MAX_CHARS = 21;
+    const uint8_t MAX_CHARS = 21;
 
     snprintf_P(&vLCDbuf[20],
                MAX_CHARS,
@@ -5081,7 +5081,7 @@ void clMenu::printParam()
 // Вывод на экран текущего номера и их колчиество для однотипных пар-ов.
 void clMenu::printSameNumber(uint8_t pos)
 {
-    static prog_uint8_t MAX_CHARS = 21;
+    const uint8_t MAX_CHARS = 21;
 
     if (sParam.local.getNumOfSameParams() > 1)
     {
@@ -5108,7 +5108,7 @@ void clMenu::printSameNumber(uint8_t pos)
 //  Вывод на экран диапазона значений параметра.
 void clMenu::printRange(uint8_t pos)
 {
-    static prog_uint8_t MAX_CHARS = 11;
+    const uint8_t MAX_CHARS = 11;
 
     LocalParams* lp    = &sParam.local;
     eGB_PARAM    param = lp->getParam();
@@ -5382,10 +5382,10 @@ void clMenu::setupParam()
     {
         // Вывод на экран сообщения о невозможности изменения параметра,
         // при этом нажатые кнопки будут проигнорированы.
-        static char message[3][21] PROGMEM = { // 2345678901234567890
-                                               " Изменить параметр  ",
-                                               "  можно только в    ",
-                                               "  режиме ВЫВЕДЕН    "
+        static const char message[3][21] PROGMEM = { // 2345678901234567890
+                                                     " Изменить параметр  ",
+                                                     "  можно только в    ",
+                                                     "  режиме ВЫВЕДЕН    "
         };
 
         for (uint8_t i = 0, pos = 40; i < SIZE_OF(message); i++, pos += 20)

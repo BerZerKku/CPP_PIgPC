@@ -81,10 +81,10 @@ public:
         COM_06H_WRITE_SINGLE_REGISTER = 0x06,  ///< Запись одного внутреннего регистра.
         COM_0FH_WRITE_MULTIPLIE_COILS = 0x0F,  ///< Запись группы флагов.
         COM_10H_WRITE_MULITPLIE_REGISTERS = 0x10,  ///< Запись группы внутренних регистров.
-        COM_11H_SLAVE_ID = 0x11,  ///< Чтение ID подчиненного.
+        COM_11H_SLAVE_ID = 0x11  ///< Чтение ID подчиненного.
         //		COM_16H_MASK_WRITE_REGISTER		= 0x16,	///< Запись внутреннего
-        //регистра по маске. 		COM_17H_RW_MULTIPLIE_REGISTERS	= 0x17	///< Запись/чтение группы
-        //внутрених регистров.
+        //регистра по маске. 		COM_17H_RW_MULTIPLIE_REGISTERS	= 0x17	///< Запись/чтение
+        //группы внутрених регистров.
     };
 
     /// Коды исключения

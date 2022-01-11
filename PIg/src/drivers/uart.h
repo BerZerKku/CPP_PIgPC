@@ -6,6 +6,7 @@
 #ifndef UART_H_
 #define UART_H_
 
+#include "avr.h"
 #include "paramUart.h"
 
 class TUart
@@ -27,7 +28,7 @@ public:
         }
         else
         {
-            *ucsrb_ &= ~(1 << UDRIE1);
+            *ucsrb_ &= ~(1 << UDRIE0);
         }
     }
 
@@ -41,8 +42,8 @@ public:
     {
         cnt_       = 0;
         numTrByte_ = 0;
-        *ucsrb_ |= (1 << RXCIE);
-        *ucsrb_ &= ~(1 << TXCIE);
+        *ucsrb_ |= (1 << RXCIE0);
+        *ucsrb_ &= ~(1 << TXCIE0);
     }
 
     /// Имя последовательного порта

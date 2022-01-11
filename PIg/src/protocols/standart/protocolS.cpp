@@ -8,8 +8,8 @@
 
 clProtocolS::clProtocolS(uint8_t* buf, uint8_t size, stGBparam* sParam) :
     buf(buf),
-    size_(size),
-    sParam_(sParam)
+    sParam_(sParam),
+    size_(size)
 {
     cnt_      = 0;
     maxLen_   = 0;
