@@ -146,9 +146,12 @@ add_avr_executable( PIg
     main.cpp
     src/avr.h
     src/flash.h
+    src/flashArrays.c
+    src/flashArrays.h
     src/flashParams.cpp
     src/flashParams.h
     src/glbDefine.h
+    src/glbTypes.h
     src/paramBsp.h
     src/paramDef.h
     src/paramGlb.h

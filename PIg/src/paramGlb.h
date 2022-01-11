@@ -26,20 +26,6 @@ enum eGB_IC
     GB_IC_MAX
 };
 
-/// Совместимость
-enum eGB_COMP_R400M
-{
-    GB_COMP_R400M_MIN    = 0,
-    GB_COMP_R400M_AVANT  = 0,
-    GB_COMP_R400M_PVZ90  = 1,
-    GB_COMP_R400M_AVZK80 = 2,
-    GB_COMP_R400M_PVZUE  = 3,
-    GB_COMP_R400M_PVZL   = 4,
-    GB_COMP_R400M_LINER  = 5,
-    GB_COMP_R400M_PVZK = 6,  // TODO задел на будущее. Ничего по нему не сделано.
-    GB_COMP_R400M_MAX
-};
-
 /// Совместимость для К400
 enum eGB_COMP_K400
 {

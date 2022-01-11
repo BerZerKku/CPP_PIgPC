@@ -8,6 +8,7 @@
 #ifndef FLASHPARAMS_H_
 #define FLASHPARAMS_H_
 
+#include "flashArrays.h"
 #include "glbDefine.h"
 #include "paramDef.h"
 #include "paramGlb.h"
@@ -76,18 +77,6 @@ static const char fcPrmType[][STRING_LENGHT] PROGMEM = {
     "акт+пасс",  ///< 0
     "активный",  ///< 1
     "пассивный"  ///< 2
-};
-
-/// Тип совместимости (параметр Защиты). Связан с eGB_COMPATIBILITY.
-static const char fcCompatibility[][STRING_LENGHT] PROGMEM = {
-    // 234567890
-    "АВАНТ Р400",  ///< 0
-    "ПВЗ-90",      ///< 1
-    "АВЗК-80",     ///< 2
-    "ПВЗУ-Е",      ///< 3
-    "ПВЗЛ",        ///< 4
-    "ЛИНИЯ-Р",     ///< 5
-    "ПВЗК"         ///< 6
 };
 
 /// Тип совместимости (параметр К400). Связан с eGB_COMP_K400.

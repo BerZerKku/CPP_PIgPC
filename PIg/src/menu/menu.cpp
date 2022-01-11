@@ -1188,7 +1188,7 @@ void clMenu::lvlStart()
 
                 if (comp < GB_COMP_R400M_MAX)
                 {
-                    snprintf_P(&vLCDbuf[poz + len], 21 - len, fcCompatibility[comp]);
+                    snprintf_P(&vLCDbuf[poz + len], 21 - len, fcCompR400m[comp]);
                 }
                 else
                 {

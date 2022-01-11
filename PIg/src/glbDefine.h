@@ -17,6 +17,7 @@
 
 #include "avr.h"
 #include "debug/debug.hpp"
+#include "glbTypes.h"
 #include "menu/dateTime.h"
 #include <stdint.h>
 
@@ -56,9 +57,6 @@
 
 /// максимальное кол-во сигналов в тестах
 #define MAX_NUM_TEST_SIGNAL 100
-
-// длина половины строки (+1 - символ конца строки)
-#define STRING_LENGHT (11 + 1)
 
 // длина строки (+1 - символ конца строки)
 #define NAME_PARAM_LENGHT (20 + 1)

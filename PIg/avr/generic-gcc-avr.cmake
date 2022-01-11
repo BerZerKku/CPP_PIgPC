@@ -48,8 +48,10 @@ find_program(AVR_OBJDUMP avr-objdump REQUIRED)
 set(CMAKE_SYSTEM_NAME Generic)
 set(CMAKE_SYSTEM_PROCESSOR avr)
 set(CMAKE_C_COMPILER ${AVR_CC})
+set(CMAKE_C_STANDARD 17)
 set(CMAKE_CXX_COMPILER ${AVR_CXX})
 set(CMAKE_CXX_STANDARD 17)
+
 
 ##########################################################################
 # Identification

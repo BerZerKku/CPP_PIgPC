@@ -144,7 +144,7 @@ PGM_P getListOfValues(eGB_PARAM pn)
 PGM_P getTextValue(eGB_PARAM pn, uint8_t value)
 {
     PGM_P         str = fcNullBuf;
-    const uint8_t min = getAbsMin(pn);
+    const uint8_t min = static_cast<uint8_t>(getAbsMin(pn));
 
     if ((getListOfValues(pn) != fcNullBuf) && (value >= min))
     {
