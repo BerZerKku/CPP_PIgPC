@@ -42,8 +42,8 @@
     #define PROGMEM
     #define prog_uint8_t     uint8_t
     #define pgm_read_ptr(x)  (*(x))
-    #define pgm_read_byte(x) (*(uint8_t *) (x))
-    #define pgm_read_word(x) (*(uint16_t *) (x))
+    #define pgm_read_byte(x) (*reinterpret_cast<const uint8_t *>(x))
+    #define pgm_read_word(x) (*reinterpret_cast<const uint16_t *>(x))
     #define strncpy_P(...)   strncpy(__VA_ARGS__)
     #define snprintf_P(...)  snprintf(__VA_ARGS__)
 

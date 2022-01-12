@@ -79,7 +79,7 @@ struct stDebug
 
 extern stDebug sDebug;
 
-    #define SET_DEBUG_BYTE(number, value) (sDebug.byte##number = value)
+    #define SET_DEBUG_BYTE(number, value) (sDebug.byte##number = static_cast<uint8_t>(value))
     #define INC_DEBUG_BYTE(number)        (sDebug.byte##number = sDebug.byte##number + 1)
 
 #endif  // defined(NDEBUG)

@@ -24,7 +24,7 @@ public:
         //
         CTRL_Call = 0,       ///< Вызов
         CTRL_AcPusk,         ///< Пуск АК
-        CTRL_AcPuskSelf,     ///< Пуск АК своего ?!
+        CTRL_AcPuskSelf,     ///< Пуск АК свой
         CTRL_AcRegime,       ///< Смена режима АК
         CTRL_AcReset,        ///< Сброс АК
         CTRL_IndReset,       ///< Сброс индикации

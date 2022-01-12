@@ -26,36 +26,6 @@ enum eGB_IC
     GB_IC_MAX
 };
 
-/// Совместимость для К400
-enum eGB_COMP_K400
-{
-    GB_COMP_K400_MIN       = 0,
-    GB_COMP_K400_AVANT     = 0,
-    GB_COMP_K400_AVANT_PRD = 1,
-    GB_COMP_K400_AVANT_PRM = 2,
-    GB_COMP_K400_AKPA_PRD  = 3,
-    GB_COMP_K400_AKPA_PRM  = 4,
-    GB_COMP_K400_KEDR_PRD  = 5,
-    GB_COMP_K400_KEDR_PRM  = 6,
-    GB_COMP_K400_UPKC_PRD  = 7,
-    GB_COMP_K400_UPKC_PRM  = 8,
-    GB_COMP_K400_VCTO_PRD  = 9,
-    GB_COMP_K400_VCTO_PRM  = 10,
-    GB_COMP_K400_ANKA_PRD  = 11,  ///< АНКА-АВПА
-    GB_COMP_K400_ANKA_PRM  = 12,  ///< АНКА-АВПА
-    GB_COMP_K400_MAX
-};
-
-/// Совместимость для РЗСК
-enum eGB_COMP_RZSK
-{
-    GB_COMP_RZSK_MIN = 0,
-    GB_COMP_RZSK     = GB_COMP_RZSK_MIN,
-    GB_COMP_RZSK_M,
-    GB_COMP_RZSK_3E8,
-    //
-    GB_COMP_RZSK_MAX
-};
 
 /// класс для общих параметров и настроек
 class TDeviceGlb

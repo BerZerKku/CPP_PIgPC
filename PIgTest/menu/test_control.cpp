@@ -43,9 +43,9 @@ TEST_F(TControl_Test, common)
         string           testName;  ///< Название теста.
         TControl::ctrl_t ctrl;      ///< Сигнал управления.
         string           rtext;     ///< Название синала.
-        eGB_COM rcom;  ///< Команда стандратного протокола АВАНТ.
-        bool    rhasbyte;  ///< Наличие байта данных в команде.
-        uint8_t rbyte;     ///< Байт данных.
+        eGB_COM          rcom;      ///< Команда протокола АВАНТ.
+        bool             rhasbyte;  ///< Наличие байта данных в команде.
+        uint8_t          rbyte;     ///< Байт данных.
     };
 
     ASSERT_EQ(0x72, GB_COM_SET_CONTROL);

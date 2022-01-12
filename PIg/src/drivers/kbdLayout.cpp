@@ -73,7 +73,7 @@ static const uint8_t fcKeyRZSK[2 * NUM_KEY_IN_LAYOUT] PROGMEM = {
 };
 
 /// текущая раскладка клаавиатуры
-static PGM_P keyboard = (PGM_P) fcKeyR400M;
+static PGM_P keyboard = reinterpret_cast<PGM_P>(fcKeyR400M);
 
 /** Устанавливает текущуюю раскладку клавиатуры.
  *  @param type Тип устройства.
@@ -83,15 +83,15 @@ void vKEYset(eGB_TYPE_DEVICE type)
 {
     if (type == AVANT_K400)
     {
-        keyboard = (PGM_P) fcKeyK400;
+        keyboard = reinterpret_cast<PGM_P>(fcKeyK400);
     }
     else if (type == AVANT_R400M)
     {
-        keyboard = (PGM_P) fcKeyR400M;
+        keyboard = reinterpret_cast<PGM_P>(fcKeyR400M);
     }
     else if (type == AVANT_RZSK)
     {
-        keyboard = (PGM_P) fcKeyRZSK;
+        keyboard = reinterpret_cast<PGM_P>(fcKeyRZSK);
     }
     else
     {
@@ -105,7 +105,7 @@ eKEY vKEYgetButtonLayout(uint8_t number)
 
     if ((number > 0) && (number <= 2 * NUM_KEY_IN_LAYOUT))
     {
-        key = static_cast<eKEY>(pgm_read_byte(((PGM_P) keyboard) + number - 1));
+        key = static_cast<eKEY>(pgm_read_byte(keyboard + number - 1));
     }
 
     return key;
@@ -117,7 +117,7 @@ eKEY vKEYgetButton(uint8_t number)
 
     if ((number > 0) && (number <= 2 * NUM_KEY_IN_LAYOUT))
     {
-        key = static_cast<eKEY>(pgm_read_byte(((PGM_P) keyboard) + number - 1));
+        key = static_cast<eKEY>(pgm_read_byte(keyboard + number - 1));
     }
 
     if (key == KEY_EMPTY)

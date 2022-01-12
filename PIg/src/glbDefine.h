@@ -745,20 +745,18 @@ public:
 
     TDeviceStatus()
     {
-        // присваивание иемени по умолчанию
-        static const char nameDev[] PROGMEM = "НЕТ";
-        name                                = nameDev;
-        enable_                             = false;
-        fault_                              = 0;
-        faults_                             = 0;
-        numFaults_                          = 0;
-        warning_                            = 0;
-        warnings_                           = 0;
-        numWarnings_                        = 0;
-        remoteNumber_                       = 0;
-        regime_                             = GB_REGIME_MAX;
-        state_                              = MAX_NUM_DEVICE_STATE;
-        dopByte_                            = 0;
+        name          = PSTR("НЕТ");
+        enable_       = false;
+        fault_        = 0;
+        faults_       = 0;
+        numFaults_    = 0;
+        warning_      = 0;
+        warnings_     = 0;
+        numWarnings_  = 0;
+        remoteNumber_ = 0;
+        regime_       = GB_REGIME_MAX;
+        state_        = MAX_NUM_DEVICE_STATE;
+        dopByte_      = 0;
     }
 
     /** Установка номера удаленного аппарата.
