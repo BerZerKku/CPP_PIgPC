@@ -195,8 +195,6 @@ function(add_avr_executable EXECUTABLE_NAME)
       OUTPUT ${hex_file}
       COMMAND
          ${AVR_OBJCOPY} -j .text -j .data -O ihex ${elf_file} ${hex_file}
-      COMMAND
-         ${AVR_SIZE_TOOL} ${AVR_SIZE_ARGS} ${elf_file}
       DEPENDS ${elf_file}
    )
 
@@ -221,6 +219,13 @@ function(add_avr_executable EXECUTABLE_NAME)
       ${EXECUTABLE_NAME}
       ALL
       DEPENDS ${hex_file} ${lst_file} ${eeprom_image}
+   )
+
+   add_custom_command(
+      TARGET
+         ${EXECUTABLE_NAME}
+      COMMAND
+         ${AVR_SIZE_TOOL} ${AVR_SIZE_ARGS} ${elf_file}
    )
 
    set_target_properties(
