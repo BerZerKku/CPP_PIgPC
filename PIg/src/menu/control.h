@@ -11,11 +11,14 @@
 #include "glbDefine.h"
 
 /**
+ * *****************************************************************************
+ *
  * @brief Класс для работы с сигналами управления, в том числе и с АК.
+ *
+ * *****************************************************************************
  */
 class TControl
 {
-
 public:
     /// Сигналы управления.
     enum ctrl_t
@@ -39,42 +42,22 @@ public:
         CTRL_MAX
     };
 
-
-    /**
-     * @brief Возвращает текст для сигнала управления.
-     * @param[in] ctrl Сигнал управления.
-     * @return Текст.
-     * @return "" в случе ошибки.
-     */
     PGM_P getText(ctrl_t ctrl) const;
-
-    /**
-     * @brief Возвращает данные для сигнала управления.
-     * @param[in] ctrl Сигнал управления.
-     * @param[out] com Команда.
-     * @param[out] isbyte Наличие байта данных.
-     * @param[out] byte Байт данных.
-     * @return true если сигнал корректный, иначе false.
-     */
-    bool getData(ctrl_t ctrl, eGB_COM &com, bool &isbyte, uint8_t &byte) const;
+    bool  getData(ctrl_t ctrl, eGB_COM &com, bool &isbyte, uint8_t &byte) const;
 
 private:
     /// Структруа сигнала управления.
     struct data_t
     {
-        char    text[20];  ///< Название синала.
+        char    text[NAME_PARAM_LENGHT];  ///< Название синала.
         eGB_COM com;     ///< Команда стандратного протокола АВАНТ.
         bool    isbyte;  ///< Наличие байта данных в команде.
         uint8_t byte;    ///< Байт данных.
     };
 
-    static const data_t mData[TControl::CTRL_MAX] PROGMEM;
+    /// Массив данных.
+    static const data_t m_data[TControl::CTRL_MAX] PROGMEM;
 
-    /**
-     * @brief Проверяет корректность сигнала управления.
-     * @param[in] ctrl Сигнал управления.
-     * @return true если сигнал корректный, иначе false.
-     */
     bool checkCtrl(ctrl_t ctrl) const;
 };
 

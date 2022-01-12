@@ -746,7 +746,7 @@ void Bsp::fillComboboxList(QComboBox *combobox, eGB_PARAM param)
             for (quint8 i = 0; i < getAbsMax(param); i++)
             {
                 combobox->addItem(codec->toUnicode(l), getAbsMin(param) + i);
-                l += STRING_LENGHT;
+                l += VALUE_STRING_SIZE;
             }
         }
     }

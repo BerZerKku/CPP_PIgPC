@@ -92,7 +92,7 @@ static const char fcSrcPrm3[8][7] PROGMEM = { "      ", "(ПРМ1)", "(ПРМ2)", "   
                                               "      ", "(П1,2)", "      ", "      " };
 
 /// Номера удаленного(ых) аппарата
-static const char fcRemoteNum[TDeviceStatus::GB_MAX_REM_NUM + 1][STRING_LENGHT] PROGMEM = {
+static const char fcRemoteNum[TDeviceStatus::GB_MAX_REM_NUM + 1][VALUE_STRING_SIZE] PROGMEM = {
     // 234567890
     "   ",  ///< 000
     " 1 ",  ///< 001

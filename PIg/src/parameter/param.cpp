@@ -151,7 +151,7 @@ PGM_P getTextValue(eGB_PARAM pn, uint8_t value)
         value -= min;
         if (value < getAbsMax(pn))
         {
-            str = getListOfValues(pn) + (value * STRING_LENGHT);
+            str = getListOfValues(pn) + (value * VALUE_STRING_SIZE);
         }
     }
 

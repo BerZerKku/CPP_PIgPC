@@ -3,7 +3,7 @@
 
 // TODO Вынести STRING_LENGTH в соответствующий ему header
 // длина половины строки (+1 - символ конца строки)
-#define STRING_LENGHT (11 + 1)
+#define VALUE_STRING_SIZE (11 + 1)
 
 /** Совместимость Р400м
  *

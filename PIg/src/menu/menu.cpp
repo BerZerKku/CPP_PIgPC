@@ -4407,7 +4407,7 @@ void clMenu::lvlTest1()
         uint8_t value = sParam.test.getCurrentSignal();
 
         poz += snprintf_P(&vLCDbuf[poz], 21, fcValue);
-        snprintf_P(&vLCDbuf[poz], STRING_LENGHT, getTextValue(GB_PARAM_OTHER_TEST_SIGNAL, value));
+        snprintf_P(&vLCDbuf[poz], VALUE_STRING_SIZE, getTextValue(GB_PARAM_OTHER_TEST_SIGNAL, value));
     }
 
     // выход из теста при несоответствии режима
@@ -4556,24 +4556,24 @@ void clMenu::lvlTest2()
     {
 
         poz = 80;
-        poz += snprintf_P(&vLCDbuf[poz], STRING_LENGHT, prm1);
+        poz += snprintf_P(&vLCDbuf[poz], VALUE_STRING_SIZE, prm1);
 
         uint8_t value = sParam.test.getCurrentSignal();
-        snprintf_P(&vLCDbuf[poz], STRING_LENGHT, getTextValue(GB_PARAM_OTHER_TEST_SIGNAL, value));
+        snprintf_P(&vLCDbuf[poz], VALUE_STRING_SIZE, getTextValue(GB_PARAM_OTHER_TEST_SIGNAL, value));
 
         poz = 100;
-        poz += snprintf_P(&vLCDbuf[poz], STRING_LENGHT, prm2);
+        poz += snprintf_P(&vLCDbuf[poz], VALUE_STRING_SIZE, prm2);
 
         value = sParam.test.getCurrentSignal2();
-        snprintf_P(&vLCDbuf[poz], STRING_LENGHT, getTextValue(GB_PARAM_OTHER_TEST_SIGNAL, value));
+        snprintf_P(&vLCDbuf[poz], VALUE_STRING_SIZE, getTextValue(GB_PARAM_OTHER_TEST_SIGNAL, value));
     }
     else
     {
         poz = 100;
-        poz += snprintf_P(&vLCDbuf[poz], STRING_LENGHT, fcValue);
+        poz += snprintf_P(&vLCDbuf[poz], VALUE_STRING_SIZE, fcValue);
 
         uint8_t value = sParam.test.getCurrentSignal();
-        snprintf_P(&vLCDbuf[poz], STRING_LENGHT, getTextValue(GB_PARAM_OTHER_TEST_SIGNAL, value));
+        snprintf_P(&vLCDbuf[poz], VALUE_STRING_SIZE, getTextValue(GB_PARAM_OTHER_TEST_SIGNAL, value));
     }
 
     // выход из теста при несооответствии режима
@@ -5101,7 +5101,7 @@ void clMenu::printSameNumber(uint8_t pos)
         if (p == GB_PARAM_RING_COM_TRANSIT)
         {
             // дл€ транзитных команд вместо номера выводитс€ значение типа 16A/32C
-            len = snprintf_P(&vLCDbuf[pos], STRING_LENGHT, PSTR("Ќомер: "));
+            len = snprintf_P(&vLCDbuf[pos], VALUE_STRING_SIZE, PSTR("Ќомер: "));
             len += snprintf_P(&vLCDbuf[pos + len], 4, getTextValue(GB_PARAM_RING_COM_REC, val));
             vLCDbuf[pos + len++] = '/';
             snprintf_P(&vLCDbuf[pos + len], 4, getTextValue(GB_PARAM_RING_COM_REC, max));

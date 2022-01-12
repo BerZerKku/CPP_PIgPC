@@ -12,21 +12,22 @@
 #include "flashArrays.h"
 
 /// Тип совместимости Р400м (параметр Защиты)
-const char fcCompR400m[][STRING_LENGHT] PROGMEM = {
+const char fcCompR400m[][VALUE_STRING_SIZE] PROGMEM = {
     //                        1234567890
     [GB_COMP_R400M_AVANT]  = "АВАНТ Р400",  //
     [GB_COMP_R400M_PVZ90]  = "ПВЗ-90",      //
     [GB_COMP_R400M_AVZK80] = "АВЗК-80",     //
     [GB_COMP_R400M_PVZUE]  = "ПВЗУ-Е",      //
     [GB_COMP_R400M_PVZL]   = "ПВЗЛ",        //
+    [GB_COMP_R400M_PVZK]   = "ПВЗК",        //
     [GB_COMP_R400M_LINER]  = "ЛИНИЯ-Р",     //
     [GB_COMP_R400M_PVZU]   = "ПВЗУ",        //
     [GB_COMP_R400M_PVZ]    = "ПВЗ",         //
     [GB_COMP_R400M_P400]   = "Р400",        //
 };
 
-/// Тип совместимости (параметр К400). Связан с eGB_COMP_K400.
-const char fcCompK400[][STRING_LENGHT] PROGMEM = {
+/// Тип совместимости (параметр К400)
+const char fcCompK400[][VALUE_STRING_SIZE] PROGMEM = {
     //                          1234567890
     [GB_COMP_K400_AVANT]     = "АВАНТ",      //
     [GB_COMP_K400_AVANT_PRD] = "АВАНТ ПРД",  //
@@ -43,8 +44,8 @@ const char fcCompK400[][STRING_LENGHT] PROGMEM = {
     [GB_COMP_K400_ANKA_PRM]  = "АНКА ПРМ"    //
 };
 
-/// Тип совместимости (параметр РЗСК). Связан с eGB_COMP_RZSK.
-const char fcCompRZSK[][STRING_LENGHT] PROGMEM = {
+/// Тип совместимости (параметр РЗСК)
+const char fcCompRZSK[][VALUE_STRING_SIZE] PROGMEM = {
     //                    1234567890
     [GB_COMP_RZSK]     = "РЗСК",      //
     [GB_COMP_RZSK_M]   = "РЗСКм",     //
