@@ -75,9 +75,13 @@ void MainWindow::initViewCommands()
     //    viewCom.append(GB_COM_GET_TEST);
     //    viewCom.append(GB_COM_GET_VERS);
 
-    viewCom.append(GB_COM_DEF_GET_TYPE_AC);
+    //    viewCom.append(GB_COM_DEF_GET_TYPE_AC);
     viewCom.append(GB_COM_DEF_SET_TYPE_AC);
-    viewCom.append(GB_COM_GET_MEAS);
+    viewCom.append(GB_COM_PRM_ENTER);
+    viewCom.append(GB_COM_SET_CONTROL);
+    viewCom.append(GB_COM_PRM_RES_IND);
+
+    //    viewCom.append(GB_COM_GET_MEAS);
 }
 
 //

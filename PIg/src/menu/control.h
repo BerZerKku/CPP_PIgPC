@@ -25,19 +25,44 @@ public:
     {
         CTRL_NO = -1,  ///< Нет сигнала
         //
-        CTRL_Call = 0,       ///< Вызов
-        CTRL_AcPusk,         ///< Пуск АК
-        CTRL_AcPuskSelf,     ///< Пуск АК свой
-        CTRL_AcRegime,       ///< Смена режима АК
-        CTRL_AcReset,        ///< Сброс АК
-        CTRL_IndReset,       ///< Сброс индикации
-        CTRL_PuskAdjOn,      ///< Пуск своего вкл.
-        CTRL_PuskAdjOff,     ///< Пуск своего выкл.
-        CTRL_PuskPrm,        ///< Пуск приемника
-        CTRL_RemoteAcPusk,   ///< Пуск АК удаленного
-        CTRL_RemotePusk1,    ///< Пуск удаленного 1
-        CTRL_RemotePuskAll,  ///< Пуск удаленных
-        CTRL_Reset,          ///< Сброс
+        CTRL_Call = 0,        ///< Вызов
+        CTRL_AcAuto,          ///< АК автоматический
+        CTRL_AcAccelerated,   ///< АК ускоренный
+        CTRL_AcNormal,        ///< АК нормальный
+        CTRL_AcOff,           ///< АК выключен
+        CTRL_AcOn,            ///< АК включен
+        CTRL_AcPusk,          ///< Пуск АК
+        CTRL_AcPuskSelf,      ///< Пуск АК свой
+        CTRL_AcQuick,         ///< АК беглый
+        CTRL_AcRegime,        ///< Смена режима АК
+        CTRL_AcReset,         ///< Сброс АК
+        CTRL_AcTest,          ///< АК тест
+        CTRL_CtrlCheck,       ///< АК контрольная проверка
+        CTRL_IndReset,        ///< Сброс индикации
+        CTRL_PuskAdjOn,       ///< Пуск наладочный вкл.
+        CTRL_PuskAdjOff,      ///< Пуск наладочный выкл.
+        CTRL_PuskPrd,         ///< Пуск передатчика
+        CTRL_PuskPrm,         ///< Пуск приемника
+        CTRL_RemoteAcPusk,    ///< Пуск АК удаленного
+        CTRL_RemoteMan,       ///< Пуск удаленной манипуляции
+        CTRL_RemoteMan1,      ///< Пуск удаленной манипуляции 1
+        CTRL_RemoteMan2,      ///< Пуск удаленной манипуляции 2
+        CTRL_RemoteMan3,      ///< Пуск удаленной манипуляции 3
+        CTRL_RemoteManAll,    ///< Пуск удаленных манипуляций
+        CTRL_RemotePusk,      ///< Пуск удаленного
+        CTRL_RemotePusk1,     ///< Пуск удаленного 1
+        CTRL_RemotePusk2,     ///< Пуск удаленного 2
+        CTRL_RemotePusk3,     ///< Пуск удаленного 3
+        CTRL_RemotePuskAll,   ///< Пуск удаленных
+        CTRL_RemoteReset,     ///< Сброс удаленного
+        CTRL_RemoteReset1,    ///< Сброс удаленного 1
+        CTRL_RemoteReset2,    ///< Сброс удаленного 2
+        CTRL_RemoteReset3,    ///< Сброс удаленного 3
+        CTRL_RemoteResetAll,  ///< Сброс удаленных
+        CTRL_Reset,           ///< Сброс
+        CTRL_ResetAll,        ///< Сброс всех
+        CTRL_SingleOff,       ///< Односторонний режим выкл.
+        CTRL_SingleOn,        ///< Односторонний режим вкл.
         //
         CTRL_MAX
     };

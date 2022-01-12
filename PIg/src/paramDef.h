@@ -19,7 +19,7 @@ enum eGB_TYPE_AC
     GB_TYPE_AC_MIN         = 1,  // минимальное значение
     GB_TYPE_AC_AUTO_NORM   = 1,  // АК нормальный / АК включен
     GB_TYPE_AC_AUTO_REPEAT = 2,  // АК повторный
-    GB_TYPE_AC_FAST        = 3,  // АК ускоренный
+    GB_TYPE_AC_ACCEL       = 3,  // АК ускоренный
     GB_TYPE_AC_OFF         = 4,  // АК выключен
     GB_TYPE_AC_CHECK       = 5,  // АК беглый
     GB_TYPE_AC_PUSK_SELF = 6,  // Пуск АК свой / АК испытания / АК контр.пров.

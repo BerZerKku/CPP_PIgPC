@@ -2763,7 +2763,7 @@ void clMenu::lvlControl()
             }
             else if (name == punkt16)
             {
-                sParam.txComBuf.setInt8(GB_TYPE_AC_FAST);
+                sParam.txComBuf.setInt8(GB_TYPE_AC_ACCEL);
                 sParam.txComBuf.addFastCom(GB_COM_DEF_SET_TYPE_AC);
             }
             else if (name == punkt17)
@@ -4407,7 +4407,9 @@ void clMenu::lvlTest1()
         uint8_t value = sParam.test.getCurrentSignal();
 
         poz += snprintf_P(&vLCDbuf[poz], 21, fcValue);
-        snprintf_P(&vLCDbuf[poz], VALUE_STRING_SIZE, getTextValue(GB_PARAM_OTHER_TEST_SIGNAL, value));
+        snprintf_P(&vLCDbuf[poz],
+                   VALUE_STRING_SIZE,
+                   getTextValue(GB_PARAM_OTHER_TEST_SIGNAL, value));
     }
 
     // выход из теста при несоответствии режима
@@ -4559,13 +4561,17 @@ void clMenu::lvlTest2()
         poz += snprintf_P(&vLCDbuf[poz], VALUE_STRING_SIZE, prm1);
 
         uint8_t value = sParam.test.getCurrentSignal();
-        snprintf_P(&vLCDbuf[poz], VALUE_STRING_SIZE, getTextValue(GB_PARAM_OTHER_TEST_SIGNAL, value));
+        snprintf_P(&vLCDbuf[poz],
+                   VALUE_STRING_SIZE,
+                   getTextValue(GB_PARAM_OTHER_TEST_SIGNAL, value));
 
         poz = 100;
         poz += snprintf_P(&vLCDbuf[poz], VALUE_STRING_SIZE, prm2);
 
         value = sParam.test.getCurrentSignal2();
-        snprintf_P(&vLCDbuf[poz], VALUE_STRING_SIZE, getTextValue(GB_PARAM_OTHER_TEST_SIGNAL, value));
+        snprintf_P(&vLCDbuf[poz],
+                   VALUE_STRING_SIZE,
+                   getTextValue(GB_PARAM_OTHER_TEST_SIGNAL, value));
     }
     else
     {
@@ -4573,7 +4579,9 @@ void clMenu::lvlTest2()
         poz += snprintf_P(&vLCDbuf[poz], VALUE_STRING_SIZE, fcValue);
 
         uint8_t value = sParam.test.getCurrentSignal();
-        snprintf_P(&vLCDbuf[poz], VALUE_STRING_SIZE, getTextValue(GB_PARAM_OTHER_TEST_SIGNAL, value));
+        snprintf_P(&vLCDbuf[poz],
+                   VALUE_STRING_SIZE,
+                   getTextValue(GB_PARAM_OTHER_TEST_SIGNAL, value));
     }
 
     // выход из теста при несооответствии режима
