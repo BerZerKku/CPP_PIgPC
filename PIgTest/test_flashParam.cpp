@@ -5,6 +5,7 @@
 using namespace std;
 
 #include "PIg/src/flash.h"
+#include "PIg/src/flashArrays.h"
 #include "PIg/src/flashParams.h"
 #include "PIg/src/parameter/param.h"
 
@@ -427,16 +428,16 @@ TEST_F(FlashParam_Test, gbParam_Freq)
 TEST_F(FlashParam_Test, gbParam_CompP400)
 {
     Param prop = {
-        "Совместимость",           // название параметра
-        GB_COM_GET_COM_PRD_KEEP,   // команда стандартного протокола
-        Param::PARAM_LIST,         // тип параметра
-        Param::RANGE_LIST,         // диапазон измнения
-        Param::DIM_NO,             // размерность
-        fcCompatibility[0],        // массив значений
-        1,                         // кол-во повторений параметра
-        0,                         // минимальное значение
-        SIZE_OF(fcCompatibility),  // максимальное значение
-        1,                         // дискретность
+        "Совместимость",          // название параметра
+        GB_COM_GET_COM_PRD_KEEP,  // команда стандартного протокола
+        Param::PARAM_LIST,        // тип параметра
+        Param::RANGE_LIST,        // диапазон измнения
+        Param::DIM_NO,            // размерность
+        fcCompR400m[0],           // массив значений
+        1,                        // кол-во повторений параметра
+        0,                        // минимальное значение
+        SIZE_OF(fcCompR400m),     // максимальное значение
+        1,                        // дискретность
         1,                 // множитель для стандартного протокола
         GB_SEND_INT8_DOP,  // тип параметра для сохранения новго значения
         1,  // байт дополнительной информации для сохранения
