@@ -16,20 +16,21 @@
 class TMeasure
 {
 public:
-    TMeasure() {
-        mVoltDef = 0;
-        mVoltDef2 = 0;
-        mVoltCf = 0;
-        mVoltCf2 = 0;
-        mVoltNoise = 0;
-        mVoltNoise2 = 0;
-        mVoltOut = 0;
-        mCurOut = 0;
-        mResistOut = 0;
-        mPulseWidth = 0;
-        mD = 0;
+    TMeasure()
+    {
+        mVoltDef     = 0;
+        mVoltDef2    = 0;
+        mVoltCf      = 0;
+        mVoltCf2     = 0;
+        mVoltNoise   = 0;
+        mVoltNoise2  = 0;
+        mVoltOut     = 0;
+        mCurOut      = 0;
+        mResistOut   = 0;
+        mPulseWidth  = 0;
+        mD           = 0;
         mTemperature = -100;
-        mFreqDev = 0;
+        mFreqDev     = 0;
     }
 
     /**
@@ -41,7 +42,8 @@ public:
     {
         bool check = (value > -100) && (value < 100);
 
-        if (check) {
+        if (check)
+        {
             mVoltDef = value;
         }
 
@@ -63,7 +65,8 @@ public:
     {
         bool check = (value > -100) && (value < 100);
 
-        if (check) {
+        if (check)
+        {
             mVoltDef2 = value;
         }
 
@@ -85,7 +88,8 @@ public:
     {
         bool check = (value > -100) && (value < 100);
 
-        if (check) {
+        if (check)
+        {
             mVoltCf = value;
         }
 
@@ -107,7 +111,8 @@ public:
     {
         bool check = (value > -100) && (value < 100);
 
-        if (check) {
+        if (check)
+        {
             mVoltCf2 = value;
         }
 
@@ -128,10 +133,11 @@ public:
      */
     bool setVoltageOut(uint8_t valueInt, uint8_t valueFract)
     {
-        bool check = (valueInt< 100) && (valueFract < 10);
+        bool check = (valueInt < 100) && (valueFract < 10);
 
-        if (check) {
-            mVoltOut = static_cast<uint16_t> (valueInt) * 10;
+        if (check)
+        {
+            mVoltOut = static_cast<uint16_t>(valueInt) * 10;
             mVoltOut += valueFract;
         }
 
@@ -148,27 +154,25 @@ public:
      * @brief Возвращает целую часть для напряжения выхода.
      * @return Целая часть напряжения выхода
      */
-    uint8_t getVoltageOutInt() const {
-        return static_cast<uint8_t> (mVoltOut / 10);
-    }
+    uint8_t getVoltageOutInt() const { return static_cast<uint8_t>(mVoltOut / 10); }
 
     /**
      * @brief Возвращает дробную часть для напряжения выхода.
      * @return Дробная часть напряжения выхода
      */
-    uint8_t getVoltageOutFract() const {
-        return static_cast<uint8_t> (mVoltOut % 10);
-    }
+    uint8_t getVoltageOutFract() const { return static_cast<uint8_t>(mVoltOut % 10); }
 
     /**
      * @brief Устанавливает ток выхода.
      * @param[in] valuе Значение [0..999].
      * @return true если значение было установлено, иначе false.
      */
-    bool setCurrentOut(uint16_t value) {
+    bool setCurrentOut(uint16_t value)
+    {
         bool check = value < 1000;
 
-        if (check) {
+        if (check)
+        {
             mCurOut = value;
         }
 
@@ -190,7 +194,8 @@ public:
     {
         bool check = value < 1000;
 
-        if (check) {
+        if (check)
+        {
             mResistOut = value;
         }
 
@@ -212,7 +217,8 @@ public:
     {
         bool check = (value > -100) && (value < 100);
 
-        if (check) {
+        if (check)
+        {
             mVoltNoise = value;
         }
 
@@ -234,7 +240,8 @@ public:
     {
         bool check = (value > -100) && (value < 100);
 
-        if (check) {
+        if (check)
+        {
             mVoltNoise2 = value;
         }
 
@@ -256,7 +263,8 @@ public:
     {
         bool check = (value <= 360);
 
-        if (check) {
+        if (check)
+        {
             mPulseWidth = value;
         }
 
@@ -282,7 +290,8 @@ public:
     {
         bool check = (value >= -64) && (value <= 64);
 
-        if (check) {
+        if (check)
+        {
             mD = value;
         }
 
@@ -307,7 +316,8 @@ public:
     {
         bool check = (value >= -100) && (value <= 125);
 
-        if (check) {
+        if (check)
+        {
             mTemperature = value;
         }
 
@@ -329,7 +339,8 @@ public:
     {
         bool check = (value <= 100);
 
-        if (check) {
+        if (check)
+        {
             mFreqDev = value;
         }
 
@@ -343,19 +354,19 @@ public:
     uint8_t getFreqDev() const { return mFreqDev; }
 
 private:
-    int8_t mVoltDef;
-    int8_t mVoltDef2;
-    int8_t mVoltCf;
-    int8_t mVoltCf2;
-    int8_t mVoltNoise;
-    int8_t mVoltNoise2;
+    int8_t   mVoltDef;
+    int8_t   mVoltDef2;
+    int8_t   mVoltCf;
+    int8_t   mVoltCf2;
+    int8_t   mVoltNoise;
+    int8_t   mVoltNoise2;
     uint16_t mVoltOut;
     uint16_t mCurOut;
     uint16_t mResistOut;
     uint16_t mPulseWidth;
-    int8_t mD;
-    int8_t mTemperature;
-    uint8_t mFreqDev;
+    int8_t   mD;
+    int8_t   mTemperature;
+    uint8_t  mFreqDev;
 };
 
 #endif /* MEASURED_PARAMETERS_H_ */

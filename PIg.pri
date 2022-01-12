@@ -13,8 +13,10 @@ HEADERS += \
     $${PIG_PATH}/src/drivers/tmp75.h \
     $${PIG_PATH}/src/drivers/uart.h \
     $${PIG_PATH}/src/flash.h \
+    $${PIG_PATH}/src/flashArrays.h \
     $${PIG_PATH}/src/flashParams.h \
     $${PIG_PATH}/src/glbDefine.h \
+    $${PIG_PATH}/src/glbTypes.h \
     $${PIG_PATH}/src/menu/base.h \
     $${PIG_PATH}/src/menu/control.h \
     $${PIG_PATH}/src/menu/dateTime.h \
@@ -44,6 +46,7 @@ HEADERS += \
 
 SOURCES += \
     $${PIG_PATH}/src/drivers/kbdLayout.cpp \
+    $${PIG_PATH}/src/flashArrays.c \
     $${PIG_PATH}/src/flashParams.cpp \
     $${PIG_PATH}/src/debug/debug.cpp \
     $${PIG_PATH}/src/menu/base.cpp \

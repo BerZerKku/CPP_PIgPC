@@ -48,6 +48,7 @@ ContinuationIndentWidth: 4
 DerivePointerAlignment: true
 IndentCaseBlocks: true
 IndentCaseLabels: false
+IndentPPDirectives: BeforeHash
 MaxEmptyLinesToKeep: 2
 SpaceAfterCStyleCast: true
 SpaceAfterTemplateKeyword: false

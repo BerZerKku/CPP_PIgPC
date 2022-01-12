@@ -12,67 +12,68 @@
 
 #if defined(AVR)
 
-#include <avr/io.h>
+    #include <avr/io.h>
 
-// тестовые пины
-#define DDR_DBG  DDRE
-#define PORT_DBG PORTE
-#define PIN_TP1  (1 << 6)
-#define PIN_TP2  (1 << 7)
+    // тестовые пины
+    #define DDR_DBG  DDRE
+    #define PORT_DBG PORTE
+    #define PIN_TP1  (1 << 6)
+    #define PIN_TP2  (1 << 7)
 
-#define SET_TP1 PORT_DBG |= PIN_TP1
-#define CLR_TP1 PORT_DBG &= ~PIN_TP1
-#define TOG_TP1 PORT_DBG ^= PIN_TP1
+    #define SET_TP1 PORT_DBG |= PIN_TP1
+    #define CLR_TP1 PORT_DBG &= ~PIN_TP1
+    #define TOG_TP1 PORT_DBG ^= PIN_TP1
 
-#define SET_TP2 PORT_DBG |= PIN_TP2
-#define CLR_TP2 PORT_DBG &= ~PIN_TP2
-#define TOG_TP2 PORT_DBG ^= PIN_TP2
+    #define SET_TP2 PORT_DBG |= PIN_TP2
+    #define CLR_TP2 PORT_DBG &= ~PIN_TP2
+    #define TOG_TP2 PORT_DBG ^= PIN_TP2
 
-#define Q_ASSERT(x) (void(0))
+    #define Q_ASSERT(x) (void(0))
+
+#elif defined(QT_CORE_LIB)
+
+    #include <QDebug>
+
 #endif
 
 //
 #if defined(NDEBUG)
 
-#define COMPILE_TIME_ASSERT(expression) (void(0))
-#define QDEBUG(x)                       (void(0))
-#define QDINFO(x)                       (void(0))
-#define QWARNING(x)                     (void(0))
-#define QCRITICAL(x)                    (void(0))
+    #define COMPILE_TIME_ASSERT(expression) (void(0))
+    #define QDEBUG(x)                       (void(0))
+    #define QDINFO(x)                       (void(0))
+    #define QWARNING(x)                     (void(0))
+    #define QCRITICAL(x)                    (void(0))
 
-#define SET_DEBUG_BYTE(number, value) (void(0))
-#define INC_DEBUG_BYTE(number)        (void(0))
+    #define SET_DEBUG_BYTE(number, value) (void(0))
+    #define INC_DEBUG_BYTE(number)        (void(0))
 
-#if !defined(Q_ASSERT)
-#define Q_ASSERT(x) (void(0))
-#endif
+    #if !defined(Q_ASSERT)
+        #define Q_ASSERT(x) (void(0))
+    #endif
 
 #else  // defined(NDEBUG)
 
-#if defined(QT_CORE_LIB)
+    #if defined(QT_CORE_LIB)
+        #define QDEBUG(x)                       (qDebug() << x)
+        #define QINFO(x)                        (qInfo() << x)
+        #define QWARNING(x)                     (qWarning() << x)
+        #define QCRITICAL(x)                    (qCritical() << x)
+        #define COMPILE_TIME_ASSERT(expression) Q_STATIC_ASSERT_X(expression, "Error")
+    #else
+        #define QDEBUG(x)    (void(0))
+        #define QDINFO(x)    (void(0))
+        #define QWARNING(x)  (void(0))
+        #define QCRITICAL(x) (void(0))
+        #define COMPILE_TIME_ASSERT(expression) \
+            switch (0)                          \
+            {                                   \
+            case 0:                             \
+            case (expression):;                 \
+            }
 
-#include <QDebug>
-#define QDEBUG(x)                       (qDebug() << x)
-#define QINFO(x)                        (qInfo() << x)
-#define QWARNING(x)                     (qWarning() << x)
-#define QCRITICAL(x)                    (qCritical() << x)
-#define COMPILE_TIME_ASSERT(expression) Q_STATIC_ASSERT_X(expression, "Error")
-
-#else  // defined(QT_CORE_LIB)
-
-#define QDEBUG(x)    (void(0))
-#define QDINFO(x)    (void(0))
-#define QWARNING(x)  (void(0))
-#define QCRITICAL(x) (void(0))
-#define COMPILE_TIME_ASSERT(expression) \
-    switch (0)                          \
-    {                                   \
-    case 0:                             \
-    case (expression):;                 \
-    }
-
-#warning "¬ключен режим отладки!!!"
-#endif  // defined(QT_CORE_LIB)
+        //        #warning "¬ключен режим отладки!!!"
+    #endif  // defined(QT_CORE_LIB)
 
 // вывод отладочной информации на экран
 //#define VIEW_DEBUG_PARAM
@@ -93,8 +94,8 @@ struct stDebug
 
 extern stDebug sDebug;
 
-#define SET_DEBUG_BYTE(number, value) (sDebug.byte##number = value)
-#define INC_DEBUG_BYTE(number)        (sDebug.byte##number = sDebug.byte##number + 1)
+    #define SET_DEBUG_BYTE(number, value) (sDebug.byte##number = value)
+    #define INC_DEBUG_BYTE(number)        (sDebug.byte##number = sDebug.byte##number + 1)
 
 #endif  // defined(NDEBUG)
 
