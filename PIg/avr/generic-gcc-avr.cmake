@@ -52,7 +52,6 @@ set(CMAKE_C_STANDARD 99)
 set(CMAKE_CXX_COMPILER ${AVR_CXX})
 set(CMAKE_CXX_STANDARD 17)
 
-
 ##########################################################################
 # Identification
 ##########################################################################
@@ -140,8 +139,6 @@ endif(NOT ((CMAKE_BUILD_TYPE MATCHES Release) OR
 (CMAKE_BUILD_TYPE MATCHES RelWithDebInfo) OR
 (CMAKE_BUILD_TYPE MATCHES Debug) OR
 (CMAKE_BUILD_TYPE MATCHES MinSizeRel)))
-
-
 
 ##########################################################################
 
@@ -269,7 +266,6 @@ function(add_avr_executable EXECUTABLE_NAME)
       DEPENDS ${elf_file}
    )
 endfunction(add_avr_executable)
-
 
 ##########################################################################
 # add_avr_library

@@ -30,7 +30,6 @@ set(AVR_MCU atmega128a)
 set(AVR_H_FUSE 0xd9)
 set(AVR_L_FUSE 0xc3)
 set(AVR_FCPU "16000000UL")
-
 ### END TOOLCHAIN SETUP AREA #############################################
 
 include(avr/generic-gcc-avr.cmake)
@@ -68,7 +67,6 @@ endif(NOT CMAKE_BUILD_TYPE)
 ##########################################################################
 # some cmake cross-compile necessities
 ##########################################################################
-set(CMAKE_CXX_STANDARD 17)
 if(DEFINED ENV{AVR_FIND_ROOT_PATH})
     set(CMAKE_FIND_ROOT_PATH $ENV{AVR_FIND_ROOT_PATH})
 else(DEFINED ENV{AVR_FIND_ROOT_PATH})
@@ -84,9 +82,11 @@ else(DEFINED ENV{AVR_FIND_ROOT_PATH})
       message(FATAL_ERROR "Please set AVR_FIND_ROOT_PATH in your environment.")
     endif(EXISTS "/opt/local/avr")
 endif(DEFINED ENV{AVR_FIND_ROOT_PATH})
+
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+
 # not added automatically, since CMAKE_SYSTEM_NAME is "generic"
 set(CMAKE_SYSTEM_INCLUDE_PATH "${CMAKE_FIND_ROOT_PATH}/include")
 set(CMAKE_SYSTEM_LIBRARY_PATH "${CMAKE_FIND_ROOT_PATH}/lib")
