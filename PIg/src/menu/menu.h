@@ -385,6 +385,12 @@ private:
      */
     void addControlToSend(TControl::ctrl_t ctrl);
 
+
+    bool fillLvlControl(eGB_TYPE_DEVICE device);
+    bool fillLvlControlR400m(eGB_COMP_R400M comp, uint8_t num_devices);
+    bool fillLvlControlK400();
+    bool fillLvlControlOpto(eGB_TYPE_OPTO type, bool def, bool prd, bool prm);
+
 #ifdef TEST_FRIENDS
     TEST_FRIENDS
 #endif

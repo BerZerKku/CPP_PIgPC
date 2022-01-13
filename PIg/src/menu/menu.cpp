@@ -2433,6 +2433,9 @@ void clMenu::lvlControl()
 
         Punkts_.clear();
         sParam.local.clearParams();
+
+        fillLvlControl(device);
+
         if (device == AVANT_R400M)
         {
             eGB_NUM_DEVICES numDevices    = sParam.def.getNumDevices();
@@ -2595,32 +2598,6 @@ void clMenu::lvlControl()
         }
         else if (device == AVANT_OPTO)
         {
-            if (sParam.def.status.isEnable())
-            {
-                Punkts_.addName(punkt07);  // далее выбирается в зависимости от текущего
-            }
-            Punkts_.addName(punkt03);
-            if (sParam.glb.getTypeOpto() == TYPE_OPTO_STANDART)
-            {
-                Punkts_.addName(punkt04);
-            }
-            else
-            {
-                Punkts_.addName(punkt36);
-            }
-            if (sParam.prd.status.isEnable() || sParam.prm.status.isEnable())
-            {
-                Punkts_.addName(punkt35);
-            }
-            if (sParam.def.status.isEnable())
-            {
-                Punkts_.addName(punkt02);
-                if (!sParam.prd.status.isEnable() && !sParam.prm.status.isEnable())
-                {
-                    // "Сброс АК" есть в Р400 и нет в РЗСК
-                    Punkts_.addName(punkt11);
-                }
-            }
         }
 
         // доплнительные команды
@@ -2672,7 +2649,6 @@ void clMenu::lvlControl()
         Punkts_.choose(punkt38, punkt37, sParam.local.getValue() != 1);
     }
 
-    PGM_P name = Punkts_.getName(cursorLine_ - 1);
     printPunkts();
 
     switch (key_)
@@ -2691,188 +2667,14 @@ void clMenu::lvlControl()
 
     case KEY_ENTER:
         {
-            if (name == punkt02)
-            {
-                sParam.txComBuf.setInt8(GB_CONTROL_PUSK_UD_1);
-                sParam.txComBuf.addFastCom(GB_COM_SET_CONTROL);
-            }
-            else if (name == punkt03)
-            {
-                sParam.txComBuf.setInt8(GB_CONTROL_RESET_SELF);
-                sParam.txComBuf.addFastCom(GB_COM_SET_CONTROL);
-            }
-            else if (name == punkt04)
-            {
-                sParam.txComBuf.setInt8(GB_CONTROL_RESET_UD);
-                sParam.txComBuf.addFastCom(GB_COM_SET_CONTROL);
-            }
-            else if (name == punkt05)
-            {
-                sParam.txComBuf.setInt8(GB_CONTROL_CALL);
-                sParam.txComBuf.addFastCom(GB_COM_SET_CONTROL);
-            }
-            else if (name == punkt06)
-            {
-                sParam.txComBuf.setInt8(GB_CONTROL_PUSK_ON);
-                sParam.txComBuf.addFastCom(GB_COM_SET_CONTROL);
-            }
-            else if (name == punkt07)
-            {
-                sParam.txComBuf.setInt8(GB_CONTROL_PUSK_OFF);
-                sParam.txComBuf.addFastCom(GB_COM_SET_CONTROL);
-            }
-            else if (name == punkt08)
-            {
-                sParam.txComBuf.setInt8(GB_TYPE_AC_PUSK);
-                sParam.txComBuf.addFastCom(GB_COM_DEF_SET_TYPE_AC);
-            }
-            else if (name == punkt09)
-            {
-                sParam.txComBuf.setInt8(GB_CONTROL_MAN_1);
-                sParam.txComBuf.addFastCom(GB_COM_SET_CONTROL);
-            }
-            else if (name == punkt10)
-            {
-                sParam.txComBuf.setInt8(GB_TYPE_AC_PUSK_SELF);
-                sParam.txComBuf.addFastCom(GB_COM_DEF_SET_TYPE_AC);
-            }
-            else if (name == punkt11)
-            {
-                sParam.txComBuf.setInt8(GB_CONTROL_RESET_AC);
-                sParam.txComBuf.addFastCom(GB_COM_SET_CONTROL);
-            }
-            else if (name == punkt12)
-            {
-                sParam.txComBuf.setInt8(GB_TYPE_AC_PUSK_SELF);
-                sParam.txComBuf.addFastCom(GB_COM_DEF_SET_TYPE_AC);
-            }
-            else if (name == punkt13)
-            {
-                sParam.txComBuf.setInt8(GB_CONTROL_PUSK_AC_UD);
-                sParam.txComBuf.addFastCom(GB_COM_SET_CONTROL);
-            }
-            else if (name == punkt14)
-            {
-                sParam.txComBuf.setInt8(GB_CONTROL_PUSK_UD_1);
-                sParam.txComBuf.addFastCom(GB_COM_SET_CONTROL);
-            }
-            else if (name == punkt15)
-            {
-                sParam.txComBuf.setInt8(GB_TYPE_AC_AUTO_NORM);
-                sParam.txComBuf.addFastCom(GB_COM_DEF_SET_TYPE_AC);
-            }
-            else if (name == punkt16)
-            {
-                sParam.txComBuf.setInt8(GB_TYPE_AC_ACCEL);
-                sParam.txComBuf.addFastCom(GB_COM_DEF_SET_TYPE_AC);
-            }
-            else if (name == punkt17)
-            {
-                sParam.txComBuf.setInt8(GB_TYPE_AC_OFF);
-                sParam.txComBuf.addFastCom(GB_COM_DEF_SET_TYPE_AC);
-            }
-            else if (name == punkt18)
-            {
-                sParam.txComBuf.setInt8(GB_TYPE_AC_PUSK_SELF);
-                sParam.txComBuf.addFastCom(GB_COM_DEF_SET_TYPE_AC);
-            }
-            else if (name == punkt19)
-            {
-                sParam.txComBuf.setInt8(GB_TYPE_AC_AUTO_NORM);
-                sParam.txComBuf.addFastCom(GB_COM_DEF_SET_TYPE_AC);
-            }
-            else if (name == punkt20)
-            {
-                sParam.txComBuf.setInt8(GB_TYPE_AC_CHECK);
-                sParam.txComBuf.addFastCom(GB_COM_DEF_SET_TYPE_AC);
-                //      } else if (p == punkt21) {
-                //          sParam.txComBuf.setInt8(GB_TYPE_AC_CHECK);
-                //          sParam.txComBuf.addFastCom(GB_COM_DEF_SET_TYPE_AC);
-            }
-            else if (name == punkt22)
-            {
-                sParam.txComBuf.setInt8(GB_CONTROL_RESET_UD);
-                sParam.txComBuf.addFastCom(GB_COM_SET_CONTROL);
-            }
-            else if (name == punkt23)
-            {
-                sParam.txComBuf.setInt8(GB_CONTROL_PUSK_UD_1);
-                sParam.txComBuf.addFastCom(GB_COM_SET_CONTROL);
-            }
-            else if (name == punkt24)
-            {
-                sParam.txComBuf.setInt8(GB_CONTROL_PUSK_UD_2);
-                sParam.txComBuf.addFastCom(GB_COM_SET_CONTROL);
-            }
-            else if (name == punkt25)
-            {
-                sParam.txComBuf.setInt8(GB_CONTROL_PUSK_UD_3);
-                sParam.txComBuf.addFastCom(GB_COM_SET_CONTROL);
-            }
-            else if (name == punkt26)
-            {
-                sParam.txComBuf.setInt8(GB_CONTROL_PUSK_UD_ALL);
-                sParam.txComBuf.addFastCom(GB_COM_SET_CONTROL);
-            }
-            else if (name == punkt27)
-            {
-                sParam.txComBuf.setInt8(GB_CONTROL_MAN_1);
-                sParam.txComBuf.addFastCom(GB_COM_SET_CONTROL);
-            }
-            else if (name == punkt28)
-            {
-                sParam.txComBuf.setInt8(GB_CONTROL_MAN_2);
-                sParam.txComBuf.addFastCom(GB_COM_SET_CONTROL);
-            }
-            else if (name == punkt29)
-            {
-                sParam.txComBuf.setInt8(GB_CONTROL_MAN_3);
-                sParam.txComBuf.addFastCom(GB_COM_SET_CONTROL);
-            }
-            else if (name == punkt30)
-            {
-                sParam.txComBuf.setInt8(GB_CONTROL_MAN_ALL);
-                sParam.txComBuf.addFastCom(GB_COM_SET_CONTROL);
-            }
-            else if (name == punkt31)
-            {
-                sParam.txComBuf.setInt8(GB_TYPE_AC_AUTO_NORM);
-                sParam.txComBuf.addFastCom(GB_COM_DEF_SET_TYPE_AC);
-            }
-            else if (name == punkt32)
-            {
-                sParam.txComBuf.setInt8(GB_CONTROL_RESET_UD_1);
-                sParam.txComBuf.addFastCom(GB_COM_SET_CONTROL);
-            }
-            else if (name == punkt33)
-            {
-                sParam.txComBuf.setInt8(GB_CONTROL_RESET_UD_2);
-                sParam.txComBuf.addFastCom(GB_COM_SET_CONTROL);
-            }
-            else if (name == punkt34)
-            {
-                sParam.txComBuf.setInt8(GB_CONTROL_RESET_UD_3);
-                sParam.txComBuf.addFastCom(GB_COM_SET_CONTROL);
-            }
-            else if (name == punkt35)
-            {
-                sParam.txComBuf.addFastCom(GB_COM_PRM_RES_IND);
-            }
-            else if (name == punkt36)
-            {
-                sParam.txComBuf.setInt8(GB_CONTROL_RESET_UD);
-                sParam.txComBuf.addFastCom(GB_COM_SET_CONTROL);
-            }
-            else if (name == punkt37)
-            {
-                sParam.txComBuf.setInt8(0);
-                sParam.txComBuf.addFastCom(GB_COM_DEF_SET_TYPE_AC);
-            }
-            else if (name == punkt38)
+            /*
+            PGM_P name = Punkts_.getName(cursorLine_ - 1);
+            if (name == punkt38)
             {
                 sParam.txComBuf.setInt8(1);
                 sParam.txComBuf.addFastCom(GB_COM_DEF_SET_TYPE_AC);
             }
+            */
         }
         break;
 
@@ -4790,6 +4592,7 @@ eMENU_ENTER_PARAM clMenu::enterPassword()
 }
 
 /** Вывод на экран текущих пунктов меню и курсора
+ *
  *  @param Нет
  *  @return Нет
  */
@@ -5854,6 +5657,136 @@ void clMenu::addControlToSend(TControl::ctrl_t ctrl)
                 sParam.txComBuf.setInt8(byte);
             }
             sParam.txComBuf.addFastCom(com);
+        }
+    }
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Формирует список сигналов управления на уровне "Управление".
+ * @param[in] device Устройство.
+ * @return True если список заполнен, иначе False.
+ *
+ * *****************************************************************************
+ */
+bool clMenu::fillLvlControl(eGB_TYPE_DEVICE device)
+{
+    bool is_fill = false;
+
+    Q_ASSERT(device > AVANT_NO);
+    Q_ASSERT(device < AVANT_MAX);
+
+    Punkts_.clear();
+
+    switch (device)
+    {
+    case AVANT_R400M:
+        is_fill = fillLvlControlR400m(sParam.glb.getCompR400m(), sParam.def.getNumDevices());
+        break;
+    case AVANT_RZSK: break;
+    case AVANT_K400: is_fill = fillLvlControlK400(); break;
+    case AVANT_OPTO: break;
+
+    case AVANT_NO: [[fallthrough]];
+    case AVANT_R400: [[fallthrough]];
+    case AVANT_MAX: break;
+    }
+
+    return is_fill;
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Формирует список сигналов управления на уровне "Управление" для Р400м.
+ * @param[in] comp Совместимость.
+ * @param[in] num_devices Количество устройств в линии.
+ * @return True если список заполнен, иначе False.
+ *
+ * *****************************************************************************
+ */
+bool clMenu::fillLvlControlR400m(eGB_COMP_R400M comp, uint8_t num_devices)
+{
+    Q_ASSERT(sParam.glb.getTypeDevice() == AVANT_R400M);
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Формирует список сигналов управления на уровне "Управление" для К400.
+ * @return True если список заполнен, иначе False.
+ *
+ * *****************************************************************************
+ */
+bool clMenu::fillLvlControlK400()
+{
+    Q_ASSERT(sParam.glb.getTypeDevice() == AVANT_K400);
+
+    Punkts_.addNumber(TControl::CTRL_Reset);
+    Punkts_.addNumber(TControl::CTRL_IndReset);
+
+    return true;
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Формирует список сигналов управления на уровне "Управление" для оптики.
+ *
+ * Команды управления:
+ * - Пуск наладочный выкл. (или вкл., выбирается далее)
+ * - Сброс своего
+ * - Сброс удаленного (при работе по оптоволокну)
+ * - Сброс всех (при работе не по оптоволокну)
+ * - Сброс индикации (если есть приемник или передатчик)
+ * - Пуск удаленного (если есть защита)
+ * - Сброс АК (если есть только защита)
+ *
+ * @param[in] type Тип оптическиого канала.
+ * @param[in] def Наличие защиты.
+ * @param[in] prd Наличие передатчика.
+ * @param[in] prm Наличие приемника.
+ * @return True если список заполнен, иначе False.
+ *
+ * *****************************************************************************
+ */
+bool clMenu::fillLvlControlOpto(eGB_TYPE_OPTO type, bool def, bool prd, bool prm)
+{
+    Q_ASSERT(sParam.glb.getTypeDevice() == AVANT_OPTO);
+
+    if (def)
+    {
+        Punkts_.addNumber(TControl::CTRL_PuskAdjOff);
+    }
+
+    Punkts_.addNumber(TControl::CTRL_Reset);
+
+    if (type == TYPE_OPTO_STANDART)
+    {
+        Punkts_.addNumber(TControl::CTRL_RemoteReset);
+    }
+    else
+    {
+        Punkts_.addNumber(TControl::CTRL_ResetAll);
+    }
+
+    if (prd || prm)
+    {
+        Punkts_.addNumber(TControl::CTRL_IndReset);
+    }
+
+    if (def)
+    {
+        Punkts_.addNumber(TControl::CTRL_RemotePusk);
+
+        if (!prd && !prm)
+        {
+            Punkts_.addNumber(TControl::CTRL_AcReset);
         }
     }
 }
