@@ -23,7 +23,7 @@ const char fcCompR400m[][VALUE_STRING_SIZE] PROGMEM = {
     [GB_COMP_R400M_LINER]  = "ЛИНИЯ-Р",     //
     [GB_COMP_R400M_PVZU]   = "ПВЗУ",        //
     [GB_COMP_R400M_PVZ]    = "ПВЗ",         //
-    [GB_COMP_R400M_P400]   = "Р400",        //
+    [GB_COMP_R400M_R400]   = "Р400",        //
 };
 
 /// Тип совместимости (параметр К400)

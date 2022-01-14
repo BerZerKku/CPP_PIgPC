@@ -6,14 +6,17 @@
 
 using namespace std;
 
-#define TEST_FRIENDS                            \
-    friend class clMenu_Test;                   \
-    FRIEND_TEST(clMenu_Test, checkLedOn);       \
-    FRIEND_TEST(clMenu_Test, onFnButton);       \
-    FRIEND_TEST(clMenu_Test, addControlToSend); \
-    FRIEND_TEST(clMenu_Test, isRzskM);          \
-    FRIEND_TEST(clMenu_Test, getKeyboardLayout);
-
+#define TEST_FRIENDS                               \
+    friend class clMenu_Test;                      \
+    FRIEND_TEST(clMenu_Test, checkLedOn);          \
+    FRIEND_TEST(clMenu_Test, onFnButton);          \
+    FRIEND_TEST(clMenu_Test, addControlToSend);    \
+    FRIEND_TEST(clMenu_Test, isRzskM);             \
+    FRIEND_TEST(clMenu_Test, getKeyboardLayout);   \
+    FRIEND_TEST(clMenu_Test, fillLvlControl_K400); \
+    FRIEND_TEST(clMenu_Test, fillLvlControl_Opto); \
+    FRIEND_TEST(clMenu_Test, fillLvlControl_Rzsk); \
+    FRIEND_TEST(clMenu_Test, fillLvlControl_R400m);
 
 #include "menu/menu.h"
 
@@ -472,4 +475,373 @@ TEST_F(clMenu_Test, addControlToSend)
 
     mObj->addControlToSend(TControl::CTRL_MAX);
     ASSERT_EQ(GB_COM_NO, mObj->sParam.txComBuf.getFastCom());
+}
+
+//
+TEST_F(clMenu_Test, fillLvlControl_K400)
+{
+    uint8_t counter;
+
+    ASSERT_TRUE(mObj->fillLvlControl(AVANT_K400));
+
+    counter = 0;
+    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_IndReset, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(counter, mObj->Punkts_.getMaxNumPunkts());
+}
+
+//
+TEST_F(clMenu_Test, fillLvlControl_Opto)
+{
+    uint8_t counter;
+
+    mObj->sParam.glb.setTypeLine(GB_TYPE_LINE_OPTO);  // требуется для установки типа оптики
+
+    // защита + приемник + передатчик, стандартная оптика
+    mObj->sParam.def.status.setEnable(true);
+    mObj->sParam.prm.status.setEnable(true);
+    mObj->sParam.prd.status.setEnable(true);
+    mObj->sParam.glb.setTypeOpto(TYPE_OPTO_STANDART);
+
+    ASSERT_TRUE(mObj->fillLvlControl(AVANT_OPTO));
+
+    counter = 0;
+    ASSERT_EQ(TControl::CTRL_PuskAdjOff, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_RemoteReset, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_IndReset, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_RemotePusk, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(counter, mObj->Punkts_.getMaxNumPunkts());
+
+    // приемник, стандратная оптика
+    mObj->sParam.def.status.setEnable(false);
+    mObj->sParam.prd.status.setEnable(false);
+
+    ASSERT_TRUE(mObj->fillLvlControl(AVANT_OPTO));
+
+    counter = 0;
+    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_RemoteReset, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_IndReset, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(counter, mObj->Punkts_.getMaxNumPunkts());
+
+    // передатчик, кольцо
+    mObj->sParam.prm.status.setEnable(false);
+    mObj->sParam.prd.status.setEnable(true);
+    mObj->sParam.glb.setTypeOpto(TYPE_OPTO_RING_BI);
+
+    ASSERT_TRUE(mObj->fillLvlControl(AVANT_OPTO));
+
+    counter = 0;
+    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_ResetAll, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_IndReset, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(counter, mObj->Punkts_.getMaxNumPunkts());
+
+    // защита, стандратная оптика
+    mObj->sParam.prd.status.setEnable(false);
+    mObj->sParam.def.status.setEnable(true);
+    mObj->sParam.glb.setTypeOpto(TYPE_OPTO_STANDART);
+
+    ASSERT_TRUE(mObj->fillLvlControl(AVANT_OPTO));
+
+    counter = 0;
+    ASSERT_EQ(TControl::CTRL_PuskAdjOff, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_RemoteReset, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_RemotePusk, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_AcReset, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(counter, mObj->Punkts_.getMaxNumPunkts());
+}
+
+//
+TEST_F(clMenu_Test, fillLvlControl_Rzsk)
+{
+    uint8_t counter;
+    mObj->sParam.typeDevice = AVANT_RZSK;  // для совместимости РЗСКм
+
+    // защита, 2-концевая линия, совместимость РЗСК
+    mObj->sParam.def.status.setEnable(true);
+    mObj->sParam.def.setNumDevices(GB_NUM_DEVICES_2);
+    mObj->sParam.glb.setCompatibility(GB_COMP_RZSK);
+
+    ASSERT_TRUE(mObj->fillLvlControl(AVANT_RZSK));
+
+    counter = 0;
+    ASSERT_EQ(TControl::CTRL_PuskAdjOff, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_RemoteReset, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_RemotePusk, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_IndReset, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_Call, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(counter, mObj->Punkts_.getMaxNumPunkts());
+
+    // защита, 3-концевая линия, совместимость РЗСК
+    mObj->sParam.def.setNumDevices(GB_NUM_DEVICES_3);
+
+    ASSERT_TRUE(mObj->fillLvlControl(AVANT_RZSK));
+
+    counter = 0;
+    ASSERT_EQ(TControl::CTRL_PuskAdjOff, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_RemoteResetAll, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_RemotePusk1, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_RemotePusk2, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_RemotePuskAll, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_IndReset, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_Call, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(counter, mObj->Punkts_.getMaxNumPunkts());
+
+    // защита, 3-концевая линия, совместимость РЗСКм
+    mObj->sParam.glb.setCompatibility(GB_COMP_RZSK_M);
+
+    ASSERT_TRUE(mObj->fillLvlControl(AVANT_RZSK));
+
+    counter = 0;
+    ASSERT_EQ(TControl::CTRL_PuskAdjOff, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_RemoteResetAll, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_RemotePusk1, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_RemotePusk2, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_RemotePuskAll, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_IndReset, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_Call, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_SingleOn, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(counter, mObj->Punkts_.getMaxNumPunkts());
+
+    // без защиты, 3-концевая линия
+    mObj->sParam.def.status.setEnable(false);
+
+    ASSERT_TRUE(mObj->fillLvlControl(AVANT_RZSK));
+
+    counter = 0;
+    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_RemoteResetAll, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_IndReset, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(counter, mObj->Punkts_.getMaxNumPunkts());
+
+    // без защиты, 2-концевая линия
+    mObj->sParam.def.setNumDevices(GB_NUM_DEVICES_2);
+
+    ASSERT_TRUE(mObj->fillLvlControl(AVANT_RZSK));
+
+    counter = 0;
+    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_RemoteReset, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_IndReset, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(counter, mObj->Punkts_.getMaxNumPunkts());
+}
+
+//
+TEST_F(clMenu_Test, fillLvlControl_R400m)
+{
+    uint8_t counter;
+
+    // 2-концевая линия, совместимость АВАНТ
+    mObj->sParam.def.setNumDevices(GB_NUM_DEVICES_2);
+    mObj->sParam.glb.setCompatibility(GB_COMP_R400M_AVANT);
+
+    ASSERT_TRUE(mObj->fillLvlControl(AVANT_R400M));
+
+    counter = 0;
+    ASSERT_EQ(TControl::CTRL_PuskAdjOff, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_RemoteReset, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_RemotePusk, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_AcReset, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_AcPuskSelf, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_RemoteAcPusk, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_AcNormal, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_AcAccelerated, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_AcOff, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_Call, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(counter, mObj->Punkts_.getMaxNumPunkts());
+
+    ASSERT_EQ(counter, mObj->Punkts_.getMaxNumPunkts());
+
+    // 3-концевая линия, совместимость АВАНТ
+    mObj->sParam.def.setNumDevices(GB_NUM_DEVICES_3);
+    mObj->sParam.glb.setCompatibility(GB_COMP_R400M_AVANT);
+
+    ASSERT_TRUE(mObj->fillLvlControl(AVANT_R400M));
+
+    counter = 0;
+    ASSERT_EQ(TControl::CTRL_PuskAdjOff, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_RemoteResetAll, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_RemotePusk1, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_RemotePusk2, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_RemotePuskAll, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_AcReset, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_AcPuskSelf, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_RemoteAcPusk, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_AcNormal, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_AcAccelerated, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_AcOff, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_Call, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(counter, mObj->Punkts_.getMaxNumPunkts());
+
+    // 2-концевая линия, совместимость ПВЗ90
+    mObj->sParam.def.setNumDevices(GB_NUM_DEVICES_2);
+    mObj->sParam.glb.setCompatibility(GB_COMP_R400M_PVZ90);
+
+    ASSERT_TRUE(mObj->fillLvlControl(AVANT_R400M));
+
+    counter = 0;
+    ASSERT_EQ(TControl::CTRL_PuskAdjOff, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_RemoteReset, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_AcNormal, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_AcAccelerated, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_AcOff, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_AcTest, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_AcPusk, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(counter, mObj->Punkts_.getMaxNumPunkts());
+
+    // 2-концевая линия, совместимость ПВЗУ-Е
+    mObj->sParam.def.setNumDevices(GB_NUM_DEVICES_2);
+    mObj->sParam.glb.setCompatibility(GB_COMP_R400M_PVZUE);
+
+    ASSERT_TRUE(mObj->fillLvlControl(AVANT_R400M));
+
+    counter = 0;
+    ASSERT_EQ(TControl::CTRL_PuskAdjOff, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_RemotePusk, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_RemoteMan, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_RemoteManAll, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_AcNormal, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_AcAccelerated, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_AcQuick, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_AcCtrlCheck, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_AcOff, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_Call, mObj->Punkts_.getNumber(counter++));
+
+    ASSERT_EQ(counter, mObj->Punkts_.getMaxNumPunkts());
+
+    // 3-концевая линия, совместимость ПВЗУ-Е
+    mObj->sParam.def.setNumDevices(GB_NUM_DEVICES_3);
+    mObj->sParam.glb.setCompatibility(GB_COMP_R400M_PVZUE);
+
+    ASSERT_TRUE(mObj->fillLvlControl(AVANT_R400M));
+
+    counter = 0;
+    ASSERT_EQ(TControl::CTRL_PuskAdjOff, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_RemotePusk1, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_RemotePusk2, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_RemoteMan1, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_RemoteMan2, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_RemoteManAll, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_AcNormal, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_AcAccelerated, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_AcQuick, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_AcCtrlCheck, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_AcOff, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_Call, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(counter, mObj->Punkts_.getMaxNumPunkts());
+
+    // 2-концевая линия, совместимость АВЗК-80
+    mObj->sParam.def.setNumDevices(GB_NUM_DEVICES_2);
+    mObj->sParam.glb.setCompatibility(GB_COMP_R400M_AVZK80);
+
+    ASSERT_TRUE(mObj->fillLvlControl(AVANT_R400M));
+
+    counter = 0;
+    ASSERT_EQ(TControl::CTRL_PuskAdjOff, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_AcNormal, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_AcAccelerated, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_AcOff, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_AcTest, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_AcPusk, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(counter, mObj->Punkts_.getMaxNumPunkts());
+
+    // 2-концевая линия, совместимость ПВЗЛ
+    mObj->sParam.def.setNumDevices(GB_NUM_DEVICES_2);
+    mObj->sParam.glb.setCompatibility(GB_COMP_R400M_PVZL);
+
+    ASSERT_TRUE(mObj->fillLvlControl(AVANT_R400M));
+
+    counter = 0;
+    ASSERT_EQ(TControl::CTRL_PuskAdjOff, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_AcReset, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_AcPuskSelf, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_RemoteAcPusk, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_PuskPrd, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_AcOn, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_AcOff, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_Call, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(counter, mObj->Punkts_.getMaxNumPunkts());
+
+    // 2-концевая линия, совместимость ЛИНИЯ-Р
+    mObj->sParam.def.setNumDevices(GB_NUM_DEVICES_2);
+    mObj->sParam.glb.setCompatibility(GB_COMP_R400M_LINER);
+
+    ASSERT_TRUE(mObj->fillLvlControl(AVANT_R400M));
+
+    counter = 0;
+    ASSERT_EQ(TControl::CTRL_PuskAdjOff, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_RemoteReset, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_RemotePusk, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_AcAuto, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_AcAccelerated, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_AcOff, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_Call, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(counter, mObj->Punkts_.getMaxNumPunkts());
+
+    // 3-концевая линия, совместимость ЛИНИЯ-Р
+    mObj->sParam.def.setNumDevices(GB_NUM_DEVICES_3);
+    mObj->sParam.glb.setCompatibility(GB_COMP_R400M_LINER);
+
+    ASSERT_TRUE(mObj->fillLvlControl(AVANT_R400M));
+
+    counter = 0;
+    ASSERT_EQ(TControl::CTRL_PuskAdjOff, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_RemoteReset1, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_RemoteReset2, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_RemotePusk1, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_RemotePusk2, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_RemotePuskAll, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_AcAuto, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_AcAccelerated, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_AcOff, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_Call, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(counter, mObj->Punkts_.getMaxNumPunkts());
+
+    // 2-концевая линия, совместимость ПВЗУ
+    mObj->sParam.def.setNumDevices(GB_NUM_DEVICES_2);
+    mObj->sParam.glb.setCompatibility(GB_COMP_R400M_PVZU);
+
+    ASSERT_TRUE(mObj->fillLvlControl(AVANT_R400M));
+
+    counter = 0;
+    ASSERT_EQ(TControl::CTRL_PuskAdjOff, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_AcNormal, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_AcAccelerated, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_AcQuick, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_AcOff, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_AcCtrlCheck, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_Call, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(counter, mObj->Punkts_.getMaxNumPunkts());
+
+    // 2-концевая линия, совместимость ПВЗ
+    mObj->sParam.def.setNumDevices(GB_NUM_DEVICES_2);
+    mObj->sParam.glb.setCompatibility(GB_COMP_R400M_PVZ);
+
+    ASSERT_TRUE(mObj->fillLvlControl(AVANT_R400M));
+
+    counter = 0;
+    ASSERT_EQ(TControl::CTRL_PuskAdjOff, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_AcNormal, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_AcAccelerated, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_AcOff, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_AcRequest, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_AcReset, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(counter, mObj->Punkts_.getMaxNumPunkts());
 }

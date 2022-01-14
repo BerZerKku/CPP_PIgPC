@@ -98,8 +98,7 @@ void MainWindow::initEeprom()
 //
 void MainWindow::initView()
 {
-    QTreeWidgetItem *top  = nullptr;
-    QTreeWidgetItem *item = nullptr;
+    QTreeWidgetItem *top = nullptr;
 
     ui->treeWidget->header()->setSectionResizeMode(0, QHeaderView::Fixed);
     ui->treeWidget->header()->resizeSection(0, 150);

@@ -2440,161 +2440,12 @@ void clMenu::lvlControl()
         {
             eGB_NUM_DEVICES numDevices    = sParam.def.getNumDevices();
             eGB_COMP_R400M  compatibility = sParam.glb.getCompR400m();
-            // первым всегда идет пуск наладочный
-            Punkts_.addName(punkt07);  // далее выбирается в зависимости от текущего
-            // сброс своего есть во всех аппаратах и совместимостях
-            Punkts_.addName(punkt03);
-            // TODO для ПВЗК
-            if (compatibility == GB_COMP_R400M_AVANT)
-            {
-                if (numDevices == GB_NUM_DEVICES_2)
-                {
-                    Punkts_.addName(punkt04);
-                    Punkts_.addName(punkt02);
-                    Punkts_.addName(punkt11);
-                    Punkts_.addName(punkt12);
-                    Punkts_.addName(punkt13);
-                    Punkts_.addName(punkt19);
-                    Punkts_.addName(punkt16);
-                    Punkts_.addName(punkt17);
-                }
-                else if (numDevices == GB_NUM_DEVICES_3)
-                {
-                    Punkts_.addName(punkt22);
-                    Punkts_.addName(punkt23);
-                    Punkts_.addName(punkt24);
-                    Punkts_.addName(punkt26);
-                    Punkts_.addName(punkt11);
-                    Punkts_.addName(punkt12);
-                    Punkts_.addName(punkt13);
-                    Punkts_.addName(punkt19);
-                    Punkts_.addName(punkt16);
-                    Punkts_.addName(punkt17);
-                }
-                Punkts_.addName(punkt05);
-            }
-            else if (compatibility == GB_COMP_R400M_PVZ90)
-            {
-                Punkts_.addName(punkt04);
-                Punkts_.addName(punkt19);
-                Punkts_.addName(punkt16);
-                Punkts_.addName(punkt17);
-                Punkts_.addName(punkt18);
-                Punkts_.addName(punkt08);
-            }
-            else if (compatibility == GB_COMP_R400M_PVZUE)
-            {
-                if (numDevices == GB_NUM_DEVICES_2)
-                {
-                    Punkts_.addName(punkt02);
-                    Punkts_.addName(punkt09);
-                    Punkts_.addName(punkt30);
-                    Punkts_.addName(punkt19);
-                    Punkts_.addName(punkt16);
-                    Punkts_.addName(punkt20);
-                    Punkts_.addName(punkt10);
-                    Punkts_.addName(punkt17);
-                }
-                else if (numDevices == GB_NUM_DEVICES_3)
-                {
-                    Punkts_.addName(punkt23);
-                    Punkts_.addName(punkt24);
-                    Punkts_.addName(punkt27);
-                    Punkts_.addName(punkt28);
-                    Punkts_.addName(punkt30);
-                    Punkts_.addName(punkt19);
-                    Punkts_.addName(punkt16);
-                    Punkts_.addName(punkt20);
-                    Punkts_.addName(punkt10);
-                    Punkts_.addName(punkt17);
-                }
-                Punkts_.addName(punkt05);
-            }
-            else if (compatibility == GB_COMP_R400M_AVZK80)
-            {
-                Punkts_.addName(punkt19);
-                Punkts_.addName(punkt16);
-                Punkts_.addName(punkt17);
-                Punkts_.addName(punkt18);
-                Punkts_.addName(punkt08);
-            }
-            else if (compatibility == GB_COMP_R400M_PVZL)
-            {
-                Punkts_.addName(punkt11);
-                Punkts_.addName(punkt12);
-                Punkts_.addName(punkt13);
-                Punkts_.addName(punkt14);
-                Punkts_.addName(punkt31);
-                Punkts_.addName(punkt17);
-                Punkts_.addName(punkt05);
-            }
-            else if (compatibility == GB_COMP_R400M_LINER)
-            {
-                if (numDevices == GB_NUM_DEVICES_2)
-                {
-                    Punkts_.addName(punkt04);
-                    Punkts_.addName(punkt02);
-                }
-                else if (numDevices == GB_NUM_DEVICES_3)
-                {
-                    Punkts_.addName(punkt33);  // далее выбирается в зависимости от номера
-                    Punkts_.addName(punkt34);  // далее выбирается в зависимости от номера
-                    Punkts_.addName(punkt23);  // далее выбирается в зависимости от номера
-                    Punkts_.addName(punkt24);  // далее выбирается в зависимости от номера
-                    Punkts_.addName(punkt26);
-                }
-                Punkts_.addName(punkt15);
-                Punkts_.addName(punkt16);
-                Punkts_.addName(punkt17);
-                Punkts_.addName(punkt05);
-            }
         }
         else if (device == AVANT_RZSK)
         {
-            eGB_NUM_DEVICES numDevices = sParam.def.getNumDevices();
-            if (sParam.def.status.isEnable())
-            {
-                Punkts_.addName(punkt07);  // далее выбирается в зависимости от текущего
-                Punkts_.addName(punkt03);
-                if (numDevices == GB_NUM_DEVICES_2)
-                {
-                    Punkts_.addName(punkt04);
-                    Punkts_.addName(punkt02);
-                }
-                else if (numDevices == GB_NUM_DEVICES_3)
-                {
-                    Punkts_.addName(punkt22);
-                    Punkts_.addName(punkt23);  // далее выбирается в зависимости от номера
-                    Punkts_.addName(punkt24);  // далее выбирается в зависимости от номера
-                    Punkts_.addName(punkt26);
-                }
-                Punkts_.addName(punkt35);
-                Punkts_.addName(punkt05);
-
-                if (isRzskM())
-                {
-                    Punkts_.addName(punkt38);
-                }
-            }
-            else
-            {
-                // РЗСК без поста
-                Punkts_.addName(punkt03);
-                if (numDevices == GB_NUM_DEVICES_2)
-                {
-                    Punkts_.addName(punkt04);
-                }
-                else if (numDevices == GB_NUM_DEVICES_3)
-                {
-                    Punkts_.addName(punkt22);
-                }
-                Punkts_.addName(punkt35);
-            }
         }
         else if (device == AVANT_K400)
         {
-            Punkts_.addName(punkt03);
-            Punkts_.addName(punkt35);
         }
         else if (device == AVANT_OPTO)
         {
@@ -5683,11 +5534,32 @@ bool clMenu::fillLvlControl(eGB_TYPE_DEVICE device)
     switch (device)
     {
     case AVANT_R400M:
-        is_fill = fillLvlControlR400m(sParam.glb.getCompR400m(), sParam.def.getNumDevices());
-        break;
-    case AVANT_RZSK: break;
-    case AVANT_K400: is_fill = fillLvlControlK400(); break;
-    case AVANT_OPTO: break;
+        {
+            is_fill = fillLvlControlR400m(sParam.glb.getCompR400m(), sParam.def.getNumDevices());
+            break;
+        }
+
+    case AVANT_RZSK:
+        {
+            is_fill = fillLvlControlRzsk(sParam.def.getNumDevices(),
+                                         sParam.def.status.isEnable(),
+                                         isRzskM());
+            break;
+        }
+
+    case AVANT_K400:
+        {
+            is_fill = fillLvlControlK400();
+            break;
+        }
+    case AVANT_OPTO:
+        {
+            is_fill = fillLvlControlOpto(sParam.glb.getTypeOpto(),
+                                         sParam.def.status.isEnable(),
+                                         sParam.prd.status.isEnable(),
+                                         sParam.prm.status.isEnable());
+            break;
+        }
 
     case AVANT_NO: [[fallthrough]];
     case AVANT_R400: [[fallthrough]];
@@ -5702,15 +5574,223 @@ bool clMenu::fillLvlControl(eGB_TYPE_DEVICE device)
  * *****************************************************************************
  *
  * @brief Формирует список сигналов управления на уровне "Управление" для Р400м.
+ *
  * @param[in] comp Совместимость.
  * @param[in] num_devices Количество устройств в линии.
  * @return True если список заполнен, иначе False.
  *
  * *****************************************************************************
  */
-bool clMenu::fillLvlControlR400m(eGB_COMP_R400M comp, uint8_t num_devices)
+bool clMenu::fillLvlControlR400m(eGB_COMP_R400M comp, eGB_NUM_DEVICES num_devices)
 {
     Q_ASSERT(sParam.glb.getTypeDevice() == AVANT_R400M);
+
+    // команды общие для всех совместимостей
+    Punkts_.addNumber(TControl::CTRL_PuskAdjOff);
+    Punkts_.addNumber(TControl::CTRL_Reset);
+
+    switch (comp)
+    {
+    case GB_COMP_R400M_AVANT:
+        {
+            if (num_devices == GB_NUM_DEVICES_3)
+            {
+                Punkts_.addNumber(TControl::CTRL_RemoteResetAll);
+                Punkts_.addNumber(TControl::CTRL_RemotePusk1);
+                Punkts_.addNumber(TControl::CTRL_RemotePusk2);
+                Punkts_.addNumber(TControl::CTRL_RemotePuskAll);
+            }
+            else
+            {
+                Punkts_.addNumber(TControl::CTRL_RemoteReset);
+                Punkts_.addNumber(TControl::CTRL_RemotePusk);
+            }
+            Punkts_.addNumber(TControl::CTRL_AcReset);
+            Punkts_.addNumber(TControl::CTRL_AcPuskSelf);
+            Punkts_.addNumber(TControl::CTRL_RemoteAcPusk);
+            Punkts_.addNumber(TControl::CTRL_AcNormal);
+            Punkts_.addNumber(TControl::CTRL_AcAccelerated);
+            Punkts_.addNumber(TControl::CTRL_AcOff);
+            Punkts_.addNumber(TControl::CTRL_Call);
+            break;
+        }
+
+    case GB_COMP_R400M_PVZ90:
+        {
+            Punkts_.addNumber(TControl::CTRL_RemoteReset);
+            Punkts_.addNumber(TControl::CTRL_AcNormal);
+            Punkts_.addNumber(TControl::CTRL_AcAccelerated);
+            Punkts_.addNumber(TControl::CTRL_AcOff);
+            Punkts_.addNumber(TControl::CTRL_AcTest);
+            Punkts_.addNumber(TControl::CTRL_AcPusk);
+            break;
+        }
+
+    case GB_COMP_R400M_PVZUE:
+        {
+            if (num_devices == GB_NUM_DEVICES_3)
+            {
+                Punkts_.addNumber(TControl::CTRL_RemotePusk1);
+                Punkts_.addNumber(TControl::CTRL_RemotePusk2);
+                Punkts_.addNumber(TControl::CTRL_RemoteMan1);
+                Punkts_.addNumber(TControl::CTRL_RemoteMan2);
+            }
+            else
+            {
+                Punkts_.addNumber(TControl::CTRL_RemotePusk);
+                Punkts_.addNumber(TControl::CTRL_RemoteMan);
+            }
+            Punkts_.addNumber(TControl::CTRL_RemoteManAll);
+            Punkts_.addNumber(TControl::CTRL_AcNormal);
+            Punkts_.addNumber(TControl::CTRL_AcAccelerated);
+            Punkts_.addNumber(TControl::CTRL_AcQuick);
+            Punkts_.addNumber(TControl::CTRL_AcCtrlCheck);
+            Punkts_.addNumber(TControl::CTRL_AcOff);
+            Punkts_.addNumber(TControl::CTRL_Call);
+            break;
+        }
+
+    case GB_COMP_R400M_AVZK80:
+        {
+            Punkts_.addNumber(TControl::CTRL_AcNormal);
+            Punkts_.addNumber(TControl::CTRL_AcAccelerated);
+            Punkts_.addNumber(TControl::CTRL_AcOff);
+            Punkts_.addNumber(TControl::CTRL_AcTest);
+            Punkts_.addNumber(TControl::CTRL_AcPusk);
+            break;
+        }
+
+    case GB_COMP_R400M_PVZL:
+        {
+            Punkts_.addNumber(TControl::CTRL_AcReset);
+            Punkts_.addNumber(TControl::CTRL_AcPuskSelf);
+            Punkts_.addNumber(TControl::CTRL_RemoteAcPusk);
+            Punkts_.addNumber(TControl::CTRL_PuskPrd);
+            Punkts_.addNumber(TControl::CTRL_AcOn);
+            Punkts_.addNumber(TControl::CTRL_AcOff);
+            Punkts_.addNumber(TControl::CTRL_Call);
+            break;
+        }
+
+    case GB_COMP_R400M_LINER:
+        {
+            if (num_devices == GB_NUM_DEVICES_3)
+            {
+                Punkts_.addNumber(TControl::CTRL_RemoteReset1);
+                Punkts_.addNumber(TControl::CTRL_RemoteReset2);
+                Punkts_.addNumber(TControl::CTRL_RemotePusk1);
+                Punkts_.addNumber(TControl::CTRL_RemotePusk2);
+                Punkts_.addNumber(TControl::CTRL_RemotePuskAll);
+            }
+            else
+            {
+                Punkts_.addNumber(TControl::CTRL_RemoteReset);
+                Punkts_.addNumber(TControl::CTRL_RemotePusk);
+            }
+            Punkts_.addNumber(TControl::CTRL_AcAuto);
+            Punkts_.addNumber(TControl::CTRL_AcAccelerated);
+            Punkts_.addNumber(TControl::CTRL_AcOff);
+            Punkts_.addNumber(TControl::CTRL_Call);
+            break;
+        }
+
+    case GB_COMP_R400M_PVZK:
+        {
+            // TODO Добавить команды управления для совместимости ПВЗК.
+            break;
+        }
+
+    case GB_COMP_R400M_PVZU:
+        {
+            Punkts_.addNumber(TControl::CTRL_AcNormal);
+            Punkts_.addNumber(TControl::CTRL_AcAccelerated);
+            Punkts_.addNumber(TControl::CTRL_AcQuick);
+            Punkts_.addNumber(TControl::CTRL_AcOff);
+            Punkts_.addNumber(TControl::CTRL_AcCtrlCheck);
+            Punkts_.addNumber(TControl::CTRL_Call);
+            break;
+        }
+
+    case GB_COMP_R400M_PVZ:
+        {
+            Punkts_.addNumber(TControl::CTRL_AcNormal);
+            Punkts_.addNumber(TControl::CTRL_AcAccelerated);
+            Punkts_.addNumber(TControl::CTRL_AcOff);
+            Punkts_.addNumber(TControl::CTRL_AcRequest);
+            Punkts_.addNumber(TControl::CTRL_AcReset);
+            break;
+        }
+
+    case GB_COMP_R400M_R400:
+        {
+            Q_ASSERT(false);
+            // TODO Добавить команды управления для совместимости Р400.
+            break;
+        }
+
+    case GB_COMP_R400M_MAX: break;
+    }
+
+    return true;
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Формирует список сигналов управления на уровне "Управление" для РЗСК.
+ * @param[in] num_devices Количество устройств в линии.
+ * @param[in] def Наличие защиты.
+ * @param[in] comp_rzskm True если совместимость РЗСКм.
+ * @return True если список заполнен, иначе False.
+ *
+ * *****************************************************************************
+ */
+bool clMenu::fillLvlControlRzsk(eGB_NUM_DEVICES num_devices, bool def, bool comp_rzskm)
+{
+    Q_ASSERT(sParam.glb.getTypeDevice() == AVANT_RZSK);
+
+    if (def)
+    {
+        Punkts_.addNumber(TControl::CTRL_PuskAdjOff);
+    }
+
+    Punkts_.addNumber(TControl::CTRL_Reset);
+
+    if (num_devices == GB_NUM_DEVICES_3)
+    {
+        Punkts_.addNumber(TControl::CTRL_RemoteResetAll);
+
+        if (def)
+        {
+            Punkts_.addNumber(TControl::CTRL_RemotePusk1);
+            Punkts_.addNumber(TControl::CTRL_RemotePusk2);
+            Punkts_.addNumber(TControl::CTRL_RemotePuskAll);
+        }
+    }
+    else
+    {
+        Punkts_.addNumber(TControl::CTRL_RemoteReset);
+
+        if (def)
+        {
+            Punkts_.addNumber(TControl::CTRL_RemotePusk);
+        }
+    }
+
+    Punkts_.addNumber(TControl::CTRL_IndReset);
+
+    if (def)
+    {
+        Punkts_.addNumber(TControl::CTRL_Call);
+
+        if (comp_rzskm)
+        {
+            Punkts_.addNumber(TControl::CTRL_SingleOn);
+        }
+    }
+
+    return true;
 }
 
 
@@ -5737,16 +5817,6 @@ bool clMenu::fillLvlControlK400()
  * *****************************************************************************
  *
  * @brief Формирует список сигналов управления на уровне "Управление" для оптики.
- *
- * Команды управления:
- * - Пуск наладочный выкл. (или вкл., выбирается далее)
- * - Сброс своего
- * - Сброс удаленного (при работе по оптоволокну)
- * - Сброс всех (при работе не по оптоволокну)
- * - Сброс индикации (если есть приемник или передатчик)
- * - Пуск удаленного (если есть защита)
- * - Сброс АК (если есть только защита)
- *
  * @param[in] type Тип оптическиого канала.
  * @param[in] def Наличие защиты.
  * @param[in] prd Наличие передатчика.
@@ -5758,6 +5828,7 @@ bool clMenu::fillLvlControlK400()
 bool clMenu::fillLvlControlOpto(eGB_TYPE_OPTO type, bool def, bool prd, bool prm)
 {
     Q_ASSERT(sParam.glb.getTypeDevice() == AVANT_OPTO);
+    Q_ASSERT(sParam.glb.getTypeLine() == GB_TYPE_LINE_OPTO);
 
     if (def)
     {
@@ -5789,4 +5860,6 @@ bool clMenu::fillLvlControlOpto(eGB_TYPE_OPTO type, bool def, bool prd, bool prm
             Punkts_.addNumber(TControl::CTRL_AcReset);
         }
     }
+
+    return true;
 }

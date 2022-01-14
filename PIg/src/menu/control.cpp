@@ -18,9 +18,10 @@ static const char AcPuskText[] PROGMEM         = "АК пуск";
 static const char AcPuskSelfText[] PROGMEM     = "Пуск АК свой";
 static const char AcQuickText[] PROGMEM        = "АК беглый";
 static const char AcRegimeText[] PROGMEM       = "Режим АК";
+static const char AcRequestText[] PROGMEM      = "АК запрос";
 static const char AcResetText[] PROGMEM        = "Сброс АК";
 static const char AcTestText[] PROGMEM         = "АК испытания";
-static const char CtrlCheckText[] PROGMEM      = "АК контр.провер.";
+static const char AcCtrlCheckText[] PROGMEM    = "АК контр.провер.";
 static const char IndResetText[] PROGMEM       = "Сброс индикации";
 static const char PuskAdjOnText[] PROGMEM      = "Пуск налад. вкл.";
 static const char PuskAdjOffText[] PROGMEM     = "Пуск налад. выкл";
@@ -48,45 +49,46 @@ static const char SingleOffText[] PROGMEM      = "Одност.реж. выкл";
 static const char SingleOnText[] PROGMEM       = "Одност.реж. вкл";
 
 const TControl::data_t TControl::m_data[TControl::CTRL_MAX] PROGMEM = {
-    // 12345678901234567890
-    { CallText, GB_COM_SET_CONTROL, true, GB_CONTROL_CALL },                  // punkt05
-    { AcAutoText, GB_COM_DEF_SET_TYPE_AC, true, GB_TYPE_AC_AUTO_NORM },       // punkt15
-    { AcAcceleratedText, GB_COM_DEF_SET_TYPE_AC, true, GB_TYPE_AC_ACCEL },    // punkt16
-    { AcNormalText, GB_COM_DEF_SET_TYPE_AC, true, GB_TYPE_AC_AUTO_NORM },     // punkt19
-    { AcOffText, GB_COM_DEF_SET_TYPE_AC, true, GB_TYPE_AC_OFF },              // punkt17
-    { AcOnText, GB_COM_DEF_SET_TYPE_AC, true, GB_TYPE_AC_AUTO_NORM },         // punkt31
-    { AcPuskText, GB_COM_DEF_SET_TYPE_AC, true, GB_TYPE_AC_PUSK },            // punkt08
-    { AcPuskSelfText, GB_COM_DEF_SET_TYPE_AC, true, GB_TYPE_AC_PUSK_SELF },   // punkt12
-    { AcQuickText, GB_COM_DEF_SET_TYPE_AC, true, GB_TYPE_AC_CHECK },          // punkt20
+    // 2345678901234567890
+    { CallText, GB_COM_SET_CONTROL, true, GB_CONTROL_CALL },                  //
+    { AcAutoText, GB_COM_DEF_SET_TYPE_AC, true, GB_TYPE_AC_AUTO_NORM },       //
+    { AcAcceleratedText, GB_COM_DEF_SET_TYPE_AC, true, GB_TYPE_AC_ACCEL },    //
+    { AcCtrlCheckText, GB_COM_DEF_SET_TYPE_AC, true, GB_TYPE_AC_PUSK_SELF },  //
+    { AcNormalText, GB_COM_DEF_SET_TYPE_AC, true, GB_TYPE_AC_AUTO_NORM },     //
+    { AcOffText, GB_COM_DEF_SET_TYPE_AC, true, GB_TYPE_AC_OFF },              //
+    { AcOnText, GB_COM_DEF_SET_TYPE_AC, true, GB_TYPE_AC_AUTO_NORM },         //
+    { AcPuskText, GB_COM_DEF_SET_TYPE_AC, true, GB_TYPE_AC_PUSK },            //
+    { AcPuskSelfText, GB_COM_DEF_SET_TYPE_AC, true, GB_TYPE_AC_PUSK_SELF },   //
+    { AcQuickText, GB_COM_DEF_SET_TYPE_AC, true, GB_TYPE_AC_CHECK },          //
     { AcRegimeText, GB_COM_SET_CONTROL, true, GB_CONTROL_REG_AC },            //
-    { AcResetText, GB_COM_SET_CONTROL, true, GB_CONTROL_RESET_AC },           // punkt11
-    { AcTestText, GB_COM_DEF_SET_TYPE_AC, true, GB_TYPE_AC_PUSK_SELF },       // punkt18
-    { CtrlCheckText, GB_COM_DEF_SET_TYPE_AC, true, GB_TYPE_AC_PUSK_SELF },    // punkt10
-    { IndResetText, GB_COM_PRM_RES_IND, false, 0U },                          // punkt35
-    { PuskAdjOnText, GB_COM_SET_CONTROL, true, GB_CONTROL_PUSK_ON },          // punkt06
-    { PuskAdjOffText, GB_COM_SET_CONTROL, true, GB_CONTROL_PUSK_OFF },        // punkt07
-    { PuskPrdText, GB_COM_SET_CONTROL, true, GB_CONTROL_PUSK_UD_1 },          // punkt14
+    { AcRequestText, GB_COM_DEF_SET_TYPE_AC, true, 6U },                      //
+    { AcResetText, GB_COM_SET_CONTROL, true, GB_CONTROL_RESET_AC },           //
+    { AcTestText, GB_COM_DEF_SET_TYPE_AC, true, GB_TYPE_AC_PUSK_SELF },       //
+    { IndResetText, GB_COM_PRM_RES_IND, false, 0U },                          //
+    { PuskAdjOnText, GB_COM_SET_CONTROL, true, GB_CONTROL_PUSK_ON },          //
+    { PuskAdjOffText, GB_COM_SET_CONTROL, true, GB_CONTROL_PUSK_OFF },        //
+    { PuskPrdText, GB_COM_SET_CONTROL, true, GB_CONTROL_PUSK_UD_1 },          //
     { PuskPrmText, GB_COM_PRM_ENTER, false, 0U },                             //
-    { RemoteAcPuskText, GB_COM_SET_CONTROL, true, GB_CONTROL_PUSK_AC_UD },    // punkt13
-    { RemoteManText, GB_COM_SET_CONTROL, true, GB_CONTROL_MAN_1 },            // punkt09
-    { RemoteMan1Text, GB_COM_SET_CONTROL, true, GB_CONTROL_MAN_1 },           // punkt27
-    { RemoteMan2Text, GB_COM_SET_CONTROL, true, GB_CONTROL_MAN_2 },           // punkt28
-    { RemoteMan3Text, GB_COM_SET_CONTROL, true, GB_CONTROL_MAN_3 },           // punkt29
-    { RemoteManAllText, GB_COM_SET_CONTROL, true, GB_CONTROL_MAN_ALL },       // punkt30
-    { RemotePuskText, GB_COM_SET_CONTROL, true, GB_CONTROL_PUSK_UD_1 },       // punkt02
-    { RemotePusk1Text, GB_COM_SET_CONTROL, true, GB_CONTROL_PUSK_UD_1 },      // punkt23
-    { RemotePusk2Text, GB_COM_SET_CONTROL, true, GB_CONTROL_PUSK_UD_2 },      // punkt24
-    { RemotePusk3Text, GB_COM_SET_CONTROL, true, GB_CONTROL_PUSK_UD_3 },      // punkt25
-    { RemotePuskAllText, GB_COM_SET_CONTROL, true, GB_CONTROL_PUSK_UD_ALL },  // punkt26
-    { RemoteResetText, GB_COM_SET_CONTROL, true, GB_CONTROL_RESET_UD },       // punkt04
-    { RemoteReset1Text, GB_COM_SET_CONTROL, true, GB_CONTROL_RESET_UD_1 },    // punkt32
-    { RemoteReset2Text, GB_COM_SET_CONTROL, true, GB_CONTROL_RESET_UD_2 },    // punkt33
-    { RemoteReset3Text, GB_COM_SET_CONTROL, true, GB_CONTROL_RESET_UD_3 },    // punkt34
-    { RemoteResetAllText, GB_COM_SET_CONTROL, true, GB_CONTROL_RESET_UD },    // punkt22
-    { ResetText, GB_COM_SET_CONTROL, true, GB_CONTROL_RESET_SELF },           // punkt03
-    { ResetAllText, GB_COM_SET_CONTROL, true, GB_CONTROL_RESET_UD },          // punkt36
-    { SingleOffText, GB_COM_DEF_SET_TYPE_AC, true, 0 },                       // punkt37
-    { SingleOnText, GB_COM_DEF_SET_TYPE_AC, true, 1 }                         // punkt38
+    { RemoteAcPuskText, GB_COM_SET_CONTROL, true, GB_CONTROL_PUSK_AC_UD },    //
+    { RemoteManText, GB_COM_SET_CONTROL, true, GB_CONTROL_MAN_1 },            //
+    { RemoteMan1Text, GB_COM_SET_CONTROL, true, GB_CONTROL_MAN_1 },           //
+    { RemoteMan2Text, GB_COM_SET_CONTROL, true, GB_CONTROL_MAN_2 },           //
+    { RemoteMan3Text, GB_COM_SET_CONTROL, true, GB_CONTROL_MAN_3 },           //
+    { RemoteManAllText, GB_COM_SET_CONTROL, true, GB_CONTROL_MAN_ALL },       //
+    { RemotePuskText, GB_COM_SET_CONTROL, true, GB_CONTROL_PUSK_UD_1 },       //
+    { RemotePusk1Text, GB_COM_SET_CONTROL, true, GB_CONTROL_PUSK_UD_1 },      //
+    { RemotePusk2Text, GB_COM_SET_CONTROL, true, GB_CONTROL_PUSK_UD_2 },      //
+    { RemotePusk3Text, GB_COM_SET_CONTROL, true, GB_CONTROL_PUSK_UD_3 },      //
+    { RemotePuskAllText, GB_COM_SET_CONTROL, true, GB_CONTROL_PUSK_UD_ALL },  //
+    { RemoteResetText, GB_COM_SET_CONTROL, true, GB_CONTROL_RESET_UD },       //
+    { RemoteReset1Text, GB_COM_SET_CONTROL, true, GB_CONTROL_RESET_UD_1 },    //
+    { RemoteReset2Text, GB_COM_SET_CONTROL, true, GB_CONTROL_RESET_UD_2 },    //
+    { RemoteReset3Text, GB_COM_SET_CONTROL, true, GB_CONTROL_RESET_UD_3 },    //
+    { RemoteResetAllText, GB_COM_SET_CONTROL, true, GB_CONTROL_RESET_UD },    //
+    { ResetText, GB_COM_SET_CONTROL, true, GB_CONTROL_RESET_SELF },           //
+    { ResetAllText, GB_COM_SET_CONTROL, true, GB_CONTROL_RESET_UD },          //
+    { SingleOffText, GB_COM_DEF_SET_TYPE_AC, true, 0 },                       //
+    { SingleOnText, GB_COM_DEF_SET_TYPE_AC, true, 1 }                         //
 };
 
 

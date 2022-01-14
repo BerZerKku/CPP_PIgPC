@@ -52,6 +52,10 @@
 
 #endif
 
+#if defined(MY_TEST)
+    //
+#endif
+
 //
 #if defined(NDEBUG)
 

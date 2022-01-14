@@ -22,7 +22,7 @@ enum eGB_TYPE_AC
     GB_TYPE_AC_ACCEL       = 3,  // АК ускоренный
     GB_TYPE_AC_OFF         = 4,  // АК выключен
     GB_TYPE_AC_CHECK       = 5,  // АК беглый
-    GB_TYPE_AC_PUSK_SELF   = 6,  // Пуск АК свой/испытания/контр.пров.
+    GB_TYPE_AC_PUSK_SELF   = 6,  // Пуск АК свой/исп/контр.пров./запрос
     GB_TYPE_AC_PUSK        = 7,  // АК пуск
     GB_TYPE_AC_ONE_SIDE    = 8,  // АК односторонний
     GB_TYPE_AC_MAX,              // максимальное принимаемое значение

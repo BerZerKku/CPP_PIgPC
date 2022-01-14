@@ -28,6 +28,7 @@ public:
         CTRL_Call = 0,        ///< Вызов
         CTRL_AcAuto,          ///< АК автоматический
         CTRL_AcAccelerated,   ///< АК ускоренный
+        CTRL_AcCtrlCheck,     ///< АК контрольная проверка
         CTRL_AcNormal,        ///< АК нормальный
         CTRL_AcOff,           ///< АК выключен
         CTRL_AcOn,            ///< АК включен
@@ -35,9 +36,9 @@ public:
         CTRL_AcPuskSelf,      ///< Пуск АК свой
         CTRL_AcQuick,         ///< АК беглый
         CTRL_AcRegime,        ///< Смена режима АК
+        CTRL_AcRequest,       ///< АК запрос
         CTRL_AcReset,         ///< Сброс АК
         CTRL_AcTest,          ///< АК тест
-        CTRL_CtrlCheck,       ///< АК контрольная проверка
         CTRL_IndReset,        ///< Сброс индикации
         CTRL_PuskAdjOn,       ///< Пуск наладочный вкл.
         CTRL_PuskAdjOff,      ///< Пуск наладочный выкл.
@@ -59,7 +60,7 @@ public:
         CTRL_RemoteReset2,    ///< Сброс удаленного 2
         CTRL_RemoteReset3,    ///< Сброс удаленного 3
         CTRL_RemoteResetAll,  ///< Сброс удаленных
-        CTRL_Reset,           ///< Сброс
+        CTRL_Reset,           ///< Сброс своего
         CTRL_ResetAll,        ///< Сброс всех
         CTRL_SingleOff,       ///< Односторонний режим выкл.
         CTRL_SingleOn,        ///< Односторонний режим вкл.

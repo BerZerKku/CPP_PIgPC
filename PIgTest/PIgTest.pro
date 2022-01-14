@@ -12,7 +12,8 @@ CONFIG += cmdline
 
 DEFINES += \
     NDEBUG \
-    MY_TESTS
+    MY_TESTS \
+    QT_NO_DEBUG
 
 INCLUDEPATH += \
     googletest/ \

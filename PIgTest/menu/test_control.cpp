@@ -64,9 +64,10 @@ TEST_F(TControl_Test, common)
         { "AcPuskSelf", TControl::CTRL_AcPuskSelf, "Пуск АК свой", 0x8A, true, 6 },
         { "AcQuick", TControl::CTRL_AcQuick, "АК беглый", 0x8A, true, 5 },
         { "AcRegime", TControl::CTRL_AcRegime, "Режим АК", 0x72, true, 14 },
+        { "AcRequest", TControl::CTRL_AcRequest, "АК запрос", 0x8A, true, 6 },
         { "AcReset", TControl::CTRL_AcReset, "Сброс АК", 0x72, true, 3 },
         { "AcTest", TControl::CTRL_AcTest, "АК испытания", 0x8A, true, 6 },
-        { "CtrlCheck", TControl::CTRL_CtrlCheck, "АК контр.провер.", 0x8A, true, 6 },
+        { "CtrlCheck", TControl::CTRL_AcCtrlCheck, "АК контр.провер.", 0x8A, true, 6 },
         { "IndReset", TControl::CTRL_IndReset, "Сброс индикации", 0x9A, false, 0 },
         { "PuskAdjOn", TControl::CTRL_PuskAdjOn, "Пуск налад. вкл.", 0x72, true, 8 },
         { "PuskAdjOff", TControl::CTRL_PuskAdjOff, "Пуск налад. выкл", 0x72, true, 9 },
@@ -93,6 +94,8 @@ TEST_F(TControl_Test, common)
         { "SingleOff", TControl::CTRL_SingleOff, "Одност.реж. выкл", 0x8A, true, 0 },
         { "SingleOn", TControl::CTRL_SingleOn, "Одност.реж. вкл", 0x8A, true, 1 }
     };
+
+    ASSERT_EQ(TControl::CTRL_MAX, testData.size());
 
     for (size_t i = 0; i < testData.size(); i++)
     {
