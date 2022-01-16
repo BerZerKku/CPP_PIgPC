@@ -34,6 +34,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(ui->serialBsp, &TSerial::read, [=](int byte) { bspPushByteFrom(byte, false); });
     connect(this, &MainWindow::writeByteToBsp, ui->serialBsp, &TSerial::write);
     connect(ui->serialBsp, &TSerial::sendFinished, [=]() { bspTxEnd(); });
+    connect(ui->serialBsp, &TSerial::openPort, [&]() { ui->mBspConnect->setEnabled(false); });
+    connect(ui->serialBsp, &TSerial::closePort, [&]() { ui->mBspConnect->setEnabled(true); });
 
     ui->serialPc->setLabelText("Port PC:");
     ui->serialPc->setup(19200, QSerialPort::NoParity, QSerialPort::TwoStop);
@@ -47,6 +49,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     codec = QTextCodec::codecForName("CP1251");
     connect(ui->textEdit, &QTextEdit::selectionChanged, this, &MainWindow::clearSelection);
 
+    connect(ui->mBspConnect, &QPushButton::clicked, this, &MainWindow::SlotBspConnection);
+
     // палитры
     QLineEdit lineedit;
     pdefault = lineedit.palette();
@@ -55,6 +59,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     pblue = pdefault;
     pblue.setColor(QPalette::Text, Qt::blue);
 
+    initBsp();
     initEeprom();
     initView();
     initKeyboard();
@@ -88,6 +93,30 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+//
+void MainWindow::initBsp()
+{
+    ui->mBspTree->crtTreeDevice();
+    ui->mBspTree->crtTreeState();
+    ui->mBspTree->crtTreePrm();
+    ui->mBspTree->crtTreePrd();
+    ui->mBspTree->crtTreeGlb();
+    ui->mBspTree->crtTreeInterface();
+    ui->mBspTree->crtTest();
+    ui->mBspTree->crtTreeDef();
+    ui->mBspTree->crtTreeMeasure();
+    ui->mBspTree->initParam();
+
+    ui->mBspTree->expandAll();
+    ui->mBspTree->resizeColumnToContents(0);
+    //    ui->mBspTree->resizeColumnToContents(1);
+    ui->mBspTree->header()->setSectionResizeMode(0, QHeaderView::Fixed);
+
+    //    ui->mBspTree->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+    ui->mBspTree->collapseAll();
 }
 
 void MainWindow::initEeprom()
@@ -351,6 +380,29 @@ void MainWindow::setBacklight(bool enable)
     {
         QString qss = QString("background-color: %1").arg(color.name());
         ui->textEdit->setStyleSheet(qss);
+    }
+}
+
+void MainWindow::SlotBspConnection()
+{
+    if (ui->serialBsp->isEnabled())
+    {
+        connect(this, &MainWindow::writeByteToBsp, ui->mBspTree, &Bsp::SlotReadByte);
+        connect(ui->mBspTree,
+                &Bsp::SignalWriteByte,
+                [=](int byte) { bspPushByteFrom(byte, false); });
+        connect(ui->mBspTree, &Bsp::SignalSendFinished, [=]() { bspTxEnd(); });
+
+        ui->serialBsp->setEnabled(false);
+        ui->mBspConnect->setText("Disconnect");
+    }
+    else
+    {
+        ui->mBspTree->disconnect();
+        disconnect(this, &MainWindow::writeByteToBsp, ui->mBspTree, &Bsp::SlotReadByte);
+
+        ui->serialBsp->setEnabled(true);
+        ui->mBspConnect->setText("Connect");
     }
 }
 

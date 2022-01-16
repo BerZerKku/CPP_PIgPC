@@ -23,7 +23,7 @@ void TSerialPort::start()
         port = new QSerialPort(m_portName);
         if (!port->setBaudRate(m_baudrate))
         {
-            emit finished();
+            emit SignalFinished();
         }
         port->setParity(m_parity);
         port->setStopBits(m_stopbits);
@@ -51,7 +51,7 @@ void TSerialPort::start()
     }
     else
     {
-        emit finished();
+        emit SignalFinished();
     }
 }
 
@@ -60,7 +60,7 @@ void TSerialPort::stop()
 {
     timer->stop();
     port->close();
-    emit finished();
+    emit SignalFinished();
 }
 
 //
@@ -70,7 +70,6 @@ void TSerialPort::writeByteSlot(int byte)
     {
         bufTx.append(static_cast<quint8>(byte));
 
-        // запуск передачи если она еще не ведется
         if (!timer->isActive())
         {
             timeoutSlot();
@@ -160,26 +159,16 @@ void TSerialPort::readyReadSlot()
 //
 void TSerialPort::timeoutSlot()
 {
-    m_timeToFinishSendMs += 1.0;  // 1.0 шаг таймера
+    m_timeToFinishSendMs += 1.0;
 
-    // Начало передачи
     if (!timer->isActive())
     {
         m_timeToFinishSendMs = 0;
         timer->start();
     }
 
-    // FIXME Определение окончания передачи
-    // На данный момент сделано для виртуальных портов:
-    // - байт отправляется по окончанию времени передачи
-    // одного байта. Для реального порта при этом будет
-    // осуществлена только запись в буфер.
-
-    // Отправка байта. Первый сразу, остальные только по
-    // таймауту
     if (m_timeToFinishSendMs >= m_byteSendMs)
     {
-        // Передача следующего(их) байт.
         while ((m_timeToFinishSendMs >= m_byteSendMs) && !bufTx.isEmpty())
         {
             char byte = static_cast<char>(bufTx.takeFirst());
@@ -189,7 +178,6 @@ void TSerialPort::timeoutSlot()
 
         if (bufTx.isEmpty())
         {
-            // Окончание передачи.
             timer->stop();
             emit sendFinished();
         }

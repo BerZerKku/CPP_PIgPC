@@ -17,9 +17,8 @@ class TSerial : public QWidget
 {
     Q_OBJECT
 
-    // Время горения светодиода при передаче/приеме
-    // байта
     const uint16_t kTimeLedOnMs = 200;
+    const QString  kInternal    = "internal";
 
 public:
     explicit TSerial(QWidget *parent = nullptr);
@@ -29,7 +28,7 @@ public:
     bool setup(uint32_t baudrate, QSerialPort::Parity parity, QSerialPort::StopBits stopbits);
     void addDefaultPort(QString portname);
 
-    void setLedLink(bool enable);
+    void setLedLink(bool enabled);
 
 signals:
     void write(int value);
@@ -39,14 +38,12 @@ signals:
     void sendFinished();
 
 private:
-    Ui::TSerial *ui;
-    QPointer<TSerialPort> sport;  // Последовательный порт.
-    QPointer<QThread>
-                     thread;  // Поток для работы последовательного порта.
-    QVector<QString> defaultPorts;  // Список портов устанавливаемых по
-                                    // умолчанию.
-    QTimer timerLedRx;  // Таймер светодиода принятых байт.
-    QTimer timerLedTx;  // Таймер светодиода переданных байт.
+    Ui::TSerial *         ui;
+    QPointer<TSerialPort> sport;
+    QPointer<QThread>     thread;
+    QVector<QString>      defaultPorts;
+    QTimer                timerLedRx;
+    QTimer                timerLedTx;
 
     uint32_t              mBaudrate = 0;
     QSerialPort::Parity   mParity   = QSerialPort::NoParity;

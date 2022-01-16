@@ -21,15 +21,13 @@ public slots:
     void writeByteSlot(int byte);
 
 signals:
-    void finished();
+    void SignalFinished();
     void readByte(int byte);
-
-    /// Сигнал завершения передачи (
     void sendFinished();
 
-private:
+protected:
     qint32                m_baudrate = 0;
-    QSerialPort *         port       = nullptr;
+    QSerialPort*          port       = nullptr;
     QString               m_portName;
     QSerialPort::Parity   m_parity;
     QSerialPort::StopBits m_stopbits;
@@ -41,7 +39,7 @@ private:
 
     double calcOneByteSendTime() const;
 
-private slots:
+protected slots:
     void error(QSerialPort::SerialPortError err);
     void readyReadSlot();
     void timeoutSlot();

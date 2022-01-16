@@ -41,22 +41,26 @@ HEADERS += \
     mainwindow.h \
     qkeyboard.h \
     serial.h \
+    bsp/bsp.h \
+    wrapper.h \
     serial/serialport.h \
     widget/combobox.h \
     widget/qledindicator.h \
-    widget/qpush1.h \
-    wrapper.h
+    widget/qpush1.h
+
 
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
     qkeyboard.cpp \
+    wrapperGui.cpp \
+    bsp/bsp.cpp \
     serial.cpp \
     serial/serialport.cpp \
     widget/combobox.cpp \
     widget/qledindicator.cpp \
-    widget/qpush1.cpp \
-    wrapperGui.cpp
+    widget/qpush1.cpp
+
 
 FORMS += \
     mainwindow.ui \

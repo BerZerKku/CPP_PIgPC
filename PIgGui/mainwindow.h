@@ -19,6 +19,8 @@
 #include "PIg/src/protocols/standart/protocolBspS.h"
 #include "PIg/src/protocols/standart/protocolPcS.h"
 
+#include "bsp/bsp.h"
+
 QT_BEGIN_NAMESPACE
 namespace Ui
 {
@@ -96,6 +98,8 @@ private:
     QPalette      pdefault;
     QElapsedTimer etimer;
 
+    /// Инициализация БСП
+    void initBsp();
     /// Инициализация параметров из EEPROM
     void initEeprom();
     /// Инициализация параметров.
@@ -117,6 +121,7 @@ private slots:
     void cycleMenu();       ///< Цикл 200 мс.
     void clearSelection();  ///< Очистка выделения в textEdit.
     void setBacklight(bool enable);
+    void SlotBspConnection();
 
     void test1();
     void test2();

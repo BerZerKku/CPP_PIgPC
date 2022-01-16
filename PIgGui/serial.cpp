@@ -50,9 +50,6 @@ TSerial::TSerial(QWidget *parent) : QWidget(parent), ui(new Ui::TSerial)
 //
 TSerial::~TSerial()
 {
-    // Не решило проблему! Ошибка все равно появляется,
-    // просто не всегда!
-
     if (!thread.isNull())
     {
         thread->quit();
@@ -95,9 +92,9 @@ void TSerial::addDefaultPort(QString portname)
 }
 
 //
-void TSerial::setLedLink(bool enable)
+void TSerial::setLedLink(bool enabled)
 {
-    ui->ledLink->setChecked(enable);
+    ui->ledLink->setChecked(enabled);
 }
 
 //
@@ -112,7 +109,6 @@ void TSerial::refreshPortList()
     {
         portname = ui->cbPort->currentText();
         ui->cbPort->clear();
-
 
         for (const QSerialPortInfo &info : infos)
         {
@@ -157,9 +153,9 @@ void TSerial::connectSerialPort()
         connect(thread, &QThread::finished, sport, &TSerialPort::stop);
         connect(thread, &QThread::finished, thread, &QThread::deleteLater);
 
-        connect(sport, &TSerialPort::finished, this, &TSerial::closeSerialPort);
-        connect(sport, &TSerialPort::finished, thread, &QThread::quit);
-        connect(sport, &TSerialPort::finished, sport, &TSerialPort::deleteLater);
+        connect(sport, &TSerialPort::SignalFinished, this, &TSerial::closeSerialPort);
+        connect(sport, &TSerialPort::SignalFinished, thread, &QThread::quit);
+        connect(sport, &TSerialPort::SignalFinished, sport, &TSerialPort::deleteLater);
         connect(sport, &TSerialPort::readByte, this, &TSerial::read);
         connect(sport, &TSerialPort::sendFinished, this, &TSerial::sendFinished);
 
