@@ -58,8 +58,10 @@
 /// максимальное кол-во сигналов в тестах
 #define MAX_NUM_TEST_SIGNAL 100
 
+// Количество символов в строке ЖКИ
+#define DISPLAY_ROW_SIZE 20
 // длина строки (+1 - символ конца строки)
-#define NAME_PARAM_LENGHT (20 + 1)
+#define NAME_PARAM_LENGHT (DISPLAY_ROW_SIZE + 1)
 
 /// максимальное и минимальный код типа событий в журнале событий
 #define MIN_JRN_EVENT_VALUE 1

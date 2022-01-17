@@ -129,7 +129,7 @@ public:
     void   setSpinBoxValue(eGB_PARAM param, qint16 value, uint8_t number = 1);
     int    setSpinBoxValue(QSpinBox *spinbox, qint16 value);
 
-    device_t  device;
+    device_t  mDevice;
     state_t   stateDef;
     state_t   stateGlb;
     state_t   statePrm;

@@ -385,6 +385,9 @@ private:
      */
     void addControlToSend(TControl::ctrl_t ctrl);
 
+
+    void AddControlToPunkts(TControl::ctrl_t ctrl);
+
     bool fillLvlControl(eGB_TYPE_DEVICE device);
     bool fillLvlControlR400m(eGB_COMP_R400M comp, eGB_NUM_DEVICES num_devices);
     bool fillLvlControlRzsk(eGB_NUM_DEVICES num_devices, bool def, bool comp_rzskm);

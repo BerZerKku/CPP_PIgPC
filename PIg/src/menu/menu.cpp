@@ -1233,12 +1233,12 @@ void clMenu::lvlStart()
 void clMenu::lvlFirst()
 {
     static const char title[] PROGMEM  = "Меню";
-    static const char punkt1[] PROGMEM = "%d. Журнал";
-    static const char punkt2[] PROGMEM = "%d. Управление";
-    static const char punkt3[] PROGMEM = "%d. Настройка";
-    static const char punkt4[] PROGMEM = "%d. Тесты";
-    static const char punkt5[] PROGMEM = "%d. Информация";
-    static const char punkt6[] PROGMEM = "%d. Измерения";
+    static const char punkt1[] PROGMEM = "Журнал";
+    static const char punkt2[] PROGMEM = "Управление";
+    static const char punkt3[] PROGMEM = "Настройка";
+    static const char punkt4[] PROGMEM = "Тесты";
+    static const char punkt5[] PROGMEM = "Информация";
+    static const char punkt6[] PROGMEM = "Измерения";
 
     if (lvlCreate_)
     {
@@ -1444,10 +1444,10 @@ void clMenu::lvlInfo()
 void clMenu::lvlJournal()
 {
     static const char title[] PROGMEM  = "Меню\\Журнал";
-    static const char punkt1[] PROGMEM = "%d. События";
-    static const char punkt2[] PROGMEM = "%d. Защита";
-    static const char punkt3[] PROGMEM = "%d. Приемник";
-    static const char punkt4[] PROGMEM = "%d. Передатчик";
+    static const char punkt1[] PROGMEM = "События";
+    static const char punkt2[] PROGMEM = "Защита";
+    static const char punkt3[] PROGMEM = "Приемник";
+    static const char punkt4[] PROGMEM = "Передатчик";
 
     if (lvlCreate_)
     {
@@ -2378,46 +2378,21 @@ void clMenu::lvlJournalPrd()
 void clMenu::lvlControl()
 {
 
-    static const char title[] PROGMEM = "Меню\\Управление";
-    // %d - может быть двухзначным, учесть для макс. кол-ва символов !
-    //                              "01234567890123456789"
-    static const char punkt02[] PROGMEM = "%d. Пуск удаленного";
-    static const char punkt03[] PROGMEM = "%d. Сброс своего";
-    static const char punkt04[] PROGMEM = "%d. Сброс удаленного";
-    static const char punkt05[] PROGMEM = "%d. Вызов";
-    static const char punkt06[] PROGMEM = "%d. Пуск налад. вкл.";
-    static const char punkt07[] PROGMEM = "%d. Пуск налад. выкл";
-    static const char punkt08[] PROGMEM = "%d. АК пуск";
-    static const char punkt09[] PROGMEM = "%d. Пуск удален. МАН";
-    static const char punkt10[] PROGMEM = "%d. АК контр.провер.";
-    static const char punkt11[] PROGMEM = "%d. Сброс АК";
-    static const char punkt12[] PROGMEM = "%d. Пуск АК свой";
-    static const char punkt13[] PROGMEM = "%d. Пуск АК удаленн.";
-    static const char punkt14[] PROGMEM = "%d. Пуск ПРД";
-    static const char punkt15[] PROGMEM = "%d. АК автоматическ.";
-    static const char punkt16[] PROGMEM = "%d. АК ускоренный";
-    static const char punkt17[] PROGMEM = "%d. АК выключен";
-    static const char punkt18[] PROGMEM = "%d. АК испытания";
-    static const char punkt19[] PROGMEM = "%d. АК нормальный";
-    static const char punkt20[] PROGMEM = "%d. АК беглый";
+    static const char title[] PROGMEM   = "Меню\\Управление";
+    static const char punkt06[] PROGMEM = "Пуск налад. вкл.";
+    static const char punkt07[] PROGMEM = "Пуск налад. выкл";
     //  static const char punkt21[] PROGMEM = "%d. АК односторонний";
-    static const char punkt22[] PROGMEM = "%d. Сброс удаленных";
-    static const char punkt23[] PROGMEM = "%d. Пуск удаленн. 1";
-    static const char punkt24[] PROGMEM = "%d. Пуск удаленн. 2";
-    static const char punkt25[] PROGMEM = "%d. Пуск удаленн. 3";
-    static const char punkt26[] PROGMEM = "%d. Пуск удаленных";
-    static const char punkt27[] PROGMEM = "%d. Пуск удал. МАН 1";
-    static const char punkt28[] PROGMEM = "%d. Пуск удал. МАН 2";
-    static const char punkt29[] PROGMEM = "%d. Пуск удал. МАН 3";
-    static const char punkt30[] PROGMEM = "%d. Пуск удал-ых МАН";
-    static const char punkt31[] PROGMEM = "%d. АК включен";
-    static const char punkt32[] PROGMEM = "%d. Сброс удален. 1";
-    static const char punkt33[] PROGMEM = "%d. Сброс удален. 2";
-    static const char punkt34[] PROGMEM = "%d. Сброс удален. 3";
-    static const char punkt35[] PROGMEM = "%d. Сброс индикации";
-    static const char punkt36[] PROGMEM = "%d. Сброс всех";
-    static const char punkt37[] PROGMEM = "%d. Одност.реж. выкл";
-    static const char punkt38[] PROGMEM = "%d. Одност.реж. вкл";
+    static const char punkt23[] PROGMEM = "Пуск удаленн. 1";
+    static const char punkt24[] PROGMEM = "Пуск удаленн. 2";
+    static const char punkt25[] PROGMEM = "Пуск удаленн. 3";
+    static const char punkt27[] PROGMEM = "Пуск удал. МАН 1";
+    static const char punkt28[] PROGMEM = "Пуск удал. МАН 2";
+    static const char punkt29[] PROGMEM = "Пуск удал. МАН 3";
+    static const char punkt32[] PROGMEM = "Сброс удален. 1";
+    static const char punkt33[] PROGMEM = "Сброс удален. 2";
+    static const char punkt34[] PROGMEM = "Сброс удален. 3";
+    static const char punkt37[] PROGMEM = "Одност.реж. выкл";
+    static const char punkt38[] PROGMEM = "Одност.реж. вкл";
 
     eGB_TYPE_DEVICE device = sParam.typeDevice;
 
@@ -2436,21 +2411,6 @@ void clMenu::lvlControl()
 
         fillLvlControl(device);
 
-        if (device == AVANT_R400M)
-        {
-            eGB_NUM_DEVICES numDevices    = sParam.def.getNumDevices();
-            eGB_COMP_R400M  compatibility = sParam.glb.getCompR400m();
-        }
-        else if (device == AVANT_RZSK)
-        {
-        }
-        else if (device == AVANT_K400)
-        {
-        }
-        else if (device == AVANT_OPTO)
-        {
-        }
-
         // доплнительные команды
         sParam.txComBuf.clear();
         if (sParam.typeDevice != AVANT_OPTO)
@@ -2459,12 +2419,13 @@ void clMenu::lvlControl()
             sParam.txComBuf.addCom1(GB_COM_DEF_GET_LINE_TYPE);
             sParam.txComBuf.addCom1(GB_COM_GET_COM_PRD_KEEP);
             sParam.txComBuf.addCom1(GB_COM_GET_DEVICE_NUM);
-        }
-        if (isRzskM())
-        {
-            // режим односторонний
-            sParam.txComBuf.addCom1(GB_COM_DEF_GET_TYPE_AC);
-            sParam.local.addParam(GB_PARAM_DEF_ONE_SIDE);
+
+            if (isRzskM())
+            {
+                // режим односторонний
+                sParam.txComBuf.addCom1(GB_COM_DEF_GET_TYPE_AC);
+                sParam.local.addParam(GB_PARAM_DEF_ONE_SIDE);
+            }
         }
     }
 
@@ -2540,11 +2501,11 @@ void clMenu::lvlControl()
 void clMenu::lvlSetup()
 {
     static const char title[] PROGMEM  = "Меню\\Настройка";
-    static const char punkt1[] PROGMEM = "%d. Режим";
-    static const char punkt2[] PROGMEM = "%d. Время и дата";
-    static const char punkt3[] PROGMEM = "%d. Параметры";
-    static const char punkt4[] PROGMEM = "%d. Пароль";
-    static const char punkt5[] PROGMEM = "%d. Интерфейс";
+    static const char punkt1[] PROGMEM = "Режим";
+    static const char punkt2[] PROGMEM = "Время и дата";
+    static const char punkt3[] PROGMEM = "Параметры";
+    static const char punkt4[] PROGMEM = "Пароль";
+    static const char punkt5[] PROGMEM = "Интерфейс";
 
     if (lvlCreate_)
     {
@@ -2812,11 +2773,11 @@ void clMenu::lvlRegime()
 void clMenu::lvlSetupParam()
 {
     static const char title[] PROGMEM  = "Настройка\\Параметры";
-    static const char punkt1[] PROGMEM = "%d. Защита";
-    static const char punkt2[] PROGMEM = "%d. Приемник";
-    static const char punkt3[] PROGMEM = "%d. Передатчик";
-    static const char punkt4[] PROGMEM = "%d. Общие";
-    static const char punkt5[] PROGMEM = "%d. Кольцо";
+    static const char punkt1[] PROGMEM = "Защита";
+    static const char punkt2[] PROGMEM = "Приемник";
+    static const char punkt3[] PROGMEM = "Передатчик";
+    static const char punkt4[] PROGMEM = "Общие";
+    static const char punkt5[] PROGMEM = "Кольцо";
 
     if (lvlCreate_)
     {
@@ -3540,12 +3501,12 @@ void clMenu::lvlSetupInterface()
 void clMenu::lvlSetupDT()
 {
     static const char title[] PROGMEM  = "Настройка\\Время&дата";
-    static const char punkt1[] PROGMEM = "%d. Год";
-    static const char punkt2[] PROGMEM = "%d. Месяц";
-    static const char punkt3[] PROGMEM = "%d. День";
-    static const char punkt4[] PROGMEM = "%d. Часы";
-    static const char punkt5[] PROGMEM = "%d. Минуты";
-    static const char punkt6[] PROGMEM = "%d. Секунды";
+    static const char punkt1[] PROGMEM = "Год";
+    static const char punkt2[] PROGMEM = "Месяц";
+    static const char punkt3[] PROGMEM = "День";
+    static const char punkt4[] PROGMEM = "Часы";
+    static const char punkt5[] PROGMEM = "Минуты";
+    static const char punkt6[] PROGMEM = "Секунды";
 
     if (lvlCreate_)
     {
@@ -3779,8 +3740,8 @@ void clMenu::lvlMeasure()
 void clMenu::lvlTest()
 {
     static const char title[] PROGMEM       = "Настройка\\Тесты";
-    static const char punkt1[] PROGMEM      = "%d. Тест передатчика";
-    static const char punkt2[] PROGMEM      = "%d. Тест приемника";
+    static const char punkt1[] PROGMEM      = "Тест передатчика";
+    static const char punkt2[] PROGMEM      = "Тест приемника";
     static const char message[][21] PROGMEM = {
         // 12345678901234567890
         "    Перейдите в     ",  //
@@ -4462,7 +4423,10 @@ void clMenu::printPunkts()
 
     for (uint_fast8_t line = lineParam_; line < NUM_TEXT_LINES; line++)
     {
-        snprintf_P(&vLCDbuf[20 * line], 21, Punkts_.getName(cntPunkts), cntPunkts + 1);
+        char* position = &vLCDbuf[20 * line];
+
+        uint8_t len = snprintf_P(position, DISPLAY_ROW_SIZE + 1, PSTR("%u. "), cntPunkts + 1);
+        snprintf_P(position + len, DISPLAY_ROW_SIZE - len + 1, Punkts_.getName(cntPunkts));
 
         if (++cntPunkts >= Punkts_.getMaxNumPunkts())
             break;
@@ -5516,6 +5480,25 @@ void clMenu::addControlToSend(TControl::ctrl_t ctrl)
 /**
  * *****************************************************************************
  *
+ * @brief Добавляет сигнал управления в список пунктов меню.
+ * @param[in] ctrl Сигнал управления.
+ *
+ * *****************************************************************************
+ */
+void clMenu::AddControlToPunkts(TControl::ctrl_t ctrl)
+{
+    Q_ASSERT(ctrl < TControl::CTRL_MAX);
+
+    if (ctrl < TControl::CTRL_MAX)
+    {
+        Punkts_.addName(mControl.getText(ctrl), ctrl);
+    }
+}
+
+
+/**
+ * *****************************************************************************
+ *
  * @brief Формирует список сигналов управления на уровне "Управление".
  * @param[in] device Устройство.
  * @return True если список заполнен, иначе False.
@@ -5586,8 +5569,8 @@ bool clMenu::fillLvlControlR400m(eGB_COMP_R400M comp, eGB_NUM_DEVICES num_device
     Q_ASSERT(sParam.glb.getTypeDevice() == AVANT_R400M);
 
     // команды общие для всех совместимостей
-    Punkts_.addNumber(TControl::CTRL_PuskAdjOff);
-    Punkts_.addNumber(TControl::CTRL_Reset);
+    AddControlToPunkts(TControl::CTRL_PuskAdjOff);
+    AddControlToPunkts(TControl::CTRL_Reset);
 
     switch (comp)
     {
@@ -5595,34 +5578,34 @@ bool clMenu::fillLvlControlR400m(eGB_COMP_R400M comp, eGB_NUM_DEVICES num_device
         {
             if (num_devices == GB_NUM_DEVICES_3)
             {
-                Punkts_.addNumber(TControl::CTRL_RemoteResetAll);
-                Punkts_.addNumber(TControl::CTRL_RemotePusk1);
-                Punkts_.addNumber(TControl::CTRL_RemotePusk2);
-                Punkts_.addNumber(TControl::CTRL_RemotePuskAll);
+                AddControlToPunkts(TControl::CTRL_RemoteResetAll);
+                AddControlToPunkts(TControl::CTRL_RemotePusk1);
+                AddControlToPunkts(TControl::CTRL_RemotePusk2);
+                AddControlToPunkts(TControl::CTRL_RemotePuskAll);
             }
             else
             {
-                Punkts_.addNumber(TControl::CTRL_RemoteReset);
-                Punkts_.addNumber(TControl::CTRL_RemotePusk);
+                AddControlToPunkts(TControl::CTRL_RemoteReset);
+                AddControlToPunkts(TControl::CTRL_RemotePusk);
             }
-            Punkts_.addNumber(TControl::CTRL_AcReset);
-            Punkts_.addNumber(TControl::CTRL_AcPuskSelf);
-            Punkts_.addNumber(TControl::CTRL_RemoteAcPusk);
-            Punkts_.addNumber(TControl::CTRL_AcNormal);
-            Punkts_.addNumber(TControl::CTRL_AcAccelerated);
-            Punkts_.addNumber(TControl::CTRL_AcOff);
-            Punkts_.addNumber(TControl::CTRL_Call);
+            AddControlToPunkts(TControl::CTRL_AcReset);
+            AddControlToPunkts(TControl::CTRL_AcPuskSelf);
+            AddControlToPunkts(TControl::CTRL_RemoteAcPusk);
+            AddControlToPunkts(TControl::CTRL_AcNormal);
+            AddControlToPunkts(TControl::CTRL_AcAccelerated);
+            AddControlToPunkts(TControl::CTRL_AcOff);
+            AddControlToPunkts(TControl::CTRL_Call);
             break;
         }
 
     case GB_COMP_R400M_PVZ90:
         {
-            Punkts_.addNumber(TControl::CTRL_RemoteReset);
-            Punkts_.addNumber(TControl::CTRL_AcNormal);
-            Punkts_.addNumber(TControl::CTRL_AcAccelerated);
-            Punkts_.addNumber(TControl::CTRL_AcOff);
-            Punkts_.addNumber(TControl::CTRL_AcTest);
-            Punkts_.addNumber(TControl::CTRL_AcPusk);
+            AddControlToPunkts(TControl::CTRL_RemoteReset);
+            AddControlToPunkts(TControl::CTRL_AcNormal);
+            AddControlToPunkts(TControl::CTRL_AcAccelerated);
+            AddControlToPunkts(TControl::CTRL_AcOff);
+            AddControlToPunkts(TControl::CTRL_AcTest);
+            AddControlToPunkts(TControl::CTRL_AcPusk);
             break;
         }
 
@@ -5630,45 +5613,45 @@ bool clMenu::fillLvlControlR400m(eGB_COMP_R400M comp, eGB_NUM_DEVICES num_device
         {
             if (num_devices == GB_NUM_DEVICES_3)
             {
-                Punkts_.addNumber(TControl::CTRL_RemotePusk1);
-                Punkts_.addNumber(TControl::CTRL_RemotePusk2);
-                Punkts_.addNumber(TControl::CTRL_RemoteMan1);
-                Punkts_.addNumber(TControl::CTRL_RemoteMan2);
+                AddControlToPunkts(TControl::CTRL_RemotePusk1);
+                AddControlToPunkts(TControl::CTRL_RemotePusk2);
+                AddControlToPunkts(TControl::CTRL_RemoteMan1);
+                AddControlToPunkts(TControl::CTRL_RemoteMan2);
             }
             else
             {
-                Punkts_.addNumber(TControl::CTRL_RemotePusk);
-                Punkts_.addNumber(TControl::CTRL_RemoteMan);
+                AddControlToPunkts(TControl::CTRL_RemotePusk);
+                AddControlToPunkts(TControl::CTRL_RemoteMan);
             }
-            Punkts_.addNumber(TControl::CTRL_RemoteManAll);
-            Punkts_.addNumber(TControl::CTRL_AcNormal);
-            Punkts_.addNumber(TControl::CTRL_AcAccelerated);
-            Punkts_.addNumber(TControl::CTRL_AcQuick);
-            Punkts_.addNumber(TControl::CTRL_AcCtrlCheck);
-            Punkts_.addNumber(TControl::CTRL_AcOff);
-            Punkts_.addNumber(TControl::CTRL_Call);
+            AddControlToPunkts(TControl::CTRL_RemoteManAll);
+            AddControlToPunkts(TControl::CTRL_AcNormal);
+            AddControlToPunkts(TControl::CTRL_AcAccelerated);
+            AddControlToPunkts(TControl::CTRL_AcQuick);
+            AddControlToPunkts(TControl::CTRL_AcCtrlCheck);
+            AddControlToPunkts(TControl::CTRL_AcOff);
+            AddControlToPunkts(TControl::CTRL_Call);
             break;
         }
 
     case GB_COMP_R400M_AVZK80:
         {
-            Punkts_.addNumber(TControl::CTRL_AcNormal);
-            Punkts_.addNumber(TControl::CTRL_AcAccelerated);
-            Punkts_.addNumber(TControl::CTRL_AcOff);
-            Punkts_.addNumber(TControl::CTRL_AcTest);
-            Punkts_.addNumber(TControl::CTRL_AcPusk);
+            AddControlToPunkts(TControl::CTRL_AcNormal);
+            AddControlToPunkts(TControl::CTRL_AcAccelerated);
+            AddControlToPunkts(TControl::CTRL_AcOff);
+            AddControlToPunkts(TControl::CTRL_AcTest);
+            AddControlToPunkts(TControl::CTRL_AcPusk);
             break;
         }
 
     case GB_COMP_R400M_PVZL:
         {
-            Punkts_.addNumber(TControl::CTRL_AcReset);
-            Punkts_.addNumber(TControl::CTRL_AcPuskSelf);
-            Punkts_.addNumber(TControl::CTRL_RemoteAcPusk);
-            Punkts_.addNumber(TControl::CTRL_PuskPrd);
-            Punkts_.addNumber(TControl::CTRL_AcOn);
-            Punkts_.addNumber(TControl::CTRL_AcOff);
-            Punkts_.addNumber(TControl::CTRL_Call);
+            AddControlToPunkts(TControl::CTRL_AcReset);
+            AddControlToPunkts(TControl::CTRL_AcPuskSelf);
+            AddControlToPunkts(TControl::CTRL_RemoteAcPusk);
+            AddControlToPunkts(TControl::CTRL_PuskPrd);
+            AddControlToPunkts(TControl::CTRL_AcOn);
+            AddControlToPunkts(TControl::CTRL_AcOff);
+            AddControlToPunkts(TControl::CTRL_Call);
             break;
         }
 
@@ -5676,21 +5659,21 @@ bool clMenu::fillLvlControlR400m(eGB_COMP_R400M comp, eGB_NUM_DEVICES num_device
         {
             if (num_devices == GB_NUM_DEVICES_3)
             {
-                Punkts_.addNumber(TControl::CTRL_RemoteReset1);
-                Punkts_.addNumber(TControl::CTRL_RemoteReset2);
-                Punkts_.addNumber(TControl::CTRL_RemotePusk1);
-                Punkts_.addNumber(TControl::CTRL_RemotePusk2);
-                Punkts_.addNumber(TControl::CTRL_RemotePuskAll);
+                AddControlToPunkts(TControl::CTRL_RemoteReset1);
+                AddControlToPunkts(TControl::CTRL_RemoteReset2);
+                AddControlToPunkts(TControl::CTRL_RemotePusk1);
+                AddControlToPunkts(TControl::CTRL_RemotePusk2);
+                AddControlToPunkts(TControl::CTRL_RemotePuskAll);
             }
             else
             {
-                Punkts_.addNumber(TControl::CTRL_RemoteReset);
-                Punkts_.addNumber(TControl::CTRL_RemotePusk);
+                AddControlToPunkts(TControl::CTRL_RemoteReset);
+                AddControlToPunkts(TControl::CTRL_RemotePusk);
             }
-            Punkts_.addNumber(TControl::CTRL_AcAuto);
-            Punkts_.addNumber(TControl::CTRL_AcAccelerated);
-            Punkts_.addNumber(TControl::CTRL_AcOff);
-            Punkts_.addNumber(TControl::CTRL_Call);
+            AddControlToPunkts(TControl::CTRL_AcAuto);
+            AddControlToPunkts(TControl::CTRL_AcAccelerated);
+            AddControlToPunkts(TControl::CTRL_AcOff);
+            AddControlToPunkts(TControl::CTRL_Call);
             break;
         }
 
@@ -5702,22 +5685,22 @@ bool clMenu::fillLvlControlR400m(eGB_COMP_R400M comp, eGB_NUM_DEVICES num_device
 
     case GB_COMP_R400M_PVZU:
         {
-            Punkts_.addNumber(TControl::CTRL_AcNormal);
-            Punkts_.addNumber(TControl::CTRL_AcAccelerated);
-            Punkts_.addNumber(TControl::CTRL_AcQuick);
-            Punkts_.addNumber(TControl::CTRL_AcOff);
-            Punkts_.addNumber(TControl::CTRL_AcCtrlCheck);
-            Punkts_.addNumber(TControl::CTRL_Call);
+            AddControlToPunkts(TControl::CTRL_AcNormal);
+            AddControlToPunkts(TControl::CTRL_AcAccelerated);
+            AddControlToPunkts(TControl::CTRL_AcQuick);
+            AddControlToPunkts(TControl::CTRL_AcOff);
+            AddControlToPunkts(TControl::CTRL_AcCtrlCheck);
+            AddControlToPunkts(TControl::CTRL_Call);
             break;
         }
 
     case GB_COMP_R400M_PVZ:
         {
-            Punkts_.addNumber(TControl::CTRL_AcNormal);
-            Punkts_.addNumber(TControl::CTRL_AcAccelerated);
-            Punkts_.addNumber(TControl::CTRL_AcOff);
-            Punkts_.addNumber(TControl::CTRL_AcRequest);
-            Punkts_.addNumber(TControl::CTRL_AcReset);
+            AddControlToPunkts(TControl::CTRL_AcNormal);
+            AddControlToPunkts(TControl::CTRL_AcAccelerated);
+            AddControlToPunkts(TControl::CTRL_AcOff);
+            AddControlToPunkts(TControl::CTRL_AcRequest);
+            AddControlToPunkts(TControl::CTRL_AcReset);
             break;
         }
 
@@ -5752,41 +5735,41 @@ bool clMenu::fillLvlControlRzsk(eGB_NUM_DEVICES num_devices, bool def, bool comp
 
     if (def)
     {
-        Punkts_.addNumber(TControl::CTRL_PuskAdjOff);
+        AddControlToPunkts(TControl::CTRL_PuskAdjOff);
     }
 
-    Punkts_.addNumber(TControl::CTRL_Reset);
+    AddControlToPunkts(TControl::CTRL_Reset);
 
     if (num_devices == GB_NUM_DEVICES_3)
     {
-        Punkts_.addNumber(TControl::CTRL_RemoteResetAll);
+        AddControlToPunkts(TControl::CTRL_RemoteResetAll);
 
         if (def)
         {
-            Punkts_.addNumber(TControl::CTRL_RemotePusk1);
-            Punkts_.addNumber(TControl::CTRL_RemotePusk2);
-            Punkts_.addNumber(TControl::CTRL_RemotePuskAll);
+            AddControlToPunkts(TControl::CTRL_RemotePusk1);
+            AddControlToPunkts(TControl::CTRL_RemotePusk2);
+            AddControlToPunkts(TControl::CTRL_RemotePuskAll);
         }
     }
     else
     {
-        Punkts_.addNumber(TControl::CTRL_RemoteReset);
+        AddControlToPunkts(TControl::CTRL_RemoteReset);
 
         if (def)
         {
-            Punkts_.addNumber(TControl::CTRL_RemotePusk);
+            AddControlToPunkts(TControl::CTRL_RemotePusk);
         }
     }
 
-    Punkts_.addNumber(TControl::CTRL_IndReset);
+    AddControlToPunkts(TControl::CTRL_IndReset);
 
     if (def)
     {
-        Punkts_.addNumber(TControl::CTRL_Call);
+        AddControlToPunkts(TControl::CTRL_Call);
 
         if (comp_rzskm)
         {
-            Punkts_.addNumber(TControl::CTRL_SingleOn);
+            AddControlToPunkts(TControl::CTRL_SingleOn);
         }
     }
 
@@ -5806,8 +5789,8 @@ bool clMenu::fillLvlControlK400()
 {
     Q_ASSERT(sParam.glb.getTypeDevice() == AVANT_K400);
 
-    Punkts_.addNumber(TControl::CTRL_Reset);
-    Punkts_.addNumber(TControl::CTRL_IndReset);
+    AddControlToPunkts(TControl::CTRL_Reset);
+    AddControlToPunkts(TControl::CTRL_IndReset);
 
     return true;
 }
@@ -5832,32 +5815,32 @@ bool clMenu::fillLvlControlOpto(eGB_TYPE_OPTO type, bool def, bool prd, bool prm
 
     if (def)
     {
-        Punkts_.addNumber(TControl::CTRL_PuskAdjOff);
+        AddControlToPunkts(TControl::CTRL_PuskAdjOff);
     }
 
-    Punkts_.addNumber(TControl::CTRL_Reset);
+    AddControlToPunkts(TControl::CTRL_Reset);
 
     if (type == TYPE_OPTO_STANDART)
     {
-        Punkts_.addNumber(TControl::CTRL_RemoteReset);
+        AddControlToPunkts(TControl::CTRL_RemoteReset);
     }
     else
     {
-        Punkts_.addNumber(TControl::CTRL_ResetAll);
+        AddControlToPunkts(TControl::CTRL_ResetAll);
     }
 
     if (prd || prm)
     {
-        Punkts_.addNumber(TControl::CTRL_IndReset);
+        AddControlToPunkts(TControl::CTRL_IndReset);
     }
 
     if (def)
     {
-        Punkts_.addNumber(TControl::CTRL_RemotePusk);
+        AddControlToPunkts(TControl::CTRL_RemotePusk);
 
         if (!prd && !prm)
         {
-            Punkts_.addNumber(TControl::CTRL_AcReset);
+            AddControlToPunkts(TControl::CTRL_AcReset);
         }
     }
 

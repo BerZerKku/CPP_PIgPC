@@ -57,7 +57,7 @@ TEST_F(TMenuPunkt_Test, add_get)
     {
         list.at(counter) = to_string(counter + 1);
 
-        ASSERT_TRUE(m_obj->addName(list.at(counter).c_str()));
+        ASSERT_TRUE(m_obj->addName(list.at(counter).c_str(), counter * 2));
         ASSERT_EQ(counter + 1, m_obj->getMaxNumPunkts());
     }
 
@@ -83,6 +83,7 @@ TEST_F(TMenuPunkt_Test, add_get)
         SCOPED_TRACE("counter = " + to_string(counter + 1));
         SCOPED_TRACE(m_obj->getName(counter));
 
+        ASSERT_EQ(counter * 2, m_obj->getNumber(counter));
         ASSERT_STREQ(list.at(counter).c_str(), m_obj->getName(counter));
     }
 
