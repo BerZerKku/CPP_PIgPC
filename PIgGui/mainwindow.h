@@ -7,6 +7,7 @@
 #include <QLineEdit>
 #include <QMainWindow>
 #include <QPointer>
+#include <QPushButton>
 #include <QTextCodec>
 #include <QThread>
 #include <QTimer>
@@ -20,6 +21,7 @@
 #include "PIg/src/protocols/standart/protocolPcS.h"
 
 #include "bsp/bsp.h"
+#include "qprotocolviewer.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui
@@ -98,6 +100,8 @@ private:
     QPalette      pdefault;
     QElapsedTimer etimer;
 
+    QProtocolViewer mProtocolViewer;
+
     /// Инициализация БСП
     void initBsp();
     /// Инициализация параметров из EEPROM
@@ -122,6 +126,9 @@ private slots:
     void clearSelection();  ///< Очистка выделения в textEdit.
     void setBacklight(bool enable);
     void SlotBspConnection();
+
+    void SlotByteBspToPi(uint8_t byte);
+    void SlotBytePiToBsp(uint8_t byte);
 
     void test1();
     void test2();

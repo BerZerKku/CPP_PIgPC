@@ -161,9 +161,7 @@ void clMenu::proc(void)
     // Считаем код с клавиатуры
     // Если нажата любая кнопка - включится кратковременная подсветка
     uint8_t key_code = eKEYget();
-    SET_DEBUG_BYTE(1, key_code);
-    eKEY key = vKEYgetButton(key_code);
-    SET_DEBUG_BYTE(2, key);
+    eKEY    key      = vKEYgetButton(key_code);
     if (key != KEY_NO)
     {
         if (key == KEY_EMPTY)
@@ -199,9 +197,7 @@ void clMenu::proc(void)
     if ((key_ != KEY_NO) && !EnterParam.isEnable())
     {
         TControl::ctrl_t ctrl = onFnButton(key_);
-        INC_DEBUG_BYTE(3);
-        SET_DEBUG_BYTE(4, ctrl);
-        addControlToSend(ctrl);
+        AddControlToSend(ctrl);
     }
 
     if (checkLedOn())
@@ -1216,7 +1212,7 @@ void clMenu::lvlStart()
         // TODO Разобрабться зачем нужна дополнительная проверка "Фн + кнопка"!
         // Дополнительная проверка нажатия конпка + "Фн" в начальном меню
         TControl::ctrl_t ctrl = onFnButton(key_);
-        addControlToSend(ctrl);
+        AddControlToSend(ctrl);
 
         if (key_ == KEY_MENU)
         {
@@ -1394,10 +1390,10 @@ void clMenu::lvlInfo()
         uint8_t pos = 20 * line;
         eGB_IC  ic  = static_cast<eGB_IC>(Punkts_.getNumber(cntPunkts));
 
-        uint8_t  len  = snprintf_P(&vLCDbuf[pos], 21, fcIC[ic]);
+        uint8_t  len  = snprintf_P(&vLCDbuf[pos], DISPLAY_ROW_SIZE + 1, fcIC[ic]);
         uint16_t vers = sParam.glb.getVersProgIC(ic);
         snprintf_P(&vLCDbuf[pos + len],
-                   NAME_PARAM_LENGHT - len,
+                   DISPLAY_ROW_SIZE - len + 1,
                    PSTR(": %02X.%02X"),
                    static_cast<uint8_t>(vers >> 8),
                    static_cast<uint8_t>(vers));
@@ -2469,26 +2465,26 @@ void clMenu::lvlControl()
     case KEY_DOWN: cursorLineDown(); break;
 
     case KEY_CANCEL:
-        lvlMenu    = &clMenu::lvlFirst;
-        lvlCreate_ = true;
-        break;
+        {
+            lvlMenu    = &clMenu::lvlFirst;
+            lvlCreate_ = true;
+            break;
+        }
+
     case KEY_MENU:
-        lvlMenu    = &clMenu::lvlStart;
-        lvlCreate_ = true;
-        break;
+        {
+            lvlMenu    = &clMenu::lvlStart;
+            lvlCreate_ = true;
+            break;
+        }
 
     case KEY_ENTER:
         {
-            /*
-            PGM_P name = Punkts_.getName(cursorLine_ - 1);
-            if (name == punkt38)
-            {
-                sParam.txComBuf.setInt8(1);
-                sParam.txComBuf.addFastCom(GB_COM_DEF_SET_TYPE_AC);
-            }
-            */
+            uint8_t ctrl = Punkts_.getNumber(cursorLine_ - 1);
+            AddControlToSend(static_cast<TControl::ctrl_t>(ctrl));
+            break;
         }
-        break;
+
 
     default: break;
     }
@@ -5453,7 +5449,7 @@ eGB_TYPE_DEVICE clMenu::getKeyboardLayout()
     return layout;
 }
 
-void clMenu::addControlToSend(TControl::ctrl_t ctrl)
+void clMenu::AddControlToSend(TControl::ctrl_t ctrl)
 {
     eGB_COM com     = GB_COM_NO;
     bool    hasbyte = false;
@@ -5461,9 +5457,8 @@ void clMenu::addControlToSend(TControl::ctrl_t ctrl)
 
     if (mControl.getData(ctrl, com, hasbyte, byte))
     {
-        INC_DEBUG_BYTE(5);
-        SET_DEBUG_BYTE(6, ctrl);
-        SET_DEBUG_BYTE(7, com);
+        SET_DEBUG_BYTE(1, com);
+        SET_DEBUG_BYTE(2, byte);
 
         if (com != GB_COM_NO)
         {

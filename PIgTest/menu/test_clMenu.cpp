@@ -463,17 +463,17 @@ TEST_F(clMenu_Test, getKeyboardLayout)
 //
 TEST_F(clMenu_Test, addControlToSend)
 {
-    mObj->addControlToSend(TControl::CTRL_Call);
+    mObj->AddControlToSend(TControl::CTRL_Call);
     ASSERT_EQ(GB_COM_SET_CONTROL, mObj->sParam.txComBuf.getFastCom());
     ASSERT_EQ(7, mObj->sParam.txComBuf.getInt8());
 
-    mObj->addControlToSend(TControl::CTRL_PuskPrm);
+    mObj->AddControlToSend(TControl::CTRL_PuskPrm);
     ASSERT_EQ(GB_COM_PRM_ENTER, mObj->sParam.txComBuf.getFastCom());
 
-    mObj->addControlToSend(TControl::CTRL_NO);
+    mObj->AddControlToSend(TControl::CTRL_NO);
     ASSERT_EQ(GB_COM_NO, mObj->sParam.txComBuf.getFastCom());
 
-    mObj->addControlToSend(TControl::CTRL_MAX);
+    mObj->AddControlToSend(TControl::CTRL_MAX);
     ASSERT_EQ(GB_COM_NO, mObj->sParam.txComBuf.getFastCom());
 }
 

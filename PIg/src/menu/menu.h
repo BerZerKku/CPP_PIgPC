@@ -383,7 +383,7 @@ private:
      * @brief Добавляет команду для передачи сигнала управления.
      * @param[in] ctrl Сигнал управления.
      */
-    void addControlToSend(TControl::ctrl_t ctrl);
+    void AddControlToSend(TControl::ctrl_t ctrl);
 
 
     void AddControlToPunkts(TControl::ctrl_t ctrl);

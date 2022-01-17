@@ -31,8 +31,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->serialBsp->addDefaultPort("COM20");
     ui->serialBsp->addDefaultPort("tnt0");
 
-    connect(ui->serialBsp, &TSerial::read, [=](int byte) { bspPushByteFrom(byte, false); });
+    connect(ui->serialBsp, &TSerial::read, this, &MainWindow::SlotByteBspToPi);
     connect(this, &MainWindow::writeByteToBsp, ui->serialBsp, &TSerial::write);
+    connect(this, &MainWindow::writeByteToBsp, this, &MainWindow::SlotBytePiToBsp);
     connect(ui->serialBsp, &TSerial::sendFinished, [=]() { bspTxEnd(); });
     connect(ui->serialBsp, &TSerial::openPort, [&]() { ui->mBspConnect->setEnabled(false); });
     connect(ui->serialBsp, &TSerial::closePort, [&]() { ui->mBspConnect->setEnabled(true); });
@@ -50,6 +51,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(ui->textEdit, &QTextEdit::selectionChanged, this, &MainWindow::clearSelection);
 
     connect(ui->mBspConnect, &QPushButton::clicked, this, &MainWindow::SlotBspConnection);
+
+    connect(ui->pbView, &QPushButton::clicked, &mProtocolViewer, &QWidget::show);
 
     // палитры
     QLineEdit lineedit;
@@ -388,9 +391,8 @@ void MainWindow::SlotBspConnection()
     if (ui->serialBsp->isEnabled())
     {
         connect(this, &MainWindow::writeByteToBsp, ui->mBspTree, &Bsp::SlotReadByte);
-        connect(ui->mBspTree,
-                &Bsp::SignalWriteByte,
-                [=](int byte) { bspPushByteFrom(byte, false); });
+
+        connect(ui->mBspTree, &Bsp::SignalWriteByte, this, &MainWindow::SlotByteBspToPi);
         connect(ui->mBspTree, &Bsp::SignalSendFinished, [=]() { bspTxEnd(); });
 
         ui->serialBsp->setEnabled(false);
@@ -400,10 +402,29 @@ void MainWindow::SlotBspConnection()
     {
         ui->mBspTree->disconnect();
         disconnect(this, &MainWindow::writeByteToBsp, ui->mBspTree, &Bsp::SlotReadByte);
+        disconnect(this,
+                   &MainWindow::writeByteToBsp,
+                   &mProtocolViewer,
+                   &QProtocolViewer::AddTxByte);
 
         ui->serialBsp->setEnabled(true);
         ui->mBspConnect->setText("Connect");
     }
+}
+
+
+//
+void MainWindow::SlotByteBspToPi(uint8_t byte)
+{
+    mProtocolViewer.AddRxByte(byte);
+    bspPushByteFrom(byte, false);
+}
+
+
+//
+void MainWindow::SlotBytePiToBsp(uint8_t byte)
+{
+    mProtocolViewer.AddTxByte(byte);
 }
 
 //

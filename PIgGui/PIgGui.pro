@@ -40,6 +40,7 @@ INCLUDEPATH += \
 HEADERS += \
     mainwindow.h \
     qkeyboard.h \
+    qprotocolviewer.h \
     serial.h \
     bsp/bsp.h \
     wrapper.h \
@@ -53,6 +54,7 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     qkeyboard.cpp \
+    qprotocolviewer.cpp \
     wrapperGui.cpp \
     bsp/bsp.cpp \
     serial.cpp \
