@@ -1066,4 +1066,41 @@ TEST_F(clMenu_Test, fillLvlControl_R400m)
     ASSERT_EQ(TControl::CTRL_AcRequest, mObj->Punkts_.GetData(counter++));
     ASSERT_EQ(TControl::CTRL_AcReset, mObj->Punkts_.GetData(counter++));
     ASSERT_EQ(counter, mObj->Punkts_.GetLen());
+
+    // 2-концевая линия, совместимость р400
+    mObj->sParam.def.setNumDevices(GB_NUM_DEVICES_2);
+    mObj->sParam.glb.setCompatibility(GB_COMP_R400M_R400);
+
+    ASSERT_TRUE(mObj->fillLvlControl(AVANT_R400M));
+
+    counter = 0;
+    ASSERT_EQ(TControl::CTRL_PuskAdjOff, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_RemoteReset, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_RemotePusk, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcAuto, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcAccelerated, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcOff, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_Call, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(counter, mObj->Punkts_.GetLen());
+
+    // 3-концевая линия, совместимость р400
+    mObj->sParam.def.setNumDevices(GB_NUM_DEVICES_3);
+    mObj->sParam.glb.setCompatibility(GB_COMP_R400M_R400);
+
+    ASSERT_TRUE(mObj->fillLvlControl(AVANT_R400M));
+
+    counter = 0;
+    ASSERT_EQ(TControl::CTRL_PuskAdjOff, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_RemoteReset1, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_RemoteReset2, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_RemotePusk1, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_RemotePusk2, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_RemotePuskAll, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcAuto, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcAccelerated, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcOff, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_Call, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(counter, mObj->Punkts_.GetLen());
 }

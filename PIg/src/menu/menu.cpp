@@ -5666,8 +5666,23 @@ bool clMenu::fillLvlControlR400m(eGB_COMP_R400M comp, eGB_NUM_DEVICES num_device
 
     case GB_COMP_R400M_R400:
         {
-            Q_ASSERT(false);
-            // TODO Добавить команды управления для совместимости Р400.
+            if (num_devices == GB_NUM_DEVICES_3)
+            {
+                AddControlToPunkts(TControl::CTRL_RemoteReset1);
+                AddControlToPunkts(TControl::CTRL_RemoteReset2);
+                AddControlToPunkts(TControl::CTRL_RemotePusk1);
+                AddControlToPunkts(TControl::CTRL_RemotePusk2);
+                AddControlToPunkts(TControl::CTRL_RemotePuskAll);
+            }
+            else
+            {
+                AddControlToPunkts(TControl::CTRL_RemoteReset);
+                AddControlToPunkts(TControl::CTRL_RemotePusk);
+            }
+            AddControlToPunkts(TControl::CTRL_AcAuto);
+            AddControlToPunkts(TControl::CTRL_AcAccelerated);
+            AddControlToPunkts(TControl::CTRL_AcOff);
+            AddControlToPunkts(TControl::CTRL_Call);
             break;
         }
 
