@@ -12,9 +12,8 @@ using namespace std;
 class TMenuPunkt_Test : public ::testing::Test
 {
 public:
-    static const uint8_t k_max_num_punkts;
-
-    TMenuPunkt* m_obj = nullptr;
+    TMenuPunkt*      mObj = nullptr;
+    static const int mSize;
 
     TMenuPunkt_Test() { }
     virtual ~TMenuPunkt_Test() override = default;
@@ -25,12 +24,12 @@ protected:
     // Can be omitted if not needed.
     static void SetUpTestSuite() { }
 
-    virtual void SetUp() override { m_obj = new TMenuPunkt; }
+    virtual void SetUp() override { mObj = new TMenuPunkt; }
 
     virtual void TearDown() override
     {
-        delete m_obj;
-        m_obj = nullptr;
+        delete mObj;
+        mObj = nullptr;
     }
 
     // Per-test-suite tear-down.
@@ -39,106 +38,142 @@ protected:
     static void TearDownTestSuite() { }
 };
 
-const uint8_t TMenuPunkt_Test::k_max_num_punkts = 20;
+const int TMenuPunkt_Test::mSize = 20;
 
 //
-TEST_F(TMenuPunkt_Test, add_get)
+TEST_F(TMenuPunkt_Test, GetSize)
 {
-    uint8_t                         counter;
-    array<string, k_max_num_punkts> list;
-
-    // начальная проверка
-
-    ASSERT_EQ(uint8_t(0), m_obj->GetLen());
-
-    // заполнение списка
-
-    for (counter = 0; counter < k_max_num_punkts / 2; counter++)
-    {
-        list.at(counter) = to_string(counter + 1);
-
-        ASSERT_TRUE(m_obj->Add(list.at(counter).c_str(), counter * 2));
-        ASSERT_EQ(counter + 1, m_obj->GetLen());
-    }
-
-    for (; counter < k_max_num_punkts; counter++)
-    {
-        ASSERT_TRUE(m_obj->Add(nullptr, counter));
-        ASSERT_EQ(counter + 1, m_obj->GetLen());
-    }
-
-    ASSERT_EQ(k_max_num_punkts, m_obj->GetLen());
-
-    // проверка переполнения
-
-    ASSERT_FALSE(m_obj->Add(to_string(33).c_str()));
-    ASSERT_EQ(k_max_num_punkts, m_obj->GetLen());
-    ASSERT_FALSE(m_obj->Add(nullptr, 33));
-    ASSERT_EQ(k_max_num_punkts, m_obj->GetLen());
-
-    // проверка списка
-
-    for (counter = 0; counter < k_max_num_punkts / 2; counter++)
-    {
-        SCOPED_TRACE("counter = " + to_string(counter + 1));
-        SCOPED_TRACE(m_obj->GetName(counter));
-
-        ASSERT_EQ(counter * 2, m_obj->GetData(counter));
-        ASSERT_STREQ(list.at(counter).c_str(), m_obj->GetName(counter));
-    }
-
-    for (; counter < k_max_num_punkts; counter++)
-    {
-        ASSERT_EQ(counter, m_obj->GetData(counter));
-    }
-
-    // проверка значений выходящих за диапазон
-
-    ASSERT_EQ(uint8_t(0), m_obj->GetData(k_max_num_punkts));
-    ASSERT_STREQ(nullptr, m_obj->GetName(k_max_num_punkts));
-
-    // проверка значений выходящих за текущее количество
-
-    m_obj->Clear();
-
-    ASSERT_TRUE(m_obj->Add(list.at(0).c_str()));
-    ASSERT_TRUE(m_obj->Add(nullptr, counter));
-
-    ASSERT_EQ(uint8_t(0), m_obj->GetData(2));
-    ASSERT_STREQ(nullptr, m_obj->GetName(2));
+    ASSERT_EQ(mSize, mObj->GetSize());
 }
 
 
 //
-TEST_F(TMenuPunkt_Test, clear)
+TEST_F(TMenuPunkt_Test, Add_Get)
+{
+    uint8_t              counter;
+    array<string, mSize> list;
+
+    // начальная проверка
+
+    ASSERT_EQ(uint8_t(0), mObj->GetLen());
+
+    // заполнение списка
+
+    for (counter = 0; counter < mSize / 2; counter++)
+    {
+        list.at(counter) = to_string(counter + 1);
+
+        ASSERT_TRUE(mObj->Add(list.at(counter).c_str(), counter * 2));
+        ASSERT_EQ(counter + 1, mObj->GetLen());
+    }
+
+    for (; counter < mSize; counter++)
+    {
+        ASSERT_TRUE(mObj->Add(nullptr, counter));
+        ASSERT_EQ(counter + 1, mObj->GetLen());
+    }
+
+    ASSERT_EQ(mSize, mObj->GetLen());
+
+    // проверка переполнения
+
+    ASSERT_FALSE(mObj->Add(to_string(33).c_str()));
+    ASSERT_EQ(mSize, mObj->GetLen());
+    ASSERT_FALSE(mObj->Add(nullptr, 33));
+    ASSERT_EQ(mSize, mObj->GetLen());
+
+    // проверка списка
+
+    for (counter = 0; counter < mSize / 2; counter++)
+    {
+        SCOPED_TRACE("counter = " + to_string(counter + 1));
+        SCOPED_TRACE(mObj->GetName(counter));
+
+        ASSERT_EQ(counter * 2, mObj->GetData(counter));
+        ASSERT_STREQ(list.at(counter).c_str(), mObj->GetName(counter));
+    }
+
+    for (; counter < mSize; counter++)
+    {
+        ASSERT_EQ(counter, mObj->GetData(counter));
+    }
+
+    // проверка значений выходящих за диапазон
+
+    ASSERT_EQ(uint8_t(0), mObj->GetData(mSize));
+    ASSERT_STREQ(nullptr, mObj->GetName(mSize));
+
+    // проверка значений выходящих за текущее количество
+
+    mObj->Clear();
+
+    ASSERT_TRUE(mObj->Add(list.at(0).c_str()));
+    ASSERT_TRUE(mObj->Add(nullptr, counter));
+
+    ASSERT_EQ(uint8_t(0), mObj->GetData(2));
+    ASSERT_STREQ(nullptr, mObj->GetName(2));
+}
+
+
+//
+TEST_F(TMenuPunkt_Test, Clear)
 {
     uint8_t counter;
 
     // начальное состояние
 
-    ASSERT_EQ(uint8_t(0), m_obj->GetLen());
-    ASSERT_EQ(uint8_t(0), m_obj->GetData(0));
-    ASSERT_STREQ(nullptr, m_obj->GetName(0));
+    ASSERT_EQ(uint8_t(0), mObj->GetLen());
+    ASSERT_EQ(uint8_t(0), mObj->GetData(0));
+    ASSERT_STREQ(nullptr, mObj->GetName(0));
 
     // заполнение списка
 
-    for (counter = 0; counter < k_max_num_punkts / 2; counter++)
+    for (counter = 0; counter < mSize / 2; counter++)
     {
-        ASSERT_TRUE(m_obj->Add(to_string(counter + 1).c_str()));
+        ASSERT_TRUE(mObj->Add(to_string(counter + 1).c_str()));
     }
 
-    for (; counter < k_max_num_punkts; counter++)
+    for (; counter < mSize; counter++)
     {
-        ASSERT_TRUE(m_obj->Add(nullptr, counter));
+        ASSERT_TRUE(mObj->Add(nullptr, counter));
     }
 
-    ASSERT_EQ(k_max_num_punkts, m_obj->GetLen());
+    ASSERT_EQ(mSize, mObj->GetLen());
 
     // проверка очистки
 
-    m_obj->Clear();
+    mObj->Clear();
 
-    ASSERT_EQ(uint8_t(0), m_obj->GetLen());
-    ASSERT_EQ(uint8_t(0), m_obj->GetData(0));
-    ASSERT_STREQ(nullptr, m_obj->GetName(0));
+    ASSERT_EQ(uint8_t(0), mObj->GetLen());
+    ASSERT_EQ(uint8_t(0), mObj->GetData(0));
+    ASSERT_STREQ(nullptr, mObj->GetName(0));
+}
+
+
+//
+TEST_F(TMenuPunkt_Test, Change)
+{
+    uint8_t counter;
+
+    // начальное состояние
+
+    ASSERT_EQ(uint8_t(0), mObj->GetLen());
+    ASSERT_EQ(uint8_t(0), mObj->GetData(0));
+    ASSERT_STREQ(nullptr, mObj->GetName(0));
+
+    // заполнение списка
+
+    for (counter = 0; counter < mSize / 2; counter++)
+    {
+        ASSERT_TRUE(mObj->Add(to_string(counter + 1).c_str()));
+    }
+
+    ASSERT_EQ(counter, mObj->GetLen());
+
+    // изменение произвольного пунтка, в данном случае 1
+
+    mObj->Change(1, "Hello", 58);
+    ASSERT_EQ(58, mObj->GetData(1));
+    ASSERT_STREQ("Hello", mObj->GetName(1));
+    ASSERT_EQ(counter, mObj->GetLen());
 }

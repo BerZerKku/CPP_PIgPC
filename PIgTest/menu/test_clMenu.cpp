@@ -10,7 +10,10 @@ using namespace std;
     friend class clMenu_Test;                      \
     FRIEND_TEST(clMenu_Test, checkLedOn);          \
     FRIEND_TEST(clMenu_Test, onFnButton);          \
-    FRIEND_TEST(clMenu_Test, addControlToSend);    \
+    FRIEND_TEST(clMenu_Test, AddControlToSend);    \
+    FRIEND_TEST(clMenu_Test, AddControlToPunkts);  \
+    FRIEND_TEST(clMenu_Test, ChangeCotnrolPunkt);  \
+    FRIEND_TEST(clMenu_Test, ChangeControlPunkts); \
     FRIEND_TEST(clMenu_Test, isRzskM);             \
     FRIEND_TEST(clMenu_Test, getKeyboardLayout);   \
     FRIEND_TEST(clMenu_Test, fillLvlControl_K400); \
@@ -461,7 +464,7 @@ TEST_F(clMenu_Test, getKeyboardLayout)
 }
 
 //
-TEST_F(clMenu_Test, addControlToSend)
+TEST_F(clMenu_Test, AddControlToSend)
 {
     mObj->AddControlToSend(TControl::CTRL_Call);
     ASSERT_EQ(GB_COM_SET_CONTROL, mObj->sParam.txComBuf.getFastCom());
@@ -475,6 +478,222 @@ TEST_F(clMenu_Test, addControlToSend)
 
     mObj->AddControlToSend(TControl::CTRL_MAX);
     ASSERT_EQ(GB_COM_NO, mObj->sParam.txComBuf.getFastCom());
+}
+
+//
+TEST_F(clMenu_Test, AddControlToPunkts)
+{
+    // «аполнение пунктов меню.  оличество пунктов превышает допустимый размер.
+
+    for (uint8_t i = 0; i < mObj->Punkts_.GetSize() + 2; i++)
+    {
+        TControl::ctrl_t ctrl = static_cast<TControl::ctrl_t>(i);
+        mObj->AddControlToPunkts(ctrl);
+    }
+
+    // ѕроверка пунктов.
+
+    ASSERT_EQ(mObj->Punkts_.GetSize(), mObj->Punkts_.GetLen());
+
+    for (uint8_t i = 0; i < mObj->Punkts_.GetLen(); i++)
+    {
+        TControl::ctrl_t ctrl = static_cast<TControl::ctrl_t>(i);
+        ASSERT_EQ(ctrl, mObj->Punkts_.GetData(i));
+        ASSERT_STREQ(mObj->mControl.getText(ctrl), mObj->Punkts_.GetName(i));
+    }
+}
+
+
+//
+TEST_F(clMenu_Test, ChangeCotnrolPunkt)
+{
+    TControl::ctrl_t ctrl;
+
+    // «аполнение пунктов меню.
+
+    for (uint8_t i = 0; i < mObj->Punkts_.GetSize(); i++)
+    {
+        ctrl = static_cast<TControl::ctrl_t>(i);
+        mObj->AddControlToPunkts(ctrl);
+    }
+
+    // «амена
+
+    ctrl = TControl::CTRL_Reset;
+    ASSERT_NE(ctrl, mObj->Punkts_.GetData(3));
+    mObj->ChangeCotnrolPunkt(3, ctrl);
+
+    // ѕроверка
+
+    ASSERT_EQ(ctrl, mObj->Punkts_.GetData(3));
+    ASSERT_STREQ(mObj->mControl.getText(ctrl), mObj->Punkts_.GetName(3));
+}
+
+
+//
+TEST_F(clMenu_Test, ChangeControlPunkts)
+{
+    TControl::ctrl_t ctrl;
+
+    // —писок команд управлени€ завис€щих от состо€ни€ аппарата
+    QVector<TControl::ctrl_t> ctrl_list = { TControl::CTRL_PuskAdjOn,     //
+                                            TControl::CTRL_RemoteMan2,    //
+                                            TControl::CTRL_RemoteMan3,    //
+                                            TControl::CTRL_RemotePusk2,   //
+                                            TControl::CTRL_RemotePusk3,   //
+                                            TControl::CTRL_RemoteReset2,  //
+                                            TControl::CTRL_RemoteReset3,  //
+                                            TControl::CTRL_SingleOn };
+
+    // «аполнение списка
+    mObj->Punkts_.Clear();
+    for (int i = 0; i < ctrl_list.size(); i++)
+    {
+        mObj->AddControlToPunkts(ctrl_list.at(i));
+    }
+
+    // 3-х концева€ лини€, дл€ установки номера аппарата 3
+    mObj->sParam.glb.setNumDevices(GB_NUM_DEVICES_3);
+
+    // защита есть, состо€ние не "Ќал.пуск", номер аппарата 1, одност. режим 0
+    mObj->sParam.typeDevice = AVANT_R400;
+    mObj->sParam.def.status.setEnable(true);
+    mObj->sParam.def.status.setState(0);
+    mObj->sParam.glb.setDeviceNum(1);
+    mObj->sParam.local.setValue(0);
+
+    mObj->ChangeControlPunkts();
+
+    for (uint8_t i = 0; i < static_cast<uint8_t>(ctrl_list.size()); i++)
+    {
+        ctrl = ctrl_list.at(i);
+        SCOPED_TRACE("ctrl[" + to_string(i) + "] = " + to_string(ctrl));
+
+        ASSERT_EQ(ctrl_list.at(i), mObj->Punkts_.GetData(i));
+        ASSERT_STREQ(mObj->mControl.getText(ctrl_list.at(i)), mObj->Punkts_.GetName(i));
+    }
+
+    // защита есть, состо€ние не "Ќал.пуск", номер аппарата 3, одност. режим 0
+    // в командах управлени€ содержащих номер аппарата "2" мен€етс€ на "1"
+    // в командах управлени€ содержащих номер аппарата "3" мен€етс€ на "2"
+    mObj->sParam.glb.setDeviceNum(3);
+    ctrl_list.replace(ctrl_list.indexOf(TControl::CTRL_RemoteMan2), TControl::CTRL_RemoteMan1);
+    ctrl_list.replace(ctrl_list.indexOf(TControl::CTRL_RemoteMan3), TControl::CTRL_RemoteMan2);
+    ctrl_list.replace(ctrl_list.indexOf(TControl::CTRL_RemotePusk2), TControl::CTRL_RemotePusk1);
+    ctrl_list.replace(ctrl_list.indexOf(TControl::CTRL_RemotePusk3), TControl::CTRL_RemotePusk2);
+    ctrl_list.replace(ctrl_list.indexOf(TControl::CTRL_RemoteReset2), TControl::CTRL_RemoteReset1);
+    ctrl_list.replace(ctrl_list.indexOf(TControl::CTRL_RemoteReset3), TControl::CTRL_RemoteReset2);
+
+    mObj->ChangeControlPunkts();
+
+    for (uint8_t i = 0; i < static_cast<uint8_t>(ctrl_list.size()); i++)
+    {
+        ctrl = ctrl_list.at(i);
+        SCOPED_TRACE("ctrl[" + to_string(i) + "] = " + to_string(ctrl));
+
+        ASSERT_EQ(ctrl_list.at(i), mObj->Punkts_.GetData(i));
+        ASSERT_STREQ(mObj->mControl.getText(ctrl_list.at(i)), mObj->Punkts_.GetName(i));
+    }
+
+    // защита есть, состо€ние не "Ќал.пуск", номер аппарата 2, одност. режим 0
+    // в командах управлени€ содержащих номер аппарата "2" мен€етс€ на "3"
+    mObj->sParam.glb.setDeviceNum(2);
+    ctrl_list.replace(ctrl_list.indexOf(TControl::CTRL_RemoteMan2), TControl::CTRL_RemoteMan3);
+    ctrl_list.replace(ctrl_list.indexOf(TControl::CTRL_RemotePusk2), TControl::CTRL_RemotePusk3);
+    ctrl_list.replace(ctrl_list.indexOf(TControl::CTRL_RemoteReset2), TControl::CTRL_RemoteReset3);
+
+    mObj->ChangeControlPunkts();
+
+    for (uint8_t i = 0; i < static_cast<uint8_t>(ctrl_list.size()); i++)
+    {
+        ctrl = ctrl_list.at(i);
+        SCOPED_TRACE("ctrl[" + to_string(i) + "] = " + to_string(ctrl));
+
+        ASSERT_EQ(ctrl_list.at(i), mObj->Punkts_.GetData(i));
+        ASSERT_STREQ(mObj->mControl.getText(ctrl_list.at(i)), mObj->Punkts_.GetName(i));
+    }
+
+    // защита есть, состо€ние "Ќал.пуск", номер аппарата 2, одност. режим 0
+    // наладочный пуск мен€етс€ с "вкл." на "выкл."
+    mObj->sParam.def.status.setState(7);
+    ctrl_list.replace(ctrl_list.indexOf(TControl::CTRL_PuskAdjOn), TControl::CTRL_PuskAdjOff);
+
+    mObj->ChangeControlPunkts();
+
+    for (uint8_t i = 0; i < static_cast<uint8_t>(ctrl_list.size()); i++)
+    {
+        ctrl = ctrl_list.at(i);
+        SCOPED_TRACE("ctrl[" + to_string(i) + "] = " + to_string(ctrl));
+
+        ASSERT_EQ(ctrl_list.at(i), mObj->Punkts_.GetData(i));
+        ASSERT_STREQ(mObj->mControl.getText(ctrl_list.at(i)), mObj->Punkts_.GetName(i));
+    }
+
+    // защита есть, состо€ние "Ќал.пуск", номер аппарата 2, одност. режим 0
+    // наладочный пуск мен€етс€ с "выкл." на "вкл."
+    mObj->sParam.def.status.setState(6);
+    ctrl_list.replace(ctrl_list.indexOf(TControl::CTRL_PuskAdjOff), TControl::CTRL_PuskAdjOn);
+
+    mObj->ChangeControlPunkts();
+
+    for (uint8_t i = 0; i < static_cast<uint8_t>(ctrl_list.size()); i++)
+    {
+        ctrl = ctrl_list.at(i);
+        SCOPED_TRACE("ctrl[" + to_string(i) + "] = " + to_string(ctrl));
+
+        ASSERT_EQ(ctrl_list.at(i), mObj->Punkts_.GetData(i));
+        ASSERT_STREQ(mObj->mControl.getText(ctrl_list.at(i)), mObj->Punkts_.GetName(i));
+    }
+
+    // защита есть, состо€ние "Ќал.пуск", номер аппарата 2, одност. режим 1
+    // односторонний режим мен€естс€ с "вкл." на "выкл."
+    mObj->sParam.local.setValue(1);
+    ctrl_list.replace(ctrl_list.indexOf(TControl::CTRL_SingleOn), TControl::CTRL_SingleOff);
+
+    mObj->ChangeControlPunkts();
+
+    for (uint8_t i = 0; i < static_cast<uint8_t>(ctrl_list.size()); i++)
+    {
+        ctrl = ctrl_list.at(i);
+        SCOPED_TRACE("ctrl[" + to_string(i) + "] = " + to_string(ctrl));
+
+        ASSERT_EQ(ctrl_list.at(i), mObj->Punkts_.GetData(i));
+        ASSERT_STREQ(mObj->mControl.getText(ctrl_list.at(i)), mObj->Punkts_.GetName(i));
+    }
+
+    // защита есть, состо€ние "Ќал.пуск", номер аппарата 2, одност. режим 0
+    // односторонний режим мен€естс€ с "выкл." на "вкл."
+    mObj->sParam.local.setValue(0);
+    ctrl_list.replace(ctrl_list.indexOf(TControl::CTRL_SingleOff), TControl::CTRL_SingleOn);
+
+    mObj->ChangeControlPunkts();
+
+    for (uint8_t i = 0; i < static_cast<uint8_t>(ctrl_list.size()); i++)
+    {
+        ctrl = ctrl_list.at(i);
+        SCOPED_TRACE("ctrl[" + to_string(i) + "] = " + to_string(ctrl));
+
+        ASSERT_EQ(ctrl_list.at(i), mObj->Punkts_.GetData(i));
+        ASSERT_STREQ(mObj->mControl.getText(ctrl_list.at(i)), mObj->Punkts_.GetName(i));
+    }
+
+    // защиты нет, состо€ние не "Ќал.пуск", номер аппарата 1, одност. режим 1
+    // т.к. защиты нет то проверка на замену не производитс€
+    mObj->sParam.def.status.setEnable(false);
+    mObj->sParam.glb.setDeviceNum(1);
+    mObj->sParam.def.status.setState(0);
+    mObj->sParam.local.setValue(1);
+
+    mObj->ChangeControlPunkts();
+
+    for (uint8_t i = 0; i < static_cast<uint8_t>(ctrl_list.size()); i++)
+    {
+        ctrl = ctrl_list.at(i);
+        SCOPED_TRACE("ctrl[" + to_string(i) + "] = " + to_string(ctrl));
+
+        ASSERT_EQ(ctrl_list.at(i), mObj->Punkts_.GetData(i));
+        ASSERT_STREQ(mObj->mControl.getText(ctrl_list.at(i)), mObj->Punkts_.GetName(i));
+    }
 }
 
 //

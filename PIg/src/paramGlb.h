@@ -324,15 +324,12 @@ public:
     {
         bool stat = false;
 
-        // записано в таком виде т.к. иначе портится автоформат в Eclipse
-        if (val >= 1)
+        if ((val >= 1) && (val <= getMaxNumDevices()))
         {
-            if (val <= getMaxNumDevices())
-            {
-                deviceNum_ = val;
-                stat       = true;
-            }
+            deviceNum_ = val;
+            stat       = true;
         }
+
         return stat;
     }
     uint8_t getDeviceNum() const { return (deviceNum_); }
