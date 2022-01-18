@@ -485,9 +485,9 @@ TEST_F(clMenu_Test, fillLvlControl_K400)
     ASSERT_TRUE(mObj->fillLvlControl(AVANT_K400));
 
     counter = 0;
-    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_IndReset, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(counter, mObj->Punkts_.getMaxNumPunkts());
+    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_IndReset, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(counter, mObj->Punkts_.GetLen());
 }
 
 //
@@ -506,12 +506,12 @@ TEST_F(clMenu_Test, fillLvlControl_Opto)
     ASSERT_TRUE(mObj->fillLvlControl(AVANT_OPTO));
 
     counter = 0;
-    ASSERT_EQ(TControl::CTRL_PuskAdjOff, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_RemoteReset, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_IndReset, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_RemotePusk, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(counter, mObj->Punkts_.getMaxNumPunkts());
+    ASSERT_EQ(TControl::CTRL_PuskAdjOff, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_RemoteReset, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_IndReset, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_RemotePusk, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(counter, mObj->Punkts_.GetLen());
 
     // приемник, стандратная оптика
     mObj->sParam.def.status.setEnable(false);
@@ -520,10 +520,10 @@ TEST_F(clMenu_Test, fillLvlControl_Opto)
     ASSERT_TRUE(mObj->fillLvlControl(AVANT_OPTO));
 
     counter = 0;
-    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_RemoteReset, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_IndReset, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(counter, mObj->Punkts_.getMaxNumPunkts());
+    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_RemoteReset, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_IndReset, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(counter, mObj->Punkts_.GetLen());
 
     // передатчик, кольцо
     mObj->sParam.prm.status.setEnable(false);
@@ -533,10 +533,10 @@ TEST_F(clMenu_Test, fillLvlControl_Opto)
     ASSERT_TRUE(mObj->fillLvlControl(AVANT_OPTO));
 
     counter = 0;
-    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_ResetAll, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_IndReset, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(counter, mObj->Punkts_.getMaxNumPunkts());
+    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_ResetAll, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_IndReset, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(counter, mObj->Punkts_.GetLen());
 
     // защита, стандратная оптика
     mObj->sParam.prd.status.setEnable(false);
@@ -546,12 +546,12 @@ TEST_F(clMenu_Test, fillLvlControl_Opto)
     ASSERT_TRUE(mObj->fillLvlControl(AVANT_OPTO));
 
     counter = 0;
-    ASSERT_EQ(TControl::CTRL_PuskAdjOff, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_RemoteReset, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_RemotePusk, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_AcReset, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(counter, mObj->Punkts_.getMaxNumPunkts());
+    ASSERT_EQ(TControl::CTRL_PuskAdjOff, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_RemoteReset, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_RemotePusk, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcReset, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(counter, mObj->Punkts_.GetLen());
 }
 
 //
@@ -568,13 +568,13 @@ TEST_F(clMenu_Test, fillLvlControl_Rzsk)
     ASSERT_TRUE(mObj->fillLvlControl(AVANT_RZSK));
 
     counter = 0;
-    ASSERT_EQ(TControl::CTRL_PuskAdjOff, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_RemoteReset, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_RemotePusk, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_IndReset, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_Call, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(counter, mObj->Punkts_.getMaxNumPunkts());
+    ASSERT_EQ(TControl::CTRL_PuskAdjOff, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_RemoteReset, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_RemotePusk, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_IndReset, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_Call, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(counter, mObj->Punkts_.GetLen());
 
     // защита, 3-концевая линия, совместимость РЗСК
     mObj->sParam.def.setNumDevices(GB_NUM_DEVICES_3);
@@ -582,15 +582,15 @@ TEST_F(clMenu_Test, fillLvlControl_Rzsk)
     ASSERT_TRUE(mObj->fillLvlControl(AVANT_RZSK));
 
     counter = 0;
-    ASSERT_EQ(TControl::CTRL_PuskAdjOff, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_RemoteResetAll, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_RemotePusk1, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_RemotePusk2, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_RemotePuskAll, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_IndReset, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_Call, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(counter, mObj->Punkts_.getMaxNumPunkts());
+    ASSERT_EQ(TControl::CTRL_PuskAdjOff, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_RemoteResetAll, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_RemotePusk1, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_RemotePusk2, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_RemotePuskAll, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_IndReset, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_Call, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(counter, mObj->Punkts_.GetLen());
 
     // защита, 3-концевая линия, совместимость РЗСКм
     mObj->sParam.glb.setCompatibility(GB_COMP_RZSK_M);
@@ -598,16 +598,16 @@ TEST_F(clMenu_Test, fillLvlControl_Rzsk)
     ASSERT_TRUE(mObj->fillLvlControl(AVANT_RZSK));
 
     counter = 0;
-    ASSERT_EQ(TControl::CTRL_PuskAdjOff, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_RemoteResetAll, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_RemotePusk1, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_RemotePusk2, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_RemotePuskAll, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_IndReset, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_Call, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_SingleOn, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(counter, mObj->Punkts_.getMaxNumPunkts());
+    ASSERT_EQ(TControl::CTRL_PuskAdjOff, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_RemoteResetAll, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_RemotePusk1, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_RemotePusk2, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_RemotePuskAll, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_IndReset, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_Call, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_SingleOn, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(counter, mObj->Punkts_.GetLen());
 
     // без защиты, 3-концевая линия
     mObj->sParam.def.status.setEnable(false);
@@ -615,10 +615,10 @@ TEST_F(clMenu_Test, fillLvlControl_Rzsk)
     ASSERT_TRUE(mObj->fillLvlControl(AVANT_RZSK));
 
     counter = 0;
-    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_RemoteResetAll, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_IndReset, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(counter, mObj->Punkts_.getMaxNumPunkts());
+    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_RemoteResetAll, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_IndReset, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(counter, mObj->Punkts_.GetLen());
 
     // без защиты, 2-концевая линия
     mObj->sParam.def.setNumDevices(GB_NUM_DEVICES_2);
@@ -626,10 +626,10 @@ TEST_F(clMenu_Test, fillLvlControl_Rzsk)
     ASSERT_TRUE(mObj->fillLvlControl(AVANT_RZSK));
 
     counter = 0;
-    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_RemoteReset, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_IndReset, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(counter, mObj->Punkts_.getMaxNumPunkts());
+    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_RemoteReset, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_IndReset, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(counter, mObj->Punkts_.GetLen());
 }
 
 //
@@ -643,21 +643,24 @@ TEST_F(clMenu_Test, fillLvlControl_R400m)
 
     ASSERT_TRUE(mObj->fillLvlControl(AVANT_R400M));
 
-    counter = 0;
-    ASSERT_EQ(TControl::CTRL_PuskAdjOff, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_RemoteReset, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_RemotePusk, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_AcReset, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_AcPuskSelf, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_RemoteAcPusk, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_AcNormal, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_AcAccelerated, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_AcOff, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_Call, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(counter, mObj->Punkts_.getMaxNumPunkts());
+    // Выборочная проверка заполнения названия
+    ASSERT_STREQ(mObj->Punkts_.GetName(1), mObj->mControl.getText(TControl::CTRL_Reset));
 
-    ASSERT_EQ(counter, mObj->Punkts_.getMaxNumPunkts());
+    counter = 0;
+    ASSERT_EQ(TControl::CTRL_PuskAdjOff, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_RemoteReset, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_RemotePusk, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcReset, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcPuskSelf, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_RemoteAcPusk, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcNormal, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcAccelerated, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcOff, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_Call, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(counter, mObj->Punkts_.GetLen());
+
+    ASSERT_EQ(counter, mObj->Punkts_.GetLen());
 
     // 3-концевая линия, совместимость АВАНТ
     mObj->sParam.def.setNumDevices(GB_NUM_DEVICES_3);
@@ -666,20 +669,20 @@ TEST_F(clMenu_Test, fillLvlControl_R400m)
     ASSERT_TRUE(mObj->fillLvlControl(AVANT_R400M));
 
     counter = 0;
-    ASSERT_EQ(TControl::CTRL_PuskAdjOff, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_RemoteResetAll, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_RemotePusk1, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_RemotePusk2, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_RemotePuskAll, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_AcReset, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_AcPuskSelf, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_RemoteAcPusk, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_AcNormal, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_AcAccelerated, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_AcOff, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_Call, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(counter, mObj->Punkts_.getMaxNumPunkts());
+    ASSERT_EQ(TControl::CTRL_PuskAdjOff, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_RemoteResetAll, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_RemotePusk1, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_RemotePusk2, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_RemotePuskAll, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcReset, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcPuskSelf, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_RemoteAcPusk, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcNormal, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcAccelerated, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcOff, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_Call, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(counter, mObj->Punkts_.GetLen());
 
     // 2-концевая линия, совместимость ПВЗ90
     mObj->sParam.def.setNumDevices(GB_NUM_DEVICES_2);
@@ -688,15 +691,15 @@ TEST_F(clMenu_Test, fillLvlControl_R400m)
     ASSERT_TRUE(mObj->fillLvlControl(AVANT_R400M));
 
     counter = 0;
-    ASSERT_EQ(TControl::CTRL_PuskAdjOff, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_RemoteReset, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_AcNormal, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_AcAccelerated, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_AcOff, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_AcTest, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_AcPusk, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(counter, mObj->Punkts_.getMaxNumPunkts());
+    ASSERT_EQ(TControl::CTRL_PuskAdjOff, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_RemoteReset, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcNormal, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcAccelerated, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcOff, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcTest, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcPusk, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(counter, mObj->Punkts_.GetLen());
 
     // 2-концевая линия, совместимость ПВЗУ-Е
     mObj->sParam.def.setNumDevices(GB_NUM_DEVICES_2);
@@ -705,19 +708,19 @@ TEST_F(clMenu_Test, fillLvlControl_R400m)
     ASSERT_TRUE(mObj->fillLvlControl(AVANT_R400M));
 
     counter = 0;
-    ASSERT_EQ(TControl::CTRL_PuskAdjOff, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_RemotePusk, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_RemoteMan, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_RemoteManAll, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_AcNormal, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_AcAccelerated, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_AcQuick, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_AcCtrlCheck, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_AcOff, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_Call, mObj->Punkts_.getNumber(counter++));
+    ASSERT_EQ(TControl::CTRL_PuskAdjOff, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_RemotePusk, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_RemoteMan, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_RemoteManAll, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcNormal, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcAccelerated, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcQuick, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcCtrlCheck, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcOff, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_Call, mObj->Punkts_.GetData(counter++));
 
-    ASSERT_EQ(counter, mObj->Punkts_.getMaxNumPunkts());
+    ASSERT_EQ(counter, mObj->Punkts_.GetLen());
 
     // 3-концевая линия, совместимость ПВЗУ-Е
     mObj->sParam.def.setNumDevices(GB_NUM_DEVICES_3);
@@ -726,20 +729,20 @@ TEST_F(clMenu_Test, fillLvlControl_R400m)
     ASSERT_TRUE(mObj->fillLvlControl(AVANT_R400M));
 
     counter = 0;
-    ASSERT_EQ(TControl::CTRL_PuskAdjOff, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_RemotePusk1, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_RemotePusk2, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_RemoteMan1, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_RemoteMan2, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_RemoteManAll, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_AcNormal, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_AcAccelerated, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_AcQuick, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_AcCtrlCheck, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_AcOff, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_Call, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(counter, mObj->Punkts_.getMaxNumPunkts());
+    ASSERT_EQ(TControl::CTRL_PuskAdjOff, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_RemotePusk1, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_RemotePusk2, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_RemoteMan1, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_RemoteMan2, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_RemoteManAll, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcNormal, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcAccelerated, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcQuick, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcCtrlCheck, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcOff, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_Call, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(counter, mObj->Punkts_.GetLen());
 
     // 2-концевая линия, совместимость АВЗК-80
     mObj->sParam.def.setNumDevices(GB_NUM_DEVICES_2);
@@ -748,14 +751,14 @@ TEST_F(clMenu_Test, fillLvlControl_R400m)
     ASSERT_TRUE(mObj->fillLvlControl(AVANT_R400M));
 
     counter = 0;
-    ASSERT_EQ(TControl::CTRL_PuskAdjOff, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_AcNormal, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_AcAccelerated, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_AcOff, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_AcTest, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_AcPusk, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(counter, mObj->Punkts_.getMaxNumPunkts());
+    ASSERT_EQ(TControl::CTRL_PuskAdjOff, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcNormal, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcAccelerated, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcOff, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcTest, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcPusk, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(counter, mObj->Punkts_.GetLen());
 
     // 2-концевая линия, совместимость ПВЗЛ
     mObj->sParam.def.setNumDevices(GB_NUM_DEVICES_2);
@@ -764,16 +767,16 @@ TEST_F(clMenu_Test, fillLvlControl_R400m)
     ASSERT_TRUE(mObj->fillLvlControl(AVANT_R400M));
 
     counter = 0;
-    ASSERT_EQ(TControl::CTRL_PuskAdjOff, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_AcReset, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_AcPuskSelf, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_RemoteAcPusk, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_PuskPrd, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_AcOn, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_AcOff, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_Call, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(counter, mObj->Punkts_.getMaxNumPunkts());
+    ASSERT_EQ(TControl::CTRL_PuskAdjOff, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcReset, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcPuskSelf, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_RemoteAcPusk, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_PuskPrd, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcOn, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcOff, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_Call, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(counter, mObj->Punkts_.GetLen());
 
     // 2-концевая линия, совместимость ЛИНИЯ-Р
     mObj->sParam.def.setNumDevices(GB_NUM_DEVICES_2);
@@ -782,15 +785,15 @@ TEST_F(clMenu_Test, fillLvlControl_R400m)
     ASSERT_TRUE(mObj->fillLvlControl(AVANT_R400M));
 
     counter = 0;
-    ASSERT_EQ(TControl::CTRL_PuskAdjOff, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_RemoteReset, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_RemotePusk, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_AcAuto, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_AcAccelerated, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_AcOff, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_Call, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(counter, mObj->Punkts_.getMaxNumPunkts());
+    ASSERT_EQ(TControl::CTRL_PuskAdjOff, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_RemoteReset, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_RemotePusk, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcAuto, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcAccelerated, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcOff, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_Call, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(counter, mObj->Punkts_.GetLen());
 
     // 3-концевая линия, совместимость ЛИНИЯ-Р
     mObj->sParam.def.setNumDevices(GB_NUM_DEVICES_3);
@@ -799,18 +802,18 @@ TEST_F(clMenu_Test, fillLvlControl_R400m)
     ASSERT_TRUE(mObj->fillLvlControl(AVANT_R400M));
 
     counter = 0;
-    ASSERT_EQ(TControl::CTRL_PuskAdjOff, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_RemoteReset1, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_RemoteReset2, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_RemotePusk1, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_RemotePusk2, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_RemotePuskAll, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_AcAuto, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_AcAccelerated, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_AcOff, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_Call, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(counter, mObj->Punkts_.getMaxNumPunkts());
+    ASSERT_EQ(TControl::CTRL_PuskAdjOff, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_RemoteReset1, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_RemoteReset2, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_RemotePusk1, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_RemotePusk2, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_RemotePuskAll, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcAuto, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcAccelerated, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcOff, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_Call, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(counter, mObj->Punkts_.GetLen());
 
     // 2-концевая линия, совместимость ПВЗУ
     mObj->sParam.def.setNumDevices(GB_NUM_DEVICES_2);
@@ -819,15 +822,15 @@ TEST_F(clMenu_Test, fillLvlControl_R400m)
     ASSERT_TRUE(mObj->fillLvlControl(AVANT_R400M));
 
     counter = 0;
-    ASSERT_EQ(TControl::CTRL_PuskAdjOff, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_AcNormal, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_AcAccelerated, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_AcQuick, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_AcOff, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_AcCtrlCheck, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_Call, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(counter, mObj->Punkts_.getMaxNumPunkts());
+    ASSERT_EQ(TControl::CTRL_PuskAdjOff, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcNormal, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcAccelerated, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcQuick, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcOff, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcCtrlCheck, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_Call, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(counter, mObj->Punkts_.GetLen());
 
     // 2-концевая линия, совместимость ПВЗ
     mObj->sParam.def.setNumDevices(GB_NUM_DEVICES_2);
@@ -836,12 +839,12 @@ TEST_F(clMenu_Test, fillLvlControl_R400m)
     ASSERT_TRUE(mObj->fillLvlControl(AVANT_R400M));
 
     counter = 0;
-    ASSERT_EQ(TControl::CTRL_PuskAdjOff, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_AcNormal, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_AcAccelerated, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_AcOff, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_AcRequest, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(TControl::CTRL_AcReset, mObj->Punkts_.getNumber(counter++));
-    ASSERT_EQ(counter, mObj->Punkts_.getMaxNumPunkts());
+    ASSERT_EQ(TControl::CTRL_PuskAdjOff, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcNormal, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcAccelerated, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcOff, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcRequest, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(TControl::CTRL_AcReset, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(counter, mObj->Punkts_.GetLen());
 }

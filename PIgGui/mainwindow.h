@@ -102,14 +102,12 @@ private:
 
     QProtocolViewer mProtocolViewer;
 
-    /// Инициализация БСП
     void initBsp();
-    /// Инициализация параметров из EEPROM
     void initEeprom();
-    /// Инициализация параметров.
     void initView();
-    /// Инициализация клавиатуры.
     void initKeyboard();
+    void InitProtocolViewer();
+
     /// Настройка тестовых кнопок.
     void setupTestButtons();
     /// Отображение параметров.

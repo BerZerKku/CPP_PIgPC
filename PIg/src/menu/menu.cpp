@@ -1247,16 +1247,16 @@ void clMenu::lvlFirst()
         vLCDclear();
         vLCDdrawBoard(lineParam_);
 
-        Punkts_.clear();
-        Punkts_.addName(punkt1);
-        Punkts_.addName(punkt2);
-        Punkts_.addName(punkt3);
-        Punkts_.addName(punkt4);
-        Punkts_.addName(punkt5);
+        Punkts_.Clear();
+        Punkts_.Add(punkt1);
+        Punkts_.Add(punkt2);
+        Punkts_.Add(punkt3);
+        Punkts_.Add(punkt4);
+        Punkts_.Add(punkt5);
 
         if (sParam.glb.getTypeDevice() != AVANT_OPTO)
         {
-            Punkts_.addName(punkt6);
+            Punkts_.Add(punkt6);
         }
 
         // доплнительные команды
@@ -1270,7 +1270,7 @@ void clMenu::lvlFirst()
 
     snprintf_P(&vLCDbuf[0], 21, title);
 
-    PGM_P name = Punkts_.getName(cursorLine_ - 1);
+    PGM_P name = Punkts_.GetName(cursorLine_ - 1);
     printPunkts();
 
     switch (key_)
@@ -1342,37 +1342,37 @@ void clMenu::lvlInfo()
         vLCDclear();
         vLCDdrawBoard(lineParam_);
 
-        Punkts_.clear();
-        Punkts_.addNumber(GB_IC_BSP_MCU);
+        Punkts_.Clear();
+        Punkts_.Add(nullptr, GB_IC_BSP_MCU);
         if (sParam.typeDevice != AVANT_OPTO)
         {
-            Punkts_.addNumber(GB_IC_BSP_DSP);  // только в оптике нет DSP
+            Punkts_.Add(nullptr, GB_IC_BSP_DSP);  // только в оптике нет DSP
 
             if (sParam.typeDevice == AVANT_K400)
             {  // в К400 отдельно прошивка DSP
-                Punkts_.addNumber(GB_IC_BSP_DSP_PLIS);
+                Punkts_.Add(nullptr, GB_IC_BSP_DSP_PLIS);
             }
         }
-        Punkts_.addNumber(GB_IC_PI_MCU);
+        Punkts_.Add(nullptr, GB_IC_PI_MCU);
         if (sParam.prd.status.isEnable())
         {
-            Punkts_.addNumber(GB_IC_BSK_PLIS_PRD1);
+            Punkts_.Add(nullptr, GB_IC_BSK_PLIS_PRD1);
             if (sParam.prd.getNumCom() > 16)
             {
-                Punkts_.addNumber(GB_IC_BSK_PLIS_PRD2);
+                Punkts_.Add(nullptr, GB_IC_BSK_PLIS_PRD2);
             }
         }
         if (sParam.prm.status.isEnable())
         {
-            Punkts_.addNumber(GB_IC_BSK_PLIS_PRM1);
+            Punkts_.Add(nullptr, GB_IC_BSK_PLIS_PRM1);
             if (sParam.prm.getNumCom() > 16)
             {
-                Punkts_.addNumber(GB_IC_BSK_PLIS_PRM2);
+                Punkts_.Add(nullptr, GB_IC_BSK_PLIS_PRM2);
             }
         }
         if (sParam.def.status.isEnable())
         {
-            Punkts_.addNumber(GB_IC_BSZ_PLIS);
+            Punkts_.Add(nullptr, GB_IC_BSZ_PLIS);
         }
 
         // доплнительные команды
@@ -1388,7 +1388,7 @@ void clMenu::lvlInfo()
     for (uint_fast8_t line = lineParam_; line < NUM_TEXT_LINES; line++)
     {
         uint8_t pos = 20 * line;
-        eGB_IC  ic  = static_cast<eGB_IC>(Punkts_.getNumber(cntPunkts));
+        eGB_IC  ic  = static_cast<eGB_IC>(Punkts_.GetData(cntPunkts));
 
         uint8_t  len  = snprintf_P(&vLCDbuf[pos], DISPLAY_ROW_SIZE + 1, fcIC[ic]);
         uint16_t vers = sParam.glb.getVersProgIC(ic);
@@ -1398,7 +1398,7 @@ void clMenu::lvlInfo()
                    static_cast<uint8_t>(vers >> 8),
                    static_cast<uint8_t>(vers));
 
-        if (++cntPunkts >= Punkts_.getMaxNumPunkts())
+        if (++cntPunkts >= Punkts_.GetLen())
         {
             break;
         }
@@ -1413,7 +1413,7 @@ void clMenu::lvlInfo()
         }
         break;
     case KEY_DOWN:
-        if ((cursorLine_ + numLines) < Punkts_.getMaxNumPunkts())
+        if ((cursorLine_ + numLines) < Punkts_.GetLen())
         {
             cursorLine_++;
         }
@@ -1458,26 +1458,26 @@ void clMenu::lvlJournal()
         sParam.txComBuf.clear();
 
         // активация необходимых пунктов меню и соответствующих им команд
-        Punkts_.clear();
-        Punkts_.addName(punkt1);
+        Punkts_.Clear();
+        Punkts_.Add(punkt1);
 
         if (sParam.def.status.isEnable())
         {
-            Punkts_.addName(punkt2);
+            Punkts_.Add(punkt2);
         }
 
         if (sParam.prm.status.isEnable())
         {
-            Punkts_.addName(punkt3);
+            Punkts_.Add(punkt3);
         }
 
         if (sParam.prd.status.isEnable())
         {
-            Punkts_.addName(punkt4);
+            Punkts_.Add(punkt4);
         }
     }
 
-    PGM_P name = Punkts_.getName(cursorLine_ - 1);
+    PGM_P name = Punkts_.GetName(cursorLine_ - 1);
 
     snprintf_P(&vLCDbuf[0], 21, title);
     printPunkts();
@@ -2374,21 +2374,7 @@ void clMenu::lvlJournalPrd()
 void clMenu::lvlControl()
 {
 
-    static const char title[] PROGMEM   = "Меню\\Управление";
-    static const char punkt06[] PROGMEM = "Пуск налад. вкл.";
-    static const char punkt07[] PROGMEM = "Пуск налад. выкл";
-    //  static const char punkt21[] PROGMEM = "%d. АК односторонний";
-    static const char punkt23[] PROGMEM = "Пуск удаленн. 1";
-    static const char punkt24[] PROGMEM = "Пуск удаленн. 2";
-    static const char punkt25[] PROGMEM = "Пуск удаленн. 3";
-    static const char punkt27[] PROGMEM = "Пуск удал. МАН 1";
-    static const char punkt28[] PROGMEM = "Пуск удал. МАН 2";
-    static const char punkt29[] PROGMEM = "Пуск удал. МАН 3";
-    static const char punkt32[] PROGMEM = "Сброс удален. 1";
-    static const char punkt33[] PROGMEM = "Сброс удален. 2";
-    static const char punkt34[] PROGMEM = "Сброс удален. 3";
-    static const char punkt37[] PROGMEM = "Одност.реж. выкл";
-    static const char punkt38[] PROGMEM = "Одност.реж. вкл";
+    static const char title[] PROGMEM = "Меню\\Управление";
 
     eGB_TYPE_DEVICE device = sParam.typeDevice;
 
@@ -2402,7 +2388,7 @@ void clMenu::lvlControl()
         vLCDclear();
         vLCDdrawBoard(lineParam_);
 
-        Punkts_.clear();
+        Punkts_.Clear();
         sParam.local.clearParams();
 
         fillLvlControl(device);
@@ -2427,36 +2413,7 @@ void clMenu::lvlControl()
 
     snprintf_P(&vLCDbuf[0], 21, title);
 
-    if (sParam.def.status.isEnable())
-    {
-        // выбор вкл./выкл. наладочного пуска
-        Punkts_.choose(punkt06, punkt07, sParam.def.status.getState() != 7);
-
-        if (sParam.glb.getMaxNumDevices() != 2)
-        {
-            uint8_t position;
-            uint8_t device_number = sParam.glb.getDeviceNum();
-
-            // выбор Пуск удаленн. 1/2/3
-            position = Punkts_.choose(punkt24, punkt23, device_number == 1);
-            Punkts_.choose(punkt24, punkt25, device_number == 3, position + 1);
-
-            // выбор Пуск удал. МАН. 1/2/3
-            position = Punkts_.choose(punkt28, punkt27, device_number == 1);
-            Punkts_.choose(punkt28, punkt29, device_number == 3, position + 1);
-
-            // выбор Сброс удален. 1/2/3
-            position = Punkts_.choose(punkt33, punkt32, device_number == 1);
-            Punkts_.choose(punkt33, punkt34, device_number == 3, position + 1);
-        }
-    }
-
-    if (isRzskM())
-    {
-        // выбор вкл./выкл. режима Одност. выкл/вкл
-        Punkts_.choose(punkt38, punkt37, sParam.local.getValue() != 1);
-    }
-
+    ChangeControlPunkts();
     printPunkts();
 
     switch (key_)
@@ -2480,7 +2437,7 @@ void clMenu::lvlControl()
 
     case KEY_ENTER:
         {
-            uint8_t ctrl = Punkts_.getNumber(cursorLine_ - 1);
+            uint8_t ctrl = Punkts_.GetData(cursorLine_ - 1);
             AddControlToSend(static_cast<TControl::ctrl_t>(ctrl));
             break;
         }
@@ -2513,12 +2470,12 @@ void clMenu::lvlSetup()
         vLCDclear();
         vLCDdrawBoard(lineParam_);
 
-        Punkts_.clear();
-        Punkts_.addName(punkt1);
-        Punkts_.addName(punkt2);
-        Punkts_.addName(punkt3);
-        Punkts_.addName(punkt4);
-        Punkts_.addName(punkt5);
+        Punkts_.Clear();
+        Punkts_.Add(punkt1);
+        Punkts_.Add(punkt2);
+        Punkts_.Add(punkt3);
+        Punkts_.Add(punkt4);
+        Punkts_.Add(punkt5);
 
         // доплнительные команды
         sParam.txComBuf.clear();
@@ -2526,7 +2483,7 @@ void clMenu::lvlSetup()
 
     snprintf_P(&vLCDbuf[0], 21, title);
 
-    PGM_P name = Punkts_.getName(cursorLine_ - 1);
+    PGM_P name = Punkts_.GetName(cursorLine_ - 1);
     printPunkts();
     if (EnterParam.isEnable())
     {
@@ -2786,27 +2743,27 @@ void clMenu::lvlSetupParam()
         vLCDdrawBoard(lineParam_);
 
         // настройка меню, в зависимости от текущего устройства
-        Punkts_.clear();
+        Punkts_.Clear();
         if (sParam.def.status.isEnable())
         {
-            Punkts_.addName(punkt1);
+            Punkts_.Add(punkt1);
         }
         if (sParam.prm.status.isEnable())
         {
-            Punkts_.addName(punkt2);
+            Punkts_.Add(punkt2);
         }
         if (sParam.prd.status.isEnable())
         {
-            Punkts_.addName(punkt3);
+            Punkts_.Add(punkt3);
         }
-        Punkts_.addName(punkt4);
+        Punkts_.Add(punkt4);
 
         // в оптике для кольца добавляются новые параметры
         if (sParam.glb.getTypeDevice() == AVANT_OPTO)
         {
             if (sParam.glb.getTypeOpto() != TYPE_OPTO_STANDART)
             {
-                Punkts_.addName(punkt5);
+                Punkts_.Add(punkt5);
             }
         }
 
@@ -2814,7 +2771,7 @@ void clMenu::lvlSetupParam()
         sParam.txComBuf.clear();
     }
 
-    PGM_P name = Punkts_.getName(cursorLine_ - 1);
+    PGM_P name = Punkts_.GetName(cursorLine_ - 1);
 
     snprintf_P(&vLCDbuf[0], 20, title);
     printPunkts();
@@ -3193,8 +3150,8 @@ void clMenu::lvlSetupParamGlb()
             sParam.local.addParam(GB_PARAM_COMP_K400);
             sParam.local.addParam(GB_PARAM_TIME_SYNCH);
             sParam.local.addParam(GB_PARAM_NUM_OF_DEVICE);
-            //          TODO На данный момент в ПО БСП проверка выходного сигнала не отключается в
-            //          ПРД. Поэтому параметр есть всегда! if (sParam.prd.status.isEnable()) {
+            //          TODO На данный момент в ПО БСП проверка выходного сигнала не отключается
+            //          в ПРД. Поэтому параметр есть всегда! if (sParam.prd.status.isEnable()) {
             sParam.local.addParam(GB_PARAM_OUT_CHECK);
             //          }
             if (sParam.prm.status.isEnable())
@@ -3514,19 +3471,19 @@ void clMenu::lvlSetupDT()
         vLCDclear();
         vLCDdrawBoard(lineParam_);
 
-        Punkts_.clear();
-        Punkts_.addName(punkt1);
-        Punkts_.addName(punkt2);
-        Punkts_.addName(punkt3);
-        Punkts_.addName(punkt4);
-        Punkts_.addName(punkt5);
-        Punkts_.addName(punkt6);
+        Punkts_.Clear();
+        Punkts_.Add(punkt1);
+        Punkts_.Add(punkt2);
+        Punkts_.Add(punkt3);
+        Punkts_.Add(punkt4);
+        Punkts_.Add(punkt5);
+        Punkts_.Add(punkt6);
 
         // доплнительные команды
         sParam.txComBuf.clear();
     }
 
-    PGM_P name = Punkts_.getName(cursorLine_ - 1);
+    PGM_P name = Punkts_.GetName(cursorLine_ - 1);
 
     snprintf_P(&vLCDbuf[20], 21, title);
 
@@ -3754,16 +3711,16 @@ void clMenu::lvlTest()
         vLCDclear();
         vLCDdrawBoard(lineParam_);
 
-        Punkts_.clear();
+        Punkts_.Clear();
         // тест передатчика при наличии передатчика или защиты
         if ((sParam.prd.status.isEnable()) || (sParam.def.status.isEnable()))
         {
-            Punkts_.addName(punkt1);
+            Punkts_.Add(punkt1);
         }
         // тест приемника при наличии приемника или защиты
         if ((sParam.prm.status.isEnable()) || (sParam.def.status.isEnable()))
         {
-            Punkts_.addName(punkt2);
+            Punkts_.Add(punkt2);
         }
 
         // дополнительные команды
@@ -3775,7 +3732,7 @@ void clMenu::lvlTest()
         }
     }
 
-    PGM_P name = Punkts_.getName(cursorLine_ - 1);
+    PGM_P name = Punkts_.GetName(cursorLine_ - 1);
 
     snprintf_P(&vLCDbuf[0], 20, title);
     if (isMessage())
@@ -4415,28 +4372,27 @@ void clMenu::printPunkts()
     // если номер текущей строки больше, чем вмещается строк на экране
     // то выводить на экран начинаем с (текущий пункт - кол.во строк)
     // иначе с первой
-    uint8_t cntPunkts = (cursorLine_ > numLines) ? cursorLine_ - numLines : 0;
+    uint8_t punkt_index = (cursorLine_ > numLines) ? cursorLine_ - numLines : 0;
 
     for (uint_fast8_t line = lineParam_; line < NUM_TEXT_LINES; line++)
     {
         char* position = &vLCDbuf[20 * line];
 
-        uint8_t len = snprintf_P(position, DISPLAY_ROW_SIZE + 1, PSTR("%u. "), cntPunkts + 1);
-        snprintf_P(position + len, DISPLAY_ROW_SIZE - len + 1, Punkts_.getName(cntPunkts));
+        uint8_t len = snprintf_P(position, DISPLAY_ROW_SIZE + 1, PSTR("%u. "), punkt_index + 1);
 
-        if (++cntPunkts >= Punkts_.getMaxNumPunkts())
-            break;
-    }
-
-    // при необходиомости, вывод курсора на экран
-    if (cursorEnable_)
-    {
-        if (cursorLine_ > numLines)
-            vLCDbuf[20 * (NUM_TEXT_LINES - 1) + 2] = '*';
-        else
+        if (cursorEnable_ && (cursorLine_ == (punkt_index + 1)))
         {
-            vLCDbuf[20 * (cursorLine_ + lineParam_ - 1) + 2] = '*';
+            *(position + len - 1) = '*';
         }
+
+        PGM_P text = Punkts_.GetName(punkt_index);
+        if (text != nullptr)
+        {
+            snprintf_P(position + len, DISPLAY_ROW_SIZE - len + 1, text);
+        }
+
+        if (++punkt_index >= Punkts_.GetLen())
+            break;
     }
 }
 
@@ -5449,6 +5405,15 @@ eGB_TYPE_DEVICE clMenu::getKeyboardLayout()
     return layout;
 }
 
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Добавляет команду для передачи сигнала управления.
+ * @param[in] ctrl Сигнал управления.
+ *
+ * *****************************************************************************
+ */
 void clMenu::AddControlToSend(TControl::ctrl_t ctrl)
 {
     eGB_COM com     = GB_COM_NO;
@@ -5486,7 +5451,7 @@ void clMenu::AddControlToPunkts(TControl::ctrl_t ctrl)
 
     if (ctrl < TControl::CTRL_MAX)
     {
-        Punkts_.addName(mControl.getText(ctrl), ctrl);
+        Punkts_.Add(mControl.getText(ctrl), static_cast<uint8_t>(ctrl));
     }
 }
 
@@ -5507,7 +5472,7 @@ bool clMenu::fillLvlControl(eGB_TYPE_DEVICE device)
     Q_ASSERT(device > AVANT_NO);
     Q_ASSERT(device < AVANT_MAX);
 
-    Punkts_.clear();
+    Punkts_.Clear();
 
     switch (device)
     {
@@ -5840,4 +5805,85 @@ bool clMenu::fillLvlControlOpto(eGB_TYPE_OPTO type, bool def, bool prd, bool prm
     }
 
     return true;
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Заменяет сигнал управления для указанного пункта меню.
+ * @param[in] index Индекс пункта меню.
+ * @param[in] ctrl Сигнал управления.
+ *
+ * *****************************************************************************
+ */
+void clMenu::ChangeCotnrolPunkt(uint8_t index, TControl::ctrl_t ctrl)
+{
+    Q_ASSERT(ctrl < TControl::CTRL_MAX);
+
+    if (ctrl < TControl::CTRL_MAX)
+    {
+        Punkts_.Change(index, mControl.getText(ctrl), static_cast<uint8_t>(ctrl));
+    }
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Заменяет пункты меню в зависимости от текущего состояния аппарата
+ *
+ * Замены производятся только для защиты. Основная часть только в трех-концевом
+ * варианте.
+ *
+ * @fixme Придумать нормальный алгоритм для замены сигналов зависящих от номера аппарата.
+ *
+ * *****************************************************************************
+ */
+void clMenu::ChangeControlPunkts()
+{
+    if (!sParam.def.status.isEnable())
+        return;
+
+    uint8_t dnumber = sParam.glb.getDeviceNum();
+    for (uint8_t i = 0; i < Punkts_.GetLen(); i++)
+    {
+        TControl::ctrl_t ctrl = static_cast<TControl::ctrl_t>(Punkts_.GetData(i));
+
+        if ((ctrl == TControl::CTRL_PuskAdjOn) || (ctrl == TControl::CTRL_PuskAdjOff))
+        {
+            ctrl = (sParam.def.status.getState() == 7) ? (TControl::CTRL_PuskAdjOff)
+                                                       : (TControl::CTRL_PuskAdjOn);
+            ChangeCotnrolPunkt(i, ctrl);
+        }
+        else if ((ctrl == TControl::CTRL_RemoteMan1) || (ctrl == TControl::CTRL_RemoteMan2))
+        {
+
+            ctrl = (dnumber == 1) ? (TControl::CTRL_RemoteMan2) : (TControl::CTRL_RemoteMan1);
+            ChangeCotnrolPunkt(i, ctrl);
+            ctrl = (dnumber > 2) ? (TControl::CTRL_RemoteMan2) : (TControl::CTRL_RemoteMan3);
+            ChangeCotnrolPunkt(++i, ctrl);
+        }
+        else if ((ctrl == TControl::CTRL_RemotePusk1) || (ctrl == TControl::CTRL_RemotePusk2))
+        {
+            ctrl = (dnumber == 1) ? (TControl::CTRL_RemotePusk2) : (TControl::CTRL_RemotePusk1);
+            ChangeCotnrolPunkt(i, ctrl);
+            ctrl = (dnumber > 2) ? (TControl::CTRL_RemotePusk2) : (TControl::CTRL_RemotePusk3);
+            ChangeCotnrolPunkt(++i, ctrl);
+        }
+        else if ((ctrl == TControl::CTRL_RemoteReset1) || (ctrl == TControl::CTRL_RemoteReset2))
+        {
+
+            ctrl = (dnumber == 1) ? (TControl::CTRL_RemoteReset2) : (TControl::CTRL_RemoteReset1);
+            ChangeCotnrolPunkt(i, ctrl);
+            ctrl = (dnumber > 2) ? (TControl::CTRL_RemoteReset2) : (TControl::CTRL_RemoteReset3);
+            ChangeCotnrolPunkt(++i, ctrl);
+        }
+        else if ((ctrl == TControl::CTRL_SingleOff) || (ctrl == TControl::CTRL_SingleOn))
+        {
+            ctrl = (sParam.local.getValue() != 1) ? (TControl::CTRL_SingleOn)
+                                                  : (TControl::CTRL_SingleOff);
+            ChangeCotnrolPunkt(i, ctrl);
+        }
+    }
 }

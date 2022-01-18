@@ -1,9 +1,9 @@
+#include "qprotocolviewer.h"
 #include <QDateTime>
 #include <QDebug>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
-
-#include "qprotocolviewer.h"
+#include <QValidator>
 
 /**
  * *****************************************************************************
@@ -29,6 +29,10 @@ QProtocolViewer::QProtocolViewer(QWidget *parent) : QWidget(parent)
             &QLineEdit::textChanged,
             this,
             &QProtocolViewer::SlotUpdatePattern);
+
+    // HEX строка
+    QRegExp hex_reg("^[A-Fa-f0-9]{2}( [A-Fa-f0-9]{2})*");
+    mCommandFilterEdit.setValidator(new QRegExpValidator(hex_reg));
 
     QFont font = mTextEdit.font();
     font.setFamily("Monospace");
@@ -99,13 +103,7 @@ void QProtocolViewer::AddTxByte(uint8_t byte)
  */
 void QProtocolViewer::SetPattern(const QString &text)
 {
-    QString pattern;
-
-    pattern.append("[RT]X: 55 AA (");
-    pattern.append(text.simplified().split(' ').join('|'));
-    pattern.append(")");
-
-    mCommandRegExp.setPattern(pattern);
+    mCommandFilterEdit.setText(text);
 }
 
 
@@ -207,5 +205,11 @@ void QProtocolViewer::SlotStart()
  */
 void QProtocolViewer::SlotUpdatePattern(const QString &text)
 {
-    SetPattern(text);
+    QString pattern;
+
+    pattern.append("[RT]X: 55 AA (");
+    pattern.append(text.simplified().split(' ').join('|'));
+    pattern.append(")");
+
+    mCommandRegExp.setPattern(pattern);
 }

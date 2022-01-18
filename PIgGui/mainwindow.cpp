@@ -33,7 +33,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     connect(ui->serialBsp, &TSerial::read, this, &MainWindow::SlotByteBspToPi);
     connect(this, &MainWindow::writeByteToBsp, ui->serialBsp, &TSerial::write);
-    connect(this, &MainWindow::writeByteToBsp, this, &MainWindow::SlotBytePiToBsp);
     connect(ui->serialBsp, &TSerial::sendFinished, [=]() { bspTxEnd(); });
     connect(ui->serialBsp, &TSerial::openPort, [&]() { ui->mBspConnect->setEnabled(false); });
     connect(ui->serialBsp, &TSerial::closePort, [&]() { ui->mBspConnect->setEnabled(true); });
@@ -52,8 +51,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     connect(ui->mBspConnect, &QPushButton::clicked, this, &MainWindow::SlotBspConnection);
 
-    connect(ui->pbView, &QPushButton::clicked, &mProtocolViewer, &QWidget::show);
-
     // палитры
     QLineEdit lineedit;
     pdefault = lineedit.palette();
@@ -66,6 +63,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     initEeprom();
     initView();
     initKeyboard();
+    InitProtocolViewer();
 
     installEventFilter(this);
     ui->textEdit->installEventFilter(this);
@@ -198,6 +196,35 @@ void MainWindow::initKeyboard()
     {
         ui->kbd->setLayoutButton(i, vKEYgetButtonLayout(i));
     }
+}
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Настройка просмотрщика протокола.
+ *
+ * *****************************************************************************
+ */
+void MainWindow::InitProtocolViewer()
+{
+    connect(ui->pbView, &QPushButton::clicked, &mProtocolViewer, &QProtocolViewer::show);
+    //            [=]()
+    //            {
+    //                // Если окно уже открыто, фокус переходит на него
+    //                auto flags = mProtocolViewer.windowFlags();
+    //                mProtocolViewer.setWindowFlags(flags | Qt::WindowStaysOnTopHint);
+    //                mProtocolViewer.show();
+    //                mProtocolViewer.setWindowFlags(flags);
+    //                mProtocolViewer.show();
+    //            });
+
+    connect(this, &MainWindow::writeByteToBsp, this, &MainWindow::SlotBytePiToBsp);
+
+    mProtocolViewer.SetPattern("51 72 8A 9A");
+    mProtocolViewer.resize(width(), height());
+
+    auto flags = mProtocolViewer.windowFlags();
+    mProtocolViewer.setWindowFlags(flags | Qt::WindowStaysOnTopHint);
 }
 
 //

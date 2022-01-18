@@ -216,16 +216,10 @@ private:
     eMENU_ENTER_PARAM enterPassword();
 
     /// перемещение курсора вверх
-    void cursorLineUp()
-    {
-        cursorLine_ = (cursorLine_ > 1) ? cursorLine_ - 1 : Punkts_.getMaxNumPunkts();
-    }
+    void cursorLineUp() { cursorLine_ = (cursorLine_ > 1) ? cursorLine_ - 1 : Punkts_.GetLen(); }
 
     /// пермещение курсора вниз
-    void cursorLineDown()
-    {
-        cursorLine_ = (cursorLine_ < Punkts_.getMaxNumPunkts()) ? cursorLine_ + 1 : 1;
-    }
+    void cursorLineDown() { cursorLine_ = (cursorLine_ < Punkts_.GetLen()) ? cursorLine_ + 1 : 1; }
 
     /// вывод на экран текущих пунктов меню и курсора
     void printPunkts();
@@ -379,13 +373,8 @@ private:
      */
     eGB_TYPE_DEVICE getKeyboardLayout();
 
-    /**
-     * @brief Добавляет команду для передачи сигнала управления.
-     * @param[in] ctrl Сигнал управления.
-     */
+
     void AddControlToSend(TControl::ctrl_t ctrl);
-
-
     void AddControlToPunkts(TControl::ctrl_t ctrl);
 
     bool fillLvlControl(eGB_TYPE_DEVICE device);
@@ -394,6 +383,8 @@ private:
     bool fillLvlControlK400();
     bool fillLvlControlOpto(eGB_TYPE_OPTO type, bool def, bool prd, bool prm);
 
+    void ChangeCotnrolPunkt(uint8_t index, TControl::ctrl_t ctrl);
+    void ChangeControlPunkts();
 
 #ifdef TEST_FRIENDS
     TEST_FRIENDS

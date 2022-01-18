@@ -12,6 +12,7 @@ class QProtocolViewer : public QWidget
 
     using pkg_t = QVector<uint8_t>;
 
+    const QString kHexRegEx   = "^[A-Fa-f0-9]{2}( [A-Fa-f0-9]{2})*";  // например "12 f1 8F"
     const QString kTimeFormat = "HH:mm:ss.zzz";
 
 public:
