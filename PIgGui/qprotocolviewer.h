@@ -4,13 +4,12 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QTextEdit>
+#include <QTimer>
 #include <QWidget>
 
 class QProtocolViewer : public QWidget
 {
     Q_OBJECT
-
-    using pkg_t = QVector<uint8_t>;
 
     const QString kHexRegEx   = "^[A-Fa-f0-9]{2}( [A-Fa-f0-9]{2})*";  // например "12 f1 8F"
     const QString kTimeFormat = "HH:mm:ss.zzz";
@@ -24,21 +23,29 @@ public:
 
 private:
     bool mStart  = false;
-    bool mTxByte = true;
+    bool mTxByte = false;
+    bool mRxByte = false;
+
+    int         mDataLengthLast = -1;
+    QStringList mData;
 
     QTextEdit   mTextEdit;
     QPushButton mButtonStart;
+    QPushButton mButtonClear;
     QRegExp     mCommandRegExp;
     QLineEdit   mCommandFilterEdit;
+    QTimer      mTimer;
 
     void    Start(bool start);
     void    AppendByte(uint8_t byte);
     QString ConvertByte(uint8_t byte);
-    void    FilterData(const QRegExp &reg_exp);
+    void    UpdateText();
 
 private slots:
+    void SlotClear();
     void SlotStart();
     void SlotUpdatePattern(const QString &text);
+    void SlotTimerTimeout();
 };
 
 #endif  // QPROTOCOLVIEWER_H

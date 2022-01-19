@@ -50,7 +50,7 @@ void vLCDrefresh(void)
 
 bool vLCDdrawBoard(uint8_t num)
 {
-    Q_UNUSED(num);
+    Q_UNUSED(num)
     return true;
 }
 

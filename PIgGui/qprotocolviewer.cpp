@@ -11,6 +11,8 @@
  * @brief QProtocolViewer::QProtocolViewer
  * @param parent
  *
+ * @todo Перенести работу протокола в отдельный поток.
+ *
  * *****************************************************************************
  */
 QProtocolViewer::QProtocolViewer(QWidget *parent) : QWidget(parent)
@@ -19,16 +21,20 @@ QProtocolViewer::QProtocolViewer(QWidget *parent) : QWidget(parent)
     QHBoxLayout *hlayout = new QHBoxLayout();
 
     hlayout->addWidget(&mCommandFilterEdit);
+    hlayout->addWidget(&mButtonClear);
     hlayout->addWidget(&mButtonStart);
 
     vlayout->addWidget(&mTextEdit);
     vlayout->addLayout(hlayout);
 
+    connect(&mButtonClear, &QPushButton::clicked, this, &QProtocolViewer::SlotClear);
     connect(&mButtonStart, &QPushButton::clicked, this, &QProtocolViewer::SlotStart);
     connect(&mCommandFilterEdit,
             &QLineEdit::textChanged,
             this,
             &QProtocolViewer::SlotUpdatePattern);
+
+    mButtonClear.setText("Clear");
 
     // HEX строка
     QRegExp hex_reg("^[A-Fa-f0-9]{2}( [A-Fa-f0-9]{2})*");
@@ -36,6 +42,11 @@ QProtocolViewer::QProtocolViewer(QWidget *parent) : QWidget(parent)
 
     QFont font = mTextEdit.font();
     font.setFamily("Monospace");
+
+    // Программа не запускается (Windows) если mTimer сделать не укзаателем
+    mTimer.setInterval(25);
+    mTimer.setSingleShot(true);
+    mTimer.connect(&mTimer, &QTimer::timeout, this, &QProtocolViewer::SlotTimerTimeout);
 
     Start(false);
 }
@@ -58,13 +69,19 @@ void QProtocolViewer::AddRxByte(uint8_t byte)
     if (mTxByte)
     {
         mTxByte = false;
-        FilterData(mCommandRegExp);
+        UpdateText();
+    }
+
+    if (!mRxByte || mData.size() == 0)
+    {
+        mRxByte = true;
 
         QString time = QTime::currentTime().toString(kTimeFormat);
-        mTextEdit.append(QString("[%1] RX:").arg(time));
+        mData.append(QString("[%1] RX:").arg(time));
     }
 
     AppendByte(byte);
+    mTimer.start();
 }
 
 
@@ -81,16 +98,22 @@ void QProtocolViewer::AddTxByte(uint8_t byte)
     if (!mStart)
         return;
 
-    if (!mTxByte)
+    if (mRxByte)
+    {
+        mRxByte = false;
+        UpdateText();
+    }
+
+    if (!mTxByte || mData.size() == 0)
     {
         mTxByte = true;
-        FilterData(mCommandRegExp);
 
         QString time = QTime::currentTime().toString(kTimeFormat);
-        mTextEdit.append(QString("\n[%1] TX:").arg(time));
+        mData.append(QString("[%1] TX:").arg(time));
     }
 
     AppendByte(byte);
+    mTimer.start();
 }
 
 /**
@@ -119,10 +142,12 @@ void QProtocolViewer::Start(bool start)
 {
     mStart = start;
     mButtonStart.setText(mStart ? "Stop" : "Start");
+    mTimer.stop();
 
     if (mStart)
     {
-        mTextEdit.clear();
+        mTxByte = false;
+        mRxByte = false;
     }
 }
 
@@ -137,7 +162,7 @@ void QProtocolViewer::Start(bool start)
  */
 void QProtocolViewer::AppendByte(uint8_t byte)
 {
-    mTextEdit.insertPlainText(" " + ConvertByte(byte));
+    mData.last().append(" " + ConvertByte(byte));
 }
 
 
@@ -159,17 +184,17 @@ QString QProtocolViewer::ConvertByte(uint8_t byte)
 /**
  * *****************************************************************************
  *
- * @brief QProtocolViewer::FilterData
- * @param[in] commands
+ * @brief QProtocolViewer::UpdateText
  *
  * *****************************************************************************
  */
-void QProtocolViewer::FilterData(const QRegExp &reg_exp)
+void QProtocolViewer::UpdateText()
 {
-    QStringList text = mTextEdit.toPlainText().split("\n").filter(reg_exp);
-    text.removeAll("");
+    int length = mData.length();
 
-    mTextEdit.clear();
+    QStringList text = mData.mid(mDataLengthLast).filter(mCommandRegExp);
+    mDataLengthLast  = length;
+
     for (auto &line : text)
     {
         mTextEdit.append(line);
@@ -179,6 +204,19 @@ void QProtocolViewer::FilterData(const QRegExp &reg_exp)
             mTextEdit.append("");
         }
     }
+}
+
+/**
+ * *****************************************************************************
+ * @brief QProtocolViewer::SlotClear
+ *
+ * @fixme Возможны проблемы при очистке в то время как туда осуществляется запись.
+ * *****************************************************************************
+ */
+void QProtocolViewer::SlotClear()
+{
+    mData.clear();
+    mTextEdit.clear();
 }
 
 
@@ -212,4 +250,17 @@ void QProtocolViewer::SlotUpdatePattern(const QString &text)
     pattern.append(")");
 
     mCommandRegExp.setPattern(pattern);
+
+    // при смене фильтра обновить информацию на экране
+    mTextEdit.clear();
+    mDataLengthLast = -1;
+    UpdateText();
+}
+
+void QProtocolViewer::SlotTimerTimeout()
+{
+    mTxByte = false;
+    mRxByte = false;
+
+    UpdateText();
 }

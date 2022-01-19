@@ -51,7 +51,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     connect(ui->mBspConnect, &QPushButton::clicked, this, &MainWindow::SlotBspConnection);
 
-    // палитры
+    //    палитры
     QLineEdit lineedit;
     pdefault = lineedit.palette();
     pred     = pdefault;
@@ -88,6 +88,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     QTimer *timerMenu = new QTimer(this);
     connect(timerMenu, &QTimer::timeout, this, &MainWindow::cycleMenu);
     timerMenu->start(100);
+
+    setFocusPolicy(Qt::StrongFocus);
 }
 
 //
