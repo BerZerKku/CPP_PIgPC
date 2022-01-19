@@ -5278,7 +5278,7 @@ TControl::ctrl_t clMenu::onFnButton(eKEY& key)
             }
             else
             {
-                ctrl = TControl::CTRL_RemotePusk1;
+                ctrl = TControl::CTRL_RemotePusk;
             }
         }
         break;
@@ -5286,7 +5286,11 @@ TControl::ctrl_t clMenu::onFnButton(eKEY& key)
     case KEY_AC_PUSK_UD:
         if (sParam.def.status.isEnable())
         {
-            ctrl = TControl::CTRL_RemoteAcPusk;
+            eGB_COMP_R400M comp = sParam.glb.getCompR400m();
+            if (comp != GB_COMP_R400M_R400)
+            {
+                ctrl = TControl::CTRL_RemoteAcPusk;
+            }
         }
         break;
 
@@ -5317,7 +5321,7 @@ TControl::ctrl_t clMenu::onFnButton(eKEY& key)
             if (sParam.typeDevice == AVANT_R400M)
             {
                 eGB_COMP_R400M comp = sParam.glb.getCompR400m();
-                if (comp != GB_COMP_R400M_LINER)
+                if ((comp != GB_COMP_R400M_LINER) && (comp != GB_COMP_R400M_R400))
                 {
                     if ((comp == GB_COMP_R400M_AVZK80) || (comp == GB_COMP_R400M_PVZ90))
                     {
