@@ -3139,142 +3139,31 @@ void clMenu::lvlSetupParamGlb()
 
         // заполнение массивов параметров и команд
         eGB_TYPE_DEVICE device = sParam.typeDevice;
-        sParam.txComBuf.clear();
 
-        sParam.local.clearParams();
+        sParam.txComBuf.clear();
+        fillLvlSetupParamGlb(device);
+
         if (device == AVANT_K400)
         {
             sParam.txComBuf.addCom2(GB_COM_GET_MEAS);
             sParam.txComBuf.addCom1(GB_COM_GET_COM_PRD_KEEP);
-
-            sParam.local.addParam(GB_PARAM_COMP_K400);
-            sParam.local.addParam(GB_PARAM_TIME_SYNCH);
-            sParam.local.addParam(GB_PARAM_NUM_OF_DEVICE);
-            //          TODO На данный момент в ПО БСП проверка выходного сигнала не отключается
-            //          в ПРД. Поэтому параметр есть всегда! if (sParam.prd.status.isEnable()) {
-            sParam.local.addParam(GB_PARAM_OUT_CHECK);
-            //          }
-            if (sParam.prm.status.isEnable())
-            {
-                sParam.local.addParam(GB_PARAM_WARN_THD);
-                sParam.local.addParam(GB_PARAM_TIME_RERUN);
-            }
-            if (sParam.prd.status.isEnable())
-            {
-                sParam.local.addParam(GB_PARAM_COM_PRD_KEEP);
-            }
-            if (sParam.prm.status.isEnable())
-            {
-                sParam.local.addParam(GB_PARAM_COM_PRM_KEEP);
-                sParam.local.addParam(GB_PARAM_IN_DEC);
-            }
-            sParam.local.addParam(GB_PARAM_FREQ);
-            if (sParam.prd.status.isEnable())
-            {
-                sParam.local.addParam(GB_PARAM_COR_U);
-                sParam.local.addParam(GB_PARAM_COR_I);
-            }
-            sParam.local.addParam(GB_PARAM_NUM_OF_DEVICES);
-            sParam.local.addParam(GB_PARAM_TM_K400);
-            sParam.local.addParam(GB_PARAM_WARN_D);
-            sParam.local.addParam(GB_PARAM_ALARM_D);
-            sParam.local.addParam(GB_PARAM_TEMP_MONITOR);
-            sParam.local.addParam(GB_PARAM_TEMP_THR_HI);
-            sParam.local.addParam(GB_PARAM_TEMP_THR_LOW);
-
-            eGB_COMP_K400 comp = sParam.glb.getCompK400();
-            if ((comp == GB_COMP_K400_UPKC_PRD) || (comp == GB_COMP_K400_UPKC_PRM))
-            {
-                sParam.local.addParam(GB_PARAM_TM_SPEED);
-            }
         }
         else if (device == AVANT_RZSK)
         {
             sParam.txComBuf.addCom2(GB_COM_GET_MEAS);
             sParam.txComBuf.addCom1(GB_COM_GET_COM_PRD_KEEP);
-
-            sParam.local.addParam(GB_PARAM_COMP_RZSK);
-            sParam.local.addParam(GB_PARAM_NUM_OF_DEVICES,
-                                  sParam.glb.getCompRZSK() == GB_COMP_RZSK_3E8);
-            sParam.local.addParam(GB_PARAM_TIME_SYNCH_SRC);
-            sParam.local.addParam(GB_PARAM_NUM_OF_DEVICE);
-            sParam.local.addParam(GB_PARAM_OUT_CHECK);
-            sParam.local.addParam(GB_PARAM_WARN_THD_CF);
-            sParam.local.addParam(GB_PARAM_TIME_RERUN);
-            sParam.local.addParam(GB_PARAM_COM_PRD_KEEP);
-            sParam.local.addParam(GB_PARAM_COM_PRM_KEEP);
-            sParam.local.addParam(GB_PARAM_IN_DEC);
-            sParam.local.addParam(GB_PARAM_FREQ);
-            sParam.local.addParam(GB_PARAM_DETECTOR);
-            sParam.local.addParam(GB_PARAM_COR_U);
-            sParam.local.addParam(GB_PARAM_COR_I);
         }
         else if (device == AVANT_R400M)
         {
-            eGB_COMP_R400M comp = sParam.glb.getCompR400m();
-
             // для переформирования меню добавляются команды опроса:
             // совместимости и кол-ва аппаратов в линии
             // измеряемые параметры для коррекции
             sParam.txComBuf.addCom2(GB_COM_GET_MEAS);
             sParam.txComBuf.addCom1(GB_COM_GET_COM_PRD_KEEP);
             sParam.txComBuf.addCom1(GB_COM_DEF_GET_LINE_TYPE);
-
-            sParam.local.addParam(GB_PARAM_COMP_P400);
-            if (comp == GB_COMP_R400M_AVANT)
-            {
-                sParam.local.addParam(GB_PARAM_TIME_SYNCH_SRC);
-            }
-            sParam.local.addParam(GB_PARAM_NUM_OF_DEVICE);
-            sParam.local.addParam(GB_PARAM_OUT_CHECK);
-            sParam.local.addParam(GB_PARAM_WARN_THD);
-            sParam.local.addParam(GB_PARAM_U_OUT_NOM);
-            sParam.local.addParam(GB_PARAM_FREQ);
-            if (comp == GB_COMP_R400M_PVZL)
-            {
-                sParam.local.addParam(GB_PARAM_IN_DEC_AC_ANSWER);
-            }
-            sParam.local.addParam(GB_PARAM_COR_U);
-            sParam.local.addParam(GB_PARAM_COR_I);
-            if (comp == GB_COMP_R400M_PVZUE)
-            {
-                sParam.local.addParam(GB_PARAM_PVZUE_PROTOCOL);
-                sParam.local.addParam(GB_PARAM_PVZUE_PARITY);
-                sParam.local.addParam(GB_PARAM_PVZUE_FAIL);
-                sParam.local.addParam(GB_PARAM_PVZUE_NOISE_THD);
-                sParam.local.addParam(GB_PARAM_PVZUE_NOISE_LVL);
-                sParam.local.addParam(GB_PARAM_PVZUE_AC_TYPE);
-                sParam.local.addParam(GB_PARAM_PVZUE_AC_PERIOD);
-                sParam.local.addParam(GB_PARAM_PVZUE_AC_PER_RE);
-            }
         }
         else if (device == AVANT_OPTO)
         {
-            sParam.local.addParam(GB_PARAM_TIME_SYNCH);
-            if (sParam.glb.getTypeOpto() == TYPE_OPTO_STANDART)
-            {
-                sParam.local.addParam(GB_PARAM_NUM_OF_DEVICE);
-            }
-            else
-            {
-                sParam.local.addParam(GB_PARAM_NUM_OF_DEVICE_RING);
-            }
-            if (sParam.prm.status.isEnable())
-            {
-                sParam.local.addParam(GB_PARAM_TIME_RERUN);
-            }
-            if (sParam.prd.status.isEnable())
-            {
-                sParam.local.addParam(GB_PARAM_COM_PRD_KEEP);
-            }
-            if (sParam.prm.status.isEnable())
-            {
-                sParam.local.addParam(GB_PARAM_COM_PRM_KEEP);
-            }
-            if (sParam.glb.getTypeOpto() == TYPE_OPTO_STANDART)
-            {
-                sParam.local.addParam(GB_PARAM_BACKUP);
-            }
         }
     }
 
@@ -5508,8 +5397,9 @@ bool clMenu::fillLvlControl(eGB_TYPE_DEVICE device)
             break;
         }
 
-    case AVANT_NO: [[fallthrough]];
-    case AVANT_R400: [[fallthrough]];
+
+    case AVANT_NO: [[gnu::fallthrough]];
+    case AVANT_R400: [[gnu::fallthrough]];
     case AVANT_MAX: break;
     }
 
@@ -5905,4 +5795,257 @@ void clMenu::ChangeControlPunkts()
             ChangeCotnrolPunkt(i, ctrl);
         }
     }
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Формирует список параметров на уровне "Параметры\Общие".
+ * @param[in] device Устройство.
+ * @return True если список заполнен, иначе False.
+ *
+ * *****************************************************************************
+ */
+bool clMenu::fillLvlSetupParamGlb(eGB_TYPE_DEVICE device)
+{
+    bool is_fill = false;
+
+    Q_ASSERT(device > AVANT_NO);
+    Q_ASSERT(device < AVANT_MAX);
+
+    sParam.local.clearParams();
+
+    switch (device)
+    {
+    case AVANT_R400M:
+        {
+            is_fill = fillLvlSetupParamGlbR400m(sParam.glb.getCompR400m());
+            break;
+        }
+
+    case AVANT_RZSK:
+        {
+            is_fill = fillLvlSetupParamGlbRzsk(sParam.glb.getCompRZSK());
+            break;
+        }
+
+    case AVANT_K400:
+        {
+            is_fill = fillLvlSetupParamGlbK400(sParam.glb.getCompK400(),
+                                               sParam.prd.status.isEnable(),
+                                               sParam.prm.status.isEnable());
+            break;
+        }
+    case AVANT_OPTO:
+        {
+            is_fill = fillLvlSetupParamGlbOpto(sParam.glb.getTypeOpto(),
+                                               sParam.prd.status.isEnable(),
+                                               sParam.prm.status.isEnable());
+            break;
+        }
+
+
+    case AVANT_NO: [[gnu::fallthrough]];
+    case AVANT_R400: [[gnu::fallthrough]];
+    case AVANT_MAX: break;
+    }
+
+    return is_fill;
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Формирует список параметров на уровне "Параметры\Общие" для Р400м.
+ * @param[in] comp Совместимость.
+ * @return True если список заполнен, иначе False.
+ *
+ * *****************************************************************************
+ */
+bool clMenu::fillLvlSetupParamGlbR400m(eGB_COMP_R400M comp)
+{
+    Q_ASSERT(sParam.glb.getTypeDevice() == AVANT_R400M);
+    Q_ASSERT(sParam.glb.getTypeLine() == GB_TYPE_LINE_UM);
+
+    sParam.local.addParam(GB_PARAM_COMP_P400);
+
+    if (comp == GB_COMP_R400M_AVANT)
+    {
+        sParam.local.addParam(GB_PARAM_TIME_SYNCH_SRC);
+    }
+
+    sParam.local.addParam(GB_PARAM_NUM_OF_DEVICE);
+    sParam.local.addParam(GB_PARAM_OUT_CHECK);
+    sParam.local.addParam(GB_PARAM_WARN_THD);
+    sParam.local.addParam(GB_PARAM_U_OUT_NOM);
+    sParam.local.addParam(GB_PARAM_FREQ);
+
+    if (comp == GB_COMP_R400M_PVZL)
+    {
+        sParam.local.addParam(GB_PARAM_IN_DEC_AC_ANSWER);
+    }
+
+    sParam.local.addParam(GB_PARAM_COR_U);
+    sParam.local.addParam(GB_PARAM_COR_I);
+
+    if (comp == GB_COMP_R400M_PVZUE)
+    {
+        sParam.local.addParam(GB_PARAM_PVZUE_PROTOCOL);
+        sParam.local.addParam(GB_PARAM_PVZUE_PARITY);
+        sParam.local.addParam(GB_PARAM_PVZUE_FAIL);
+        sParam.local.addParam(GB_PARAM_PVZUE_NOISE_THD);
+        sParam.local.addParam(GB_PARAM_PVZUE_NOISE_LVL);
+        sParam.local.addParam(GB_PARAM_PVZUE_AC_TYPE);
+        sParam.local.addParam(GB_PARAM_PVZUE_AC_PERIOD);
+        sParam.local.addParam(GB_PARAM_PVZUE_AC_PER_RE);
+    }
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Формирует список параметров на уровне "Параметры\Общие" для РЗСК.
+ * @param[in] comp_rzskm True если совместимость РЗСКм.
+ * @return True если список заполнен, иначе False.
+ *
+ * *****************************************************************************
+ */
+bool clMenu::fillLvlSetupParamGlbRzsk(eGB_COMP_RZSK comp)
+{
+    Q_ASSERT(sParam.glb.getTypeDevice() == AVANT_RZSK);
+    Q_ASSERT(sParam.glb.getTypeLine() == GB_TYPE_LINE_UM);
+
+    sParam.local.addParam(GB_PARAM_COMP_RZSK);
+    sParam.local.addParam(GB_PARAM_NUM_OF_DEVICES, comp == GB_COMP_RZSK_3E8);
+    sParam.local.addParam(GB_PARAM_TIME_SYNCH_SRC);
+    sParam.local.addParam(GB_PARAM_NUM_OF_DEVICE);
+    sParam.local.addParam(GB_PARAM_OUT_CHECK);
+    sParam.local.addParam(GB_PARAM_WARN_THD_CF);
+    sParam.local.addParam(GB_PARAM_TIME_RERUN);
+    sParam.local.addParam(GB_PARAM_COM_PRD_KEEP);
+    sParam.local.addParam(GB_PARAM_COM_PRM_KEEP);
+    sParam.local.addParam(GB_PARAM_IN_DEC);
+    sParam.local.addParam(GB_PARAM_FREQ);
+    sParam.local.addParam(GB_PARAM_DETECTOR);
+    sParam.local.addParam(GB_PARAM_COR_U);
+    sParam.local.addParam(GB_PARAM_COR_I);
+
+    return true;
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Формирует список параметров на уровне "Параметры\Общие" для К400.
+ * @param[in] comp Совместимость.
+ * @param[in] prd Наличие передатчика.
+ * @param[in] prm Наличие приемника.
+ * @return True если список заполнен, иначе False.
+ *
+ * *****************************************************************************
+ */
+bool clMenu::fillLvlSetupParamGlbK400(eGB_COMP_K400 comp, bool prd, bool prm)
+{
+    Q_ASSERT(sParam.glb.getTypeDevice() == AVANT_K400);
+    Q_ASSERT(sParam.glb.getTypeLine() == GB_TYPE_LINE_UM);
+
+    sParam.local.addParam(GB_PARAM_COMP_K400);
+    sParam.local.addParam(GB_PARAM_TIME_SYNCH);
+    sParam.local.addParam(GB_PARAM_NUM_OF_DEVICE);
+    sParam.local.addParam(GB_PARAM_OUT_CHECK);
+
+    if (prm)
+    {
+        sParam.local.addParam(GB_PARAM_WARN_THD);
+        sParam.local.addParam(GB_PARAM_TIME_RERUN);
+    }
+
+    if (prd)
+    {
+        sParam.local.addParam(GB_PARAM_COM_PRD_KEEP);
+    }
+
+    if (prm)
+    {
+        sParam.local.addParam(GB_PARAM_COM_PRM_KEEP);
+        sParam.local.addParam(GB_PARAM_IN_DEC);
+    }
+
+    sParam.local.addParam(GB_PARAM_FREQ);
+
+    if (prd)
+    {
+        sParam.local.addParam(GB_PARAM_COR_U);
+        sParam.local.addParam(GB_PARAM_COR_I);
+    }
+
+    sParam.local.addParam(GB_PARAM_NUM_OF_DEVICES);
+    sParam.local.addParam(GB_PARAM_TM_K400);
+    sParam.local.addParam(GB_PARAM_WARN_D);
+    sParam.local.addParam(GB_PARAM_ALARM_D);
+    sParam.local.addParam(GB_PARAM_TEMP_MONITOR);
+    sParam.local.addParam(GB_PARAM_TEMP_THR_HI);
+    sParam.local.addParam(GB_PARAM_TEMP_THR_LOW);
+
+    if ((comp == GB_COMP_K400_UPKC_PRD) || (comp == GB_COMP_K400_UPKC_PRM))
+    {
+        sParam.local.addParam(GB_PARAM_TM_SPEED);
+    }
+
+    return true;
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Формирует список параметров на уровне "Параметры\Общие" для РЗСК.
+ * @param[in] type Тип оптическиого канала.
+ * @param[in] prd Наличие передатчика.
+ * @param[in] prm Наличие приемника.
+ * @return True если список заполнен, иначе False.
+ *
+ * *****************************************************************************
+ */
+bool clMenu::fillLvlSetupParamGlbOpto(eGB_TYPE_OPTO type, bool prd, bool prm)
+{
+    Q_ASSERT(sParam.glb.getTypeDevice() == AVANT_OPTO);
+    Q_ASSERT(sParam.glb.getTypeLine() == GB_TYPE_LINE_OPTO);
+
+    sParam.local.addParam(GB_PARAM_TIME_SYNCH);
+
+    if (type == TYPE_OPTO_STANDART)
+    {
+        sParam.local.addParam(GB_PARAM_NUM_OF_DEVICE);
+    }
+    else
+    {
+        sParam.local.addParam(GB_PARAM_NUM_OF_DEVICE_RING);
+    }
+
+    if (prm)
+    {
+        sParam.local.addParam(GB_PARAM_TIME_RERUN);
+    }
+
+    if (prd)
+    {
+        sParam.local.addParam(GB_PARAM_COM_PRD_KEEP);
+    }
+
+    if (prm)
+    {
+        sParam.local.addParam(GB_PARAM_COM_PRM_KEEP);
+    }
+
+    if (type == TYPE_OPTO_STANDART)
+    {
+        sParam.local.addParam(GB_PARAM_BACKUP);
+    }
+
+    return true;
 }

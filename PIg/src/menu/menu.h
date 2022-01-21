@@ -386,6 +386,12 @@ private:
     void ChangeCotnrolPunkt(uint8_t index, TControl::ctrl_t ctrl);
     void ChangeControlPunkts();
 
+    bool fillLvlSetupParamGlb(eGB_TYPE_DEVICE device);
+    bool fillLvlSetupParamGlbR400m(eGB_COMP_R400M comp);
+    bool fillLvlSetupParamGlbRzsk(eGB_COMP_RZSK comp);
+    bool fillLvlSetupParamGlbK400(eGB_COMP_K400 comp, bool prd, bool prm);
+    bool fillLvlSetupParamGlbOpto(eGB_TYPE_OPTO type, bool prd, bool prm);
+
 #ifdef TEST_FRIENDS
     TEST_FRIENDS
 #endif

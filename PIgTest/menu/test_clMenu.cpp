@@ -6,20 +6,24 @@
 
 using namespace std;
 
-#define TEST_FRIENDS                               \
-    friend class clMenu_Test;                      \
-    FRIEND_TEST(clMenu_Test, checkLedOn);          \
-    FRIEND_TEST(clMenu_Test, onFnButton);          \
-    FRIEND_TEST(clMenu_Test, AddControlToSend);    \
-    FRIEND_TEST(clMenu_Test, AddControlToPunkts);  \
-    FRIEND_TEST(clMenu_Test, ChangeCotnrolPunkt);  \
-    FRIEND_TEST(clMenu_Test, ChangeControlPunkts); \
-    FRIEND_TEST(clMenu_Test, isRzskM);             \
-    FRIEND_TEST(clMenu_Test, getKeyboardLayout);   \
-    FRIEND_TEST(clMenu_Test, fillLvlControl_K400); \
-    FRIEND_TEST(clMenu_Test, fillLvlControl_Opto); \
-    FRIEND_TEST(clMenu_Test, fillLvlControl_Rzsk); \
-    FRIEND_TEST(clMenu_Test, fillLvlControl_R400m);
+#define TEST_FRIENDS                                \
+    friend class clMenu_Test;                       \
+    FRIEND_TEST(clMenu_Test, checkLedOn);           \
+    FRIEND_TEST(clMenu_Test, onFnButton);           \
+    FRIEND_TEST(clMenu_Test, AddControlToSend);     \
+    FRIEND_TEST(clMenu_Test, AddControlToPunkts);   \
+    FRIEND_TEST(clMenu_Test, ChangeCotnrolPunkt);   \
+    FRIEND_TEST(clMenu_Test, ChangeControlPunkts);  \
+    FRIEND_TEST(clMenu_Test, isRzskM);              \
+    FRIEND_TEST(clMenu_Test, getKeyboardLayout);    \
+    FRIEND_TEST(clMenu_Test, fillLvlControl_K400);  \
+    FRIEND_TEST(clMenu_Test, fillLvlControl_Opto);  \
+    FRIEND_TEST(clMenu_Test, fillLvlControl_Rzsk);  \
+    FRIEND_TEST(clMenu_Test, fillLvlControl_R400m); \
+    FRIEND_TEST(clMenu_Test, fillLvlSetupGlb_K400); \
+    FRIEND_TEST(clMenu_Test, fillLvlSetupGlb_Opto); \
+    FRIEND_TEST(clMenu_Test, fillLvlSetupGlb_Rzsk); \
+    FRIEND_TEST(clMenu_Test, fillLvlSetupGlb_R400m);
 
 #include "menu/menu.h"
 
@@ -36,6 +40,7 @@ public:
 
     bool testFnButton(eKEY key, TControl::ctrl_t rctrl) const;
     bool testCheckLedOn(TDeviceStatus &status) const;
+    bool checkLocalParam(eGB_PARAM param, bool read_only = false);
 
 protected:
     virtual void SetUp() override { mObj = new clMenu; }
@@ -173,6 +178,29 @@ bool clMenu_Test::testCheckLedOn(TDeviceStatus &status) const
 
     return check;
 }
+
+//
+bool clMenu_Test::checkLocalParam(eGB_PARAM param, bool read_only)
+{
+    bool check = true;
+
+    if (param != mObj->sParam.local.getParam())
+    {
+        check = false;
+        EXPECT_EQ(param, mObj->sParam.local.getParam());
+    }
+
+    if (read_only != mObj->sParam.local.isReadOnly())
+    {
+        check = false;
+        EXPECT_EQ(read_only, mObj->sParam.local.isReadOnly());
+    }
+
+    mObj->sParam.local.nextParam();
+
+    return check;
+}
+
 
 //
 TEST_F(clMenu_Test, checkLedOn)
@@ -1113,4 +1141,231 @@ TEST_F(clMenu_Test, fillLvlControl_R400m)
     ASSERT_EQ(TControl::CTRL_AcOff, mObj->Punkts_.GetData(counter++));
     ASSERT_EQ(TControl::CTRL_Call, mObj->Punkts_.GetData(counter++));
     ASSERT_EQ(counter, mObj->Punkts_.GetLen());
+}
+
+//
+TEST_F(clMenu_Test, fillLvlSetupGlb_K400)
+{
+    mObj->sParam.typeDevice = AVANT_K400;
+    mObj->sParam.glb.setTypeLine(GB_TYPE_LINE_UM);  // требуется для установки совместимости
+
+    struct test_t
+    {
+        eGB_PARAM param;
+        uint      comp_mask;  // бит = 1 - значит есть в этой совместимости (UINT_MAX - есть всегда)
+        bool      prd;        // true - есть только в передатчике
+        bool      prm;        // true - есть только в приемнике
+    };
+
+    QVector<test_t> test_data {
+        { GB_PARAM_COMP_K400, UINT_MAX, false, false },           //
+        { GB_PARAM_TIME_SYNCH, UINT_MAX, false, false },          //
+        { GB_PARAM_NUM_OF_DEVICE, UINT_MAX, false, false },       //
+        { GB_PARAM_OUT_CHECK, UINT_MAX, false, false },           //
+        { GB_PARAM_WARN_THD, UINT_MAX, false, true },             //
+        { GB_PARAM_TIME_RERUN, UINT_MAX, false, true },           //
+        { GB_PARAM_COM_PRD_KEEP, UINT_MAX, true, false },         //
+        { GB_PARAM_COM_PRM_KEEP, UINT_MAX, false, true },         //
+        { GB_PARAM_IN_DEC, UINT_MAX, false, true },               //
+        { GB_PARAM_FREQ, UINT_MAX, false, false },                //
+        { GB_PARAM_COR_U, UINT_MAX, true, false },                //
+        { GB_PARAM_COR_I, UINT_MAX, true, false },                //
+        { GB_PARAM_NUM_OF_DEVICES, UINT_MAX, false, false },      //
+        { GB_PARAM_TM_K400, UINT_MAX, false, false },             //
+        { GB_PARAM_WARN_D, UINT_MAX, false, false },              //
+        { GB_PARAM_ALARM_D, UINT_MAX, false, false },             //
+        { GB_PARAM_TEMP_MONITOR, UINT_MAX, false, false },        //
+        { GB_PARAM_TEMP_THR_HI, UINT_MAX, false, false },         //
+        { GB_PARAM_TEMP_THR_LOW, UINT_MAX, false, false },        //
+        { GB_PARAM_TM_SPEED, (1 << 7) | (1 << 8), false, false }  //
+    };
+
+    for (int comp = GB_COMP_K400_MIN; comp < GB_COMP_K400_MAX; comp++)
+    {
+        for (int prd = 0; prd < 2; prd++)
+        {
+            for (int prm = 0; prm < 2; prm++)
+            {
+                SCOPED_TRACE("Compatibility " + to_string(comp) + ", prd " + to_string(prd)
+                             + ", prm" + to_string(prm));
+
+                mObj->sParam.glb.setCompatibility(static_cast<eGB_COMP_K400>(comp));
+                mObj->sParam.prd.status.setEnable(prd != 0);
+                mObj->sParam.prm.status.setEnable(prm != 1);
+
+                ASSERT_TRUE(mObj->fillLvlSetupParamGlb(mObj->sParam.typeDevice));
+
+                int counter = 0;
+                for (int i = 0; i < test_data.size(); i++)
+                {
+                    eGB_PARAM param = static_cast<eGB_PARAM>(test_data.at(i).param);
+
+                    SCOPED_TRACE("param[" + to_string(i) + "] = " + to_string(param));
+
+                    // пропустить параметр который есть только в передатчике
+                    if (test_data.at(i).prd && !mObj->sParam.prd.status.isEnable())
+                    {
+                        continue;
+                    }
+
+                    // пропустить параметр который есть только в приемнике
+                    if (test_data.at(i).prm && !mObj->sParam.prm.status.isEnable())
+                    {
+                        continue;
+                    }
+
+                    // пропустить параметр которого нет в данной совместимости
+                    if ((test_data.at(i).comp_mask & (1 << comp)) == 0)
+                    {
+                        continue;
+                    }
+
+                    counter++;
+                    ASSERT_TRUE(checkLocalParam(param));
+                }
+
+                // Проверка количества параметров в списке
+                ASSERT_EQ(counter, mObj->sParam.local.getNumOfParams());
+            }
+        }
+    }
+}
+
+//
+TEST_F(clMenu_Test, fillLvlSetupGlb_Opto)
+{
+    mObj->sParam.typeDevice = AVANT_OPTO;
+    mObj->sParam.glb.setTypeLine(GB_TYPE_LINE_OPTO);  // требуется для установки типа оптики
+
+    struct test_t
+    {
+        eGB_PARAM param;
+        uint8_t   type_mask;  // бит = 1 - значит есть в этом типе линии (0xFF - есть всегда)
+        bool      prd;  // true - есть только в передатчике
+        bool      prm;  // true - есть только в приемнике
+    };
+
+    QVector<test_t> test_data {
+        { GB_PARAM_TIME_SYNCH, 0xFF, false, false },          //
+        { GB_PARAM_NUM_OF_DEVICE, 0x01, false, false },       //
+        { GB_PARAM_NUM_OF_DEVICE_RING, 0xFE, false, false },  //
+        { GB_PARAM_TIME_RERUN, 0XFF, false, true },           //
+        { GB_PARAM_COM_PRD_KEEP, 0XFF, true, false },         //
+        { GB_PARAM_COM_PRM_KEEP, 0XFF, false, true },         //
+        { GB_PARAM_BACKUP, 0x01, false, false }               //
+    };
+
+    for (int type = TYPE_OPTO_STANDART; type < TYPE_OPTO_MAX; type++)
+    {
+        for (int prd = 0; prd < 2; prd++)
+        {
+            for (int prm = 0; prm < 2; prm++)
+            {
+                SCOPED_TRACE("Type opto " + to_string(type) + ", prd " + to_string(prd) + ", prm"
+                             + to_string(prm));
+
+                mObj->sParam.glb.setTypeOpto(static_cast<eGB_TYPE_OPTO>(type));
+                mObj->sParam.prd.status.setEnable(prd != 0);
+                mObj->sParam.prm.status.setEnable(prm != 1);
+
+                ASSERT_TRUE(mObj->fillLvlSetupParamGlb(mObj->sParam.typeDevice));
+
+                int counter = 0;
+                for (int i = 0; i < test_data.size(); i++)
+                {
+                    eGB_PARAM param = static_cast<eGB_PARAM>(test_data.at(i).param);
+
+                    SCOPED_TRACE("param[" + to_string(i) + "] = " + to_string(param));
+
+                    // пропустить параметр который есть только в передатчике
+                    if (test_data.at(i).prd && !mObj->sParam.prd.status.isEnable())
+                    {
+                        continue;
+                    }
+
+                    // пропустить параметр который есть только в приемнике
+                    if (test_data.at(i).prm && !mObj->sParam.prm.status.isEnable())
+                    {
+                        continue;
+                    }
+
+                    // пропустить параметр которого нет в данной совместимости
+                    if ((test_data.at(i).type_mask & (1 << type)) == 0)
+                    {
+                        continue;
+                    }
+
+                    counter++;
+                    ASSERT_TRUE(checkLocalParam(param));
+                }
+
+                // Проверка количества параметров в списке
+                ASSERT_EQ(counter, mObj->sParam.local.getNumOfParams());
+            }
+        }
+    }
+}
+
+
+//
+TEST_F(clMenu_Test, fillLvlSetupGlb_Rzsk)
+{
+    mObj->sParam.typeDevice = AVANT_RZSK;
+    mObj->sParam.glb.setTypeLine(GB_TYPE_LINE_UM);  // требуется для установки совместимости
+
+    struct test_t
+    {
+        eGB_PARAM param;
+        uint      comp_readonly_mask;  // бит = 1 - только чтение в этой совместимости
+    };
+
+    QVector<test_t> test_data {
+        { GB_PARAM_COMP_RZSK, 0 },                             //
+        { GB_PARAM_NUM_OF_DEVICES, (1 << GB_COMP_RZSK_3E8) },  //
+        { GB_PARAM_TIME_SYNCH_SRC, 0 },                        //
+        { GB_PARAM_NUM_OF_DEVICE, 0 },                         //
+        { GB_PARAM_OUT_CHECK, 0 },                             //
+        { GB_PARAM_WARN_THD_CF, 0 },                           //
+        { GB_PARAM_TIME_RERUN, 0 },                            //
+        { GB_PARAM_COM_PRD_KEEP, 0 },                          //
+        { GB_PARAM_COM_PRM_KEEP, 0 },                          //
+        { GB_PARAM_IN_DEC, 0 },                                //
+        { GB_PARAM_FREQ, 0 },                                  //
+        { GB_PARAM_DETECTOR, 0 },                              //
+        { GB_PARAM_COR_U, 0 },                                 //
+        { GB_PARAM_COR_I, 0 }                                  //
+    };
+
+    for (int comp = GB_COMP_RZSK_MIN; comp < GB_COMP_RZSK_MAX; comp++)
+    {
+        for (int prd = 0; prd < 2; prd++)
+        {
+            for (int prm = 0; prm < 2; prm++)
+            {
+                SCOPED_TRACE("Compatibility " + to_string(comp) + ", prd " + to_string(prd)
+                             + ", prm" + to_string(prm));
+
+                mObj->sParam.glb.setCompatibility(static_cast<eGB_COMP_RZSK>(comp));
+                mObj->sParam.prd.status.setEnable(prd != 0);
+                mObj->sParam.prm.status.setEnable(prm != 1);
+
+                ASSERT_TRUE(mObj->fillLvlSetupParamGlb(mObj->sParam.typeDevice));
+
+                int counter = 0;
+                for (int i = 0; i < test_data.size(); i++)
+                {
+                    eGB_PARAM param     = static_cast<eGB_PARAM>(test_data.at(i).param);
+                    bool      read_only = test_data.at(i).comp_readonly_mask & (1 << comp);
+
+                    SCOPED_TRACE("param[" + to_string(i) + "] = " + to_string(param));
+
+                    counter++;
+                    ASSERT_TRUE(checkLocalParam(param, read_only));
+                }
+
+                // Проверка количества параметров в списке
+                ASSERT_EQ(counter, mObj->sParam.local.getNumOfParams());
+            }
+        }
+    }
 }

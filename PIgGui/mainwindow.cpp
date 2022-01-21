@@ -29,6 +29,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->serialBsp->setLabelText("Port BSP:");
     ui->serialBsp->setup(4800, QSerialPort::NoParity, QSerialPort::TwoStop);
     ui->serialBsp->addDefaultPort("COM20");
+    ui->serialBsp->addDefaultPort("COM15");
+    ui->serialBsp->addDefaultPort("COM3");
     ui->serialBsp->addDefaultPort("tnt0");
 
     connect(ui->serialBsp, &TSerial::read, this, &MainWindow::SlotByteBspToPi);
@@ -210,19 +212,9 @@ void MainWindow::initKeyboard()
 void MainWindow::InitProtocolViewer()
 {
     connect(ui->pbView, &QPushButton::clicked, &mProtocolViewer, &QProtocolViewer::show);
-    //            [=]()
-    //            {
-    //                // ≈сли окно уже открыто, фокус переходит на него
-    //                auto flags = mProtocolViewer.windowFlags();
-    //                mProtocolViewer.setWindowFlags(flags | Qt::WindowStaysOnTopHint);
-    //                mProtocolViewer.show();
-    //                mProtocolViewer.setWindowFlags(flags);
-    //                mProtocolViewer.show();
-    //            });
-
     connect(this, &MainWindow::writeByteToBsp, this, &MainWindow::SlotBytePiToBsp);
 
-    mProtocolViewer.SetPattern("51 72 8A 9A");
+    mProtocolViewer.SetPattern("51 72 8A 9A FF");
     mProtocolViewer.resize(width(), height());
 
     auto flags = mProtocolViewer.windowFlags();
