@@ -419,10 +419,11 @@ typedef enum
     GB_PARAM_PVZUE_AC_TYPE,     ///< тип автоконтроля (ПВЗУ-Е)
     GB_PARAM_PVZUE_AC_PERIOD,   ///< период беглого режима АК (ПВЗУ-Е)
     GB_PARAM_PVZUE_AC_PER_RE,  ///< период повтора беглого режима АК (ПЗВУ-Е)
-    GB_PARAM_BACKUP,          ///< резервирование
-    GB_PARAM_COMP_K400,       ///< совместимость К400
-    GB_PARAM_NUM_OF_DEVICES,  ///< тип линии (кол-во аппаратов в линии)
-    GB_PARAM_TM_K400,         ///< телемеханика
+    GB_PARAM_PVZU_AC_CORRECT,  ///< Коррекция времени АК (ПВЗУ)
+    GB_PARAM_BACKUP,           ///< резервирование
+    GB_PARAM_COMP_K400,        ///< совместимость К400
+    GB_PARAM_NUM_OF_DEVICES,   ///< тип линии (кол-во аппаратов в линии)
+    GB_PARAM_TM_K400,          ///< телемеханика
     GB_PARAM_WARN_D,  ///< уровень срабатывания предупредительной сигнализации по D
     GB_PARAM_ALARM_D,  ///< уровень срабатывания аварийной сигнализации по D
     GB_PARAM_TEMP_MONITOR,  ///< контроль температуры
@@ -430,6 +431,7 @@ typedef enum
     GB_PARAM_TEMP_THR_LOW,  ///< нижнее значение температуры
     GB_PARAM_TM_SPEED,      ///< скорость ТМ
     GB_PARAM_COMP_RZSK,     ///< совместимость (РЗСК)
+    GB_PARAM_ALARM_CF,      ///< порог аварии по КЧ (Р400)
     // параметры защиты
     GB_PARAM_DEF_TYPE,     ///< тип защиты
     GB_PARAM_TIME_NO_MAN,  ///< дополнительное время без манипуляции

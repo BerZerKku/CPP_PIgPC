@@ -1369,3 +1369,69 @@ TEST_F(clMenu_Test, fillLvlSetupGlb_Rzsk)
         }
     }
 }
+
+//
+TEST_F(clMenu_Test, fillLvlSetupGlb_R400m)
+{
+    mObj->sParam.typeDevice = AVANT_R400M;
+    mObj->sParam.glb.setTypeLine(GB_TYPE_LINE_UM);  // требуетс€ дл€ установки совместимости
+
+    struct test_t
+    {
+        eGB_PARAM param;
+        uint comp_mask;  // бит = 1 - только чтение в этой совместимости
+    };
+
+    QVector<test_t> test_data {
+        //
+        { GB_PARAM_COMP_P400, 0xFFFF },                                                       //
+        { GB_PARAM_TIME_SYNCH_SRC, (1 << GB_COMP_R400M_AVANT) | (1 << GB_COMP_R400M_R400) },  //
+        { GB_PARAM_NUM_OF_DEVICE, 0xFFFF },                                                   //
+        { GB_PARAM_OUT_CHECK, 0xFFFF },                                                       //
+        { GB_PARAM_WARN_THD, 0xFFFF },                                                        //
+        { GB_PARAM_U_OUT_NOM, 0xFFFF },                                                       //
+        { GB_PARAM_FREQ, 0xFFFF },                                                            //
+        { GB_PARAM_IN_DEC_AC_ANSWER, (1 << GB_COMP_R400M_PVZL) },                             //
+        { GB_PARAM_PVZUE_PROTOCOL, (1 << GB_COMP_R400M_PVZUE) },                              //
+        { GB_PARAM_PVZUE_PARITY, (1 << GB_COMP_R400M_PVZUE) },                                //
+        { GB_PARAM_PVZUE_FAIL, (1 << GB_COMP_R400M_PVZUE) | (1 << GB_COMP_R400M_PVZU) },      //
+        { GB_PARAM_PVZUE_NOISE_THD, (1 << GB_COMP_R400M_PVZUE) },                             //
+        { GB_PARAM_PVZUE_NOISE_LVL, (1 << GB_COMP_R400M_PVZUE) },                             //
+        { GB_PARAM_PVZUE_AC_TYPE, (1 << GB_COMP_R400M_PVZUE) },                               //
+        { GB_PARAM_PVZUE_AC_PERIOD, (1 << GB_COMP_R400M_PVZUE) },                             //
+        { GB_PARAM_PVZUE_AC_PER_RE, (1 << GB_COMP_R400M_PVZUE) },                             //
+        { GB_PARAM_PVZU_AC_CORRECT, (1 << GB_COMP_R400M_PVZU) },
+        { GB_PARAM_ALARM_CF, (1 << GB_COMP_R400M_R400) },  //
+        { GB_PARAM_COR_U, 0xFFFF },                        //
+        { GB_PARAM_COR_I, 0xFFFF }
+    };
+
+    for (int comp = GB_COMP_R400M_MIN; comp < GB_COMP_R400M_MAX; comp++)
+    {
+
+        SCOPED_TRACE("Compatibility " + to_string(comp));
+
+        mObj->sParam.glb.setCompatibility(static_cast<eGB_COMP_RZSK>(comp));
+
+        ASSERT_TRUE(mObj->fillLvlSetupParamGlb(mObj->sParam.typeDevice));
+
+        int counter = 0;
+        for (int i = 0; i < test_data.size(); i++)
+        {
+            eGB_PARAM param = static_cast<eGB_PARAM>(test_data.at(i).param);
+
+            SCOPED_TRACE("param[" + to_string(i) + "] = " + to_string(param));
+
+            if ((test_data.at(i).comp_mask & (1 << comp)) == 0)
+            {
+                continue;
+            }
+
+            counter++;
+            ASSERT_TRUE(checkLocalParam(param));
+        }
+
+        // ѕроверка количества параметров в списке
+        ASSERT_EQ(counter, mObj->sParam.local.getNumOfParams());
+    }
+}

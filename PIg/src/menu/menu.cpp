@@ -5871,7 +5871,7 @@ bool clMenu::fillLvlSetupParamGlbR400m(eGB_COMP_R400M comp)
 
     sParam.local.addParam(GB_PARAM_COMP_P400);
 
-    if (comp == GB_COMP_R400M_AVANT)
+    if ((comp == GB_COMP_R400M_AVANT) || (comp == GB_COMP_R400M_R400))
     {
         sParam.local.addParam(GB_PARAM_TIME_SYNCH_SRC);
     }
@@ -5886,11 +5886,7 @@ bool clMenu::fillLvlSetupParamGlbR400m(eGB_COMP_R400M comp)
     {
         sParam.local.addParam(GB_PARAM_IN_DEC_AC_ANSWER);
     }
-
-    sParam.local.addParam(GB_PARAM_COR_U);
-    sParam.local.addParam(GB_PARAM_COR_I);
-
-    if (comp == GB_COMP_R400M_PVZUE)
+    else if (comp == GB_COMP_R400M_PVZUE)
     {
         sParam.local.addParam(GB_PARAM_PVZUE_PROTOCOL);
         sParam.local.addParam(GB_PARAM_PVZUE_PARITY);
@@ -5901,6 +5897,20 @@ bool clMenu::fillLvlSetupParamGlbR400m(eGB_COMP_R400M comp)
         sParam.local.addParam(GB_PARAM_PVZUE_AC_PERIOD);
         sParam.local.addParam(GB_PARAM_PVZUE_AC_PER_RE);
     }
+    else if (comp == GB_COMP_R400M_PVZU)
+    {
+        sParam.local.addParam(GB_PARAM_PVZUE_FAIL);
+        sParam.local.addParam(GB_PARAM_PVZU_AC_CORRECT);
+    }
+    else if (comp == GB_COMP_R400M_R400)
+    {
+        sParam.local.addParam(GB_PARAM_ALARM_CF);
+    }
+
+    sParam.local.addParam(GB_PARAM_COR_U);
+    sParam.local.addParam(GB_PARAM_COR_I);
+
+    return true;
 }
 
 

@@ -24,6 +24,7 @@ struct Param
         DIM_HZ,      ///< √ц
         DIM_KHZ,     ///< к√ц
         DIM_DEG,     ///< град
+        DIM_MIN,     ///< мин
         //
         DIM_MAX
     } DIMENSION;

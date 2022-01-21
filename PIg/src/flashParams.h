@@ -29,19 +29,20 @@ static const char fcRegimeEnter[GB_REGIME_ENTER_MAX][VALUE_STRING_SIZE] PROGMEM 
 /// массив строк размерностей, св€зан с Param::DIMENSION
 static const char fcDimension[][5] PROGMEM = {
     // 234
-    "",     // Param::DIM_NO
-    "мј",   // Param::DIM_MA
-    "ј",    // Param::DIM_A
-    "кј",   // Param::DIM_KA
-    "¬",    // Param::DIM_V
-    "к¬",   // Param::DIM_KV
-    "мс",   // Param::MSEC
-    "c",    // Param::DIM_SEC
-    "час",  // Param::DIM_HOUR
-    "дЅ",   // Param::DIM_DB
-    "√ц",   // Param::DIM_HZ
-    "к√ц",  // Param::DIM_KHZ
-    "град"  // Param::DIM_DEG
+    "",      // Param::DIM_NO
+    "мј",    // Param::DIM_MA
+    "ј",     // Param::DIM_A
+    "кј",    // Param::DIM_KA
+    "¬",     // Param::DIM_V
+    "к¬",    // Param::DIM_KV
+    "мс",    // Param::MSEC
+    "c",     // Param::DIM_SEC
+    "час",   // Param::DIM_HOUR
+    "дЅ",    // Param::DIM_DB
+    "√ц",    // Param::DIM_HZ
+    "к√ц",   // Param::DIM_KHZ
+    "град",  // Param::DIM_DEG
+    "мин"    // Param::DIM_MIN
 };
 
 /// ¬озможные значени€ параметра.

@@ -567,6 +567,26 @@ static const Param fPvzueAcPerRe PROGMEM = {
     Param::CHANGE_REG_DISABLE  // условие дл€ изменени€ параметра
 };
 
+//  коррекци€ времени ј  (ѕ«¬”)
+static const Param fPvzuAcCorrect PROGMEM = {
+    " оррекци€ времени ј ",  // название параметра
+    GB_COM_GET_TIME_RERUN,   // команда стандартного протокола
+    Param::PARAM_INT,        // тип параметра
+    Param::RANGE_INT,        // диапазон измнени€
+    Param::DIM_MIN,          // размерность
+    fcNullBuf,               // массив значений
+    1,                       // кол-во повторений параметра
+    0,                       // минимальное значение
+    20,                      // максимальное значение
+    1,                       // дискретность
+    1,                 // множитель дл€ стандартного протокола
+    GB_SEND_DOP_INT8,  // тип параметра дл€ сохранени€ новго значени€
+    9,  // байт дополнительной информации дл€ сохранени€
+    Param::DEPEND_MAX_NO,      // заивимость максимума
+    Param::DEPEND_SAME_NO,     // зависимость повторений
+    Param::CHANGE_REG_DISABLE  // условие дл€ изменени€ параметра
+};
+
 // резервирование
 static const Param fBackup PROGMEM = {
     "–езервирование",     // название параметра
@@ -786,6 +806,27 @@ static const Param fCompRZSK PROGMEM = {
     Param::DEPEND_SAME_NO,     // зависимость повторений
     Param::CHANGE_REG_DISABLE  // условие дл€ изменени€ параметра
 };
+
+// порог аварии по  „
+static const Param fAlarmCf PROGMEM = {
+    "ѕорог аварии по  „",     // название параметра
+    GB_COM_GET_CF_THRESHOLD,  // команда стандартного протокола
+    Param::PARAM_INT,         // тип параметра
+    Param::RANGE_INT,         // диапазон измнени€
+    Param::DIM_DB,            // размерность
+    fcNullBuf,                // массив значений
+    1,                        // кол-во повторений параметра
+    0,                        // минимальное значение
+    22,                       // максимальное значение
+    1,                        // дискретность
+    1,                 // множитель дл€ стандартного протокола
+    GB_SEND_DOP_INT8,  // тип параметра дл€ сохранени€ новго значени€
+    4,  // байт дополнительной информации дл€ сохранени€
+    Param::DEPEND_MAX_NO,      // заивимость максимума
+    Param::DEPEND_SAME_NO,     // зависимость повторений
+    Param::CHANGE_REG_DISABLE  // условие дл€ изменени€ параметра
+};
+
 
 // тип защиты
 static const Param fDefType PROGMEM = {
@@ -2067,6 +2108,7 @@ const Param* const fParams[] PROGMEM = { &fNullParam,
                                          &fPvzueAcType,
                                          &fPvzueAcPeriod,
                                          &fPvzueAcPerRe,
+                                         &fPvzuAcCorrect,
                                          &fBackup,
                                          &fCompK400,
                                          &fNumOfDevices,
@@ -2078,6 +2120,7 @@ const Param* const fParams[] PROGMEM = { &fNullParam,
                                          &fTempThrLow,
                                          &fTmSpeed,
                                          &fCompRZSK,
+                                         &fAlarmCf,
                                          // ѕараметры защиты
                                          &fDefType,
                                          &fTimeNoMan,

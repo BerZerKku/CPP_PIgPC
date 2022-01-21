@@ -750,6 +750,31 @@ TEST_F(FlashParam_Test, gbParam_PvzueAcPerRe)
 }
 
 //
+TEST_F(FlashParam_Test, gbParam_PvzuAcCorrect)
+{
+    Param prop = {
+        "Коррекция времени АК",  // название параметра
+        GB_COM_GET_TIME_RERUN,   // команда стандартного протокола
+        Param::PARAM_INT,        // тип параметра
+        Param::RANGE_INT,        // диапазон измнения
+        Param::DIM_MIN,          // размерность
+        fcNullBuf,               // массив значений
+        1,                       // кол-во повторений параметра
+        0,                       // минимальное значение
+        20,                      // максимальное значение
+        1,                       // дискретность
+        1,                 // множитель для стандартного протокола
+        GB_SEND_DOP_INT8,  // тип параметра для сохранения новго значения
+        9,  // байт дополнительной информации для сохранения
+        Param::DEPEND_MAX_NO,      // заивимость максимума
+        Param::DEPEND_SAME_NO,     // зависимость повторений
+        Param::CHANGE_REG_DISABLE  // условие для изменения параметра
+    };
+
+    ASSERT_TRUE(checkParam(GB_PARAM_PVZU_AC_CORRECT, prop));
+}
+
+//
 TEST_F(FlashParam_Test, gbParam_Backup)
 {
     Param prop = {
@@ -1022,6 +1047,31 @@ TEST_F(FlashParam_Test, gbParam_CompRZSK)
     };
 
     ASSERT_TRUE(checkParam(GB_PARAM_COMP_RZSK, prop));
+}
+
+//
+TEST_F(FlashParam_Test, gbParam_AlarmCf)
+{
+    Param prop = {
+        "Порог аварии по КЧ",     // название параметра
+        GB_COM_GET_CF_THRESHOLD,  // команда стандартного протокола
+        Param::PARAM_INT,         // тип параметра
+        Param::RANGE_INT,         // диапазон измнения
+        Param::DIM_DB,            // размерность
+        fcNullBuf,                // массив значений
+        1,                        // кол-во повторений параметра
+        0,                        // минимальное значение
+        22,                       // максимальное значение
+        1,                        // дискретность
+        1,                 // множитель для стандартного протокола
+        GB_SEND_DOP_INT8,  // тип параметра для сохранения новго значения
+        4,  // байт дополнительной информации для сохранения
+        Param::DEPEND_MAX_NO,      // заивимость максимума
+        Param::DEPEND_SAME_NO,     // зависимость повторений
+        Param::CHANGE_REG_DISABLE  // условие для изменения параметра
+    };
+
+    ASSERT_TRUE(checkParam(GB_PARAM_ALARM_CF, prop));
 }
 
 //
