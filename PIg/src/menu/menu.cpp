@@ -5966,7 +5966,11 @@ bool clMenu::fillLvlSetupParamGlbK400(eGB_COMP_K400 comp, bool prd, bool prm)
     sParam.local.addParam(GB_PARAM_COMP_K400);
     sParam.local.addParam(GB_PARAM_TIME_SYNCH);
     sParam.local.addParam(GB_PARAM_NUM_OF_DEVICE);
-    sParam.local.addParam(GB_PARAM_OUT_CHECK);
+
+    if (prd)
+    {
+        sParam.local.addParam(GB_PARAM_OUT_CHECK);
+    }
 
     if (prm)
     {
@@ -5995,8 +5999,13 @@ bool clMenu::fillLvlSetupParamGlbK400(eGB_COMP_K400 comp, bool prd, bool prm)
 
     sParam.local.addParam(GB_PARAM_NUM_OF_DEVICES);
     sParam.local.addParam(GB_PARAM_TM_K400);
-    sParam.local.addParam(GB_PARAM_WARN_D);
-    sParam.local.addParam(GB_PARAM_ALARM_D);
+
+    if (prm)
+    {
+        sParam.local.addParam(GB_PARAM_WARN_D);
+        sParam.local.addParam(GB_PARAM_ALARM_D);
+    }
+
     sParam.local.addParam(GB_PARAM_TEMP_MONITOR);
     sParam.local.addParam(GB_PARAM_TEMP_THR_HI);
     sParam.local.addParam(GB_PARAM_TEMP_THR_LOW);

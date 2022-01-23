@@ -1158,26 +1158,29 @@ TEST_F(clMenu_Test, fillLvlSetupGlb_K400)
     };
 
     QVector<test_t> test_data {
-        { GB_PARAM_COMP_K400, UINT_MAX, false, false },           //
-        { GB_PARAM_TIME_SYNCH, UINT_MAX, false, false },          //
-        { GB_PARAM_NUM_OF_DEVICE, UINT_MAX, false, false },       //
-        { GB_PARAM_OUT_CHECK, UINT_MAX, false, false },           //
-        { GB_PARAM_WARN_THD, UINT_MAX, false, true },             //
-        { GB_PARAM_TIME_RERUN, UINT_MAX, false, true },           //
-        { GB_PARAM_COM_PRD_KEEP, UINT_MAX, true, false },         //
-        { GB_PARAM_COM_PRM_KEEP, UINT_MAX, false, true },         //
-        { GB_PARAM_IN_DEC, UINT_MAX, false, true },               //
-        { GB_PARAM_FREQ, UINT_MAX, false, false },                //
-        { GB_PARAM_COR_U, UINT_MAX, true, false },                //
-        { GB_PARAM_COR_I, UINT_MAX, true, false },                //
-        { GB_PARAM_NUM_OF_DEVICES, UINT_MAX, false, false },      //
-        { GB_PARAM_TM_K400, UINT_MAX, false, false },             //
-        { GB_PARAM_WARN_D, UINT_MAX, false, false },              //
-        { GB_PARAM_ALARM_D, UINT_MAX, false, false },             //
-        { GB_PARAM_TEMP_MONITOR, UINT_MAX, false, false },        //
-        { GB_PARAM_TEMP_THR_HI, UINT_MAX, false, false },         //
-        { GB_PARAM_TEMP_THR_LOW, UINT_MAX, false, false },        //
-        { GB_PARAM_TM_SPEED, (1 << 7) | (1 << 8), false, false }  //
+        { GB_PARAM_COMP_K400, UINT_MAX, false, false },       //
+        { GB_PARAM_TIME_SYNCH, UINT_MAX, false, false },      //
+        { GB_PARAM_NUM_OF_DEVICE, UINT_MAX, false, false },   //
+        { GB_PARAM_OUT_CHECK, UINT_MAX, true, false },        //
+        { GB_PARAM_WARN_THD, UINT_MAX, false, true },         //
+        { GB_PARAM_TIME_RERUN, UINT_MAX, false, true },       //
+        { GB_PARAM_COM_PRD_KEEP, UINT_MAX, true, false },     //
+        { GB_PARAM_COM_PRM_KEEP, UINT_MAX, false, true },     //
+        { GB_PARAM_IN_DEC, UINT_MAX, false, true },           //
+        { GB_PARAM_FREQ, UINT_MAX, false, false },            //
+        { GB_PARAM_COR_U, UINT_MAX, true, false },            //
+        { GB_PARAM_COR_I, UINT_MAX, true, false },            //
+        { GB_PARAM_NUM_OF_DEVICES, UINT_MAX, false, false },  //
+        { GB_PARAM_TM_K400, UINT_MAX, false, false },         //
+        { GB_PARAM_WARN_D, UINT_MAX, false, true },           //
+        { GB_PARAM_ALARM_D, UINT_MAX, false, true },          //
+        { GB_PARAM_TEMP_MONITOR, UINT_MAX, false, false },    //
+        { GB_PARAM_TEMP_THR_HI, UINT_MAX, false, false },     //
+        { GB_PARAM_TEMP_THR_LOW, UINT_MAX, false, false },    //
+        { GB_PARAM_TM_SPEED,
+          (1 << GB_COMP_K400_UPKC_PRD) | (1 << GB_COMP_K400_UPKC_PRM),
+          false,
+          false }  //
     };
 
     for (int comp = GB_COMP_K400_MIN; comp < GB_COMP_K400_MAX; comp++)
