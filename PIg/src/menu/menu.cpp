@@ -5386,8 +5386,11 @@ bool clMenu::fillLvlControlR400m(eGB_COMP_R400M comp, eGB_NUM_DEVICES num_device
 {
     Q_ASSERT(sParam.glb.getTypeDevice() == AVANT_R400M);
 
-    // команды общие для всех совместимостей
-    AddControlToPunkts(TControl::CTRL_PuskAdjOff);
+    if (comp != GB_COMP_R400M_PVZK)
+    {
+        // Совместимость ПВЗК не реализована, пуск не нужен
+        AddControlToPunkts(TControl::CTRL_PuskAdjOff);
+    }
     AddControlToPunkts(TControl::CTRL_Reset);
 
     switch (comp)

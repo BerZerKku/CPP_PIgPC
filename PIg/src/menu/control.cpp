@@ -67,7 +67,7 @@ const TControl::data_t TControl::m_data[TControl::CTRL_MAX] PROGMEM = {
     { IndResetText, GB_COM_PRM_RES_IND, false, 0U },                          //
     { PuskAdjOnText, GB_COM_SET_CONTROL, true, GB_CONTROL_PUSK_ON },          //
     { PuskAdjOffText, GB_COM_SET_CONTROL, true, GB_CONTROL_PUSK_OFF },        //
-    { PuskPrdText, GB_COM_SET_CONTROL, true, GB_CONTROL_PUSK_UD_1 },          //
+    { PuskPrdText, GB_COM_SET_CONTROL, true, GB_CONTROL_PUSK_UD_ALL },        //
     { PuskPrmText, GB_COM_PRM_ENTER, false, 0U },                             //
     { RemoteAcPuskText, GB_COM_SET_CONTROL, true, GB_CONTROL_PUSK_AC_UD },    //
     { RemoteManText, GB_COM_SET_CONTROL, true, GB_CONTROL_MAN_1 },            //

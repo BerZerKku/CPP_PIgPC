@@ -1075,6 +1075,16 @@ TEST_F(clMenu_Test, fillLvlControl_R400m)
     ASSERT_EQ(TControl::CTRL_Call, mObj->Punkts_.GetData(counter++));
     ASSERT_EQ(counter, mObj->Punkts_.GetLen());
 
+    // 2-концевая линия, совместимость ПВЗК
+    mObj->sParam.def.setNumDevices(GB_NUM_DEVICES_2);
+    mObj->sParam.glb.setCompatibility(GB_COMP_R400M_PVZK);
+
+    ASSERT_TRUE(mObj->fillLvlControl(AVANT_R400M));
+
+    counter = 0;
+    ASSERT_EQ(TControl::CTRL_Reset, mObj->Punkts_.GetData(counter++));
+    ASSERT_EQ(counter, mObj->Punkts_.GetLen());
+
     // 2-концевая линия, совместимость ПВЗУ
     mObj->sParam.def.setNumDevices(GB_NUM_DEVICES_2);
     mObj->sParam.glb.setCompatibility(GB_COMP_R400M_PVZU);

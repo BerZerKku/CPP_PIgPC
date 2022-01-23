@@ -71,7 +71,7 @@ TEST_F(TControl_Test, common)
         { "IndReset", TControl::CTRL_IndReset, "Сброс индикации", 0x9A, false, 0 },
         { "PuskAdjOn", TControl::CTRL_PuskAdjOn, "Пуск налад. вкл.", 0x72, true, 8 },
         { "PuskAdjOff", TControl::CTRL_PuskAdjOff, "Пуск налад. выкл", 0x72, true, 9 },
-        { "PuskPrd", TControl::CTRL_PuskPrd, "Пуск ПРД", 0x72, true, 4 },
+        { "PuskPrd", TControl::CTRL_PuskPrd, "Пуск ПРД", 0x72, true, 6 },
         { "PuskPrm", TControl::CTRL_PuskPrm, "Пуск приемника", 0x51, false, 0 },
         { "RemoteAcPusk", TControl::CTRL_RemoteAcPusk, "Пуск АК удаленн.", 0x72, true, 10 },
         { "RemoteMan", TControl::CTRL_RemoteMan, "Пуск удален. МАН", 0x72, true, 16 },
