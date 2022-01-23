@@ -2842,6 +2842,8 @@ void clMenu::lvlSetupParamDef()
         eGB_TYPE_DEVICE device = sParam.typeDevice;
         sParam.txComBuf.clear();
 
+        fillLvlSetupParamDef(device);
+
         // для переформирования меню добавляется команда опроса:
         // кол-ва аппаратов в линии
         sParam.txComBuf.addCom2(GB_COM_DEF_GET_LINE_TYPE);
@@ -2850,45 +2852,12 @@ void clMenu::lvlSetupParamDef()
         if (device == AVANT_RZSK)
         {
             sParam.txComBuf.addCom2(GB_COM_GET_COM_PRD_KEEP);
-
-            sParam.local.addParam(GB_PARAM_DEF_TYPE);
-            sParam.local.addParam(GB_PARAM_TIME_NO_MAN);
-            sParam.local.addParam(GB_PARAM_OVERLAP);
-            sParam.local.addParam(GB_PARAM_DELAY);
-            sParam.local.addParam(GB_PARAM_WARN_THD_RZ);
-            sParam.local.addParam(GB_PARAM_SENS_DEC_RZ);
-            sParam.local.addParam(GB_PARAM_PRM_TYPE);
         }
         else if (device == AVANT_R400M)
         {
-            eGB_COMP_R400M comp = sParam.glb.getCompR400m();
             // для переформирования меню добавляется команда опроса:
             // совместимости
             sParam.txComBuf.addCom2(GB_COM_GET_COM_PRD_KEEP);
-
-            sParam.local.addParam(GB_PARAM_NUM_OF_DEVICES);
-            sParam.local.addParam(GB_PARAM_DEF_TYPE);
-            sParam.local.addParam(GB_PARAM_TIME_NO_MAN);
-            sParam.local.addParam(GB_PARAM_SHIFT_FRONT);
-            sParam.local.addParam(GB_PARAM_SHIFT_BACK);
-            sParam.local.addParam(GB_PARAM_SHIFT_PRM);
-            sParam.local.addParam(GB_PARAM_SHIFT_PRD);
-            sParam.local.addParam(GB_PARAM_SENS_DEC);
-            if (comp == GB_COMP_R400M_AVANT)
-            {
-                // Снижение уровня АК есть только в совместимости АВАНТ
-                sParam.local.addParam(GB_PARAM_AC_IN_DEC);
-            }
-            sParam.local.addParam(GB_PARAM_FREQ_PRD);
-            sParam.local.addParam(GB_PARAM_FREQ_PRM);
-        }
-        else if (device == AVANT_OPTO)
-        {
-            sParam.local.addParam(GB_PARAM_NUM_OF_DEVICES);
-            sParam.local.addParam(GB_PARAM_DEF_TYPE);
-            sParam.local.addParam(GB_PARAM_TIME_NO_MAN);
-            sParam.local.addParam(GB_PARAM_OVERLAP_OPTO);
-            sParam.local.addParam(GB_PARAM_DELAY_OPTO);
         }
     }
 
@@ -5796,6 +5765,126 @@ void clMenu::ChangeControlPunkts()
 /**
  * *****************************************************************************
  *
+ * @brief Формирует список параметров на уровне "Параметры\Защита".
+ * @param[in] device Устройство.
+ * @return True если список заполнен, иначе False.
+ *
+ * *****************************************************************************
+ */
+bool clMenu::fillLvlSetupParamDef(eGB_TYPE_DEVICE device)
+{
+    bool is_fill = false;
+
+    Q_ASSERT(device > AVANT_NO);
+    Q_ASSERT(device < AVANT_MAX);
+
+    sParam.local.clearParams();
+
+    switch (device)
+    {
+    case AVANT_R400M:
+        {
+            is_fill = fillLvlSetupParamDefR400m(sParam.glb.getCompR400m());
+            break;
+        }
+
+    case AVANT_RZSK:
+        {
+            is_fill = fillLvlSetupParamDefRzsk();
+            break;
+        }
+
+    case AVANT_OPTO:
+        {
+            is_fill = fillLvlSetupParamDefOpto();
+            break;
+        }
+
+    case AVANT_K400: [[gnu::fallthrough]];
+    case AVANT_NO: [[gnu::fallthrough]];
+    case AVANT_R400: [[gnu::fallthrough]];
+    case AVANT_MAX: break;
+    }
+
+    return is_fill;
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Формирует список параметров на уровне "Параметры\Защита" для Р400м.
+ * @param[in] comp Совместимость.
+ * @return True если список заполнен, иначе False.
+ *
+ * *****************************************************************************
+ */
+bool clMenu::fillLvlSetupParamDefR400m(eGB_COMP_R400M comp)
+{
+    sParam.local.addParam(GB_PARAM_NUM_OF_DEVICES);
+    sParam.local.addParam(GB_PARAM_DEF_TYPE);
+    sParam.local.addParam(GB_PARAM_TIME_NO_MAN);
+    sParam.local.addParam(GB_PARAM_SHIFT_FRONT);
+    sParam.local.addParam(GB_PARAM_SHIFT_BACK);
+    sParam.local.addParam(GB_PARAM_SHIFT_PRM);
+    sParam.local.addParam(GB_PARAM_SHIFT_PRD);
+    sParam.local.addParam(GB_PARAM_SENS_DEC);
+    if ((comp == GB_COMP_R400M_AVANT) || (comp == GB_COMP_R400M_R400))
+    {
+        sParam.local.addParam(GB_PARAM_AC_IN_DEC);
+    }
+    sParam.local.addParam(GB_PARAM_FREQ_PRD);
+    sParam.local.addParam(GB_PARAM_FREQ_PRM);
+
+    return true;
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Формирует список параметров на уровне "Параметры\Защита" для РЗСК.
+ * @return True если список заполнен, иначе False.
+ *
+ * *****************************************************************************
+ */
+bool clMenu::fillLvlSetupParamDefRzsk()
+{
+    sParam.local.addParam(GB_PARAM_DEF_TYPE);
+    sParam.local.addParam(GB_PARAM_TIME_NO_MAN);
+    sParam.local.addParam(GB_PARAM_OVERLAP);
+    sParam.local.addParam(GB_PARAM_DELAY);
+    sParam.local.addParam(GB_PARAM_WARN_THD_RZ);
+    sParam.local.addParam(GB_PARAM_SENS_DEC_RZ);
+    sParam.local.addParam(GB_PARAM_PRM_TYPE);
+
+    return true;
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Формирует список параметров на уровне "Параметры\Защита" для оптики.
+ * @return True если список заполнен, иначе False.
+ *
+ * *****************************************************************************
+ */
+bool clMenu::fillLvlSetupParamDefOpto()
+{
+    sParam.local.addParam(GB_PARAM_NUM_OF_DEVICES);
+    sParam.local.addParam(GB_PARAM_DEF_TYPE);
+    sParam.local.addParam(GB_PARAM_TIME_NO_MAN);
+    sParam.local.addParam(GB_PARAM_OVERLAP_OPTO);
+    sParam.local.addParam(GB_PARAM_DELAY_OPTO);
+
+    return true;
+}
+
+
+/**
+ * *****************************************************************************
+ *
  * @brief Формирует список параметров на уровне "Параметры\Общие".
  * @param[in] device Устройство.
  * @return True если список заполнен, иначе False.
@@ -6017,7 +6106,7 @@ bool clMenu::fillLvlSetupParamGlbK400(eGB_COMP_K400 comp, bool prd, bool prm)
 /**
  * *****************************************************************************
  *
- * @brief Формирует список параметров на уровне "Параметры\Общие" для РЗСК.
+ * @brief Формирует список параметров на уровне "Параметры\Общие" для оптики.
  * @param[in] type Тип оптическиого канала.
  * @param[in] prd Наличие передатчика.
  * @param[in] prm Наличие приемника.

@@ -6,24 +6,27 @@
 
 using namespace std;
 
-#define TEST_FRIENDS                                \
-    friend class clMenu_Test;                       \
-    FRIEND_TEST(clMenu_Test, checkLedOn);           \
-    FRIEND_TEST(clMenu_Test, onFnButton);           \
-    FRIEND_TEST(clMenu_Test, AddControlToSend);     \
-    FRIEND_TEST(clMenu_Test, AddControlToPunkts);   \
-    FRIEND_TEST(clMenu_Test, ChangeCotnrolPunkt);   \
-    FRIEND_TEST(clMenu_Test, ChangeControlPunkts);  \
-    FRIEND_TEST(clMenu_Test, isRzskM);              \
-    FRIEND_TEST(clMenu_Test, getKeyboardLayout);    \
-    FRIEND_TEST(clMenu_Test, fillLvlControl_K400);  \
-    FRIEND_TEST(clMenu_Test, fillLvlControl_Opto);  \
-    FRIEND_TEST(clMenu_Test, fillLvlControl_Rzsk);  \
-    FRIEND_TEST(clMenu_Test, fillLvlControl_R400m); \
-    FRIEND_TEST(clMenu_Test, fillLvlSetupGlb_K400); \
-    FRIEND_TEST(clMenu_Test, fillLvlSetupGlb_Opto); \
-    FRIEND_TEST(clMenu_Test, fillLvlSetupGlb_Rzsk); \
-    FRIEND_TEST(clMenu_Test, fillLvlSetupGlb_R400m);
+#define TEST_FRIENDS                                 \
+    friend class clMenu_Test;                        \
+    FRIEND_TEST(clMenu_Test, checkLedOn);            \
+    FRIEND_TEST(clMenu_Test, onFnButton);            \
+    FRIEND_TEST(clMenu_Test, AddControlToSend);      \
+    FRIEND_TEST(clMenu_Test, AddControlToPunkts);    \
+    FRIEND_TEST(clMenu_Test, ChangeCotnrolPunkt);    \
+    FRIEND_TEST(clMenu_Test, ChangeControlPunkts);   \
+    FRIEND_TEST(clMenu_Test, isRzskM);               \
+    FRIEND_TEST(clMenu_Test, getKeyboardLayout);     \
+    FRIEND_TEST(clMenu_Test, fillLvlControl_K400);   \
+    FRIEND_TEST(clMenu_Test, fillLvlControl_Opto);   \
+    FRIEND_TEST(clMenu_Test, fillLvlControl_Rzsk);   \
+    FRIEND_TEST(clMenu_Test, fillLvlControl_R400m);  \
+    FRIEND_TEST(clMenu_Test, fillLvlSetupGlb_K400);  \
+    FRIEND_TEST(clMenu_Test, fillLvlSetupGlb_Opto);  \
+    FRIEND_TEST(clMenu_Test, fillLvlSetupGlb_Rzsk);  \
+    FRIEND_TEST(clMenu_Test, fillLvlSetupGlb_R400m); \
+    FRIEND_TEST(clMenu_Test, fillLvlSetupDef_Opto);  \
+    FRIEND_TEST(clMenu_Test, fillLvlSetupDef_Rzsk);  \
+    FRIEND_TEST(clMenu_Test, fillLvlSetupDef_R400m);
 
 #include "menu/menu.h"
 
@@ -1417,6 +1420,139 @@ TEST_F(clMenu_Test, fillLvlSetupGlb_R400m)
         mObj->sParam.glb.setCompatibility(static_cast<eGB_COMP_RZSK>(comp));
 
         ASSERT_TRUE(mObj->fillLvlSetupParamGlb(mObj->sParam.typeDevice));
+
+        int counter = 0;
+        for (int i = 0; i < test_data.size(); i++)
+        {
+            eGB_PARAM param = static_cast<eGB_PARAM>(test_data.at(i).param);
+
+            SCOPED_TRACE("param[" + to_string(i) + "] = " + to_string(param));
+
+            if ((test_data.at(i).comp_mask & (1 << comp)) == 0)
+            {
+                continue;
+            }
+
+            counter++;
+            ASSERT_TRUE(checkLocalParam(param));
+        }
+
+        // ѕроверка количества параметров в списке
+        ASSERT_EQ(counter, mObj->sParam.local.getNumOfParams());
+    }
+}
+
+//
+TEST_F(clMenu_Test, fillLvlSetupDef_Opto)
+{
+    mObj->sParam.typeDevice = AVANT_OPTO;
+
+    struct test_t
+    {
+        eGB_PARAM param;
+    };
+
+    QVector<test_t> test_data {
+        //
+        { GB_PARAM_NUM_OF_DEVICES },  //
+        { GB_PARAM_DEF_TYPE },        //
+        { GB_PARAM_TIME_NO_MAN },     //
+        { GB_PARAM_OVERLAP_OPTO },    //
+        { GB_PARAM_DELAY_OPTO }       //
+    };
+
+    ASSERT_TRUE(mObj->fillLvlSetupParamDef(mObj->sParam.typeDevice));
+
+    int counter = 0;
+    for (int i = 0; i < test_data.size(); i++)
+    {
+        eGB_PARAM param = static_cast<eGB_PARAM>(test_data.at(i).param);
+
+        SCOPED_TRACE("param[" + to_string(i) + "] = " + to_string(param));
+
+        counter++;
+        ASSERT_TRUE(checkLocalParam(param));
+    }
+
+    // ѕроверка количества параметров в списке
+    ASSERT_EQ(counter, mObj->sParam.local.getNumOfParams());
+}
+
+
+//
+TEST_F(clMenu_Test, fillLvlSetupDef_Rzsk)
+{
+    mObj->sParam.typeDevice = AVANT_RZSK;
+
+    struct test_t
+    {
+        eGB_PARAM param;
+    };
+
+    QVector<test_t> test_data {
+        //
+        { GB_PARAM_DEF_TYPE },     //
+        { GB_PARAM_TIME_NO_MAN },  //
+        { GB_PARAM_OVERLAP },      //
+        { GB_PARAM_DELAY },        //
+        { GB_PARAM_WARN_THD_RZ },  //
+        { GB_PARAM_SENS_DEC_RZ },  //
+        { GB_PARAM_PRM_TYPE }      //
+    };
+
+    ASSERT_TRUE(mObj->fillLvlSetupParamDef(mObj->sParam.typeDevice));
+
+    int counter = 0;
+    for (int i = 0; i < test_data.size(); i++)
+    {
+        eGB_PARAM param = static_cast<eGB_PARAM>(test_data.at(i).param);
+
+        SCOPED_TRACE("param[" + to_string(i) + "] = " + to_string(param));
+
+        counter++;
+        ASSERT_TRUE(checkLocalParam(param));
+    }
+
+    // ѕроверка количества параметров в списке
+    ASSERT_EQ(counter, mObj->sParam.local.getNumOfParams());
+}
+
+
+//
+TEST_F(clMenu_Test, fillLvlSetupDef_R400m)
+{
+    mObj->sParam.typeDevice = AVANT_R400M;
+    mObj->sParam.glb.setTypeLine(GB_TYPE_LINE_UM);  // требуетс€ дл€ установки совместимости
+
+    struct test_t
+    {
+        eGB_PARAM param;
+        uint      comp_mask;
+    };
+
+    QVector<test_t> test_data {
+        //
+        { GB_PARAM_NUM_OF_DEVICES, 0xFFFF },                                             //
+        { GB_PARAM_DEF_TYPE, 0xFFFF },                                                   //
+        { GB_PARAM_TIME_NO_MAN, 0xFFFF },                                                //
+        { GB_PARAM_SHIFT_FRONT, 0xFFFF },                                                //
+        { GB_PARAM_SHIFT_BACK, 0xFFFF },                                                 //
+        { GB_PARAM_SHIFT_PRM, 0xFFFF },                                                  //
+        { GB_PARAM_SHIFT_PRD, 0xFFFF },                                                  //
+        { GB_PARAM_SENS_DEC, 0xFFFF },                                                   //
+        { GB_PARAM_AC_IN_DEC, (1 << GB_COMP_R400M_AVANT) | (1 << GB_COMP_R400M_R400) },  //
+        { GB_PARAM_FREQ_PRD, 0xFFFF },                                                   //
+        { GB_PARAM_FREQ_PRM, 0xFFFF }                                                    //
+    };
+
+    for (int comp = GB_COMP_R400M_MIN; comp < GB_COMP_R400M_MAX; comp++)
+    {
+
+        SCOPED_TRACE("Compatibility " + to_string(comp));
+
+        mObj->sParam.glb.setCompatibility(static_cast<eGB_COMP_R400M>(comp));
+
+        ASSERT_TRUE(mObj->fillLvlSetupParamDef(mObj->sParam.typeDevice));
 
         int counter = 0;
         for (int i = 0; i < test_data.size(); i++)

@@ -386,6 +386,11 @@ private:
     void ChangeCotnrolPunkt(uint8_t index, TControl::ctrl_t ctrl);
     void ChangeControlPunkts();
 
+    bool fillLvlSetupParamDef(eGB_TYPE_DEVICE device);
+    bool fillLvlSetupParamDefR400m(eGB_COMP_R400M comp);
+    bool fillLvlSetupParamDefRzsk();
+    bool fillLvlSetupParamDefOpto();
+
     bool fillLvlSetupParamGlb(eGB_TYPE_DEVICE device);
     bool fillLvlSetupParamGlbR400m(eGB_COMP_R400M comp);
     bool fillLvlSetupParamGlbRzsk(eGB_COMP_RZSK comp);
