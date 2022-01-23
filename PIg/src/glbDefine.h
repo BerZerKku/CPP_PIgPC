@@ -451,12 +451,7 @@ typedef enum
     GB_PARAM_SHIFT_BACK,    ///< сдвиг заднего фронта ПРД
     GB_PARAM_SHIFT_PRM,     ///< сдвиг ПРМ
     GB_PARAM_SHIFT_PRD,     ///< сдвиг ВЧ ПРД от ПУСК
-    GB_PARAM_LIMIT_PRD,     ///< ограничение полосы передатчика
-    GB_PARAM_DELAY_OFF_PRM,  ///< задержка выключения ПРМ
-    GB_PARAM_DELAY_ON_PRM,   ///< задержка включения ПРМ
-    GB_PARAM_DELAY_ON_PRD,   ///< задержка включения ПРД
-    GB_PARAM_MIN_TIME_PRD,   ///< минимальная длительность ПРД
-    GB_PARAM_DEF_ONE_SIDE,   ///< односторонний режим
+    GB_PARAM_DEF_ONE_SIDE,  ///< односторонний режим
     // параметры передатчика
     GB_PARAM_PRD_IN_DELAY,  ///< время включения (задержка срабатывания дискретного входа)
     GB_PARAM_PRD_DURATION_L,    ///< длительность команды ВЧ
