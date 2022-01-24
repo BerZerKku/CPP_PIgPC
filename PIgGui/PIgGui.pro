@@ -47,7 +47,8 @@ HEADERS += \
     serial/serialport.h \
     widget/combobox.h \
     widget/qledindicator.h \
-    widget/qpush1.h
+    widget/qpush1.h \
+    widget/qhexspinbox.h
 
 
 SOURCES += \

@@ -1,11 +1,13 @@
 #include <QDebug>
 #include <QHeaderView>
 
+
 #include "PIg/src/flash.h"
 #include "PIg/src/menu/txCom.h"
 #include "PIg/src/parameter/param.h"
 #include "QTextCodec"
 #include "bsp.h"
+#include "widget/qhexspinbox.h"
 
 
 const QString Bsp::kMsgSizeError       = "Wrong size of data in command %1: %2";
@@ -56,7 +58,7 @@ void Bsp::initParam()
     setComboBoxValue(mDevice.typeOpto, TYPE_OPTO_STANDART);
     setComboBoxValue(GB_PARAM_COMP_P400, GB_COMP_R400M_LINER);
 
-    setSpinBoxValue(mDevice.versionBspMcu, qint16(0xF233));
+    setSpinBoxValue(mDevice.versionBspMcu, 0xF233);
     setSpinBoxValue(mDevice.versionBspDsp, 0x330D);
     setSpinBoxValue(mDevice.versionBspDspPlis, 0x3333);
     setSpinBoxValue(mDevice.versionPiMcu, 0x151);
@@ -239,75 +241,57 @@ void Bsp::crtTreeDevieVersions(QTreeWidgetItem *top)
     QTreeWidgetItem *item = nullptr;
 
     item                  = new QTreeWidgetItem();
-    mDevice.versionBspMcu = new QSpinBox();
-    mDevice.versionBspMcu->setDisplayIntegerBase(16);
-    mDevice.versionBspMcu->setRange(0, 0xFFFF);
+    mDevice.versionBspMcu = new QHexSpinBox(false);
     item->setText(0, kCodec->toUnicode("ÁÑÏ ÌÊ"));
     branch->addChild(item);
     setItemWidget(item, 1, mDevice.versionBspMcu);
 
     // \todo Âåðñèÿ DSP â Ê400 ñîñòîèò èç 2 áàéò, èíà÷å (âåðñèÿ ïëèñ, âåðñèÿ äñï)
     item                  = new QTreeWidgetItem();
-    mDevice.versionBspDsp = new QSpinBox();
-    mDevice.versionBspDsp->setDisplayIntegerBase(16);
-    mDevice.versionBspDsp->setRange(0, 0xFFFF);
+    mDevice.versionBspDsp = new QHexSpinBox(false);
     item->setText(0, kCodec->toUnicode("ÁÑÏ ÖÑÏ"));
     branch->addChild(item);
     setItemWidget(item, 1, mDevice.versionBspDsp);
 
     // \todo Âåðñèÿ ïëèñ îòäåëüíî ïåðåäàåòñÿ òîëüêî â Ê400
     item                      = new QTreeWidgetItem();
-    mDevice.versionBspDspPlis = new QSpinBox();
-    mDevice.versionBspDspPlis->setDisplayIntegerBase(16);
-    mDevice.versionBspDspPlis->setRange(0, 0xFFFF);
+    mDevice.versionBspDspPlis = new QHexSpinBox(false);
     item->setText(0, kCodec->toUnicode("ÖÑÏ ÏËÈÑ"));
     branch->addChild(item);
     setItemWidget(item, 1, mDevice.versionBspDspPlis);
 
     item                 = new QTreeWidgetItem();
-    mDevice.versionPiMcu = new QSpinBox();
-    mDevice.versionPiMcu->setDisplayIntegerBase(16);
-    mDevice.versionPiMcu->setRange(0, 0xFFFF);
+    mDevice.versionPiMcu = new QHexSpinBox(false);
     item->setText(0, kCodec->toUnicode("ÏÈ ÌÊ"));
     branch->addChild(item);
     setItemWidget(item, 1, mDevice.versionPiMcu);
 
     item                       = new QTreeWidgetItem();
-    mDevice.versionBsk1PrdPlis = new QSpinBox();
-    mDevice.versionBsk1PrdPlis->setDisplayIntegerBase(16);
-    mDevice.versionBsk1PrdPlis->setRange(0, 0xFF);
+    mDevice.versionBsk1PrdPlis = new QHexSpinBox(true);
     item->setText(0, kCodec->toUnicode("ÁÑÊ ÏÐÄ1"));
     branch->addChild(item);
     setItemWidget(item, 1, mDevice.versionBsk1PrdPlis);
 
     item                       = new QTreeWidgetItem();
-    mDevice.versionBsk2PrdPlis = new QSpinBox();
-    mDevice.versionBsk2PrdPlis->setDisplayIntegerBase(16);
-    mDevice.versionBsk2PrdPlis->setRange(0, 0xFF);
+    mDevice.versionBsk2PrdPlis = new QHexSpinBox(true);
     item->setText(0, kCodec->toUnicode("ÁÑÊ ÏÐÄ2"));
     branch->addChild(item);
     setItemWidget(item, 1, mDevice.versionBsk2PrdPlis);
 
     item                       = new QTreeWidgetItem();
-    mDevice.versionBsk1PrmPlis = new QSpinBox();
-    mDevice.versionBsk1PrmPlis->setDisplayIntegerBase(16);
-    mDevice.versionBsk1PrmPlis->setRange(0, 0xFF);
+    mDevice.versionBsk1PrmPlis = new QHexSpinBox(true);
     item->setText(0, kCodec->toUnicode("ÁÑÊ ÏÐÌ1"));
     branch->addChild(item);
     setItemWidget(item, 1, mDevice.versionBsk1PrmPlis);
 
     item                       = new QTreeWidgetItem();
-    mDevice.versionBsk2PrmPlis = new QSpinBox();
-    mDevice.versionBsk2PrmPlis->setDisplayIntegerBase(16);
-    mDevice.versionBsk2PrmPlis->setRange(0, 0xFF);
+    mDevice.versionBsk2PrmPlis = new QHexSpinBox(true);
     item->setText(0, kCodec->toUnicode("ÁÑÊ ÏÐÌ2"));
     branch->addChild(item);
     setItemWidget(item, 1, mDevice.versionBsk2PrmPlis);
 
     item                   = new QTreeWidgetItem();
-    mDevice.versionBszPlis = new QSpinBox();
-    mDevice.versionBszPlis->setDisplayIntegerBase(16);
-    mDevice.versionBszPlis->setRange(0, 0xFF);
+    mDevice.versionBszPlis = new QHexSpinBox(true);
     item->setText(0, kCodec->toUnicode("ÁÑÇ ÏËÈÑ"));
     branch->addChild(item);
     setItemWidget(item, 1, mDevice.versionBszPlis);
