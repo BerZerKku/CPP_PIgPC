@@ -104,8 +104,8 @@ const TControl::data_t TControl::m_data[TControl::CTRL_MAX] PROGMEM = {
  */
 PGM_P TControl::getText(TControl::ctrl_t ctrl) const
 {
-
-    return checkCtrl(ctrl) ? m_data[ctrl].text : PSTR("");
+    PGM_P text = static_cast<PGM_P>(pgm_read_ptr(&m_data[ctrl].text));
+    return checkCtrl(ctrl) ? text : PSTR("");
 }
 
 
