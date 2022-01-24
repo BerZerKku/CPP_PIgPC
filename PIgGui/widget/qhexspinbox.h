@@ -3,6 +3,7 @@
 
 #include <QDebug>
 #include <QSpinBox>
+#include <stdio.h>
 
 class QHexSpinBox : public QSpinBox
 {
@@ -39,6 +40,7 @@ protected:
     QValidator::State validate(QString &input, int &pos) const override
     {
         QString copy(input);
+
 
         if (copy.startsWith("0x"))
             copy.remove(0, 2);

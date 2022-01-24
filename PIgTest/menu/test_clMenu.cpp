@@ -26,7 +26,8 @@ using namespace std;
     FRIEND_TEST(clMenu_Test, fillLvlSetupGlb_R400m); \
     FRIEND_TEST(clMenu_Test, fillLvlSetupDef_Opto);  \
     FRIEND_TEST(clMenu_Test, fillLvlSetupDef_Rzsk);  \
-    FRIEND_TEST(clMenu_Test, fillLvlSetupDef_R400m);
+    FRIEND_TEST(clMenu_Test, fillLvlSetupDef_R400m); \
+    FRIEND_TEST(clMenu_Test, getEventTextR400m);
 
 #include "menu/menu.h"
 
@@ -1582,5 +1583,51 @@ TEST_F(clMenu_Test, fillLvlSetupDef_R400m)
 
         // Проверка количества параметров в списке
         ASSERT_EQ(counter, mObj->sParam.local.getNumOfParams());
+    }
+}
+
+//
+TEST_F(clMenu_Test, getEventTextR400m)
+{
+    PGM_P text;
+
+    // проверка выхода за диапазон
+    ASSERT_EQ(nullptr, mObj->getEventTextR400m(JRN_EVENT_R400M_SIZE + 1, GB_COMP_R400M_AVANT));
+
+    for (uint8_t i = GB_COMP_R400M_MIN; i < GB_COMP_R400M_MAX; i++)
+    {
+        eGB_COMP_R400M comp = static_cast<eGB_COMP_R400M>(i);
+
+        SCOPED_TRACE("Compatibility " + to_string(comp));
+
+        text = mObj->getEventTextR400m(4, comp);
+        if (comp == GB_COMP_R400M_PVZ)
+        {
+            ASSERT_STREQ("Часы", text);
+        }
+        else
+        {
+            ASSERT_STREQ("Автоконтроль", text);
+        }
+
+        text = mObj->getEventTextR400m(26, comp);
+        if (comp == GB_COMP_R400M_PVZ)
+        {
+            ASSERT_STREQ("Помеха", text);
+        }
+        else
+        {
+            ASSERT_STREQ("Помеха в линии", text);
+        }
+
+        text = mObj->getEventTextR400m(28, comp);
+        if (comp == GB_COMP_R400M_PVZ)
+        {
+            ASSERT_STREQ("Дальний", text);
+        }
+        else
+        {
+            ASSERT_STREQ("Уд: АК - нет ответа", text);
+        }
     }
 }

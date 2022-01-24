@@ -8,13 +8,12 @@ CONFIG += c++11
 
 CONFIG(debug, debug|release) {
     message(===Debug===)
-
-#    DEFINES += \
-#        QT_MESSAGELOGCONTEXT
 }
 
 CONFIG(release, debug|release) {
     message(===Release===)
+
+    CONFIG -= console
 
     DEFINES += \
         NDEBUG

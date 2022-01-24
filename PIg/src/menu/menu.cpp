@@ -1660,7 +1660,16 @@ void clMenu::lvlJournalEvent()
         eGB_TYPE_DEVICE device = sParam.typeDevice;
         if (device == AVANT_R400M)
         {
-            snprintf_P(&vLCDbuf[poz], 21, fcJrnEventR400_MSK[event], event);
+            PGM_P text = getEventTextR400m(event, sParam.glb.getCompR400m());
+
+            if (text == nullptr)
+            {
+                snprintf_P(&vLCDbuf[poz], 21, PSTR("Событие - %d"), event);
+            }
+            else
+            {
+                snprintf_P(&vLCDbuf[poz], 21, text);
+            }
         }
         else if (device == AVANT_K400)
         {
@@ -6154,4 +6163,44 @@ bool clMenu::fillLvlSetupParamGlbOpto(eGB_TYPE_OPTO type, bool prd, bool prm)
     }
 
     return true;
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Возвращает текст события события Р400м в зависимости от совместимости.
+ * @param[in] event Код события.
+ * @param[in] comp Совместимость.
+ * @return Текст события.
+ * @retval nullptr В случае ошибочного номера события.
+ *
+ * *****************************************************************************
+ */
+PGM_P clMenu::getEventTextR400m(uint8_t event, eGB_COMP_R400M comp) const
+{
+    PGM_P text = nullptr;
+
+    if (event < SIZE_OF(fcJrnEventR400_MSK))
+    {
+        text = static_cast<PGM_P> pgm_read_ptr(&fcJrnEventR400_MSK[event]);
+
+        if (comp == GB_COMP_R400M_PVZ)
+        {
+            if (event == 4)
+            {
+                text = PSTR("Часы");
+            }
+            else if (event == 26)
+            {
+                text = PSTR("Помеха");
+            }
+            else if (event == 28)
+            {
+                text = PSTR("Дальний");
+            }
+        }
+    }
+
+    return text;
 }

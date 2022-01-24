@@ -373,7 +373,6 @@ private:
      */
     eGB_TYPE_DEVICE getKeyboardLayout();
 
-
     void AddControlToSend(TControl::ctrl_t ctrl);
     void AddControlToPunkts(TControl::ctrl_t ctrl);
 
@@ -396,6 +395,8 @@ private:
     bool fillLvlSetupParamGlbRzsk(eGB_COMP_RZSK comp);
     bool fillLvlSetupParamGlbK400(eGB_COMP_K400 comp, bool prd, bool prm);
     bool fillLvlSetupParamGlbOpto(eGB_TYPE_OPTO type, bool prd, bool prm);
+
+    PGM_P getEventTextR400m(uint8_t event, eGB_COMP_R400M comp) const;
 
 #ifdef TEST_FRIENDS
     TEST_FRIENDS
