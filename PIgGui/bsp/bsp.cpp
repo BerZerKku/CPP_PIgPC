@@ -56,7 +56,7 @@ void Bsp::initParam()
     setComboBoxValue(mDevice.typeOpto, TYPE_OPTO_STANDART);
     setComboBoxValue(GB_PARAM_COMP_P400, GB_COMP_R400M_LINER);
 
-    setSpinBoxValue(mDevice.versionBspMcu, 0x203);
+    setSpinBoxValue(mDevice.versionBspMcu, qint16(0xF233));
     setSpinBoxValue(mDevice.versionBspDsp, 0x330D);
     setSpinBoxValue(mDevice.versionBspDspPlis, 0x3333);
     setSpinBoxValue(mDevice.versionPiMcu, 0x151);
