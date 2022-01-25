@@ -1531,9 +1531,7 @@ void clMenu::lvlJournalEvent()
 {
     static const char title[] PROGMEM = "Журнал\\События";
 
-    // TODO Разобраться откуда взялись эти события и куда исчезли.
-    // static const char opto_ring1_13[] PROGMEM = "Кольцо восстановлено";
-    // static const char opto_ring1_14[] PROGMEM = "Дистанционный сброс";
+    eGB_TYPE_DEVICE device = sParam.typeDevice;
 
     if (lvlCreate_)
     {
@@ -1548,8 +1546,8 @@ void clMenu::lvlJournalEvent()
         // установка текущего журнала и максимального кол-во записей в нем
         sParam.jrnEntry.clear();
         sParam.jrnEntry.setCurrentDevice(GB_DEVICE_GLB);
-        uint16_t        t      = 0;
-        eGB_TYPE_DEVICE device = sParam.typeDevice;
+        uint16_t t = 0;
+
         if (device == AVANT_K400)
         {
             t = GLB_JRN_EVENT_K400_MAX;
@@ -1573,9 +1571,13 @@ void clMenu::lvlJournalEvent()
         sParam.txComBuf.addCom1(GB_COM_GET_JRN_CNT);
         sParam.txComBuf.addCom2(GB_COM_GET_JRN_ENTRY);
         sParam.txComBuf.setInt16(sParam.jrnEntry.getEntryAdress());
-    }
 
-    eGB_TYPE_DEVICE device = sParam.typeDevice;
+        if (device == AVANT_R400M)
+        {
+            // В Р400м записи в журнале событий зависят от совместимости
+            sParam.txComBuf.addCom2(GB_COM_GET_COM_PRD_KEEP);
+        }
+    }
 
     // номер текущей записи в архиве и максимальное кол-во записей
     uint16_t cur_entry   = sParam.jrnEntry.getCurrentEntry();
@@ -2857,7 +2859,6 @@ void clMenu::lvlSetupParamDef()
         // кол-ва аппаратов в линии
         sParam.txComBuf.addCom2(GB_COM_DEF_GET_LINE_TYPE);
 
-        sParam.local.clearParams();
         if (device == AVANT_RZSK)
         {
             sParam.txComBuf.addCom2(GB_COM_GET_COM_PRD_KEEP);
