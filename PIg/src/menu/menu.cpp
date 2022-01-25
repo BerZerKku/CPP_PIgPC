@@ -1662,15 +1662,19 @@ void clMenu::lvlJournalEvent()
         eGB_TYPE_DEVICE device = sParam.typeDevice;
         if (device == AVANT_R400M)
         {
-            PGM_P text = getEventTextR400m(event, sParam.glb.getCompR400m());
+            eGB_COMP_R400M comp = sParam.glb.getCompR400m();
+            PGM_P          text = getEventTextR400m(event, comp);
 
             if (text == nullptr)
             {
-                snprintf_P(&vLCDbuf[poz], 21, PSTR("Событие - %d"), event);
+                snprintf_P(&vLCDbuf[poz], NAME_PARAM_LENGHT, PSTR("Событие - %d"), event);
             }
             else
             {
-                snprintf_P(&vLCDbuf[poz], 21, text);
+                int len = snprintf_P(&vLCDbuf[poz], NAME_PARAM_LENGHT, text);
+                // вывод номеров удаленных аппаратов, при необходимости
+                text = getEventRemotesR400m(sParam.jrnEntry.getRegime(), comp);
+                snprintf_P(&vLCDbuf[poz + len], NAME_PARAM_LENGHT - len, text);
             }
         }
         else if (device == AVANT_K400)
@@ -6201,7 +6205,65 @@ PGM_P clMenu::getEventTextR400m(uint8_t event, eGB_COMP_R400M comp) const
                 text = PSTR("Дальний");
             }
         }
+        else if (comp == GB_COMP_R400M_PVZU || comp == GB_COMP_R400M_PVZUE)
+        {
+            if (event == 21)
+            {
+                text = PSTR("АК - Сниж.запаса %s");
+            }
+            else if (event == 22)
+            {
+                text = PSTR("АК - Нет ответа %s");
+            }
+            else if (event == 28)
+            {
+                text = PSTR("Уд: АК - Нет отв %s");
+            }
+            else if (event == 29)
+            {
+                text = PSTR("Уд: Помеха в лин %s");
+            }
+            else if (event == 30)
+            {
+                text = PSTR("Уд: Неиспр. ДФЗ %s");
+            }
+            else if (event == 31)
+            {
+                text = PSTR("Уд: Неиспр. цВЫХ %s");
+            }
+        }
     }
 
     return text;
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Возвращает строку с номерами удаленных устройств.
+ * @param[in] numbers Номера устройств (по маске).
+ * @param[in] comp Совместимость.
+ * @return Строка.
+ *
+ * *****************************************************************************
+ */
+const char* clMenu::getEventRemotesR400m(uint8_t numbers, eGB_COMP_R400M comp) const
+{
+    PGM_P line = PSTR("");
+
+
+    if (comp == GB_COMP_R400M_PVZU || comp == GB_COMP_R400M_PVZUE)
+    {
+        if (numbers < SIZE_OF(fcRemoteNum))
+        {
+            line = static_cast<PGM_P> pgm_read_ptr(&fcRemoteNum[numbers]);
+        }
+        else
+        {
+            line = PSTR(" ? ");
+        }
+    }
+
+    return line;
 }

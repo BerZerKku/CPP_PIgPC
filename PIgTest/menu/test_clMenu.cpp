@@ -27,7 +27,8 @@ using namespace std;
     FRIEND_TEST(clMenu_Test, fillLvlSetupDef_Opto);  \
     FRIEND_TEST(clMenu_Test, fillLvlSetupDef_Rzsk);  \
     FRIEND_TEST(clMenu_Test, fillLvlSetupDef_R400m); \
-    FRIEND_TEST(clMenu_Test, getEventTextR400m);
+    FRIEND_TEST(clMenu_Test, getEventTextR400m);     \
+    FRIEND_TEST(clMenu_Test, getEventRemotesR400m);
 
 #include "menu/menu.h"
 
@@ -1541,7 +1542,7 @@ TEST_F(clMenu_Test, fillLvlSetupDef_R400m)
         uint      comp_mask;
     };
 
-    QVector<test_t> test_data {
+    vector<test_t> test_data {
         //
         { GB_PARAM_NUM_OF_DEVICES, 0xFFFF },                                             //
         { GB_PARAM_DEF_TYPE, 0xFFFF },                                                   //
@@ -1591,43 +1592,152 @@ TEST_F(clMenu_Test, getEventTextR400m)
 {
     PGM_P text;
 
+    struct test_t
+    {
+        uint8_t value;  // номер события
+        PGM_P   text;   // строка с расшифровкой события
+        int     comp_mask;  // маска совместимостей в которых выводится эта строка
+    };
+
+    int pvzu_pvzue_mask     = (1 << GB_COMP_R400M_PVZU) | (1 << GB_COMP_R400M_PVZUE);
+    int pvz_pvzu_pvzue_mask = (1 << GB_COMP_R400M_PVZ) | pvzu_pvzue_mask;
+
+    vector<test_t> test_data = {
+        { 0, "Событие - 0", 0xFFFF },                         //
+        { 1, "Неиспр чт/зап FLASH", 0xFFFF },                 //
+        { 2, "ВЧ тракт восстановл.", 0xFFFF },                //
+        { 3, "Неиспр чт/зап ПЛИС", 0xFFFF },                  //
+        { 4, "Автоконтроль", ~(1 << GB_COMP_R400M_PVZ) },     //
+        { 4, "Часы", (1 << GB_COMP_R400M_PVZ) },              //
+        { 5, "Ток покоя", 0xFFFF },                           //
+        { 6, "Неиспр чт/зап 2RAM", 0xFFFF },                  //
+        { 7, "Неиспр работы DSP", 0xFFFF },                   //
+        { 8, "Восстан-е работы DSP", 0xFFFF },                //
+        { 9, "Низкое напр. выхода", 0xFFFF },                 //
+        { 10, "Высокое напр. выхода", 0xFFFF },               //
+        { 11, "Нарушен обмен с УМ", 0xFFFF },                 //
+        { 12, "Неисправность часов", 0xFFFF },                //
+        { 13, "Нет блока БСЗ", 0xFFFF },                      //
+        { 14, "Ошибка версии БСЗ", 0xFFFF },                  //
+        { 15, "Неиспр перекл-ей БСЗ", 0xFFFF },               //
+        { 16, "Нет сигнала МАН", 0xFFFF },                    //
+        { 17, "Вкл.пит/Перезапуск", 0xFFFF },                 //
+        { 18, "Изменение режима", 0xFFFF },                   //
+        { 19, "Неиспр зап. вых.цепи", 0xFFFF },               //
+        { 20, "Изменение параметров", 0xFFFF },               //
+        { 21, "АК - Снижение запаса", ~pvzu_pvzue_mask },     //
+        { 21, "АК - Сниж.запаса %s", pvzu_pvzue_mask },       //
+        { 22, "АК - Нет ответа", ~pvzu_pvzue_mask },          //
+        { 22, "АК - Нет ответа %s", pvzu_pvzue_mask },        //
+        { 23, "Отсут-е сигнала Пуск", 0xFFFF },               //
+        { 24, "Отсут-е сигн Останов", 0xFFFF },               //
+        { 25, "Выключение аппарата", 0xFFFF },                //
+        { 26, "Помеха в линии", ~(1 << GB_COMP_R400M_PVZ) },  //
+        { 26, "Помеха", (1 << GB_COMP_R400M_PVZ) },           //
+        { 27, "Неисправность ДФЗ", 0xFFFF },                  //
+        { 28, "Уд: АК - нет ответа", ~pvz_pvzu_pvzue_mask },  //
+        { 28, "Дальний", (1 << GB_COMP_R400M_PVZ) },          //
+        { 28, "Уд: АК - Нет отв %s", pvzu_pvzue_mask },       //
+        { 29, "Уд: Помеха в линии", ~pvzu_pvzue_mask },       //
+        { 29, "Уд: Помеха в лин %s", pvzu_pvzue_mask },       //
+        { 30, "Уд: Неиспр. ДФЗ", ~pvzu_pvzue_mask },          //
+        { 30, "Уд: Неиспр. ДФЗ %s", pvzu_pvzue_mask },        //
+        { 31, "Уд: Неиспр. цепи вых", ~pvzu_pvzue_mask },     //
+        { 31, "Уд: Неиспр. цВЫХ %s", pvzu_pvzue_mask },       //
+        { 32, "Порог по помехе", 0xFFFF }                     //
+    };
+
     // проверка выхода за диапазон
     ASSERT_EQ(nullptr, mObj->getEventTextR400m(JRN_EVENT_R400M_SIZE + 1, GB_COMP_R400M_AVANT));
+
+    for (unsigned int i = 0; i < test_data.size(); i++)
+    {
+        for (uint8_t i = GB_COMP_R400M_MIN; i < GB_COMP_R400M_MAX; i++)
+        {
+            eGB_COMP_R400M comp = static_cast<eGB_COMP_R400M>(i);
+
+            if (test_data.a)
+
+                SCOPED_TRACE("Compatibility " + to_string(comp) + ", item " + to_string(i));
+
+            text = mObj->getEventTextR400m(4, comp);
+            if (comp == GB_COMP_R400M_PVZ)
+            {
+                ASSERT_STREQ("Часы", text);
+            }
+            else
+            {
+                ASSERT_STREQ("Автоконтроль", text);
+            }
+
+            text = mObj->getEventTextR400m(26, comp);
+            if (comp == GB_COMP_R400M_PVZ)
+            {
+                ASSERT_STREQ("Помеха", text);
+            }
+            else
+            {
+                ASSERT_STREQ("Помеха в линии", text);
+            }
+
+            text = mObj->getEventTextR400m(28, comp);
+            if (comp == GB_COMP_R400M_PVZ)
+            {
+                ASSERT_STREQ("Дальний", text);
+            }
+            else if (comp == GB_COMP_R400M_PVZU || comp == GB_COMP_R400M_PVZUE)
+            {
+                ASSERT_STREQ("Уд: АК - Нет отв %s", text);
+            }
+            else
+            {
+                ASSERT_STREQ("Уд: АК - нет ответа", text);
+            }
+        }
+    }
+}
+
+TEST_F(clMenu_Test, getEventRemotesR400m)
+{
+    QVector<PGM_P> values = {
+        "   ",  ///< 000
+        " 1 ",  ///< 001
+        " 2 ",  ///< 010
+        "1 2",  ///< 011
+        " 3 ",  ///< 100
+        "1 3",  ///< 101
+        "2 3",  ///< 110
+        " ? "   ///< 111
+    };
 
     for (uint8_t i = GB_COMP_R400M_MIN; i < GB_COMP_R400M_MAX; i++)
     {
         eGB_COMP_R400M comp = static_cast<eGB_COMP_R400M>(i);
 
-        SCOPED_TRACE("Compatibility " + to_string(comp));
+        for (uint8_t i = 0; i < values.size() + 2; i++)
+        {
+            SCOPED_TRACE("Compatibility " + to_string(comp) + ", value " + to_string(i));
 
-        text = mObj->getEventTextR400m(4, comp);
-        if (comp == GB_COMP_R400M_PVZ)
-        {
-            ASSERT_STREQ("Часы", text);
-        }
-        else
-        {
-            ASSERT_STREQ("Автоконтроль", text);
-        }
+            PGM_P line = mObj->getEventRemotesR400m(i, comp);
 
-        text = mObj->getEventTextR400m(26, comp);
-        if (comp == GB_COMP_R400M_PVZ)
-        {
-            ASSERT_STREQ("Помеха", text);
-        }
-        else
-        {
-            ASSERT_STREQ("Помеха в линии", text);
-        }
-
-        text = mObj->getEventTextR400m(28, comp);
-        if (comp == GB_COMP_R400M_PVZ)
-        {
-            ASSERT_STREQ("Дальний", text);
-        }
-        else
-        {
-            ASSERT_STREQ("Уд: АК - нет ответа", text);
+            if (comp == GB_COMP_R400M_PVZU || comp == GB_COMP_R400M_PVZUE)
+            {
+                if (i >= values.size())
+                {
+                    // проверка выхода за диапазон значений
+                    ASSERT_STREQ(" ? ", line);
+                }
+                else
+                {
+                    // проверка в совместимостях с выводом номеров удаленных устройств
+                    ASSERT_STREQ(values.at(i), line);
+                }
+            }
+            else
+            {
+                // проверка в совместимостях без вывода номеров удаленных устройств
+                ASSERT_STREQ("", line);
+            }
         }
     }
 }
