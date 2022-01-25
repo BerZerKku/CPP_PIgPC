@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 #include <algorithm>
 #include <cstdio>
+#include <cstring>
 #include <functional>
 #include <iostream>
 
@@ -1660,10 +1661,18 @@ TEST_F(clMenu_Test, getEventTextR400m)
 
             SCOPED_TRACE("Compatibility " + to_string(comp) + ", item " + to_string(index));
 
+            // Если данного сообщения нет в этой совместимости, то проверять не надо
             if ((test_data.at(index).comp_mask & (1 << comp)) == 0)
             {
                 continue;
             }
+
+            // Проверка допустимого размера строки
+            // На место %s может быть вставлены номера удаленных аппаратов
+            // в итоге "%s" меняется на три символа, например " 1 ", "1 2"
+            std::string line_string = std::string(test_data.at(index).text);
+            int         max_size    = (line_string.find("%s") == string::npos) ? (20) : (19);
+            ASSERT_GE(max_size, line_string.size());
 
             uint8_t value = test_data.at(index).value;
             ASSERT_STREQ(test_data.at(index).text, mObj->getEventTextR400m(value, comp));
