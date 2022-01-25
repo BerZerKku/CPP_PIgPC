@@ -397,7 +397,7 @@ private:
     bool fillLvlSetupParamGlbOpto(eGB_TYPE_OPTO type, bool prd, bool prm);
 
     PGM_P getEventTextR400m(uint8_t event, eGB_COMP_R400M comp) const;
-    PGM_P getEventRemotesR400m(uint8_t numbers, eGB_COMP_R400M comp) const;
+    char *getEventRemotesR400m(uint8_t numbers, eGB_COMP_R400M comp) const;
 
 #ifdef TEST_FRIENDS
     TEST_FRIENDS

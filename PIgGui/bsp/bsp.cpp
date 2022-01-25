@@ -1306,6 +1306,11 @@ quint8 Bsp::int2bcd(quint8 val, bool &ok)
 //
 void Bsp::procCommandReadJournal(eGB_COM com, pkg_t &data)
 {
+
+    int             value       = mDevice.typeDevice->currentData().toInt();
+    eGB_TYPE_DEVICE device      = static_cast<eGB_TYPE_DEVICE>(value);
+    int             log_counter = (device == AVANT_R400M) ? 50 : 0;
+
     switch (com)
     {
     case GB_COM_DEF_GET_JRN_CNT:
@@ -1318,8 +1323,9 @@ void Bsp::procCommandReadJournal(eGB_COM com, pkg_t &data)
             mPkgTx.append(com);
             mPkgTx.append(0);
             mPkgTx.append(0);
+            break;
         }
-        break;
+
 
     case GB_COM_PRM_GET_JRN_CNT:
         {
@@ -1331,8 +1337,9 @@ void Bsp::procCommandReadJournal(eGB_COM com, pkg_t &data)
             mPkgTx.append(com);
             mPkgTx.append(0);
             mPkgTx.append(0);
+            break;
         }
-        break;
+
 
     case GB_COM_PRD_GET_JRN_CNT:
         {
@@ -1344,8 +1351,9 @@ void Bsp::procCommandReadJournal(eGB_COM com, pkg_t &data)
             mPkgTx.append(com);
             mPkgTx.append(0);
             mPkgTx.append(0);
+            break;
         }
-        break;
+
 
     case GB_COM_GET_JRN_CNT:
         {
@@ -1353,12 +1361,47 @@ void Bsp::procCommandReadJournal(eGB_COM com, pkg_t &data)
             {
                 qWarning() << kMsgSizeError.arg(com, 2, 16).arg(data.size());
             }
-            // TODO Обработчик для команды чтения количества записей журнала.
+
             mPkgTx.append(com);
-            mPkgTx.append(0);
-            mPkgTx.append(0);
+            mPkgTx.append(log_counter & 0xFF);
+            mPkgTx.append((log_counter >> 8));
+            break;
         }
-        break;
+
+    case GB_COM_GET_JRN_ENTRY:
+        {
+            if (data.size() == 2)
+            {
+                int event_number = data.takeFirst();
+                event_number += static_cast<int>(data.takeFirst());
+
+                int max_event_value = (device == AVANT_R400M) ? (JRN_EVENT_R400M_SIZE) : 5;
+                mPkgTx.append(com);
+                mPkgTx.append(event_number % 6);  // устройство: приемник, передатчик и т.д.
+                mPkgTx.append(event_number % (max_event_value));  // событие
+                mPkgTx.append(event_number % 8);  // режим или источник события для ПВЗУ, ПВЗУЕ
+                mPkgTx.append(0);           // b4
+                mPkgTx.append(0);           // b5
+                mPkgTx.append(0);           // b6
+                mPkgTx.append(0);           // b7
+                mPkgTx.append(999 & 0xFF);  // миллисекунды, младший байт
+                mPkgTx.append((999 >> 8) & 0xFF);  // миллисекунды, старший байт
+                mPkgTx.append(0x59);               // секунды, bcd
+                mPkgTx.append(0x59);               // минуты, bcd
+                mPkgTx.append(0x23);               // часы, bcd
+                mPkgTx.append(0);                  // день недели
+                mPkgTx.append(0x01);               // день, bcd
+                mPkgTx.append(0x02);               // месяц, bcd
+                mPkgTx.append(0x21);               // год, bcd
+            }
+            else
+            {
+
+                qWarning() << kMsgSizeError.arg(com, 2, 16).arg(data.size());
+            }
+
+            break;
+        }
 
     default:
         {

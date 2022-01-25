@@ -1671,10 +1671,8 @@ void clMenu::lvlJournalEvent()
             }
             else
             {
-                int len = snprintf_P(&vLCDbuf[poz], NAME_PARAM_LENGHT, text);
-                // вывод номеров удаленных аппаратов, при необходимости
-                text = getEventRemotesR400m(sParam.jrnEntry.getRegime(), comp);
-                snprintf_P(&vLCDbuf[poz + len], NAME_PARAM_LENGHT - len, text);
+                char* remotes = getEventRemotesR400m(sParam.jrnEntry.getRegime(), comp);
+                snprintf_P(&vLCDbuf[poz], NAME_PARAM_LENGHT, text, remotes);
             }
         }
         else if (device == AVANT_K400)
@@ -6242,16 +6240,21 @@ PGM_P clMenu::getEventTextR400m(uint8_t event, eGB_COMP_R400M comp) const
  * *****************************************************************************
  *
  * @brief Возвращает строку с номерами удаленных устройств.
+ *
+ * Значение строки извлекается из ROM и хранится в RAM, для возможности в
+ * дальнейшем использовать "%s".
+ *
  * @param[in] numbers Номера устройств (по маске).
  * @param[in] comp Совместимость.
  * @return Строка.
  *
  * *****************************************************************************
  */
-const char* clMenu::getEventRemotesR400m(uint8_t numbers, eGB_COMP_R400M comp) const
+char* clMenu::getEventRemotesR400m(uint8_t numbers, eGB_COMP_R400M comp) const
 {
-    PGM_P line = PSTR("");
+    static char buf[4] = "";
 
+    PGM_P line = PSTR("");
 
     if (comp == GB_COMP_R400M_PVZU || comp == GB_COMP_R400M_PVZUE)
     {
@@ -6265,5 +6268,7 @@ const char* clMenu::getEventRemotesR400m(uint8_t numbers, eGB_COMP_R400M comp) c
         }
     }
 
-    return line;
+    memcpy_P(buf, line, SIZE_OF(buf));
+
+    return buf;
 }

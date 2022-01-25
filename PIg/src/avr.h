@@ -46,6 +46,7 @@
     #define pgm_read_word(x) (*reinterpret_cast<const uint16_t *>(x))
     #define strncpy_P(...)   strncpy(__VA_ARGS__)
     #define snprintf_P(...)  snprintf(__VA_ARGS__)
+    #define memcpy_P(...)    memcpy(__VA_ARGS__)
 
 #endif
 
