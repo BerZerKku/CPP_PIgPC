@@ -1647,53 +1647,37 @@ TEST_F(clMenu_Test, getEventTextR400m)
         { 32, "Порог по помехе", 0xFFFF }                     //
     };
 
-    // проверка выхода за диапазон
-    ASSERT_EQ(nullptr, mObj->getEventTextR400m(JRN_EVENT_R400M_SIZE + 1, GB_COMP_R400M_AVANT));
+    // проверка количества возможных записей в журнале событий Р400м
+    ASSERT_EQ(33, JRN_EVENT_R400M_SIZE);
 
-    for (unsigned int i = 0; i < test_data.size(); i++)
+    // проверка выхода за диапазон
+
+    for (unsigned int index = 0; index < test_data.size(); index++)
     {
         for (uint8_t i = GB_COMP_R400M_MIN; i < GB_COMP_R400M_MAX; i++)
         {
             eGB_COMP_R400M comp = static_cast<eGB_COMP_R400M>(i);
 
-            if (test_data.a)
+            SCOPED_TRACE("Compatibility " + to_string(comp) + ", item " + to_string(index));
 
-                SCOPED_TRACE("Compatibility " + to_string(comp) + ", item " + to_string(i));
-
-            text = mObj->getEventTextR400m(4, comp);
-            if (comp == GB_COMP_R400M_PVZ)
+            if ((test_data.at(index).comp_mask & (1 << comp)) == 0)
             {
-                ASSERT_STREQ("Часы", text);
-            }
-            else
-            {
-                ASSERT_STREQ("Автоконтроль", text);
+                continue;
             }
 
-            text = mObj->getEventTextR400m(26, comp);
-            if (comp == GB_COMP_R400M_PVZ)
-            {
-                ASSERT_STREQ("Помеха", text);
-            }
-            else
-            {
-                ASSERT_STREQ("Помеха в линии", text);
-            }
-
-            text = mObj->getEventTextR400m(28, comp);
-            if (comp == GB_COMP_R400M_PVZ)
-            {
-                ASSERT_STREQ("Дальний", text);
-            }
-            else if (comp == GB_COMP_R400M_PVZU || comp == GB_COMP_R400M_PVZUE)
-            {
-                ASSERT_STREQ("Уд: АК - Нет отв %s", text);
-            }
-            else
-            {
-                ASSERT_STREQ("Уд: АК - нет ответа", text);
-            }
+            uint8_t value = test_data.at(index).value;
+            ASSERT_STREQ(test_data.at(index).text, mObj->getEventTextR400m(value, comp));
         }
+    }
+
+    // проверка выхода за диапазон значений для всех совместимостей
+    for (uint8_t i = GB_COMP_R400M_MIN; i < GB_COMP_R400M_MAX; i++)
+    {
+        eGB_COMP_R400M comp = static_cast<eGB_COMP_R400M>(i);
+
+        SCOPED_TRACE("Compatibility " + to_string(comp));
+
+        ASSERT_EQ(nullptr, mObj->getEventTextR400m(JRN_EVENT_R400M_SIZE, comp));
     }
 }
 
