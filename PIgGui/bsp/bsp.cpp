@@ -1377,13 +1377,13 @@ void Bsp::procCommandReadJournal(eGB_COM com, pkg_t &data)
 
                 int max_event_value = (device == AVANT_R400M) ? (JRN_EVENT_R400M_SIZE) : 5;
                 mPkgTx.append(com);
-                mPkgTx.append(event_number % 6);  // устройство: приемник, передатчик и т.д.
+                mPkgTx.append(event_number % 9);  // удаленный аппарат для ПВЗУ, ПВЗУЕ
                 mPkgTx.append(event_number % (max_event_value));  // событие
-                mPkgTx.append(event_number % 8);  // режим или источник события для ПВЗУ, ПВЗУЕ
-                mPkgTx.append(0);           // b4
-                mPkgTx.append(0);           // b5
-                mPkgTx.append(0);           // b6
-                mPkgTx.append(0);           // b7
+                mPkgTx.append(event_number % 7);                  // режим
+                mPkgTx.append(0);                                 // b4
+                mPkgTx.append(0);                                 // b5
+                mPkgTx.append(0);                                 // b6
+                mPkgTx.append(0);                                 // b7
                 mPkgTx.append(999 & 0xFF);  // миллисекунды, младший байт
                 mPkgTx.append((999 >> 8) & 0xFF);  // миллисекунды, старший байт
                 mPkgTx.append(0x59);               // секунды, bcd

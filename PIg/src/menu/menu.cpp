@@ -1662,18 +1662,9 @@ void clMenu::lvlJournalEvent()
         eGB_TYPE_DEVICE device = sParam.typeDevice;
         if (device == AVANT_R400M)
         {
-            eGB_COMP_R400M comp = sParam.glb.getCompR400m();
-            PGM_P          text = getEventTextR400m(event, comp);
-
-            if (text == nullptr)
-            {
-                snprintf_P(&vLCDbuf[poz], NAME_PARAM_LENGHT, PSTR("Событие - %d"), event);
-            }
-            else
-            {
-                char* remotes = getEventRemotesR400m(sParam.jrnEntry.getRegime(), comp);
-                snprintf_P(&vLCDbuf[poz], NAME_PARAM_LENGHT, text, remotes);
-            }
+            eGB_COMP_R400M comp           = sParam.glb.getCompR400m();
+            uint8_t        remote_numbers = sParam.jrnEntry.getRemoteNumbers();
+            printEventTextR400m(poz, event, remote_numbers, comp);
         }
         else if (device == AVANT_K400)
         {
@@ -6168,6 +6159,43 @@ bool clMenu::fillLvlSetupParamGlbOpto(eGB_TYPE_OPTO type, bool prd, bool prm)
     return true;
 }
 
+/**
+ * *****************************************************************************
+ *
+ * @brief Выводит в буфер событие журнала Р400м
+ * @param[in] pos Начальная позиция в буфере экрана.
+ * @param[in] event Событие.
+ * @param[in] remotes Номера удаленных аппаратов.
+ * @param[in] comp Совместимость.
+ *
+ * *****************************************************************************
+ */
+void clMenu::printEventTextR400m(uint8_t pos, uint8_t event, uint8_t remotes, eGB_COMP_R400M comp)
+{
+    const uint8_t size = DISPLAY_ROW_SIZE + 1;
+
+    PGM_P text = getEventTextR400m(event, comp);
+
+    if (text == nullptr)
+    {
+        snprintf_P(&vLCDbuf[pos], size, PSTR("Событие - %d"), event);
+    }
+    else
+    {
+        uint8_t remotes_ram[4] = "?";
+        PGM_P   remotes_rom    = getEventRemotesR400m(sParam.jrnEntry.getRemoteNumbers(), comp);
+
+        if (remotes_rom != nullptr)
+        {
+            memcpy_P(remotes_ram, remotes_rom, SIZE_OF(remotes_ram) - 1);
+            // добавление символа окончания строки, на всякий случай
+            remotes_ram[SIZE_OF(remotes_ram) - 1] = '\0';
+        }
+
+        snprintf_P(&vLCDbuf[pos], size, text, remotes_ram);
+    }
+}
+
 
 /**
  * *****************************************************************************
@@ -6186,7 +6214,7 @@ PGM_P clMenu::getEventTextR400m(uint8_t event, eGB_COMP_R400M comp) const
 
     if (event < SIZE_OF(fcJrnEventR400_MSK))
     {
-        text = static_cast<PGM_P> pgm_read_ptr(&fcJrnEventR400_MSK[event]);
+        text = fcJrnEventR400_MSK[event];
 
         if (comp == GB_COMP_R400M_PVZ)
         {
@@ -6215,19 +6243,19 @@ PGM_P clMenu::getEventTextR400m(uint8_t event, eGB_COMP_R400M comp) const
             }
             else if (event == 28)
             {
-                text = PSTR("Уд: АК - Нет отв %s");
+                text = PSTR("Уд%s: АК - Нет отв");
             }
             else if (event == 29)
             {
-                text = PSTR("Уд: Помеха в лин %s");
+                text = PSTR("Уд%s: Помеха в лин");
             }
             else if (event == 30)
             {
-                text = PSTR("Уд: Неиспр. ДФЗ %s");
+                text = PSTR("Уд%s: Неиспр. ДФЗ");
             }
             else if (event == 31)
             {
-                text = PSTR("Уд: Неиспр. цВЫХ %s");
+                text = PSTR("Уд%s: Неиспр. ц.ВЫХ");
             }
         }
     }
@@ -6241,34 +6269,27 @@ PGM_P clMenu::getEventTextR400m(uint8_t event, eGB_COMP_R400M comp) const
  *
  * @brief Возвращает строку с номерами удаленных устройств.
  *
- * Значение строки извлекается из ROM и хранится в RAM, для возможности в
- * дальнейшем использовать "%s".
- *
  * @param[in] numbers Номера устройств (по маске).
  * @param[in] comp Совместимость.
  * @return Строка.
  *
  * *****************************************************************************
  */
-char* clMenu::getEventRemotesR400m(uint8_t numbers, eGB_COMP_R400M comp) const
+PGM_P clMenu::getEventRemotesR400m(uint8_t numbers, eGB_COMP_R400M comp) const
 {
-    static char buf[4] = "";
-
-    PGM_P line = PSTR("");
+    PGM_P line = nullptr;
 
     if (comp == GB_COMP_R400M_PVZU || comp == GB_COMP_R400M_PVZUE)
     {
-        if (numbers < SIZE_OF(fcRemoteNum))
+        if (numbers < SIZE_OF(fcEventRemote))
         {
-            line = static_cast<PGM_P> pgm_read_ptr(&fcRemoteNum[numbers]);
-        }
-        else
-        {
-            line = PSTR(" ? ");
+            line = fcEventRemote[numbers];
         }
     }
+    else
+    {
+        line = PSTR("");
+    }
 
-    memcpy_P(buf, line, SIZE_OF(buf));
-
-    return buf;
+    return line;
 }

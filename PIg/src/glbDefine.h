@@ -1094,6 +1094,23 @@ public:
     }
     uint8_t getEventType() const { return eventType_; }
 
+
+    /**
+     * @brief Записывает дополнительный байт данных.
+     *
+     * VERSION_1v52:
+     *     - Вновь.
+     *
+     * @param[in] Значение.
+     */
+    void setRemoteNumbers(uint8_t value) { remoteNumbers_ = value; }
+
+    /**
+     * @brief Возвращает дополнительный байт данных.
+     * @param[in] Значение.
+     */
+    uint8_t getRemoteNumbers() const { return remoteNumbers_; }
+
     // источник команды
     bool setSrcCom(uint8_t val)
     {
@@ -1497,6 +1514,9 @@ private:
 
     // источник передаваемой команды
     eGB_SOURCE_COM sourceCom_;
+
+    // номера удаленных аппаратов
+    uint8_t remoteNumbers_;
 
     // флаг получения информации о текущей записи
     bool ready_;

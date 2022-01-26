@@ -19,4 +19,6 @@ extern const char fcCompR400m[GB_COMP_R400M_MAX][VALUE_STRING_SIZE] PROGMEM;
 extern const char fcCompK400[GB_COMP_K400_MAX][VALUE_STRING_SIZE] PROGMEM;
 extern const char fcCompRZSK[GB_COMP_RZSK_MAX][VALUE_STRING_SIZE] PROGMEM;
 
+extern PGM_P const fcEventRemote[EVENT_REMOTES_MAX + 1] PROGMEM;
+
 #endif  // FLASH_ARRAYS_H

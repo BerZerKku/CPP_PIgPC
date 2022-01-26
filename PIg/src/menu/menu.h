@@ -396,8 +396,9 @@ private:
     bool fillLvlSetupParamGlbK400(eGB_COMP_K400 comp, bool prd, bool prm);
     bool fillLvlSetupParamGlbOpto(eGB_TYPE_OPTO type, bool prd, bool prm);
 
+    void  printEventTextR400m(uint8_t pos, uint8_t event, uint8_t remotes, eGB_COMP_R400M comp);
     PGM_P getEventTextR400m(uint8_t event, eGB_COMP_R400M comp) const;
-    char *getEventRemotesR400m(uint8_t numbers, eGB_COMP_R400M comp) const;
+    PGM_P getEventRemotesR400m(uint8_t numbers, eGB_COMP_R400M comp) const;
 
 #ifdef TEST_FRIENDS
     TEST_FRIENDS

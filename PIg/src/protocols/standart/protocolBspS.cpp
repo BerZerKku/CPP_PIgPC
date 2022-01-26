@@ -872,8 +872,7 @@ bool clProtocolBspS::getGlbCommand(eGB_COM com, bool pc)
                     sParam_->jrnEntry.dateTime.setSecond(m_buf[B10], true);
                     uint16_t t = TO_UINT16(m_buf[B9], m_buf[B8]);
                     sParam_->jrnEntry.dateTime.setMsSecond(t);
-                    // ! B1 - тип устройства, на данный момент игнорируется
-                    sParam_->jrnEntry.setDeviceJrn(static_cast<eGB_DEVICE_K400>(m_buf[B1]));
+                    sParam_->jrnEntry.setRemoteNumbers(m_buf[B1]);
                     sParam_->jrnEntry.setEventType(m_buf[B2]);
                     sParam_->jrnEntry.setRegime(static_cast<eGB_REGIME>(m_buf[B3]));
                     sParam_->jrnEntry.setReady();

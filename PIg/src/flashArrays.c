@@ -51,3 +51,22 @@ const char fcCompRZSK[][VALUE_STRING_SIZE] PROGMEM = {
     [GB_COMP_RZSK_M]   = "РЗСКм",     //
     [GB_COMP_RZSK_3E8] = "РЗСК-3 8к"  //
 };
+
+static const char fcEventRemote000[] PROGMEM = "";
+static const char fcEventRemote001[] PROGMEM = "1";
+static const char fcEventRemote010[] PROGMEM = "2";
+static const char fcEventRemote011[] PROGMEM = "1,2";
+static const char fcEventRemote100[] PROGMEM = "3";
+static const char fcEventRemote101[] PROGMEM = "1,3";
+static const char fcEventRemote110[] PROGMEM = "2,3";
+
+/// Номера удаленных аппаратов для журнала событий
+PGM_P const fcEventRemote[] PROGMEM = {
+    fcEventRemote000,  ///< 000
+    fcEventRemote001,  ///< 001
+    fcEventRemote010,  ///< 010
+    fcEventRemote011,  ///< 011
+    fcEventRemote100,  ///< 100
+    fcEventRemote101,  ///< 101
+    fcEventRemote110   ///< 110
+};

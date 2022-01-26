@@ -1638,13 +1638,13 @@ TEST_F(clMenu_Test, getEventTextR400m)
         { 27, "Неисправность ДФЗ", 0xFFFF },                  //
         { 28, "Уд: АК - нет ответа", ~pvz_pvzu_pvzue_mask },  //
         { 28, "Дальний", (1 << GB_COMP_R400M_PVZ) },          //
-        { 28, "Уд: АК - Нет отв %s", pvzu_pvzue_mask },       //
+        { 28, "Уд%s: АК - Нет отв", pvzu_pvzue_mask },        //
         { 29, "Уд: Помеха в линии", ~pvzu_pvzue_mask },       //
-        { 29, "Уд: Помеха в лин %s", pvzu_pvzue_mask },       //
+        { 29, "Уд%s: Помеха в лин", pvzu_pvzue_mask },        //
         { 30, "Уд: Неиспр. ДФЗ", ~pvzu_pvzue_mask },          //
-        { 30, "Уд: Неиспр. ДФЗ %s", pvzu_pvzue_mask },        //
+        { 30, "Уд%s: Неиспр. ДФЗ", pvzu_pvzue_mask },         //
         { 31, "Уд: Неиспр. цепи вых", ~pvzu_pvzue_mask },     //
-        { 31, "Уд: Неиспр. цВЫХ %s", pvzu_pvzue_mask },       //
+        { 31, "Уд%s: Неиспр. ц.ВЫХ", pvzu_pvzue_mask },       //
         { 32, "Порог по помехе", 0xFFFF }                     //
     };
 
@@ -1657,9 +1657,11 @@ TEST_F(clMenu_Test, getEventTextR400m)
     {
         for (uint8_t i = GB_COMP_R400M_MIN; i < GB_COMP_R400M_MAX; i++)
         {
-            eGB_COMP_R400M comp = static_cast<eGB_COMP_R400M>(i);
+            eGB_COMP_R400M comp  = static_cast<eGB_COMP_R400M>(i);
+            uint8_t        value = test_data.at(index).value;
 
             SCOPED_TRACE("Compatibility " + to_string(comp) + ", item " + to_string(index));
+            SCOPED_TRACE("value " + to_string(value));
 
             // Если данного сообщения нет в этой совместимости, то проверять не надо
             if ((test_data.at(index).comp_mask & (1 << comp)) == 0)
@@ -1674,7 +1676,7 @@ TEST_F(clMenu_Test, getEventTextR400m)
             int         max_size    = (line_string.find("%s") == string::npos) ? (20) : (19);
             ASSERT_GE(max_size, line_string.size());
 
-            uint8_t value = test_data.at(index).value;
+            // Проверка сообщения
             ASSERT_STREQ(test_data.at(index).text, mObj->getEventTextR400m(value, comp));
         }
     }
@@ -1693,14 +1695,13 @@ TEST_F(clMenu_Test, getEventTextR400m)
 TEST_F(clMenu_Test, getEventRemotesR400m)
 {
     QVector<PGM_P> values = {
-        "   ",  ///< 000
-        " 1 ",  ///< 001
-        " 2 ",  ///< 010
-        "1 2",  ///< 011
-        " 3 ",  ///< 100
-        "1 3",  ///< 101
-        "2 3",  ///< 110
-        " ? "   ///< 111
+        "",     ///< 000
+        "1",    ///< 001
+        "2",    ///< 010
+        "1,2",  ///< 011
+        "3",    ///< 100
+        "1,3",  ///< 101
+        "2,3"   ///< 110
     };
 
     for (uint8_t i = GB_COMP_R400M_MIN; i < GB_COMP_R400M_MAX; i++)
@@ -1718,7 +1719,7 @@ TEST_F(clMenu_Test, getEventRemotesR400m)
                 if (i >= values.size())
                 {
                     // проверка выхода за диапазон значений
-                    ASSERT_STREQ(" ? ", line);
+                    ASSERT_EQ(nullptr, line);
                 }
                 else
                 {
