@@ -14,16 +14,16 @@
 /// Тип совместимости Р400м (параметр Защиты)
 const char fcCompR400m[][VALUE_STRING_SIZE] PROGMEM = {
     //                        1234567890
-    [GB_COMP_R400M_AVANT]  = "АВАНТ Р400",  //
-    [GB_COMP_R400M_PVZ90]  = "ПВЗ-90",      //
-    [GB_COMP_R400M_AVZK80] = "АВЗК-80",     //
-    [GB_COMP_R400M_PVZUE]  = "ПВЗУ-Е",      //
-    [GB_COMP_R400M_PVZL]   = "ПВЗЛ",        //
-    [GB_COMP_R400M_PVZK]   = "ПВЗК",        //
-    [GB_COMP_R400M_LINER]  = "ЛИНИЯ-Р",     //
-    [GB_COMP_R400M_PVZU]   = "ПВЗУ",        //
-    [GB_COMP_R400M_PVZ]    = "ПВЗ",         //
-    [GB_COMP_R400M_R400]   = "Р400",        //
+    [GB_COMP_R400M_AVANT]  = "Р400м",    //
+    [GB_COMP_R400M_PVZ90]  = "ПВЗ-90",   //
+    [GB_COMP_R400M_AVZK80] = "АВЗК-80",  //
+    [GB_COMP_R400M_PVZUE]  = "ПВЗУ-Е",   //
+    [GB_COMP_R400M_PVZL]   = "ПВЗЛ",     //
+    [GB_COMP_R400M_PVZK]   = "ПВЗК",     //
+    [GB_COMP_R400M_LINER]  = "ЛИНИЯ-Р",  //
+    [GB_COMP_R400M_PVZU]   = "ПВЗУ",     //
+    [GB_COMP_R400M_PVZ]    = "ПВЗ",      //
+    [GB_COMP_R400M_R400]   = "Р400",     //
 };
 
 /// Тип совместимости (параметр К400)
