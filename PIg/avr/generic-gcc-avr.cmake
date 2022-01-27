@@ -166,12 +166,18 @@ function(add_avr_executable EXECUTABLE_NAME)
       message(FATAL_ERROR "No source files given for ${EXECUTABLE_NAME}.")
    endif(NOT ARGN)
 
-   # set file names
-   set(elf_file ${EXECUTABLE_NAME}${MCU_TYPE_FOR_FILENAME}.elf)
-   set(hex_file ${EXECUTABLE_NAME}${MCU_TYPE_FOR_FILENAME}.hex)
-   set(lst_file ${EXECUTABLE_NAME}${MCU_TYPE_FOR_FILENAME}.lst)
-   set(map_file ${EXECUTABLE_NAME}${MCU_TYPE_FOR_FILENAME}.map)
-   set(eeprom_image ${EXECUTABLE_NAME}${MCU_TYPE_FOR_FILENAME}-eeprom.hex)
+   # set file_name_full, example PIg_1v52.1
+   set(file_name ${EXECUTABLE_NAME})
+   set(file_name_full "${file_name}_${PROJECT_VERSION_MAJOR}v${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATH}")
+   set(hex_dir "../build-hex")
+   set(avr_dir "../avr")
+   set(hex_path "${avr_dir}/${file_name}.hex")
+   set(hex_path_version "${hex_dir}/${file_name_full}.hex")
+   set(hex_file ${EXECUTABLE_NAME}.hex)
+   set(elf_file ${EXECUTABLE_NAME}.elf)
+   set(lst_file ${EXECUTABLE_NAME}.lst)
+   set(map_file ${EXECUTABLE_NAME}.map)
+   set(eeprom_image ${EXECUTABLE_NAME}.eeprom.hex)
 
    set (${EXECUTABLE_NAME}_ELF_TARGET ${elf_file} PARENT_SCOPE)
    set (${EXECUTABLE_NAME}_HEX_TARGET ${hex_file} PARENT_SCOPE)
@@ -188,10 +194,15 @@ function(add_avr_executable EXECUTABLE_NAME)
          LINK_FLAGS "-mmcu=${AVR_MCU} -Wl,--gc-sections -mrelax -Wl,-Map,${map_file}"
    )
 
+message("CMAKE_COMMAND = ${CMAKE_COMMAND}")
+
    add_custom_command(
       OUTPUT ${hex_file}
-      COMMAND
-         ${AVR_OBJCOPY} -j .text -j .data -O ihex ${elf_file} ${hex_file}
+      COMMAND ${CMAKE_COMMAND} -E remove ${hex_path}
+      COMMAND ${CMAKE_COMMAND} -E remove_directory ${hex_dir}
+      COMMAND ${CMAKE_COMMAND} -E make_directory ${hex_dir}
+      COMMAND ${AVR_OBJCOPY} -j .text -j .data -O ihex ${elf_file} ${hex_path}
+      COMMAND ${AVR_OBJCOPY} -j .text -j .data -O ihex ${elf_file} ${hex_path_version}
       DEPENDS ${elf_file}
    )
 

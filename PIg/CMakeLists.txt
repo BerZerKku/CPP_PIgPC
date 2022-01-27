@@ -38,8 +38,9 @@ include(avr/generic-gcc-avr.cmake)
 # name your project
 ##########################################################################
 project(PIg)
-set(PROJECT_VERSION_MAJOR 0x01)
-set(PROJECT_VERSION_MINOR 0x52)
+set(PROJECT_VERSION_MAJOR 1)  # hex
+set(PROJECT_VERSION_MINOR 52) # hex
+set(PROJECT_VERSION_PATH  1)  # hex
 
 ##########################################################################
 # status messages
