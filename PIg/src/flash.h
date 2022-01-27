@@ -205,6 +205,7 @@ static const char fcDefFault0002[] PROGMEM      = "Неиспр.верс.БСЗ";   ///<
 static const char fcDefFault0004[] PROGMEM      = "Неиспр.перекл.";    ///<
 static const char fcDefFault0008[] PROGMEM      = "Неиспр.зап. БСЗ";   ///<
 static const char fcDefFault0008rzskm[] PROGMEM = "ВЧ тракт восст.";   ///<
+static const char fcDefFault0008r400m[] PROGMEM = "Дальний";           ///<
 static const char fcDefFault0010[] PROGMEM      = "АК-Нет ответа%s";   ///<
 static const char fcDefFault0010opto[] PROGMEM  = "Нет КС";            ///<
 static const char fcDefFault0020[] PROGMEM      = "Низкий ур. РЗ";     ///<
@@ -229,6 +230,8 @@ static const char fcDefWarning02[] PROGMEM      = "Нет сигнала МАН";   ///<
 static const char fcDefWarning04[] PROGMEM      = "Порог по помехе";   ///<
 static const char fcDefWarning04rzskm[] PROGMEM = "Прием РЗ в однос";  ///<
 static const char fcDefWarning08[] PROGMEM      = "Автоконтроль";      ///<
+static const char fcDefWarning10r400m[] PROGMEM = "Помеха";            ///<
+static const char fcDefWarning20r400m[] PROGMEM = "Часы";              ///<
 
 // неисправности приемника
 static const char fcPrmFault0001rzsk[] PROGMEM = "Нет блока БСК";     ///<

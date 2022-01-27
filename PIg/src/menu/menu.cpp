@@ -688,7 +688,7 @@ bool clMenu::setDeviceR400M()
     sParam.def.status.faultText[0] = fcDefFault0001;
     sParam.def.status.faultText[1] = fcDefFault0002;
     sParam.def.status.faultText[2] = fcDefFault0004;
-    // 3 нет
+    sParam.def.status.faultText[3] = fcDefFault0008r400m;
     sParam.def.status.faultText[4] = fcDefFault0010;
     // 5 нет
     sParam.def.status.faultText[6]  = fcDefFault0040;
@@ -706,7 +706,9 @@ bool clMenu::setDeviceR400M()
     sParam.def.status.warningText[1] = fcDefWarning02;
     sParam.def.status.warningText[2] = fcDefWarning04;
     sParam.def.status.warningText[3] = fcDefWarning08;
-    // 4-15 нет
+    sParam.def.status.warningText[4] = fcDefWarning10r400m;
+    sParam.def.status.warningText[5] = fcDefWarning20r400m;
+    // 6-15 нет
 
     // отключение приемника
     sParam.prm.status.setEnable(false);

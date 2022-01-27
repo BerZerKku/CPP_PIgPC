@@ -657,11 +657,14 @@ bool clProtocolBspS::getGlbCommand(eGB_COM com, bool pc)
         {
             sParam_->def.status.setFault(TO_UINT16(m_buf[B1], m_buf[B2]));
             sParam_->def.status.setWarning(TO_UINT16(m_buf[B3], m_buf[B4]));
-            // установка номера(ов) уд.аппаратов ддля Р400(М) в режиме ПВЗУ-Е
+
+            // установка номера(ов) уд.аппаратов ддля Р400(М) в режиме ПВЗУ / ПВЗУ-Е
             uint8_t n = 0;
             if ((device == AVANT_R400) || (device == AVANT_R400M))
             {
-                if (sParam_->glb.getCompR400m() == GB_COMP_R400M_PVZUE)
+                eGB_COMP_R400M comp = sParam_->glb.getCompR400m();
+
+                if ((comp == GB_COMP_R400M_PVZUE) || (comp == GB_COMP_R400M_PVZU))
                 {
                     n = m_buf[B5];
                 }
