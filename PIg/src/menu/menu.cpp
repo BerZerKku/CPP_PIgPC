@@ -6022,7 +6022,7 @@ bool clMenu::fillLvlSetupParamGlbRzsk(eGB_COMP_RZSK comp)
 
     sParam.local.addParam(GB_PARAM_COMP_RZSK);
     sParam.local.addParam(GB_PARAM_NUM_OF_DEVICES, comp == GB_COMP_RZSK_3E8);
-    sParam.local.addParam(GB_PARAM_TIME_SYNCH_SRC);
+    sParam.local.addParam(GB_PARAM_TIME_SYNCH);
     sParam.local.addParam(GB_PARAM_NUM_OF_DEVICE);
     sParam.local.addParam(GB_PARAM_OUT_CHECK);
     sParam.local.addParam(GB_PARAM_WARN_THD_CF);

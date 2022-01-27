@@ -1341,7 +1341,7 @@ TEST_F(clMenu_Test, fillLvlSetupGlb_Rzsk)
     QVector<test_t> test_data {
         { GB_PARAM_COMP_RZSK, 0 },                             //
         { GB_PARAM_NUM_OF_DEVICES, (1 << GB_COMP_RZSK_3E8) },  //
-        { GB_PARAM_TIME_SYNCH_SRC, 0 },                        //
+        { GB_PARAM_TIME_SYNCH, 0 },                            //
         { GB_PARAM_NUM_OF_DEVICE, 0 },                         //
         { GB_PARAM_OUT_CHECK, 0 },                             //
         { GB_PARAM_WARN_THD_CF, 0 },                           //

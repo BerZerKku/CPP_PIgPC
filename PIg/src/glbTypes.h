@@ -3,7 +3,7 @@
 
 // TODO Вынести STRING_LENGTH в соответствующий ему header
 // длина половины строки (+1 - символ конца строки)
-#define VALUE_STRING_SIZE (11 + 1)
+#define VALUE_STRING_SIZE (10 + 1)
 
 // Максимальное значение "Номера удаленных" в журнале Событий
 #define EVENT_REMOTES_MAX 6
