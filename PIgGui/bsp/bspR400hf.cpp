@@ -25,10 +25,12 @@ void TBspR400Hf::InitComMap()
     mComMap.insert(0x30, &Bsp::HdlrComGlbx30);  // чтение режимов
     mComMap.insert(0x31, &Bsp::HdlrComGlbx31);  // чтение неисправностей
     mComMap.insert(0x32, &Bsp::HdlrComGlbx32);  // чтение времени
+    mComMap.insert(0x34, &Bsp::HdlrComGlbx34);  // чтение измерений
     mComMap.insert(0x3f, &Bsp::HdlrComGlbx3F);  // чтение информации об устройстве
 
     mComMap.insert(0xB2, &Bsp::HdlrComGlbx32);  // запись времени
 }
+
 
 //
 void TBspR400Hf::InitParam()
@@ -43,7 +45,7 @@ void TBspR400Hf::InitParam()
     setSpinBoxValue(mDevice.versionBszPlis, 0x52);
 
     setComboBoxValue(stateGlb.regime, eGB_REGIME::GB_REGIME_ENABLED);
-    setComboBoxValue(stateGlb.state, 1);
+    setComboBoxValue(stateGlb.state, 1);  // 1 - контроль
     setSpinBoxValue(stateGlb.dopByte, 1);
 
     setLineEditValue(stateGlb.fault, "0000");
@@ -74,7 +76,6 @@ void TBspR400Hf::InitParam()
 
     setComboBoxValue(GB_PARAM_DEF_ONE_SIDE, 0);
 
-    setSpinBoxValue(m_measure.R, 999);
     setSpinBoxValue(m_measure.I, 101);
     setSpinBoxValue(m_measure.U, 251);
     setSpinBoxValue(m_measure.Udef1, -32);
@@ -84,8 +85,6 @@ void TBspR400Hf::InitParam()
     setSpinBoxValue(m_measure.Un1, -7);
     setSpinBoxValue(m_measure.Un2, 7);
     setSpinBoxValue(m_measure.Sd, 321);
-    setSpinBoxValue(m_measure.T, 24);
-    setSpinBoxValue(m_measure.dF, 3);
 }
 
 
@@ -100,6 +99,7 @@ void TBspR400Hf::crtTreeDef()
     top->setExpanded(false);
 }
 
+
 void TBspR400Hf::crtTreeDevice()
 {
     QTreeWidgetItem *top = new QTreeWidgetItem();
@@ -113,6 +113,7 @@ void TBspR400Hf::crtTreeDevice()
 
     crtTreeDevieVersions(top);
 }
+
 
 void TBspR400Hf::crtTreeDevieVersions(QTreeWidgetItem *top)
 {
@@ -144,6 +145,7 @@ void TBspR400Hf::crtTreeDevieVersions(QTreeWidgetItem *top)
     branch->setExpanded(false);
 }
 
+
 void TBspR400Hf::crtTreeGlb()
 {
     QTreeWidgetItem *top = new QTreeWidgetItem();
@@ -159,6 +161,7 @@ void TBspR400Hf::crtTreeGlb()
     top->setExpanded(false);
 }
 
+
 void TBspR400Hf::crtTreeMeasure()
 {
     QTreeWidgetItem *item   = nullptr;
@@ -167,18 +170,7 @@ void TBspR400Hf::crtTreeMeasure()
     QTreeWidgetItem *top = new QTreeWidgetItem();
     mTree->insertTopLevelItem(mTree->topLevelItemCount(), top);
 
-    // \todo Сделать измерения в оптике неактивными
-
     top->setText(0, kCodec->toUnicode("Измерения"));
-
-    item   = new QTreeWidgetItem();
-    widget = new QSpinBox();
-    widget->setRange(0, 999);
-    widget->setToolTip(QString("[%1, %2] Ohm").arg(widget->minimum()).arg(widget->maximum()));
-    item->setText(0, kCodec->toUnicode("R"));
-    top->addChild(item);
-    mTree->setItemWidget(item, 1, widget);
-    m_measure.R = widget;
 
     item   = new QTreeWidgetItem();
     widget = new QSpinBox();
@@ -198,13 +190,11 @@ void TBspR400Hf::crtTreeMeasure()
     mTree->setItemWidget(item, 1, widget);
     m_measure.U = widget;
 
-    // \todo В К400 вместо Uз1 передается D со значениями от -64 до 64.
-
     item   = new QTreeWidgetItem();
     widget = new QSpinBox();
     widget->setRange(-99, 99);
     widget->setToolTip(QString("[%1, %2] dB").arg(widget->minimum()).arg(widget->maximum()));
-    item->setText(0, kCodec->toUnicode("Uз1 / D"));
+    item->setText(0, kCodec->toUnicode("Uз1"));
     top->addChild(item);
     mTree->setItemWidget(item, 1, widget);
     m_measure.Udef1 = widget;
@@ -263,26 +253,9 @@ void TBspR400Hf::crtTreeMeasure()
     mTree->setItemWidget(item, 1, widget);
     m_measure.Sd = widget;
 
-    item   = new QTreeWidgetItem();
-    widget = new QSpinBox();
-    widget->setRange(0, 100);
-    widget->setToolTip(QString("[%1, %2] deg").arg(widget->minimum()).arg(widget->maximum()));
-    item->setText(0, kCodec->toUnicode("T"));
-    top->addChild(item);
-    mTree->setItemWidget(item, 1, widget);
-    m_measure.T = widget;
-
-    item   = new QTreeWidgetItem();
-    widget = new QSpinBox();
-    widget->setRange(0, 100);
-    widget->setToolTip(QString("[%1, %2] Hz").arg(widget->minimum()).arg(widget->maximum()));
-    item->setText(0, kCodec->toUnicode("dF"));
-    top->addChild(item);
-    mTree->setItemWidget(item, 1, widget);
-    m_measure.dF = widget;
-
     top->setExpanded(false);
 }
+
 
 void TBspR400Hf::crtTreePrd()
 {
@@ -300,6 +273,7 @@ void TBspR400Hf::crtTreePrd()
 
     top->setExpanded(false);
 }
+
 
 void TBspR400Hf::crtTreePrm()
 {
@@ -320,6 +294,7 @@ void TBspR400Hf::crtTreePrm()
 
     top->setExpanded(false);
 }
+
 
 //
 void TBspR400Hf::crtTreeState()
@@ -431,6 +406,7 @@ void TBspR400Hf::crtTest()
     top->setExpanded(false);
 }
 
+
 void TBspR400Hf::FillComboboxListStateDef()
 {
     QComboBox *combobox = stateDef.state;
@@ -452,6 +428,14 @@ void TBspR400Hf::FillComboboxListStateDef()
     combobox->addItem(kCodec->toUnicode(fcDefSost11), 11);
     combobox->addItem(kCodec->toUnicode(fcDefSost12), 12);
     combobox->addItem(kCodec->toUnicode(fcDefSost13), 13);
+
+    //    for (int i = 0; i < combobox->maxCount(); i++)
+    //    {
+    //        QVariant data = combobox->itemData(i);
+    //        QString  text = combobox->itemText(i);
+
+    //        combobox->insertItem(i, QString("%1 - %2").arg(data.toInt()).arg(text), data);
+    //    }
 }
 
 
@@ -469,7 +453,9 @@ void TBspR400Hf::HdlrComGlbx30(eGB_COM com, pkg_t &data)
     Q_ASSERT(com == GB_COM_GET_SOST);
 
     if (!CheckSize(com, data.size(), { 1 }))
+    {
         return;
+    }
 
     // @todo Уточнить обрабатывается ли температура в Р400м
     setSpinBoxValue(&mTemperature, data.at(0));
@@ -512,7 +498,9 @@ void TBspR400Hf::HdlrComGlbx31(eGB_COM com, pkg_t &data)
     Q_ASSERT(com == GB_COM_GET_FAULT);
 
     if (!CheckSize(com, data.size(), { 0 }))
+    {
         return;
+    }
 
     mPkgTx.append(com);
     mPkgTx.append(static_cast<uint8_t>(def_alarm >> 8));
@@ -565,7 +553,9 @@ void TBspR400Hf::HdlrComGlbx32(eGB_COM com, pkg_t &data)
     {
         // C ПИ передается флаг запроса сообщения для передачи в АСУ (0..3), с ПК нет данных
         if (!CheckSize(com, data.size(), { 0, 1 }))
+        {
             return;
+        }
 
         mPkgTx.append(com);
         mPkgTx.append(int2bcd(dt.date().year() - 2000, ok));
@@ -584,7 +574,13 @@ void TBspR400Hf::HdlrComGlbx32(eGB_COM com, pkg_t &data)
     {
         // с ПК передается 6 байт, без мс / c МК передается 9 байт
         if (!CheckSize(com, data.size(), { 6, 9 }))
+        {
             return;
+        }
+
+        // ответ на команду записи совпадает с запросом
+        mPkgTx.append(com);
+        mPkgTx.append(data);
 
         // @todo Добавить обработку флага источника синхронизации времени
         // При установке времени надо проверить флаг источника:
@@ -622,6 +618,66 @@ void TBspR400Hf::HdlrComGlbx32(eGB_COM com, pkg_t &data)
 /**
  * *****************************************************************************
  *
+ * @brief Обрабатывает команду чтения измерений.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void TBspR400Hf::HdlrComGlbx34(eGB_COM com, pkg_t &data)
+{
+    qint16 value = 0;
+
+    Q_ASSERT(com == GB_COM_GET_MEAS);
+
+    // передается код необходимых измерений
+    if (!CheckSize(com, data.size(), { 1 }))
+    {
+        return;
+    }
+
+    // в запросе всегда 0, т.е. запрос всех измерений
+    if (data.at(0) != 0)
+    {
+        QString message = "Wrong data in command %1: %2";
+        qWarning() << message.arg(com, 2, 16, QLatin1Char('0')).arg(data.at(0));
+        return;
+    }
+
+    mPkgTx.append(com);
+    mPkgTx.append(data.at(0));
+
+    // @todo Разобраться что это за измерение "noiseCounter_pvzu" и что такое "супер меню"
+    mPkgTx.append(0);  // Uart1_ArrData[5] = noiseCounter_pvzu >> 8;
+    mPkgTx.append(0);  // Uart1_ArrData[5] = noiseCounter_pvzu
+
+    value = getSpinBoxValue(m_measure.I);
+    mPkgTx.append(static_cast<quint8>(value >> 8));
+    mPkgTx.append(static_cast<quint8>(value));
+
+    value = getSpinBoxValue(m_measure.U);
+    mPkgTx.append(static_cast<quint8>(value / 10));
+    mPkgTx.append(static_cast<quint8>((value % 10) * 10));
+
+    // @todo Разобраться нужен ли Uз2, в меню не выводится
+    mPkgTx.append(static_cast<quint8>(getSpinBoxValue(m_measure.Udef1)));
+    mPkgTx.append(static_cast<quint8>(getSpinBoxValue(m_measure.Udef2)));
+    mPkgTx.append(static_cast<quint8>(getSpinBoxValue(m_measure.Ucf1)));
+    mPkgTx.append(static_cast<quint8>(getSpinBoxValue(m_measure.Ucf2)));
+    mPkgTx.append(static_cast<quint8>(getSpinBoxValue(m_measure.Un1)));
+    mPkgTx.append(static_cast<quint8>(getSpinBoxValue(m_measure.Un2)));
+
+    value = getSpinBoxValue(m_measure.Sd);
+    mPkgTx.append(static_cast<quint8>(value >> 8));
+    mPkgTx.append(static_cast<quint8>(value));
+
+    Q_ASSERT(mPkgTx.size() == 16);  // команда + 15 байт данных
+}
+
+
+/**
+ * *****************************************************************************
+ *
  * @brief Обрабатывает команду чтения версии устройства
  * @param[in] Команда.
  * @param[in] Данные.
@@ -636,7 +692,9 @@ void TBspR400Hf::HdlrComGlbx3F(eGB_COM com, pkg_t &data)
     Q_ASSERT(com == GB_COM_GET_VERS);
 
     if (!CheckSize(com, data.size(), { 0 }))
+    {
         return;
+    }
 
     mPkgTx.append(com);
     mPkgTx.append(1);  // защита

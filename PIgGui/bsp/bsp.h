@@ -186,17 +186,16 @@ protected:
     void procCommandWriteParam(eGB_COM com, pkg_t &data);
     void procCommandWriteRegime(eGB_COM com, pkg_t &data);
 
-    virtual void hdlrComDefTypeAcGet(eGB_COM com, pkg_t &data);
-    virtual void hdlrComDefTypeAcSet(eGB_COM com, pkg_t &data);
-    virtual void hdlrComDeviceNumGet(eGB_COM com, pkg_t &data);
-    virtual void hdlrComDeviceNumSet(eGB_COM com, pkg_t &data);
-    void         hdlrComGetVers(eGB_COM com, pkg_t &data);
-    virtual void hdlrComMeasGet(eGB_COM com, pkg_t &data);
-    virtual void hdlrComNetAdrGet(eGB_COM com, pkg_t &data);
-    virtual void hdlrComNetAdrSet(eGB_COM com, pkg_t &data);
-    virtual void hdlrComSetControl(eGB_COM com, pkg_t &data);
+    void hdlrComDefTypeAcGet(eGB_COM com, pkg_t &data);
+    void hdlrComDefTypeAcSet(eGB_COM com, pkg_t &data);
+    void hdlrComDeviceNumGet(eGB_COM com, pkg_t &data);
+    void hdlrComDeviceNumSet(eGB_COM com, pkg_t &data);
+    void hdlrComGetVers(eGB_COM com, pkg_t &data);
+    void hdlrComNetAdrGet(eGB_COM com, pkg_t &data);
+    void hdlrComNetAdrSet(eGB_COM com, pkg_t &data);
+    void hdlrComSetControl(eGB_COM com, pkg_t &data);
 
-    virtual void hdlrComGetTest(eGB_COM com, pkg_t &data);
+    void hdlrComGetTest(eGB_COM com, pkg_t &data);
 
     uint8_t getCompatibility(eGB_TYPE_DEVICE device);
 

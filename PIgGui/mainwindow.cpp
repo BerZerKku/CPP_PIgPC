@@ -417,13 +417,6 @@ void MainWindow::SlotBspConnection()
         disconnect(ui->serialBsp, &TSerial::read, this, &MainWindow::SlotByteBspToPi);
         disconnect(this, &MainWindow::writeByteToBsp, mBsp, &Bsp::SlotReadByte);
 
-        //        disconnect(this, &MainWindow::writeByteToBsp, mBsp, &Bsp::SlotReadByte);
-
-        //        disconnect(this,
-        //                   &MainWindow::writeByteToBsp,
-        //                   &mProtocolViewer,
-        //                   &QProtocolViewer::AddTxByte);
-
         ui->serialBsp->setEnabled(true);
         ui->mBspCombo->setEnabled(true);
         ui->mBspConnect->setText("Connect");

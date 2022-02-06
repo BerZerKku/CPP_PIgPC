@@ -112,8 +112,6 @@ void Bsp::InitParam()
 
 void Bsp::InitClock()
 {
-    qDebug() << __PRETTY_FUNCTION__;
-
     dt = QDateTime::currentDateTime();
 
     QTimer *timerClock = new QTimer(this);
@@ -201,14 +199,14 @@ void Bsp::Init()
     crtTreeDef();
     crtTreeMeasure();
 
-    InitComMap();
-    InitParam();
-    InitClock();
-
     FillComboboxListStateDef();
     FillComboboxListStatePrm();
     FillComboboxListStatePrd();
     FillComboboxListStateGlb();
+
+    InitComMap();
+    InitParam();
+    InitClock();
 }
 
 void Bsp::crtTreeDef()
@@ -1680,7 +1678,6 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data)
     case GB_COM_GET_VERS: hdlrComGetVers(com, data); break;
     case GB_COM_GET_DEVICE_NUM: hdlrComDeviceNumGet(com, data); break;
     case GB_COM_DEF_GET_TYPE_AC: hdlrComDefTypeAcGet(com, data); break;
-    case GB_COM_GET_MEAS: hdlrComMeasGet(com, data); break;
 
     default:
         {
@@ -2175,63 +2172,6 @@ void Bsp::hdlrComGetVers(eGB_COM com, pkg_t &data)
     //    mPkgTx.append(static_cast<quint8>(vers));
 }
 
-void Bsp::hdlrComMeasGet(eGB_COM com, pkg_t &data)
-{
-    qint16          value = 0;
-    eGB_TYPE_DEVICE typedevice;
-
-    //    typedevice = static_cast<eGB_TYPE_DEVICE>(getComboBoxValue(mDevice.typeDevice));
-
-    //    if (data.size() != 1)
-    //    {
-    //        qWarning() << kMsgSizeError.arg(com, 2, 16).arg(data.size());
-    //    }
-
-    //    // \todo Добавить передачу D в К400, вместо Uз1.
-
-    //    mPkgTx.append(com);
-    //    mPkgTx.append(0);
-
-    //    value = getSpinBoxValue(m_measure.R);
-    //    mPkgTx.append(static_cast<quint8>(value >> 8));
-    //    mPkgTx.append(static_cast<quint8>(value));
-
-    //    value = getSpinBoxValue(m_measure.I);
-    //    mPkgTx.append(static_cast<quint8>(value >> 8));
-    //    mPkgTx.append(static_cast<quint8>(value));
-
-    //    value = getSpinBoxValue(m_measure.U);
-    //    mPkgTx.append(static_cast<quint8>(value / 10));
-    //    mPkgTx.append(static_cast<quint8>((value % 10) * 10));
-
-    //    value = getSpinBoxValue(m_measure.Udef1);
-    //    mPkgTx.append(static_cast<quint8>(value));
-
-    //    value = getSpinBoxValue(m_measure.Udef2);
-    //    mPkgTx.append(static_cast<quint8>(value));
-
-    //    value = getSpinBoxValue(m_measure.Ucf1);
-    //    mPkgTx.append(static_cast<quint8>(value));
-
-    //    value = getSpinBoxValue(m_measure.Ucf2);
-    //    mPkgTx.append(static_cast<quint8>(value));
-
-    //    value = getSpinBoxValue(m_measure.Un1);
-    //    mPkgTx.append(static_cast<quint8>(value));
-
-    //    value = getSpinBoxValue(m_measure.Un2);
-    //    mPkgTx.append(static_cast<quint8>(value));
-
-    //    value = getSpinBoxValue(m_measure.Sd);
-    //    mPkgTx.append(static_cast<quint8>(value >> 8));
-    //    mPkgTx.append(static_cast<quint8>(value));
-
-    //    value = getSpinBoxValue(m_measure.T);
-    //    mPkgTx.append(static_cast<quint8>(value));
-
-    //    value = getSpinBoxValue(m_measure.dF);
-    //    mPkgTx.append(static_cast<quint8>(value));
-}
 
 //
 void Bsp::hdlrComNetAdrGet(eGB_COM com, pkg_t &data)
@@ -2367,19 +2307,64 @@ void Bsp::HdlrComDummy(eGB_COM com, pkg_t &data)
 //
 void Bsp::setRegime(int index)
 {
-    stateDef.regime->setCurrentIndex(index);
+    index = stateGlb.regime->currentData().toUInt();
+
+    if (stateDef.regime != nullptr)
+    {
+        stateDef.regime->setCurrentIndex(index);
+    }
+
+    if (statePrm.regime != nullptr)
+    {
+        statePrm.regime->setCurrentIndex(index);
+    }
+
+    if (statePrd.regime != nullptr)
+    {
+        statePrd.regime->setCurrentIndex(index);
+    }
 }
 
 //
 void Bsp::setState(int index)
 {
-    stateDef.state->setCurrentIndex(stateDef.state->findData(index));
+    index = stateGlb.state->currentData().toUInt();
+
+    if (stateDef.state != nullptr)
+    {
+        stateDef.state->setCurrentIndex(stateDef.state->findData(index));
+    }
+
+    if (statePrm.state != nullptr)
+    {
+        statePrm.state->setCurrentIndex(statePrm.state->findData(index));
+    }
+
+    if (statePrd.state != nullptr)
+    {
+        statePrd.state->setCurrentIndex(statePrd.state->findData(index));
+    }
 }
 
 //
 void Bsp::setDopByte(int index)
 {
-    stateDef.dopByte->setValue(index);
+    index = stateGlb.dopByte->value();
+
+    if (stateDef.dopByte != nullptr)
+    {
+        stateDef.dopByte->setValue(index);
+    }
+
+    if (statePrm.dopByte != nullptr)
+    {
+        statePrm.dopByte->setValue(index);
+    }
+
+    if (statePrd.dopByte != nullptr)
+    {
+        statePrd.dopByte->setValue(index);
+    }
 }
 
 //
