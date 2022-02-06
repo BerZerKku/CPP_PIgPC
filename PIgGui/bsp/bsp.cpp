@@ -1428,18 +1428,6 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data)
         }
         break;
 
-    case GB_COM_DEF_GET_LINE_TYPE:
-        {
-            if (data.size() != 0)
-            {
-                qWarning() << kMsgSizeError.arg(com, 2, 16).arg(data.size());
-            }
-            //
-            mPkgTx.append(com);
-            // FIXME Добавить параметр
-            mPkgTx.append(getComboBoxValue(GB_PARAM_NUM_OF_DEVICES));
-        }
-        break;
 
     case GB_COM_PRM_GET_TIME_ON:
         {
@@ -1557,31 +1545,6 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data)
         }
         break;
 
-    case GB_COM_GET_TIME:
-        {
-            // TODO Добавить обработку флага новой записи журнала
-            if (data.size() != 1)
-            {
-                qWarning() << kMsgSizeError.arg(com, 2, 16).arg(data.size());
-            }
-            //
-            bool ok;
-            mPkgTx.append(com);
-            mPkgTx.append(int2bcd(dt.date().year() - 2000, ok));
-            mPkgTx.append(int2bcd(dt.date().month(), ok));
-            mPkgTx.append(int2bcd(dt.date().day(), ok));
-            mPkgTx.append(int2bcd(dt.time().hour(), ok));
-            mPkgTx.append(int2bcd(dt.time().minute(), ok));
-            mPkgTx.append(int2bcd(dt.time().second(), ok));
-
-            uint16_t value = dt.time().msec();
-            mPkgTx.append(static_cast<uint8_t>(value));
-            mPkgTx.append(static_cast<uint8_t>(value >> 8));
-
-            // TODO Добавить считывание записи журнала для АСУ ТП.
-        }
-        break;
-
     case GB_COM_GET_TIME_SINCHR:
         {
             if (data.size() != 0)
@@ -1658,12 +1621,6 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data)
         }
         break;
 
-    case GB_COM_GET_NET_ADR:
-        {
-            hdlrComNetAdrGet(com, data);
-        }
-        break;
-
     case GB_COM_GET_TEST:
         {
             if (!data.isEmpty())
@@ -1675,7 +1632,6 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data)
         }
         break;
 
-    case GB_COM_GET_VERS: hdlrComGetVers(com, data); break;
     case GB_COM_GET_DEVICE_NUM: hdlrComDeviceNumGet(com, data); break;
     case GB_COM_DEF_GET_TYPE_AC: hdlrComDefTypeAcGet(com, data); break;
 
@@ -1815,41 +1771,6 @@ void Bsp::procCommandWriteParam(eGB_COM com, pkg_t &data)
         }
         break;
 
-    case GB_COM_SET_TIME:
-        {
-            if (data.size() != 9)
-            {
-                qWarning() << kMsgSizeError.arg(com, 2, 16).arg(data.size());
-            }
-            else
-            {
-                bool    ok    = false;
-                quint16 year  = bcd2int(data.takeFirst(), ok) + 2000;
-                quint8  month = bcd2int(data.takeFirst(), ok);
-                quint8  day   = bcd2int(data.takeFirst(), ok);
-                dt.setDate(QDate(year, month, day));
-
-                quint8 hour   = bcd2int(data.takeFirst(), ok);
-                quint8 minute = bcd2int(data.takeFirst(), ok);
-                quint8 second = bcd2int(data.takeFirst(), ok);
-                dt.setTime(QTime(hour, minute, second));
-
-                quint16 ms = data.takeFirst();
-                ms += static_cast<quint16>(data.takeFirst()) << 8;
-                if (ms != 0)
-                {
-                    qWarning() << Bsp::kCodec->toUnicode("Milliseconds is not 0.");
-                }
-
-                quint8 source = data.takeFirst();
-                if (source != 0)
-                {
-                    qWarning() << kMsgTimeSourceError.arg(source);
-                }
-            }
-        }
-        break;
-
     case GB_COM_SET_TIME_SINCHR:
         {
             // TODO В РЗСК два байта, т.к. может быть два параметра
@@ -1907,7 +1828,6 @@ void Bsp::procCommandWriteParam(eGB_COM com, pkg_t &data)
         }
         break;
 
-    case GB_COM_SET_NET_ADR: hdlrComNetAdrSet(com, data); break;
     case GB_COM_SET_DEVICE_NUM: hdlrComDeviceNumSet(com, data); break;
     case GB_COM_DEF_SET_TYPE_AC: hdlrComDefTypeAcSet(com, data); break;
 
@@ -2103,101 +2023,6 @@ void Bsp::hdlrComDeviceNumSet(eGB_COM com, pkg_t &data)
     setSpinBoxValue(GB_PARAM_NUM_OF_DEVICE, data.takeFirst());
 }
 
-void Bsp::hdlrComGetVers(eGB_COM com, pkg_t &data)
-{
-    quint16         vers = 0;
-    eGB_TYPE_DEVICE typedevice;
-
-    //    typedevice = static_cast<eGB_TYPE_DEVICE>(getComboBoxValue(mDevice.typeDevice));
-
-    //    if (data.size() != 0)
-    //    {
-    //        qWarning() << kMsgSizeError.arg(com, 2, 16).arg(data.size());
-    //    }
-    //    //
-    //    mPkgTx.append(com);
-    //    mPkgTx.append(getComboBoxValue(mDevice.isDef) ? 1 : 0);
-
-    //    if ((typedevice == AVANT_R400) || (typedevice == AVANT_R400M))
-    //    {
-    //        mPkgTx.append(0);  // прм1
-    //        mPkgTx.append(0);  // прм2
-    //        mPkgTx.append(0);
-    //    }
-    //    else
-    //    {
-    //        mPkgTx.append(getSpinBoxValue(GB_PARAM_PRM_COM_NUMS));  // прм1
-    //        mPkgTx.append(getSpinBoxValue(GB_PARAM_PRM_COM_NUMS));  // прм2
-    //        mPkgTx.append(getSpinBoxValue(GB_PARAM_PRD_COM_NUMS));
-    //    }
-    //    mPkgTx.append(getComboBoxValue(GB_PARAM_NUM_OF_DEVICES) + 1);
-    //    mPkgTx.append(getComboBoxValue(mDevice.typeLine));
-
-    //    vers = static_cast<quint16>(getSpinBoxValue(mDevice.versionBspMcu));
-    //    mPkgTx.append(static_cast<quint8>(vers >> 8));
-    //    mPkgTx.append(static_cast<quint8>(vers));
-    //    vers = static_cast<quint16>(getSpinBoxValue(mDevice.versionBspDsp));
-    //    mPkgTx.append(static_cast<quint8>(vers >> 8));
-    //    mPkgTx.append(static_cast<quint8>(vers));
-
-    //    mPkgTx.append(getCompatibility(typedevice));
-
-    //    vers = static_cast<quint8>(getSpinBoxValue(mDevice.versionBsk1PrdPlis));
-    //    mPkgTx.append(static_cast<quint8>(vers));
-    //    vers = static_cast<quint8>(getSpinBoxValue(mDevice.versionBsk2PrdPlis));
-    //    mPkgTx.append(static_cast<quint8>(vers));
-    //    vers = static_cast<quint8>(getSpinBoxValue(mDevice.versionBsk1PrmPlis));
-    //    mPkgTx.append(static_cast<quint8>(vers));
-    //    vers = static_cast<quint8>(getSpinBoxValue(mDevice.versionBsk1PrmPlis));
-    //    mPkgTx.append(static_cast<quint8>(vers));
-    //    vers = static_cast<quint8>(getSpinBoxValue(mDevice.versionBszPlis));
-    //    mPkgTx.append(static_cast<quint8>(vers));
-
-    //    mPkgTx.append(typedevice);
-
-    //    vers = static_cast<quint16>(getSpinBoxValue(mDevice.versionPiMcu));
-    //    mPkgTx.append(static_cast<quint8>(vers >> 8));
-    //    mPkgTx.append(static_cast<quint8>(vers));
-
-    //    // FIXME В случае любого кольца передается 0xAB, иначе любое другое значение
-    //    uint8_t typeopto = getComboBoxValue(mDevice.typeOpto);
-    //    if (typeopto != TYPE_OPTO_STANDART)
-    //    {
-    //        typeopto = 0xAB;
-    //    }
-    //    mPkgTx.append(typeopto);
-
-    //    vers = static_cast<quint16>(getSpinBoxValue(mDevice.versionBspDspPlis));
-    //    mPkgTx.append(static_cast<quint8>(vers >> 8));
-    //    mPkgTx.append(static_cast<quint8>(vers));
-}
-
-
-//
-void Bsp::hdlrComNetAdrGet(eGB_COM com, pkg_t &data)
-{
-    //
-    mPkgTx.append(com);
-    qint16 value = getSpinBoxValue(GB_PARAM_NET_ADDRESS);
-    mPkgTx.append(static_cast<uint8_t>(value));
-}
-
-//
-void Bsp::hdlrComNetAdrSet(eGB_COM com, pkg_t &data)
-{
-    uint8_t dop = data.takeFirst();
-    switch (dop)
-    {
-    case POS_COM_NET_ADR_netAdr:
-        {
-            uint8_t byte = data.takeFirst();
-            setSpinBoxValue(GB_PARAM_NET_ADDRESS, byte);
-        }
-        break;
-
-    default: qDebug("No dop byte handler: 0x%.2X", dop);
-    }
-}
 
 //
 void Bsp::hdlrComSetControl(eGB_COM com, pkg_t &data)

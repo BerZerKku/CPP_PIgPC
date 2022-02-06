@@ -22,13 +22,19 @@ TBspR400Hf::TBspR400Hf(QTreeWidget *tree, QWidget *parent) : Bsp(tree, parent)
  */
 void TBspR400Hf::InitComMap()
 {
+    mComMap.insert(0x02, &Bsp::HdlrComDefx02);  // чтение количества аппаратов в линии
+
     mComMap.insert(0x30, &Bsp::HdlrComGlbx30);  // чтение режимов
     mComMap.insert(0x31, &Bsp::HdlrComGlbx31);  // чтение неисправностей
     mComMap.insert(0x32, &Bsp::HdlrComGlbx32);  // чтение времени
     mComMap.insert(0x34, &Bsp::HdlrComGlbx34);  // чтение измерений
+    mComMap.insert(0x38, &Bsp::HdlrComGlbx38);  // чтение адреса в локальной сети
     mComMap.insert(0x3f, &Bsp::HdlrComGlbx3F);  // чтение информации об устройстве
 
+    mComMap.insert(0x82, &Bsp::HdlrComDefx02);  // чтение количества аппаратов в линии
+
     mComMap.insert(0xB2, &Bsp::HdlrComGlbx32);  // запись времени
+    mComMap.insert(0xB8, &Bsp::HdlrComGlbx38);  // запись адреса в локальной сети
 }
 
 
@@ -94,6 +100,7 @@ void TBspR400Hf::crtTreeDef()
     mTree->insertTopLevelItem(mTree->topLevelItemCount(), top);
 
     top->setText(0, kCodec->toUnicode("«ащита"));
+    crtComboBox(GB_PARAM_NUM_OF_DEVICES);
     crtComboBox(GB_PARAM_DEF_ONE_SIDE);
 
     top->setExpanded(false);
@@ -106,7 +113,7 @@ void TBspR400Hf::crtTreeDevice()
     mTree->insertTopLevelItem(mTree->topLevelItemCount(), top);
     top->setText(0, kCodec->toUnicode("”стройство"));
 
-    crtComboBox(GB_PARAM_NUM_OF_DEVICES);
+
     crtComboBox(GB_PARAM_COMP_P400);
 
     top->setExpanded(true);
@@ -442,6 +449,48 @@ void TBspR400Hf::FillComboboxListStateDef()
 /**
  * *****************************************************************************
  *
+ * @brief ќбрабатывает команду чтени€ количества аппаратов в линии.
+ * @param[in]  оманда.
+ * @param[in] ƒанные.
+ *
+ * *****************************************************************************
+ */
+void TBspR400Hf::HdlrComDefx02(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_DEF_GET_LINE_TYPE || com == GB_COM_DEF_SET_LINE_TYPE);
+
+    if (com == GB_COM_DEF_GET_LINE_TYPE)
+    {
+        if (!CheckSize(com, data.size(), { 0 }))
+        {
+            return;
+        }
+
+        mPkgTx.append(com);
+        mPkgTx.append(getComboBoxValue(GB_PARAM_NUM_OF_DEVICES));
+
+        Q_ASSERT(mPkgTx.size() == 2);  // команда + байт данных
+    }
+
+    if (com == GB_COM_DEF_SET_LINE_TYPE)
+    {
+        if (!CheckSize(com, data.size(), { 1 }))
+        {
+            return;
+        }
+
+        // ответ на команду записи совпадает с запросом
+        mPkgTx.append(com);
+        mPkgTx.append(data);
+
+        setComboBoxValue(GB_PARAM_NUM_OF_DEVICES, data.at(0));
+    }
+}
+
+
+/**
+ * *****************************************************************************
+ *
  * @brief ќбрабатывает команду чтени€ режимов и состо€ний.
  * @param[in]  оманда.
  * @param[in] ƒанные.
@@ -674,6 +723,47 @@ void TBspR400Hf::HdlrComGlbx34(eGB_COM com, pkg_t &data)
     Q_ASSERT(mPkgTx.size() == 16);  // команда + 15 байт данных
 }
 
+
+/**
+ * *****************************************************************************
+ *
+ * @brief ќбрабатывает команду чтени€ адреса в локальной сети.
+ * @param[in]  оманда.
+ * @param[in] ƒанные.
+ *
+ * *****************************************************************************
+ */
+void TBspR400Hf::HdlrComGlbx38(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_GET_NET_ADR || com == GB_COM_SET_NET_ADR);
+
+    if (com == GB_COM_GET_NET_ADR)
+    {
+        if (!CheckSize(com, data.size(), { 0 }))
+        {
+            return;
+        }
+
+        mPkgTx.append(com);
+        mPkgTx.append(getSpinBoxValue(GB_PARAM_NET_ADDRESS));
+
+        Q_ASSERT(mPkgTx.size() == 2);  // команда + байт данных
+    }
+
+    if (com == GB_COM_SET_NET_ADR)
+    {
+        if (!CheckSize(com, data.size(), { 1 }))
+        {
+            return;
+        }
+
+        // ответ на команду записи совпадает с запросом
+        mPkgTx.append(com);
+        mPkgTx.append(data);
+
+        setSpinBoxValue(GB_PARAM_NET_ADDRESS, data.at(0));
+    }
+}
 
 /**
  * *****************************************************************************
