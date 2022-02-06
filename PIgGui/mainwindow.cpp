@@ -10,6 +10,7 @@
 
 #include "PIg/src/flash.h"
 #include "PIg/src/menu/base.h"
+#include "bsp/bspR400hf.hpp"
 
 //
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
@@ -33,7 +34,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->serialBsp->addDefaultPort("COM3");
     ui->serialBsp->addDefaultPort("tnt0");
 
-    connect(ui->serialBsp, &TSerial::read, this, &MainWindow::SlotByteBspToPi);
     connect(this, &MainWindow::writeByteToBsp, ui->serialBsp, &TSerial::write);
     connect(ui->serialBsp, &TSerial::sendFinished, [=]() { bspTxEnd(); });
     connect(ui->serialBsp, &TSerial::openPort, [&]() { ui->mBspConnect->setEnabled(false); });
@@ -103,25 +103,14 @@ MainWindow::~MainWindow()
 //
 void MainWindow::initBsp()
 {
-    ui->mBspTree->crtTreeDevice();
-    ui->mBspTree->crtTreeState();
-    ui->mBspTree->crtTreePrm();
-    ui->mBspTree->crtTreePrd();
-    ui->mBspTree->crtTreeGlb();
-    ui->mBspTree->crtTreeInterface();
-    ui->mBspTree->crtTest();
-    ui->mBspTree->crtTreeDef();
-    ui->mBspTree->crtTreeMeasure();
-    ui->mBspTree->initParam();
+    connect(ui->mBspCombo, &QComboBox::currentTextChanged, this, &MainWindow::SlotBspChange);
 
-    ui->mBspTree->expandAll();
-    ui->mBspTree->resizeColumnToContents(0);
-    //    ui->mBspTree->resizeColumnToContents(1);
-    ui->mBspTree->header()->setSectionResizeMode(0, QHeaderView::Fixed);
-
-    //    ui->mBspTree->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-
-    ui->mBspTree->collapseAll();
+    ui->mBspCombo->addItem(codec->toUnicode("АВАНТ Р400-100-В"), DEVICE_R400_100_HF);
+    ui->mBspCombo->addItem(codec->toUnicode("АВАНТ РЗСК-111-В"), DEVICE_RZSK_111_HF);
+    ui->mBspCombo->addItem(codec->toUnicode("АВАНТ K400-088-В"), DEVICE_K400_088_HF);
+    ui->mBspCombo->addItem(codec->toUnicode("АВАНТ Р400-100-В"), DEVICE_R400_100_VOLS);
+    ui->mBspCombo->addItem(codec->toUnicode("АВАНТ РЗСК-111-В"), DEVICE_RZSK_111_VOLS);
+    ui->mBspCombo->addItem(codec->toUnicode("АВАНТ K400-088-В"), DEVICE_K400_088_VOLS);
 }
 
 void MainWindow::initEeprom()
@@ -411,25 +400,99 @@ void MainWindow::SlotBspConnection()
 {
     if (ui->serialBsp->isEnabled())
     {
-        connect(this, &MainWindow::writeByteToBsp, ui->mBspTree, &Bsp::SlotReadByte);
+        connect(this, &MainWindow::writeByteToBsp, mBsp, &Bsp::SlotReadByte);
 
-        connect(ui->mBspTree, &Bsp::SignalWriteByte, this, &MainWindow::SlotByteBspToPi);
-        connect(ui->mBspTree, &Bsp::SignalSendFinished, [=]() { bspTxEnd(); });
+        connect(ui->serialBsp, &TSerial::read, this, &MainWindow::SlotByteBspToPi);
+        connect(mBsp, &Bsp::SignalWriteByte, this, &MainWindow::SlotByteBspToPi);
+        connect(mBsp, &Bsp::SignalSendFinished, [=]() { bspTxEnd(); });
 
         ui->serialBsp->setEnabled(false);
+        ui->mBspCombo->setEnabled(false);
         ui->mBspConnect->setText("Disconnect");
     }
     else
     {
-        ui->mBspTree->disconnect();
-        disconnect(this, &MainWindow::writeByteToBsp, ui->mBspTree, &Bsp::SlotReadByte);
-        disconnect(this,
-                   &MainWindow::writeByteToBsp,
-                   &mProtocolViewer,
-                   &QProtocolViewer::AddTxByte);
+        mBsp->disconnect();
+
+        disconnect(ui->serialBsp, &TSerial::read, this, &MainWindow::SlotByteBspToPi);
+        disconnect(this, &MainWindow::writeByteToBsp, mBsp, &Bsp::SlotReadByte);
+
+        //        disconnect(this, &MainWindow::writeByteToBsp, mBsp, &Bsp::SlotReadByte);
+
+        //        disconnect(this,
+        //                   &MainWindow::writeByteToBsp,
+        //                   &mProtocolViewer,
+        //                   &QProtocolViewer::AddTxByte);
 
         ui->serialBsp->setEnabled(true);
+        ui->mBspCombo->setEnabled(true);
         ui->mBspConnect->setText("Connect");
+    }
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Заменить устройство для симулятора БСП
+ *
+ * *****************************************************************************
+ */
+void MainWindow::SlotBspChange()
+{
+    Bsp *bsp = nullptr;
+
+    switch (static_cast<eDevice>(ui->mBspCombo->currentData().toInt()))
+    {
+    case DEVICE_R400_100_HF:
+        {
+            bsp = new TBspR400Hf(ui->mBspTree, this);
+            break;
+        }
+
+    case DEVICE_RZSK_111_HF:
+        {
+            break;
+        }
+
+    case DEVICE_K400_088_HF:
+        {
+            break;
+        }
+
+    case DEVICE_R400_100_VOLS:
+        {
+            break;
+        }
+
+    case DEVICE_RZSK_111_VOLS:
+        {
+            break;
+        }
+
+    case DEVICE_K400_088_VOLS:
+        {
+            break;
+        }
+    }
+
+    if (bsp != nullptr)
+    {
+        if (mBsp != nullptr)
+        {
+            mBsp->disconnect();
+            delete mBsp;
+        }
+
+        mBsp = bsp;
+        mBsp->Init();
+
+        ui->mBspTree->expandAll();
+        ui->mBspTree->resizeColumnToContents(0);
+        //    ui->mBspTree->resizeColumnToContents(1);
+        ui->mBspTree->header()->setSectionResizeMode(0, QHeaderView::Fixed);
+        //    ui->mBspTree->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        ui->mBspTree->collapseAll();
     }
 }
 

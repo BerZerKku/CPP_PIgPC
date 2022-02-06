@@ -14,6 +14,8 @@ static uint16_t uLedTimeOn = LCD_TIME_LED_ON;
 static eLCD_LED eLed = LED_OFF;
 static QString text;
 
+// @todo Добавить симулятор температурного датчика
+
 void vKEYmain(void)
 {
 }

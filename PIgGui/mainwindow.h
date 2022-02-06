@@ -82,6 +82,17 @@ class MainWindow : public QMainWindow
         QLineEdit typeOpto;
     } view;
 
+    /// Устройство.
+    enum eDevice
+    {
+        DEVICE_R400_100_HF = 0,
+        DEVICE_RZSK_111_HF,
+        DEVICE_K400_088_HF,
+        DEVICE_R400_100_VOLS,
+        DEVICE_RZSK_111_VOLS,
+        DEVICE_K400_088_VOLS
+    };
+
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow() override;
@@ -94,6 +105,7 @@ signals:
 private:
     Ui::MainWindow *ui;
     QTextCodec *    codec;
+    Bsp *           mBsp = nullptr;
 
     QPalette      pred;
     QPalette      pblue;
@@ -124,6 +136,7 @@ private slots:
     void clearSelection();  ///< Очистка выделения в textEdit.
     void setBacklight(bool enable);
     void SlotBspConnection();
+    void SlotBspChange();
 
     void SlotByteBspToPi(uint8_t byte);
     void SlotBytePiToBsp(uint8_t byte);

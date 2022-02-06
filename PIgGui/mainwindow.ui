@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>624</width>
+    <width>663</width>
     <height>320</height>
    </rect>
   </property>
@@ -37,6 +37,9 @@
          </widget>
         </item>
         <item>
+         <widget class="QComboBox" name="mBspCombo"/>
+        </item>
+        <item>
          <spacer name="horizontalSpacer">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -52,7 +55,7 @@
        </layout>
       </item>
       <item>
-       <widget class="Bsp" name="mBspTree">
+       <widget class="QTreeWidget" name="mBspTree">
         <column>
          <property name="text">
           <string>Parameter</string>
@@ -188,7 +191,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>624</width>
+     <width>663</width>
      <height>20</height>
     </rect>
    </property>
@@ -218,11 +221,6 @@
    <extends>QWidget</extends>
    <header>serial.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>Bsp</class>
-   <extends>QTreeWidget</extends>
-   <header location="global">bsp/bsp.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

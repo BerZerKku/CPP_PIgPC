@@ -1,6 +1,6 @@
 include(../PIg.pri)
 
-QT       += core gui serialport testlib
+QT       += core gui serialport
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -16,7 +16,9 @@ CONFIG(release, debug|release) {
     CONFIG -= console
 
     DEFINES += \
-        NDEBUG
+        NDEBUG \
+        QT_NO_DEBUG \
+        QT_NO_DEBUG_OUTPUT
 }
 
 # The following define makes your compiler emit warnings if you use
@@ -42,6 +44,7 @@ HEADERS += \
     qprotocolviewer.h \
     serial.h \
     bsp/bsp.h \
+    bsp/bspR400hf.hpp \
     wrapper.h \
     serial/serialport.h \
     widget/combobox.h \
@@ -57,6 +60,7 @@ SOURCES += \
     qprotocolviewer.cpp \
     wrapperGui.cpp \
     bsp/bsp.cpp \
+    bsp/bspR400hf.cpp \
     serial.cpp \
     serial/serialport.cpp \
     widget/combobox.cpp \

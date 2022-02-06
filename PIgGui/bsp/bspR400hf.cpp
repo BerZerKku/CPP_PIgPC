@@ -1,0 +1,663 @@
+#include <QDebug>
+#include <QHeaderView>
+
+#include "bspR400hf.hpp"
+
+#include "PIg/src/flash.h"
+#include "PIg/src/menu/txCom.h"
+#include "PIg/src/parameter/param.h"
+
+
+TBspR400Hf::TBspR400Hf(QTreeWidget *tree, QWidget *parent) : Bsp(tree, parent)
+{
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Настраивает карту команд.
+ *
+ * *****************************************************************************
+ */
+void TBspR400Hf::InitComMap()
+{
+    mComMap.insert(0x30, &Bsp::HdlrComGlbx30);  // чтение режимов
+    mComMap.insert(0x31, &Bsp::HdlrComGlbx31);  // чтение неисправностей
+    mComMap.insert(0x32, &Bsp::HdlrComGlbx32);  // чтение времени
+    mComMap.insert(0x3f, &Bsp::HdlrComGlbx3F);  // чтение информации об устройстве
+
+    mComMap.insert(0xB2, &Bsp::HdlrComGlbx32);  // запись времени
+}
+
+//
+void TBspR400Hf::InitParam()
+{
+    eGB_PARAM param = GB_PARAM_NULL_PARAM;
+
+    setComboBoxValue(GB_PARAM_NUM_OF_DEVICES, GB_NUM_DEVICES_2);
+    setComboBoxValue(GB_PARAM_COMP_P400, GB_COMP_R400M_LINER);
+
+    setSpinBoxValue(mDevice.versionBspMcu, 0xF233);
+    setSpinBoxValue(mDevice.versionBspDsp, 0x330D);
+    setSpinBoxValue(mDevice.versionBszPlis, 0x52);
+
+    setComboBoxValue(stateGlb.regime, eGB_REGIME::GB_REGIME_ENABLED);
+    setComboBoxValue(stateGlb.state, 1);
+    setSpinBoxValue(stateGlb.dopByte, 1);
+
+    setLineEditValue(stateGlb.fault, "0000");
+    setLineEditValue(stateGlb.warning, "0000");
+    setLineEditValue(stateDef.fault, "0000");
+    setLineEditValue(stateDef.warning, "0000");
+    setSpinBoxValue(&mStateFaultDeviceNumber, 0);
+
+    setComboBoxValue(GB_PARAM_COM_PRD_KEEP, 0);
+    setComboBoxValue(GB_PARAM_COM_PRM_KEEP, 0);
+    setComboBoxValue(GB_PARAM_TIME_SYNCH, 0);
+
+    setSpinBoxValue(GB_PARAM_NET_ADDRESS, 17);
+
+    setSpinBoxValue(GB_PARAM_PRM_TIME_ON, 5);
+    setComboBoxValueBits(GB_PARAM_PRM_COM_BLOCK, 0x01, 1);
+    setComboBoxValueBits(GB_PARAM_PRM_COM_BLOCK, 0x02, 2);
+    setComboBoxValueBits(GB_PARAM_PRM_COM_BLOCK, 0x03, 3);
+    setComboBoxValueBits(GB_PARAM_PRM_COM_BLOCK, 0x04, 4);
+
+    param = GB_PARAM_PRM_TIME_OFF;
+    for (uint8_t i = 1; i <= getAbsMaxNumOfSameParams(param); i++)
+    {
+        qint16 value = getAbsMin(param) + i * getDisc(param);
+        value        = value % getAbsMax(param);
+        setSpinBoxValue(GB_PARAM_PRM_TIME_OFF, value / getFract(param), i);
+    }
+
+    setComboBoxValue(GB_PARAM_DEF_ONE_SIDE, 0);
+
+    setSpinBoxValue(m_measure.R, 999);
+    setSpinBoxValue(m_measure.I, 101);
+    setSpinBoxValue(m_measure.U, 251);
+    setSpinBoxValue(m_measure.Udef1, -32);
+    setSpinBoxValue(m_measure.Udef2, 32);
+    setSpinBoxValue(m_measure.Ucf1, -16);
+    setSpinBoxValue(m_measure.Ucf2, 16);
+    setSpinBoxValue(m_measure.Un1, -7);
+    setSpinBoxValue(m_measure.Un2, 7);
+    setSpinBoxValue(m_measure.Sd, 321);
+    setSpinBoxValue(m_measure.T, 24);
+    setSpinBoxValue(m_measure.dF, 3);
+}
+
+
+void TBspR400Hf::crtTreeDef()
+{
+    QTreeWidgetItem *top = new QTreeWidgetItem();
+    mTree->insertTopLevelItem(mTree->topLevelItemCount(), top);
+
+    top->setText(0, kCodec->toUnicode("Защита"));
+    crtComboBox(GB_PARAM_DEF_ONE_SIDE);
+
+    top->setExpanded(false);
+}
+
+void TBspR400Hf::crtTreeDevice()
+{
+    QTreeWidgetItem *top = new QTreeWidgetItem();
+    mTree->insertTopLevelItem(mTree->topLevelItemCount(), top);
+    top->setText(0, kCodec->toUnicode("Устройство"));
+
+    crtComboBox(GB_PARAM_NUM_OF_DEVICES);
+    crtComboBox(GB_PARAM_COMP_P400);
+
+    top->setExpanded(true);
+
+    crtTreeDevieVersions(top);
+}
+
+void TBspR400Hf::crtTreeDevieVersions(QTreeWidgetItem *top)
+{
+    QTreeWidgetItem *branch = new QTreeWidgetItem();
+    top->addChild(branch);
+    branch->setText(0, kCodec->toUnicode("Версии ПО"));
+
+    QTreeWidgetItem *item = nullptr;
+
+    item                  = new QTreeWidgetItem();
+    mDevice.versionBspMcu = new QHexSpinBox(false);
+    item->setText(0, kCodec->toUnicode("БСП МК"));
+    branch->addChild(item);
+    mTree->setItemWidget(item, 1, mDevice.versionBspMcu);
+
+    // \todo Версия DSP в К400 состоит из 2 байт, иначе (версия плис, версия дсп)
+    item                  = new QTreeWidgetItem();
+    mDevice.versionBspDsp = new QHexSpinBox(false);
+    item->setText(0, kCodec->toUnicode("БСП ЦСП"));
+    branch->addChild(item);
+    mTree->setItemWidget(item, 1, mDevice.versionBspDsp);
+
+    item                   = new QTreeWidgetItem();
+    mDevice.versionBszPlis = new QHexSpinBox(true);
+    item->setText(0, kCodec->toUnicode("БСЗ ПЛИС"));
+    branch->addChild(item);
+    mTree->setItemWidget(item, 1, mDevice.versionBszPlis);
+
+    branch->setExpanded(false);
+}
+
+void TBspR400Hf::crtTreeGlb()
+{
+    QTreeWidgetItem *top = new QTreeWidgetItem();
+    mTree->insertTopLevelItem(mTree->topLevelItemCount(), top);
+
+    top->setText(0, kCodec->toUnicode("Общие"));
+
+    crtSpinBox(GB_PARAM_NUM_OF_DEVICE);
+    crtComboBox(GB_PARAM_COM_PRD_KEEP);
+    crtComboBox(GB_PARAM_COM_PRM_KEEP);
+    crtComboBox(GB_PARAM_TIME_SYNCH);
+
+    top->setExpanded(false);
+}
+
+void TBspR400Hf::crtTreeMeasure()
+{
+    QTreeWidgetItem *item   = nullptr;
+    QSpinBox *       widget = nullptr;
+
+    QTreeWidgetItem *top = new QTreeWidgetItem();
+    mTree->insertTopLevelItem(mTree->topLevelItemCount(), top);
+
+    // \todo Сделать измерения в оптике неактивными
+
+    top->setText(0, kCodec->toUnicode("Измерения"));
+
+    item   = new QTreeWidgetItem();
+    widget = new QSpinBox();
+    widget->setRange(0, 999);
+    widget->setToolTip(QString("[%1, %2] Ohm").arg(widget->minimum()).arg(widget->maximum()));
+    item->setText(0, kCodec->toUnicode("R"));
+    top->addChild(item);
+    mTree->setItemWidget(item, 1, widget);
+    m_measure.R = widget;
+
+    item   = new QTreeWidgetItem();
+    widget = new QSpinBox();
+    widget->setRange(0, 999);
+    widget->setToolTip(QString("[%1, %2] mA").arg(widget->minimum()).arg(widget->maximum()));
+    item->setText(0, kCodec->toUnicode("I"));
+    top->addChild(item);
+    mTree->setItemWidget(item, 1, widget);
+    m_measure.I = widget;
+
+    item   = new QTreeWidgetItem();
+    widget = new QSpinBox();
+    widget->setRange(0, 999);
+    widget->setToolTip(QString("[%1, %2] * 0.1V").arg(widget->minimum()).arg(widget->maximum()));
+    item->setText(0, kCodec->toUnicode("U"));
+    top->addChild(item);
+    mTree->setItemWidget(item, 1, widget);
+    m_measure.U = widget;
+
+    // \todo В К400 вместо Uз1 передается D со значениями от -64 до 64.
+
+    item   = new QTreeWidgetItem();
+    widget = new QSpinBox();
+    widget->setRange(-99, 99);
+    widget->setToolTip(QString("[%1, %2] dB").arg(widget->minimum()).arg(widget->maximum()));
+    item->setText(0, kCodec->toUnicode("Uз1 / D"));
+    top->addChild(item);
+    mTree->setItemWidget(item, 1, widget);
+    m_measure.Udef1 = widget;
+
+    item   = new QTreeWidgetItem();
+    widget = new QSpinBox();
+    widget->setRange(-99, 99);
+    widget->setToolTip(QString("[%1, %2] dB").arg(widget->minimum()).arg(widget->maximum()));
+    item->setText(0, kCodec->toUnicode("Uз2"));
+    top->addChild(item);
+    mTree->setItemWidget(item, 1, widget);
+    m_measure.Udef2 = widget;
+
+    item   = new QTreeWidgetItem();
+    widget = new QSpinBox();
+    widget->setRange(-99, 99);
+    widget->setToolTip(QString("[%1, %2] dB").arg(widget->minimum()).arg(widget->maximum()));
+    item->setText(0, kCodec->toUnicode("Uк1"));
+    top->addChild(item);
+    mTree->setItemWidget(item, 1, widget);
+    m_measure.Ucf1 = widget;
+
+    item   = new QTreeWidgetItem();
+    widget = new QSpinBox();
+    widget->setRange(-99, 99);
+    widget->setToolTip(QString("[%1, %2] dB").arg(widget->minimum()).arg(widget->maximum()));
+    item->setText(0, kCodec->toUnicode("Uк2"));
+    top->addChild(item);
+    mTree->setItemWidget(item, 1, widget);
+    m_measure.Ucf2 = widget;
+
+    item   = new QTreeWidgetItem();
+    widget = new QSpinBox();
+    widget->setRange(-99, 99);
+    widget->setToolTip(QString("[%1, %2] dB").arg(widget->minimum()).arg(widget->maximum()));
+    item->setText(0, kCodec->toUnicode("Uш1"));
+    top->addChild(item);
+    mTree->setItemWidget(item, 1, widget);
+    m_measure.Un1 = widget;
+
+    item   = new QTreeWidgetItem();
+    widget = new QSpinBox();
+    widget->setRange(-99, 99);
+    widget->setToolTip(QString("[%1, %2] dB").arg(widget->minimum()).arg(widget->maximum()));
+    item->setText(0, kCodec->toUnicode("Uш2"));
+    top->addChild(item);
+    mTree->setItemWidget(item, 1, widget);
+    m_measure.Un2 = widget;
+
+    item   = new QTreeWidgetItem();
+    widget = new QSpinBox();
+    widget->setRange(0, 360);
+    widget->setToolTip(QString("[%1, %2] deg").arg(widget->minimum()).arg(widget->maximum()));
+    item->setText(0, kCodec->toUnicode("Sд"));
+    top->addChild(item);
+    mTree->setItemWidget(item, 1, widget);
+    m_measure.Sd = widget;
+
+    item   = new QTreeWidgetItem();
+    widget = new QSpinBox();
+    widget->setRange(0, 100);
+    widget->setToolTip(QString("[%1, %2] deg").arg(widget->minimum()).arg(widget->maximum()));
+    item->setText(0, kCodec->toUnicode("T"));
+    top->addChild(item);
+    mTree->setItemWidget(item, 1, widget);
+    m_measure.T = widget;
+
+    item   = new QTreeWidgetItem();
+    widget = new QSpinBox();
+    widget->setRange(0, 100);
+    widget->setToolTip(QString("[%1, %2] Hz").arg(widget->minimum()).arg(widget->maximum()));
+    item->setText(0, kCodec->toUnicode("dF"));
+    top->addChild(item);
+    mTree->setItemWidget(item, 1, widget);
+    m_measure.dF = widget;
+
+    top->setExpanded(false);
+}
+
+void TBspR400Hf::crtTreePrd()
+{
+    QTreeWidgetItem *top = new QTreeWidgetItem();
+    mTree->insertTopLevelItem(mTree->topLevelItemCount(), top);
+
+    top->setText(0, kCodec->toUnicode("Передатчик"));
+
+    crtSpinBox(GB_PARAM_PRD_IN_DELAY);
+    //    crtComboBox(GB_PARAM_PRD_COM_BLOCK);
+    //    crtSpinBox(GB_PARAM_PRD_DURATION_L);
+    crtSpinBox(GB_PARAM_PRD_DURATION_O);
+    crtComboBox(GB_PARAM_PRD_COM_LONG);
+    crtComboBox(GB_PARAM_PRD_COM_SIGNAL);
+
+    top->setExpanded(false);
+}
+
+void TBspR400Hf::crtTreePrm()
+{
+    QTreeWidgetItem *top = new QTreeWidgetItem();
+    mTree->insertTopLevelItem(mTree->topLevelItemCount(), top);
+
+    top->setText(0, kCodec->toUnicode("Приемник"));
+
+    // FIXME Есть два вида задержки на фиксацию команды!
+    crtSpinBox(GB_PARAM_PRM_TIME_ON);
+    //    crtComboBox(GB_PARAM_PRM_COM_BLOCK_ALL);
+    crtComboBox(GB_PARAM_PRM_COM_BLOCK);
+    crtSpinBox(GB_PARAM_PRM_TIME_OFF);
+    crtComboBox(GB_PARAM_PRD_DR_ENABLE);
+    crtComboBox(GB_PARAM_PRM_DR_COM_BLOCK);
+    crtSpinBox(GB_PARAM_PRM_DR_COM_TO_HF);
+    crtComboBox(GB_PARAM_PRM_COM_SIGNAL);
+
+    top->setExpanded(false);
+}
+
+//
+void TBspR400Hf::crtTreeState()
+{
+    QTreeWidgetItem *item;
+    QTreeWidgetItem *def;
+    QTreeWidgetItem *top = new QTreeWidgetItem();
+
+    mTree->insertTopLevelItem(mTree->topLevelItemCount(), top);
+    top->setText(0, kCodec->toUnicode("Текущее состояние"));
+
+    errRegExp.setPattern("[0-9A-Fa-F]+");
+    errValidator.setRegExp(errRegExp);
+
+    Bsp::crtTreeState(top, "Общее", stateGlb);
+
+    def  = Bsp::crtTreeState(top, "Защита", stateDef);
+    item = new QTreeWidgetItem();
+    item->setText(0, kCodec->toUnicode("Номер устройства ПВЗУ"));
+    def->addChild(item);
+    mTree->setItemWidget(item, 1, &mStateFaultDeviceNumber);
+    mStateFaultDeviceNumber.setRange(0, 255);  // @fixme Изменить на реальный диапазон
+
+    item = new QTreeWidgetItem();
+    item->setText(0, kCodec->toUnicode("Температура"));
+    top->addChild(item);
+    mTree->setItemWidget(item, 1, &mTemperature);
+    mTemperature.setRange(-100, 125);
+    mTemperature.setReadOnly(true);
+
+    connect(stateGlb.regime,
+            QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this,
+            &TBspR400Hf::setRegime);
+
+    connect(stateGlb.state,
+            QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this,
+            &TBspR400Hf::setState);
+
+    connect(stateGlb.dopByte,
+            QOverload<int>::of(&QSpinBox::valueChanged),
+            this,
+            &TBspR400Hf::setDopByte);
+
+    top->setExpanded(true);
+}
+
+
+//
+void TBspR400Hf::crtTest()
+{
+    QTreeWidgetItem *top = new QTreeWidgetItem();
+    QTreeWidgetItem *item;
+    QLineEdit *      lineedit;
+    mTree->insertTopLevelItem(mTree->topLevelItemCount(), top);
+    top->setText(0, kCodec->toUnicode("Тест"));
+
+    item       = new QTreeWidgetItem();
+    lineedit   = new QLineEdit();
+    test.byte1 = lineedit;
+    lineedit->setMaxLength(2);
+    lineedit->setInputMask("HH");
+    lineedit->setText("00");
+    top->addChild(item);
+    item->setText(0, kCodec->toUnicode("Байт 1"));
+    mTree->setItemWidget(item, 1, lineedit);
+
+    item       = new QTreeWidgetItem();
+    lineedit   = new QLineEdit();
+    test.byte2 = lineedit;
+    lineedit->setMaxLength(2);
+    lineedit->setInputMask("HH");
+    lineedit->setText("00");
+    top->addChild(item);
+    item->setText(0, kCodec->toUnicode("Байт 2"));
+    mTree->setItemWidget(item, 1, lineedit);
+
+    item       = new QTreeWidgetItem();
+    lineedit   = new QLineEdit();
+    test.byte3 = lineedit;
+    lineedit->setMaxLength(2);
+    lineedit->setInputMask("HH");
+    lineedit->setText("00");
+    top->addChild(item);
+    item->setText(0, kCodec->toUnicode("Байт 3"));
+    mTree->setItemWidget(item, 1, lineedit);
+
+    item       = new QTreeWidgetItem();
+    lineedit   = new QLineEdit();
+    test.byte4 = lineedit;
+    lineedit->setMaxLength(2);
+    lineedit->setInputMask("HH");
+    lineedit->setText("00");
+    top->addChild(item);
+    item->setText(0, kCodec->toUnicode("Байт 4"));
+    mTree->setItemWidget(item, 1, lineedit);
+
+    item       = new QTreeWidgetItem();
+    lineedit   = new QLineEdit();
+    test.byte5 = lineedit;
+    lineedit->setMaxLength(2);
+    lineedit->setInputMask("HH");
+    lineedit->setText("00");
+    top->addChild(item);
+    item->setText(0, kCodec->toUnicode("Байт 5"));
+    mTree->setItemWidget(item, 1, lineedit);
+
+    top->setExpanded(false);
+}
+
+void TBspR400Hf::FillComboboxListStateDef()
+{
+    QComboBox *combobox = stateDef.state;
+
+    if (combobox == nullptr)
+        return;
+
+    combobox->addItem(kCodec->toUnicode(fcDefSost00), 0);
+    combobox->addItem(kCodec->toUnicode(fcDefSost01), 1);
+    combobox->addItem(kCodec->toUnicode(fcDefSost02), 2);
+    combobox->addItem(kCodec->toUnicode(fcDefSost03), 3);
+    combobox->addItem(kCodec->toUnicode(fcDefSost04), 4);
+    combobox->addItem(kCodec->toUnicode(fcDefSost05), 5);
+    combobox->addItem(kCodec->toUnicode(fcDefSost06), 6);
+    combobox->addItem(kCodec->toUnicode(fcDefSost07), 7);
+    combobox->addItem(kCodec->toUnicode(fcDefSost08), 8);
+    combobox->addItem(kCodec->toUnicode(fcDefSost09), 9);
+    combobox->addItem(kCodec->toUnicode(fcDefSost10), 10);
+    combobox->addItem(kCodec->toUnicode(fcDefSost11), 11);
+    combobox->addItem(kCodec->toUnicode(fcDefSost12), 12);
+    combobox->addItem(kCodec->toUnicode(fcDefSost13), 13);
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду чтения режимов и состояний.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void TBspR400Hf::HdlrComGlbx30(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_GET_SOST);
+
+    if (!CheckSize(com, data.size(), { 1 }))
+        return;
+
+    // @todo Уточнить обрабатывается ли температура в Р400м
+    setSpinBoxValue(&mTemperature, data.at(0));
+
+    mPkgTx.append(com);
+    mPkgTx.append(getComboBoxValue(stateDef.regime));
+    mPkgTx.append(getComboBoxValue(stateDef.state));
+    mPkgTx.append(0);
+    mPkgTx.append(0);
+    mPkgTx.append(0);
+    mPkgTx.append(0);
+    mPkgTx.append(0);
+    mPkgTx.append(0);
+    mPkgTx.append(0);
+    mPkgTx.append(0);
+    mPkgTx.append(0);
+    mPkgTx.append(0);
+
+    Q_ASSERT(mPkgTx.size() == 13);  // команда + 12 байт данных
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду чтения несиправностей и предупреждений.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void TBspR400Hf::HdlrComGlbx31(eGB_COM com, pkg_t &data)
+{
+    bool    ok;
+    quint16 def_alarm = getLineEditValue(stateDef.fault).toUInt(&ok, 16);
+    quint16 def_warn  = getLineEditValue(stateDef.warning).toUInt(&ok, 16);
+    quint16 glb_alarm = getLineEditValue(stateGlb.fault).toUInt(&ok, 16);
+    quint16 glb_warn  = getLineEditValue(stateGlb.warning).toUInt(&ok, 16);
+
+    Q_ASSERT(com == GB_COM_GET_FAULT);
+
+    if (!CheckSize(com, data.size(), { 0 }))
+        return;
+
+    mPkgTx.append(com);
+    mPkgTx.append(static_cast<uint8_t>(def_alarm >> 8));
+    mPkgTx.append(static_cast<uint8_t>(def_alarm));
+    mPkgTx.append(static_cast<uint8_t>(def_warn >> 8));
+    mPkgTx.append(static_cast<uint8_t>(def_warn));
+
+    mPkgTx.append(getSpinBoxValue(&mStateFaultDeviceNumber));
+    mPkgTx.append(0);
+    mPkgTx.append(0);
+    mPkgTx.append(0);
+
+    mPkgTx.append(0);
+    mPkgTx.append(0);
+    mPkgTx.append(0);
+    mPkgTx.append(0);
+
+    mPkgTx.append(static_cast<uint8_t>(glb_alarm >> 8));
+    mPkgTx.append(static_cast<uint8_t>(glb_alarm));
+    mPkgTx.append(static_cast<uint8_t>(glb_warn >> 8));
+    mPkgTx.append(static_cast<uint8_t>(glb_warn));
+
+    mPkgTx.append(0);
+    mPkgTx.append(0);
+    mPkgTx.append(0);
+    mPkgTx.append(0);
+
+
+    Q_ASSERT(mPkgTx.size() == 21);  // команда + 20 байт данных
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду чтения даты и времени.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void TBspR400Hf::HdlrComGlbx32(eGB_COM com, pkg_t &data)
+{
+    bool     ok;
+    uint16_t msec = dt.time().msec();
+
+    Q_ASSERT(com == GB_COM_GET_TIME || com == GB_COM_SET_TIME);
+
+    if (com == GB_COM_GET_TIME)
+    {
+        // C ПИ передается флаг запроса сообщения для передачи в АСУ (0..3), с ПК нет данных
+        if (!CheckSize(com, data.size(), { 0, 1 }))
+            return;
+
+        mPkgTx.append(com);
+        mPkgTx.append(int2bcd(dt.date().year() - 2000, ok));
+        mPkgTx.append(int2bcd(dt.date().month(), ok));
+        mPkgTx.append(int2bcd(dt.date().day(), ok));
+        mPkgTx.append(int2bcd(dt.time().hour(), ok));
+        mPkgTx.append(int2bcd(dt.time().minute(), ok));
+        mPkgTx.append(int2bcd(dt.time().second(), ok));
+        mPkgTx.append(static_cast<uint8_t>(msec));
+        mPkgTx.append(static_cast<uint8_t>(msec >> 8));
+
+        Q_ASSERT(mPkgTx.size() == 9);  // команда + 8 байт данных
+    }
+
+    if (com == GB_COM_SET_TIME)
+    {
+        // с ПК передается 6 байт, без мс / c МК передается 9 байт
+        if (!CheckSize(com, data.size(), { 6, 9 }))
+            return;
+
+        // @todo Добавить обработку флага источника синхронизации времени
+        // При установке времени надо проверить флаг источника:
+        // - 0, изменение с клавиатуры/пк
+        // - 1, изменение по АСУ, надо учитывать параметр "Синхр. времени"
+
+        bool    ok    = false;
+        quint16 year  = bcd2int(data.takeFirst(), ok) + 2000;
+        quint8  month = bcd2int(data.takeFirst(), ok);
+        quint8  day   = bcd2int(data.takeFirst(), ok);
+
+        quint8 hour   = bcd2int(data.takeFirst(), ok);
+        quint8 minute = bcd2int(data.takeFirst(), ok);
+        quint8 second = bcd2int(data.takeFirst(), ok);
+
+        quint16 ms = 0;
+        if (data.size() >= 3)
+        {
+            ms = data.takeFirst();
+            ms += static_cast<quint16>(data.takeFirst()) << 8;
+
+            quint8 source = data.takeFirst();
+            if (source > 1)
+            {
+                qWarning() << kMsgTimeSourceError.arg(source);
+            }
+        }
+
+        dt.setDate(QDate(year, month, day));
+        dt.setTime(QTime(hour, minute, second, ms));
+    }
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду чтения версии устройства
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void TBspR400Hf::HdlrComGlbx3F(eGB_COM com, pkg_t &data)
+{
+    quint16 vers_bsp_mcu = getSpinBoxValue(mDevice.versionBspMcu);
+    quint16 vers_bsp_dsp = getSpinBoxValue(mDevice.versionBspDsp);
+
+    Q_ASSERT(com == GB_COM_GET_VERS);
+
+    if (!CheckSize(com, data.size(), { 0 }))
+        return;
+
+    mPkgTx.append(com);
+    mPkgTx.append(1);  // защита
+    mPkgTx.append(0);  // прм1
+    mPkgTx.append(0);  // прм2
+    mPkgTx.append(0);  // прд
+    mPkgTx.append(getComboBoxValue(GB_PARAM_NUM_OF_DEVICES) + 1);
+    mPkgTx.append(GB_TYPE_LINE_UM);
+    mPkgTx.append(static_cast<quint8>(vers_bsp_mcu >> 8));
+    mPkgTx.append(static_cast<quint8>(vers_bsp_mcu));
+    mPkgTx.append(static_cast<quint8>(vers_bsp_dsp >> 8));
+    mPkgTx.append(static_cast<quint8>(vers_bsp_dsp));
+    mPkgTx.append(getComboBoxValue(GB_PARAM_COMP_P400));
+    mPkgTx.append(0);
+    mPkgTx.append(0);
+    mPkgTx.append(0);
+    mPkgTx.append(0);
+    mPkgTx.append(static_cast<quint8>(getSpinBoxValue(mDevice.versionBszPlis)));
+    mPkgTx.append(AVANT_R400M);
+    mPkgTx.append(0);  // версия БСП-ПИ, старший байт
+    mPkgTx.append(0);  // версия БСП-ПИ, младший байт
+
+    Q_ASSERT(mPkgTx.size() == 20);  // команда + 19 байт данных
+}
