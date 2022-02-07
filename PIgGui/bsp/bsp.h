@@ -186,8 +186,6 @@ protected:
     void procCommandWriteParam(eGB_COM com, pkg_t &data);
     void procCommandWriteRegime(eGB_COM com, pkg_t &data);
 
-    void hdlrComDefTypeAcGet(eGB_COM com, pkg_t &data);
-    void hdlrComDefTypeAcSet(eGB_COM com, pkg_t &data);
     void hdlrComSetControl(eGB_COM com, pkg_t &data);
 
     void hdlrComGetTest(eGB_COM com, pkg_t &data);

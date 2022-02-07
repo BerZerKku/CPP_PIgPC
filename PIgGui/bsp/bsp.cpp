@@ -1632,8 +1632,6 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data)
         }
         break;
 
-    case GB_COM_DEF_GET_TYPE_AC: hdlrComDefTypeAcGet(com, data); break;
-
     default:
         {
             qWarning("No command handler: 0x%.2X", com);
@@ -1827,8 +1825,6 @@ void Bsp::procCommandWriteParam(eGB_COM com, pkg_t &data)
         }
         break;
 
-    case GB_COM_DEF_SET_TYPE_AC: hdlrComDefTypeAcSet(com, data); break;
-
     default:
         {
             qWarning("No command handler: 0x%.2X", com);
@@ -1942,61 +1938,6 @@ void Bsp::procCommandWriteRegime(eGB_COM com, pkg_t &data)
         {
             qWarning("No command handler: 0x%.2X", com);
         }
-    }
-}
-
-void Bsp::hdlrComDefTypeAcGet(eGB_COM com, pkg_t &data)
-{
-    if (data.size() != 0)
-    {
-        qWarning() << kMsgSizeError.arg(com, 2, 16).arg(data.size());
-    }
-
-    //    eGB_TYPE_DEVICE device =
-    //        static_cast<eGB_TYPE_DEVICE>(mDevice.typeDevice->currentData().toUInt());
-
-    //    switch (device)
-    //    {
-    //    case AVANT_RZSK:
-    //        {
-    //            if (getComboBoxValue(GB_PARAM_COMP_RZSK) == GB_COMP_RZSK_M)
-    //            {
-    //                mPkgTx.append(com);
-    //                mPkgTx.append(getComboBoxValue(GB_PARAM_DEF_ONE_SIDE));
-    //            }
-    //            break;
-    //        }
-
-    //    case AVANT_R400M:
-    //        {
-    //            // @todo Добавить передачу типа АК и времени до АК
-    //            mPkgTx.append(com);
-    //            mPkgTx.append(1);     // Тип АК
-    //            mPkgTx.append(0x98);  // Время до АК, 5 байт в мс
-    //            mPkgTx.append(0x3A);
-    //            mPkgTx.append(0x00);
-    //            mPkgTx.append(0x00);
-    //            mPkgTx.append(0x00);
-    //            break;
-    //        }
-
-    //    default:
-    //        {
-    //            qWarning() << "Добавить команду чтения АК и времени до АК";
-    //        }
-    //    }
-}
-
-void Bsp::hdlrComDefTypeAcSet(eGB_COM com, pkg_t &data)
-{
-    if (data.size() == 1)
-    {
-        setComboBoxValue(GB_PARAM_DEF_ONE_SIDE, data.takeFirst());
-    }
-    else
-    {
-        // установки времени до АК нет!
-        qWarning() << kMsgSizeError.arg(com, 2, 16).arg(data.size());
     }
 }
 

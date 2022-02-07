@@ -25,7 +25,9 @@ public:
     explicit TBspR400mHf_b15(QTreeWidget *tree, QWidget *parent = nullptr);
 
     QSpinBox mStateFaultDeviceNumber;
-    QSpinBox mTemperature;
+
+    QComboBox mAc;
+    QSpinBox  mAcTime;
 
 private:
     void InitComMap() override;
@@ -42,8 +44,10 @@ private:
     void crtTest() override;
 
     void FillComboboxListStateDef() override;
+    void FillComboboxListAc();
 
     void HdlrComDefx02(eGB_COM com, pkg_t &data) override;
+    void HdlrComDefx0A(eGB_COM com, pkg_t &data) override;
 
     void HdlrComGlbx30(eGB_COM com, pkg_t &data) override;
     void HdlrComGlbx31(eGB_COM com, pkg_t &data) override;

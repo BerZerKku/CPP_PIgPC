@@ -10,6 +10,7 @@
 
 TBspR400mHf_b15::TBspR400mHf_b15(QTreeWidget *tree, QWidget *parent) : Bsp(tree, parent)
 {
+    FillComboboxListAc();
 }
 
 
@@ -23,6 +24,7 @@ TBspR400mHf_b15::TBspR400mHf_b15(QTreeWidget *tree, QWidget *parent) : Bsp(tree,
 void TBspR400mHf_b15::InitComMap()
 {
     mComMap.insert(0x02, &Bsp::HdlrComDefx02);  // чтение количества аппаратов в линии
+    mComMap.insert(0x0A, &Bsp::HdlrComDefx0A);  // чтение режима АК и времени до АК
 
     mComMap.insert(0x30, &Bsp::HdlrComGlbx30);  // чтение режимов
     mComMap.insert(0x31, &Bsp::HdlrComGlbx31);  // чтение неисправностей
@@ -33,7 +35,8 @@ void TBspR400mHf_b15::InitComMap()
     mComMap.insert(0x3B, &Bsp::HdlrComGlbx3B);  // чтение номера аппарата
     mComMap.insert(0x3f, &Bsp::HdlrComGlbx3F);  // чтение информации об устройстве
 
-    mComMap.insert(0x82, &Bsp::HdlrComDefx02);  // чтение количества аппаратов в линии
+    mComMap.insert(0x82, &Bsp::HdlrComDefx02);  // запись количества аппаратов в линии
+    mComMap.insert(0x8A, &Bsp::HdlrComDefx0A);  // запись режима АК и времени до АК
 
     mComMap.insert(0xB2, &Bsp::HdlrComGlbx32);  // запись времени
     mComMap.insert(0xB7, &Bsp::HdlrComGlbx37);  // запись совместимости
@@ -57,6 +60,8 @@ void TBspR400mHf_b15::InitParam()
     setComboBoxValue(stateGlb.regime, eGB_REGIME::GB_REGIME_ENABLED);
     setComboBoxValue(stateGlb.state, 1);  // 1 - контроль
     setSpinBoxValue(stateGlb.dopByte, 1);
+    setComboBoxValue(&mAc, GB_TYPE_AC_AUTO_NORM);
+    mAcTime.setValue(123);
 
     setLineEditValue(stateGlb.fault, "0000");
     setLineEditValue(stateGlb.warning, "0000");
@@ -328,12 +333,16 @@ void TBspR400mHf_b15::crtTreeState()
     mStateFaultDeviceNumber.setRange(0, 255);  // @fixme Изменить на реальный диапазон
 
     item = new QTreeWidgetItem();
-    item->setText(0, kCodec->toUnicode("Температура"));
+    item->setText(0, kCodec->toUnicode("Режим АК"));
     top->addChild(item);
-    mTree->setItemWidget(item, 1, &mTemperature);
-    mTemperature.setRange(-100, 125);
-    mTemperature.setReadOnly(true);
+    mTree->setItemWidget(item, 1, &mAc);
 
+    item = new QTreeWidgetItem();
+    item->setText(0, kCodec->toUnicode("Время до АК, с"));
+    top->addChild(item);
+    mTree->setItemWidget(item, 1, &mAcTime);
+    mAcTime.setRange(0, 60000);
+    mAcTime.setToolTip(QString("%1 - %2").arg(mAcTime.minimum()).arg(mAcTime.maximum()));
     connect(stateGlb.regime,
             QOverload<int>::of(&QComboBox::currentIndexChanged),
             this,
@@ -437,14 +446,40 @@ void TBspR400mHf_b15::FillComboboxListStateDef()
     combobox->addItem(kCodec->toUnicode(fcDefSost11), 11);
     combobox->addItem(kCodec->toUnicode(fcDefSost12), 12);
     combobox->addItem(kCodec->toUnicode(fcDefSost13), 13);
+}
 
-    //    for (int i = 0; i < combobox->maxCount(); i++)
-    //    {
-    //        QVariant data = combobox->itemData(i);
-    //        QString  text = combobox->itemText(i);
 
-    //        combobox->insertItem(i, QString("%1 - %2").arg(data.toInt()).arg(text), data);
-    //    }
+/**
+ * *****************************************************************************
+ *
+ * @brief Заполнение списка возможных режимов АК.
+ *
+ * *****************************************************************************
+ */
+void TBspR400mHf_b15::FillComboboxListAc()
+{
+    // из fcAcType
+
+    mAc.addItem(kCodec->toUnicode(fcAcType[0]), 0);
+
+    QString value_1 = QString("%1 / %2")
+                          .arg(kCodec->toUnicode(fcAcType[GB_TYPE_AC_AUTO_NORM]))
+                          .arg(kCodec->toUnicode(fcAcType[GB_TYPE_AC_AUTO]));
+    mAc.addItem(value_1, 1);
+
+    mAc.addItem(kCodec->toUnicode(fcAcType[GB_TYPE_AC_AUTO_REPEAT]), GB_TYPE_AC_AUTO_REPEAT);
+    mAc.addItem(kCodec->toUnicode(fcAcType[GB_TYPE_AC_ACCEL]), GB_TYPE_AC_ACCEL);
+    mAc.addItem(kCodec->toUnicode(fcAcType[GB_TYPE_AC_OFF]), GB_TYPE_AC_OFF);
+
+    QString value_5 = QString("%1 / %2")
+                          .arg(kCodec->toUnicode(fcAcType[GB_TYPE_AC_CHECK]))
+                          .arg(kCodec->toUnicode(fcAcType[GB_TYPE_AC_CHECK_1]));
+    mAc.addItem(value_5, 1);
+
+    mAc.addItem(kCodec->toUnicode(fcAcType[GB_TYPE_AC_PUSK_SELF]), GB_TYPE_AC_PUSK_SELF);
+    mAc.addItem(kCodec->toUnicode(fcAcType[GB_TYPE_AC_PUSK]), GB_TYPE_AC_PUSK);
+    mAc.addItem(kCodec->toUnicode(fcAcType[GB_TYPE_AC_ONE_SIDE]), GB_TYPE_AC_ONE_SIDE);
+    mAc.addItem(kCodec->toUnicode(fcAcType[GB_TYPE_AC_MAX]), GB_TYPE_AC_MAX);
 }
 
 
@@ -493,6 +528,55 @@ void TBspR400mHf_b15::HdlrComDefx02(eGB_COM com, pkg_t &data)
 /**
  * *****************************************************************************
  *
+ * @brief Обрабатывает команду чтения режима АК и времени до АК
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void TBspR400mHf_b15::HdlrComDefx0A(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_DEF_GET_TYPE_AC || com == GB_COM_DEF_SET_TYPE_AC);
+
+    if (com == GB_COM_DEF_GET_TYPE_AC)
+    {
+        if (!CheckSize(com, data.size(), { 0 }))
+        {
+            return;
+        }
+
+        mPkgTx.append(com);
+        mPkgTx.append(getComboBoxValue(&mAc));
+
+        uint32_t ms = static_cast<uint32_t>(mAcTime.value()) * 1000;
+
+        mPkgTx.append(static_cast<uint8_t>(ms));
+        mPkgTx.append(static_cast<uint8_t>(ms >> 8));
+        mPkgTx.append(static_cast<uint8_t>(ms >> 16));
+        mPkgTx.append(static_cast<uint8_t>(ms >> 24));
+
+        Q_ASSERT(mPkgTx.size() == 6);  // команда + 5 байт данных
+    }
+
+    if (com == GB_COM_DEF_SET_TYPE_AC)
+    {
+        if (!CheckSize(com, data.size(), { 1 }))
+        {
+            return;
+        }
+
+        // ответ на команду записи совпадает с запросом
+        mPkgTx.append(com);
+        mPkgTx.append(data);
+
+        setComboBoxValue(&mAc, data.at(0));
+    }
+}
+
+
+/**
+ * *****************************************************************************
+ *
  * @brief Обрабатывает команду чтения режимов и состояний.
  * @param[in] Команда.
  * @param[in] Данные.
@@ -507,9 +591,6 @@ void TBspR400mHf_b15::HdlrComGlbx30(eGB_COM com, pkg_t &data)
     {
         return;
     }
-
-    // @todo Уточнить обрабатывается ли температура в Р400м
-    setSpinBoxValue(&mTemperature, data.at(0));
 
     mPkgTx.append(com);
     mPkgTx.append(getComboBoxValue(stateDef.regime));
