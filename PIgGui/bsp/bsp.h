@@ -188,8 +188,6 @@ protected:
 
     void hdlrComDefTypeAcGet(eGB_COM com, pkg_t &data);
     void hdlrComDefTypeAcSet(eGB_COM com, pkg_t &data);
-    void hdlrComDeviceNumGet(eGB_COM com, pkg_t &data);
-    void hdlrComDeviceNumSet(eGB_COM com, pkg_t &data);
     void hdlrComSetControl(eGB_COM com, pkg_t &data);
 
     void hdlrComGetTest(eGB_COM com, pkg_t &data);

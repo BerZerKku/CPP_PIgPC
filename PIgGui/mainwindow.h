@@ -85,7 +85,7 @@ class MainWindow : public QMainWindow
     /// Устройство.
     enum eDevice
     {
-        DEVICE_R400_100_HF = 0,
+        DEVICE_R400M_100_HF_b15 = 0,
         DEVICE_RZSK_111_HF,
         DEVICE_K400_088_HF,
         DEVICE_R400_100_VOLS,

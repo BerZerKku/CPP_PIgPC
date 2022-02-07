@@ -1632,7 +1632,6 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data)
         }
         break;
 
-    case GB_COM_GET_DEVICE_NUM: hdlrComDeviceNumGet(com, data); break;
     case GB_COM_DEF_GET_TYPE_AC: hdlrComDefTypeAcGet(com, data); break;
 
     default:
@@ -1828,7 +1827,6 @@ void Bsp::procCommandWriteParam(eGB_COM com, pkg_t &data)
         }
         break;
 
-    case GB_COM_SET_DEVICE_NUM: hdlrComDeviceNumSet(com, data); break;
     case GB_COM_DEF_SET_TYPE_AC: hdlrComDefTypeAcSet(com, data); break;
 
     default:
@@ -2001,28 +1999,6 @@ void Bsp::hdlrComDefTypeAcSet(eGB_COM com, pkg_t &data)
         qWarning() << kMsgSizeError.arg(com, 2, 16).arg(data.size());
     }
 }
-
-void Bsp::hdlrComDeviceNumGet(eGB_COM com, pkg_t &data)
-{
-    if (data.size() != 0)
-    {
-        qWarning() << kMsgSizeError.arg(com, 2, 16).arg(data.size());
-    }
-
-    mPkgTx.append(com);
-    mPkgTx.append(getSpinBoxValue(GB_PARAM_NUM_OF_DEVICE));
-}
-
-void Bsp::hdlrComDeviceNumSet(eGB_COM com, pkg_t &data)
-{
-    if (data.size() != 1)
-    {
-        qWarning() << kMsgSizeError.arg(com, 2, 16).arg(data.size());
-    }
-
-    setSpinBoxValue(GB_PARAM_NUM_OF_DEVICE, data.takeFirst());
-}
-
 
 //
 void Bsp::hdlrComSetControl(eGB_COM com, pkg_t &data)

@@ -39,12 +39,12 @@ INCLUDEPATH += \
     $$system(pwd)
 
 HEADERS += \
+    bsp/bspR400m_hf_b15.hpp \
     mainwindow.h \
     qkeyboard.h \
     qprotocolviewer.h \
     serial.h \
     bsp/bsp.h \
-    bsp/bspR400hf.hpp \
     wrapper.h \
     serial/serialport.h \
     widget/combobox.h \
@@ -54,13 +54,13 @@ HEADERS += \
 
 
 SOURCES += \
+    bsp/bspR400m_hf_b15.cpp \
     main.cpp \
     mainwindow.cpp \
     qkeyboard.cpp \
     qprotocolviewer.cpp \
     wrapperGui.cpp \
     bsp/bsp.cpp \
-    bsp/bspR400hf.cpp \
     serial.cpp \
     serial/serialport.cpp \
     widget/combobox.cpp \

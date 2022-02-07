@@ -10,7 +10,7 @@
 
 #include "PIg/src/flash.h"
 #include "PIg/src/menu/base.h"
-#include "bsp/bspR400hf.hpp"
+#include "bsp/bspR400m_hf_b15.hpp"
 
 //
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
@@ -105,7 +105,9 @@ void MainWindow::initBsp()
 {
     connect(ui->mBspCombo, &QComboBox::currentTextChanged, this, &MainWindow::SlotBspChange);
 
-    ui->mBspCombo->addItem(codec->toUnicode("ÀÂÀÍÒ Ð400-100-Â"), DEVICE_R400_100_HF);
+    ui->mBspCombo->addItem(codec->toUnicode("ÀÂÀÍÒ Ð400Ì-100-Â, ñáîðêà 15"),
+                           DEVICE_R400M_100_HF_b15);
+
     ui->mBspCombo->addItem(codec->toUnicode("ÀÂÀÍÒ ÐÇÑÊ-111-Â"), DEVICE_RZSK_111_HF);
     ui->mBspCombo->addItem(codec->toUnicode("ÀÂÀÍÒ K400-088-Â"), DEVICE_K400_088_HF);
     ui->mBspCombo->addItem(codec->toUnicode("ÀÂÀÍÒ Ð400-100-Â"), DEVICE_R400_100_VOLS);
@@ -437,9 +439,9 @@ void MainWindow::SlotBspChange()
 
     switch (static_cast<eDevice>(ui->mBspCombo->currentData().toInt()))
     {
-    case DEVICE_R400_100_HF:
+    case DEVICE_R400M_100_HF_b15:
         {
-            bsp = new TBspR400Hf(ui->mBspTree, this);
+            bsp = new TBspR400mHf_b15(ui->mBspTree, this);
             break;
         }
 

@@ -1,14 +1,14 @@
 #include <QDebug>
 #include <QHeaderView>
 
-#include "bspR400hf.hpp"
+#include "bspR400m_hf_b15.hpp"
 
 #include "PIg/src/flash.h"
 #include "PIg/src/menu/txCom.h"
 #include "PIg/src/parameter/param.h"
 
 
-TBspR400Hf::TBspR400Hf(QTreeWidget *tree, QWidget *parent) : Bsp(tree, parent)
+TBspR400mHf_b15::TBspR400mHf_b15(QTreeWidget *tree, QWidget *parent) : Bsp(tree, parent)
 {
 }
 
@@ -20,7 +20,7 @@ TBspR400Hf::TBspR400Hf(QTreeWidget *tree, QWidget *parent) : Bsp(tree, parent)
  *
  * *****************************************************************************
  */
-void TBspR400Hf::InitComMap()
+void TBspR400mHf_b15::InitComMap()
 {
     mComMap.insert(0x02, &Bsp::HdlrComDefx02);  // чтение количества аппаратов в линии
 
@@ -28,26 +28,30 @@ void TBspR400Hf::InitComMap()
     mComMap.insert(0x31, &Bsp::HdlrComGlbx31);  // чтение неисправностей
     mComMap.insert(0x32, &Bsp::HdlrComGlbx32);  // чтение времени
     mComMap.insert(0x34, &Bsp::HdlrComGlbx34);  // чтение измерений
+    mComMap.insert(0x37, &Bsp::HdlrComGlbx37);  // чтение совместимости
     mComMap.insert(0x38, &Bsp::HdlrComGlbx38);  // чтение адреса в локальной сети
+    mComMap.insert(0x3B, &Bsp::HdlrComGlbx3B);  // чтение номера аппарата
     mComMap.insert(0x3f, &Bsp::HdlrComGlbx3F);  // чтение информации об устройстве
 
     mComMap.insert(0x82, &Bsp::HdlrComDefx02);  // чтение количества аппаратов в линии
 
     mComMap.insert(0xB2, &Bsp::HdlrComGlbx32);  // запись времени
+    mComMap.insert(0xB7, &Bsp::HdlrComGlbx37);  // запись совместимости
     mComMap.insert(0xB8, &Bsp::HdlrComGlbx38);  // запись адреса в локальной сети
+    mComMap.insert(0xBB, &Bsp::HdlrComGlbx3B);  // запись номера аппарата
 }
 
 
 //
-void TBspR400Hf::InitParam()
+void TBspR400mHf_b15::InitParam()
 {
     eGB_PARAM param = GB_PARAM_NULL_PARAM;
 
     setComboBoxValue(GB_PARAM_NUM_OF_DEVICES, GB_NUM_DEVICES_2);
     setComboBoxValue(GB_PARAM_COMP_P400, GB_COMP_R400M_LINER);
 
-    setSpinBoxValue(mDevice.versionBspMcu, 0xF233);
-    setSpinBoxValue(mDevice.versionBspDsp, 0x330D);
+    setSpinBoxValue(mDevice.versionBspMcu, 0xF232);
+    setSpinBoxValue(mDevice.versionBspDsp, 0x5833);
     setSpinBoxValue(mDevice.versionBszPlis, 0x52);
 
     setComboBoxValue(stateGlb.regime, eGB_REGIME::GB_REGIME_ENABLED);
@@ -94,7 +98,7 @@ void TBspR400Hf::InitParam()
 }
 
 
-void TBspR400Hf::crtTreeDef()
+void TBspR400mHf_b15::crtTreeDef()
 {
     QTreeWidgetItem *top = new QTreeWidgetItem();
     mTree->insertTopLevelItem(mTree->topLevelItemCount(), top);
@@ -107,14 +111,11 @@ void TBspR400Hf::crtTreeDef()
 }
 
 
-void TBspR400Hf::crtTreeDevice()
+void TBspR400mHf_b15::crtTreeDevice()
 {
     QTreeWidgetItem *top = new QTreeWidgetItem();
     mTree->insertTopLevelItem(mTree->topLevelItemCount(), top);
     top->setText(0, kCodec->toUnicode("Устройство"));
-
-
-    crtComboBox(GB_PARAM_COMP_P400);
 
     top->setExpanded(true);
 
@@ -122,7 +123,7 @@ void TBspR400Hf::crtTreeDevice()
 }
 
 
-void TBspR400Hf::crtTreeDevieVersions(QTreeWidgetItem *top)
+void TBspR400mHf_b15::crtTreeDevieVersions(QTreeWidgetItem *top)
 {
     QTreeWidgetItem *branch = new QTreeWidgetItem();
     top->addChild(branch);
@@ -153,13 +154,14 @@ void TBspR400Hf::crtTreeDevieVersions(QTreeWidgetItem *top)
 }
 
 
-void TBspR400Hf::crtTreeGlb()
+void TBspR400mHf_b15::crtTreeGlb()
 {
     QTreeWidgetItem *top = new QTreeWidgetItem();
     mTree->insertTopLevelItem(mTree->topLevelItemCount(), top);
 
     top->setText(0, kCodec->toUnicode("Общие"));
 
+    crtComboBox(GB_PARAM_COMP_P400);
     crtSpinBox(GB_PARAM_NUM_OF_DEVICE);
     crtComboBox(GB_PARAM_COM_PRD_KEEP);
     crtComboBox(GB_PARAM_COM_PRM_KEEP);
@@ -169,7 +171,7 @@ void TBspR400Hf::crtTreeGlb()
 }
 
 
-void TBspR400Hf::crtTreeMeasure()
+void TBspR400mHf_b15::crtTreeMeasure()
 {
     QTreeWidgetItem *item   = nullptr;
     QSpinBox *       widget = nullptr;
@@ -264,7 +266,7 @@ void TBspR400Hf::crtTreeMeasure()
 }
 
 
-void TBspR400Hf::crtTreePrd()
+void TBspR400mHf_b15::crtTreePrd()
 {
     QTreeWidgetItem *top = new QTreeWidgetItem();
     mTree->insertTopLevelItem(mTree->topLevelItemCount(), top);
@@ -282,7 +284,7 @@ void TBspR400Hf::crtTreePrd()
 }
 
 
-void TBspR400Hf::crtTreePrm()
+void TBspR400mHf_b15::crtTreePrm()
 {
     QTreeWidgetItem *top = new QTreeWidgetItem();
     mTree->insertTopLevelItem(mTree->topLevelItemCount(), top);
@@ -304,7 +306,7 @@ void TBspR400Hf::crtTreePrm()
 
 
 //
-void TBspR400Hf::crtTreeState()
+void TBspR400mHf_b15::crtTreeState()
 {
     QTreeWidgetItem *item;
     QTreeWidgetItem *def;
@@ -335,24 +337,24 @@ void TBspR400Hf::crtTreeState()
     connect(stateGlb.regime,
             QOverload<int>::of(&QComboBox::currentIndexChanged),
             this,
-            &TBspR400Hf::setRegime);
+            &TBspR400mHf_b15::setRegime);
 
     connect(stateGlb.state,
             QOverload<int>::of(&QComboBox::currentIndexChanged),
             this,
-            &TBspR400Hf::setState);
+            &TBspR400mHf_b15::setState);
 
     connect(stateGlb.dopByte,
             QOverload<int>::of(&QSpinBox::valueChanged),
             this,
-            &TBspR400Hf::setDopByte);
+            &TBspR400mHf_b15::setDopByte);
 
     top->setExpanded(true);
 }
 
 
 //
-void TBspR400Hf::crtTest()
+void TBspR400mHf_b15::crtTest()
 {
     QTreeWidgetItem *top = new QTreeWidgetItem();
     QTreeWidgetItem *item;
@@ -414,7 +416,7 @@ void TBspR400Hf::crtTest()
 }
 
 
-void TBspR400Hf::FillComboboxListStateDef()
+void TBspR400mHf_b15::FillComboboxListStateDef()
 {
     QComboBox *combobox = stateDef.state;
 
@@ -455,7 +457,7 @@ void TBspR400Hf::FillComboboxListStateDef()
  *
  * *****************************************************************************
  */
-void TBspR400Hf::HdlrComDefx02(eGB_COM com, pkg_t &data)
+void TBspR400mHf_b15::HdlrComDefx02(eGB_COM com, pkg_t &data)
 {
     Q_ASSERT(com == GB_COM_DEF_GET_LINE_TYPE || com == GB_COM_DEF_SET_LINE_TYPE);
 
@@ -497,7 +499,7 @@ void TBspR400Hf::HdlrComDefx02(eGB_COM com, pkg_t &data)
  *
  * *****************************************************************************
  */
-void TBspR400Hf::HdlrComGlbx30(eGB_COM com, pkg_t &data)
+void TBspR400mHf_b15::HdlrComGlbx30(eGB_COM com, pkg_t &data)
 {
     Q_ASSERT(com == GB_COM_GET_SOST);
 
@@ -536,7 +538,7 @@ void TBspR400Hf::HdlrComGlbx30(eGB_COM com, pkg_t &data)
  *
  * *****************************************************************************
  */
-void TBspR400Hf::HdlrComGlbx31(eGB_COM com, pkg_t &data)
+void TBspR400mHf_b15::HdlrComGlbx31(eGB_COM com, pkg_t &data)
 {
     bool    ok;
     quint16 def_alarm = getLineEditValue(stateDef.fault).toUInt(&ok, 16);
@@ -585,13 +587,13 @@ void TBspR400Hf::HdlrComGlbx31(eGB_COM com, pkg_t &data)
 /**
  * *****************************************************************************
  *
- * @brief Обрабатывает команду чтения даты и времени.
+ * @brief Обрабатывает команду чтения/записи даты и времени.
  * @param[in] Команда.
  * @param[in] Данные.
  *
  * *****************************************************************************
  */
-void TBspR400Hf::HdlrComGlbx32(eGB_COM com, pkg_t &data)
+void TBspR400mHf_b15::HdlrComGlbx32(eGB_COM com, pkg_t &data)
 {
     bool     ok;
     uint16_t msec = dt.time().msec();
@@ -673,7 +675,7 @@ void TBspR400Hf::HdlrComGlbx32(eGB_COM com, pkg_t &data)
  *
  * *****************************************************************************
  */
-void TBspR400Hf::HdlrComGlbx34(eGB_COM com, pkg_t &data)
+void TBspR400mHf_b15::HdlrComGlbx34(eGB_COM com, pkg_t &data)
 {
     qint16 value = 0;
 
@@ -727,13 +729,56 @@ void TBspR400Hf::HdlrComGlbx34(eGB_COM com, pkg_t &data)
 /**
  * *****************************************************************************
  *
- * @brief Обрабатывает команду чтения адреса в локальной сети.
+ * @brief Обрабатывает команду чтения/записи совместимости.
  * @param[in] Команда.
  * @param[in] Данные.
  *
  * *****************************************************************************
  */
-void TBspR400Hf::HdlrComGlbx38(eGB_COM com, pkg_t &data)
+void TBspR400mHf_b15::HdlrComGlbx37(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_GET_COM_PRD_KEEP || com == GB_COM_SET_COM_PRD_KEEP);
+
+    if (com == GB_COM_GET_COM_PRD_KEEP)
+    {
+        if (!CheckSize(com, data.size(), { 0 }))
+        {
+            return;
+        }
+
+        mPkgTx.append(com);
+        mPkgTx.append(getComboBoxValue(GB_PARAM_COMP_P400));
+
+        Q_ASSERT(mPkgTx.size() == 2);  // команда + байт данных
+    }
+
+    if (com == GB_COM_SET_COM_PRD_KEEP)
+    {
+        // используется только первый байт
+        if (!CheckSize(com, data.size(), { 1, 2 }))
+        {
+            return;
+        }
+
+        // ответ на команду записи совпадает с запросом
+        mPkgTx.append(com);
+        mPkgTx.append(data);
+
+        setComboBoxValue(GB_PARAM_COMP_P400, data.at(0));
+    }
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду чтения/записи адреса в локальной сети.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void TBspR400mHf_b15::HdlrComGlbx38(eGB_COM com, pkg_t &data)
 {
     Q_ASSERT(com == GB_COM_GET_NET_ADR || com == GB_COM_SET_NET_ADR);
 
@@ -765,6 +810,48 @@ void TBspR400Hf::HdlrComGlbx38(eGB_COM com, pkg_t &data)
     }
 }
 
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду чтения/записи номера аппарата
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void TBspR400mHf_b15::HdlrComGlbx3B(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_GET_DEVICE_NUM || com == GB_COM_SET_DEVICE_NUM);
+
+    if (com == GB_COM_GET_DEVICE_NUM)
+    {
+        if (!CheckSize(com, data.size(), { 0 }))
+        {
+            return;
+        }
+
+        mPkgTx.append(com);
+        mPkgTx.append(getSpinBoxValue(GB_PARAM_NUM_OF_DEVICE));
+
+        Q_ASSERT(mPkgTx.size() == 2);  // команда + байт данных
+    }
+
+    if (com == GB_COM_SET_DEVICE_NUM)
+    {
+        if (!CheckSize(com, data.size(), { 1 }))
+        {
+            return;
+        }
+
+        // ответ на команду записи совпадает с запросом
+        mPkgTx.append(com);
+        mPkgTx.append(data);
+
+        setSpinBoxValue(GB_PARAM_NUM_OF_DEVICE, data.at(0));
+    }
+}
+
 /**
  * *****************************************************************************
  *
@@ -774,7 +861,7 @@ void TBspR400Hf::HdlrComGlbx38(eGB_COM com, pkg_t &data)
  *
  * *****************************************************************************
  */
-void TBspR400Hf::HdlrComGlbx3F(eGB_COM com, pkg_t &data)
+void TBspR400mHf_b15::HdlrComGlbx3F(eGB_COM com, pkg_t &data)
 {
     quint16 vers_bsp_mcu = getSpinBoxValue(mDevice.versionBspMcu);
     quint16 vers_bsp_dsp = getSpinBoxValue(mDevice.versionBspDsp);
