@@ -4,9 +4,9 @@
 #include "bspR400m_hf_b15.hpp"
 
 #include "PIg/src/flash.h"
+#include "PIg/src/menu/control.h"
 #include "PIg/src/menu/txCom.h"
 #include "PIg/src/parameter/param.h"
-
 
 TBspR400mHf_b15::TBspR400mHf_b15(QTreeWidget *tree, QWidget *parent) : Bsp(tree, parent)
 {
@@ -35,6 +35,8 @@ void TBspR400mHf_b15::InitComMap()
     mComMap.insert(0x3B, &Bsp::HdlrComGlbx3B);  // чтение номера аппарата
     mComMap.insert(0x3f, &Bsp::HdlrComGlbx3F);  // чтение информации об устройстве
 
+    mComMap.insert(0x72, &Bsp::HdlrComRegx72);  // запись команды управления
+
     mComMap.insert(0x82, &Bsp::HdlrComDefx02);  // запись количества аппаратов в линии
     mComMap.insert(0x8A, &Bsp::HdlrComDefx0A);  // запись режима АК и времени до АК
 
@@ -42,6 +44,9 @@ void TBspR400mHf_b15::InitComMap()
     mComMap.insert(0xB7, &Bsp::HdlrComGlbx37);  // запись совместимости
     mComMap.insert(0xB8, &Bsp::HdlrComGlbx38);  // запись адреса в локальной сети
     mComMap.insert(0xBB, &Bsp::HdlrComGlbx3B);  // запись номера аппарата
+
+    mComMap.insert(0xC1, &Bsp::HdlrComJrnxC1);  // запись адреса в локальной сети
+    mComMap.insert(0xF1, &Bsp::HdlrComJrnxF1);  // запись номера аппарата
 }
 
 
@@ -100,6 +105,9 @@ void TBspR400mHf_b15::InitParam()
     setSpinBoxValue(m_measure.Un1, -7);
     setSpinBoxValue(m_measure.Un2, 7);
     setSpinBoxValue(m_measure.Sd, 321);
+
+    mJrnDefCounter.setValue(15);
+    mJrnGlbCounter.setValue(15);
 }
 
 
@@ -343,6 +351,12 @@ void TBspR400mHf_b15::crtTreeState()
     mTree->setItemWidget(item, 1, &mAcTime);
     mAcTime.setRange(0, 60000);
     mAcTime.setToolTip(QString("%1 - %2").arg(mAcTime.minimum()).arg(mAcTime.maximum()));
+
+    item = new QTreeWidgetItem(top);
+    item->setText(0, kCodec->toUnicode("Управление"));
+    top->insertChild(0, item);
+    mTree->setItemWidget(item, 1, &mControl);
+
     connect(stateGlb.regime,
             QOverload<int>::of(&QComboBox::currentIndexChanged),
             this,
@@ -425,6 +439,75 @@ void TBspR400mHf_b15::crtTest()
 }
 
 
+/**
+ * *****************************************************************************
+ *
+ * @brief Создает ветку журналов.
+ *
+ * *****************************************************************************
+ */
+void TBspR400mHf_b15::crtJrn()
+{
+    QTreeWidgetItem *top = new QTreeWidgetItem(mTree);
+    QTreeWidgetItem *ltop;
+
+    mTree->insertTopLevelItem(mTree->topLevelItemCount(), top);
+    top->setText(0, kCodec->toUnicode("Журналы"));
+
+    ltop = new QTreeWidgetItem(top);
+    ltop->setText(0, kCodec->toUnicode("Журнал событий"));
+    top->insertChild(0, ltop);
+    crtJrnGlb(ltop);
+
+    ltop = new QTreeWidgetItem(top);
+    ltop->setText(0, kCodec->toUnicode("Журнал защиты"));
+    top->insertChild(0, ltop);
+    crtJrnDef(ltop);
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Создает журнал защиты.
+ * @param[in] top Верхний уровень.
+ *
+ * *****************************************************************************
+ */
+void TBspR400mHf_b15::crtJrnDef(QTreeWidgetItem *top)
+{
+    QTreeWidgetItem *item;
+
+    item = new QTreeWidgetItem(top);
+    item->setText(0, kCodec->toUnicode("Количество записей"));
+    mTree->setItemWidget(item, 1, &mJrnGlbCounter);
+    mJrnGlbCounter.setRange(0, 1024);
+
+    top->setExpanded(false);
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Создает журнал событий.
+ * @param[in] top Верхний уровень.
+ *
+ * *****************************************************************************
+ */
+void TBspR400mHf_b15::crtJrnGlb(QTreeWidgetItem *top)
+{
+    QTreeWidgetItem *item;
+
+    item = new QTreeWidgetItem(top);
+    item->setText(0, kCodec->toUnicode("Количество записей"));
+    mTree->setItemWidget(item, 1, &mJrnDefCounter);
+    mJrnDefCounter.setRange(0, 1024);
+
+    top->setExpanded(false);
+}
+
+
 void TBspR400mHf_b15::FillComboboxListStateDef()
 {
     QComboBox *combobox = stateDef.state;
@@ -480,6 +563,40 @@ void TBspR400mHf_b15::FillComboboxListAc()
     mAc.addItem(kCodec->toUnicode(fcAcType[GB_TYPE_AC_PUSK]), GB_TYPE_AC_PUSK);
     mAc.addItem(kCodec->toUnicode(fcAcType[GB_TYPE_AC_ONE_SIDE]), GB_TYPE_AC_ONE_SIDE);
     mAc.addItem(kCodec->toUnicode(fcAcType[GB_TYPE_AC_MAX]), GB_TYPE_AC_MAX);
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Заполнение списка возможных команд управления.
+ *
+ * @todo Изменять список команд управления в зависимости от текущей совместимости.
+ *
+ * *****************************************************************************
+ */
+void TBspR400mHf_b15::FillComboBoxListControl()
+{
+    mControl.addItem(kCodec->toUnicode("0 - Нет"), 0);
+    mControl.addItem(kCodec->toUnicode("1 - Сброс своего"), 1);
+    mControl.addItem(kCodec->toUnicode("2 - Сброс удаленного"), 2);
+    mControl.addItem(kCodec->toUnicode("3 - Сброс АК"), 3);
+    mControl.addItem(kCodec->toUnicode("4 - Пуск удаленного (1)"), 4);
+    mControl.addItem(kCodec->toUnicode("5 - Пуск удаленного (2)"), 5);
+    mControl.addItem(kCodec->toUnicode("6 - Пуск удаленных"), 6);
+    mControl.addItem(kCodec->toUnicode("7 - Вызов"), 7);
+    mControl.addItem(kCodec->toUnicode("8 - Наладочный пуск вкл."), 8);
+    mControl.addItem(kCodec->toUnicode("9 - Наладочный пуск выкл."), 9);
+    mControl.addItem(kCodec->toUnicode("10 - Пуск АК удаленный"), 10);
+    mControl.addItem(kCodec->toUnicode("11 - Сброс удаленного (1)"), 11);
+    mControl.addItem(kCodec->toUnicode("12 - Сброс удаленного (2)"), 12);
+    mControl.addItem(kCodec->toUnicode("13 - Пуск удаленного (3)"), 13);
+    mControl.addItem(kCodec->toUnicode("14 - Режим АК"), 14);
+    mControl.addItem(kCodec->toUnicode("15 - Сброс удаленного (3)"), 15);
+    mControl.addItem(kCodec->toUnicode("16 - Пуск уд. МАН (1)"), 16);
+    mControl.addItem(kCodec->toUnicode("17 - Пуск уд. МАН (2)"), 17);
+    mControl.addItem(kCodec->toUnicode("18 - Пуск уд. МАН (3)"), 18);
+    mControl.addItem(kCodec->toUnicode("19 - Пуск удаленных МАН"), 19);
 }
 
 
@@ -976,4 +1093,94 @@ void TBspR400mHf_b15::HdlrComGlbx3F(eGB_COM com, pkg_t &data)
     mPkgTx.append(0);  // версия БСП-ПИ, младший байт
 
     Q_ASSERT(mPkgTx.size() == 20);  // команда + 19 байт данных
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду управления.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void TBspR400mHf_b15::HdlrComRegx72(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_SET_CONTROL);
+
+    if (!CheckSize(com, data.size(), { 1 }))
+    {
+        return;
+    }
+
+    // ответ на команду записи совпадает с запросом
+    mPkgTx.append(com);
+    mPkgTx.append(data);
+
+    uint8_t control = data.takeFirst();
+    if (control >= mControl.count())
+    {
+        QString message("Wrong value in command %1: %2");
+        qWarning() << message.arg(com, 2, 16, QLatin1Char('0')).arg(control);
+    }
+
+    mControl.setCurrentIndex(mControl.findData(control));
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду чтения количества записей в журнале защиты.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void TBspR400mHf_b15::HdlrComJrnxC1(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_DEF_GET_JRN_CNT);
+
+    if (!CheckSize(com, data.size(), { 0 }))
+    {
+        return;
+    }
+
+    uint16_t len = mJrnDefCounter.value();
+
+    mPkgTx.append(com);
+    mPkgTx.append(len);
+    mPkgTx.append(len >> 8);
+
+    Q_ASSERT(mPkgTx.size() == 3);  // команда + 2 байта данных
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду чтения количества записей в журнале событий.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void TBspR400mHf_b15::HdlrComJrnxF1(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_GET_JRN_CNT);
+
+    if (!CheckSize(com, data.size(), { 0 }))
+    {
+        return;
+    }
+
+    // @todo Добавить возможность переполнени
+    uint16_t len = mJrnGlbCounter.value();
+
+    mPkgTx.append(com);
+    mPkgTx.append(len);
+    mPkgTx.append(len >> 8);
+
+    Q_ASSERT(mPkgTx.size() == 3);  // команда + 2 байта данных
 }

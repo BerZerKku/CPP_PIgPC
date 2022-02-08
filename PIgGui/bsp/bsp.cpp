@@ -37,6 +37,8 @@ Bsp::Bsp(QTreeWidget *tree, QWidget *parent) : QWidget(parent), mTree(tree)
     mTree->setSelectionMode(QAbstractItemView::NoSelection);
     mTree->setFocusPolicy(Qt::NoFocus);
 
+    mControl.setEnabled(false);
+
     mTree->clear();
 }
 
@@ -44,7 +46,6 @@ Bsp::Bsp(QTreeWidget *tree, QWidget *parent) : QWidget(parent), mTree(tree)
 void Bsp::InitParam()
 {
     eGB_PARAM param = GB_PARAM_NULL_PARAM;
-
 
     setComboBoxValue(mDevice.isDef, 1);
     setSpinBoxValue(GB_PARAM_PRM_COM_NUMS, 1);  // количество команд = num*4
@@ -198,11 +199,13 @@ void Bsp::Init()
     crtTest();
     crtTreeDef();
     crtTreeMeasure();
+    crtJrn();
 
     FillComboboxListStateDef();
     FillComboboxListStatePrm();
     FillComboboxListStatePrd();
     FillComboboxListStateGlb();
+    FillComboBoxListControl();
 
     InitComMap();
     InitParam();
@@ -507,7 +510,8 @@ void Bsp::crtTreePrm()
 //
 void Bsp::crtTreeState()
 {
-    QTreeWidgetItem *top = new QTreeWidgetItem();
+    QTreeWidgetItem *item;
+    QTreeWidgetItem *top = new QTreeWidgetItem(mTree);
 
     mTree->insertTopLevelItem(mTree->topLevelItemCount(), top);
     top->setText(0, kCodec->toUnicode("Текущее состояние"));
@@ -519,6 +523,11 @@ void Bsp::crtTreeState()
     crtTreeState(top, "Защита", stateDef);
     crtTreeState(top, "Приемник", statePrm);
     crtTreeState(top, "Передатчик", statePrd);
+
+    item = new QTreeWidgetItem(top);
+    item->setText(0, kCodec->toUnicode("Управление"));
+    top->insertChild(0, item);
+    mTree->setItemWidget(item, 1, &mControl);
 
     connect(stateGlb.regime,
             QOverload<int>::of(&QComboBox::currentIndexChanged),
@@ -656,6 +665,74 @@ void Bsp::crtTest()
 
     top->setExpanded(false);
 }
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Создает ветку журналов.
+ *
+ * *****************************************************************************
+ */
+void Bsp::crtJrn()
+{
+    QTreeWidgetItem *top = new QTreeWidgetItem(mTree);
+    QTreeWidgetItem *ltop;
+
+    mTree->insertTopLevelItem(mTree->topLevelItemCount(), top);
+    top->setText(0, kCodec->toUnicode("Журналы"));
+
+    ltop = new QTreeWidgetItem(top);
+    ltop->setText(0, kCodec->toUnicode("Журнал событий"));
+    top->insertChild(0, ltop);
+    crtJrnGlb(ltop);
+
+    ltop = new QTreeWidgetItem(top);
+    ltop->setText(0, kCodec->toUnicode("Журнал защиты"));
+    top->insertChild(0, ltop);
+    crtJrnDef(ltop);
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Создает журнал защиты.
+ * @param[in] top Верхний уровень.
+ *
+ * *****************************************************************************
+ */
+void Bsp::crtJrnDef(QTreeWidgetItem *top)
+{
+    QTreeWidgetItem *item;
+
+    item = new QTreeWidgetItem(top);
+    item->setText(0, kCodec->toUnicode("Количество записей"));
+    mTree->setItemWidget(item, 1, &mJrnDefCounter);
+
+    top->setExpanded(false);
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Создает журнал событий.
+ * @param[in] top Верхний уровень.
+ *
+ * *****************************************************************************
+ */
+void Bsp::crtJrnGlb(QTreeWidgetItem *top)
+{
+    QTreeWidgetItem *item;
+
+    item = new QTreeWidgetItem(top);
+    item->setText(0, kCodec->toUnicode("Количество записей"));
+    mTree->setItemWidget(item, 1, &mJrnGlbCounter);
+
+    top->setExpanded(false);
+}
+
 
 //
 void Bsp::crtComboBox(eGB_PARAM param)
@@ -1313,19 +1390,6 @@ void Bsp::procCommandReadJournal(eGB_COM com, pkg_t &data)
 
     //    switch (com)
     //    {
-    //    case GB_COM_DEF_GET_JRN_CNT:
-    //        {
-    //            if (!data.isEmpty())
-    //            {
-    //                qWarning() << kMsgSizeError.arg(com, 2, 16).arg(data.size());
-    //            }
-    //            // TODO Обработчик для команды чтения количества записей журнала.
-    //            mPkgTx.append(com);
-    //            mPkgTx.append(0);
-    //            mPkgTx.append(0);
-    //            break;
-    //        }
-
 
     //    case GB_COM_PRM_GET_JRN_CNT:
     //        {
@@ -1354,19 +1418,6 @@ void Bsp::procCommandReadJournal(eGB_COM com, pkg_t &data)
     //            break;
     //        }
 
-
-    //    case GB_COM_GET_JRN_CNT:
-    //        {
-    //            if (!data.isEmpty())
-    //            {
-    //                qWarning() << kMsgSizeError.arg(com, 2, 16).arg(data.size());
-    //            }
-
-    //            //            mPkgTx.append(com);
-    //            //            mPkgTx.append(log_counter & 0xFF);
-    //            //            mPkgTx.append((log_counter >> 8));
-    //            break;
-    //        }
 
     //    case GB_COM_GET_JRN_ENTRY:
     //        {

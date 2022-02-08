@@ -42,9 +42,13 @@ private:
     void crtTreePrm() override;
     void crtTreeState() override;
     void crtTest() override;
+    void crtJrn() override;
+    void crtJrnDef(QTreeWidgetItem *top) override;
+    void crtJrnGlb(QTreeWidgetItem *top) override;
 
     void FillComboboxListStateDef() override;
     void FillComboboxListAc();
+    void FillComboBoxListControl() override;
 
     void HdlrComDefx02(eGB_COM com, pkg_t &data) override;
     void HdlrComDefx0A(eGB_COM com, pkg_t &data) override;
@@ -57,6 +61,11 @@ private:
     void HdlrComGlbx38(eGB_COM com, pkg_t &data) override;
     void HdlrComGlbx3B(eGB_COM com, pkg_t &data) override;
     void HdlrComGlbx3F(eGB_COM com, pkg_t &data) override;
+
+    void HdlrComRegx72(eGB_COM com, pkg_t &data) override;
+
+    void HdlrComJrnxC1(eGB_COM com, pkg_t &data) override;
+    void HdlrComJrnxF1(eGB_COM com, pkg_t &data) override;
 };
 
 #endif  // BSP_R400M_HF_B15_HPP

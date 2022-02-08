@@ -82,6 +82,13 @@ protected:
 
     QMap<uint8_t, HdlrCom_t> mComMap;
 
+    QSpinBox mJrnDefCounter;
+    QSpinBox mJrnPrdCounter;
+    QSpinBox mJrnPrmCounter;
+    QSpinBox mJrnGlbCounter;
+
+    QComboBox mControl;
+
 public:
     explicit Bsp(QTreeWidget *tree, QWidget *parent = nullptr);
 
@@ -158,6 +165,9 @@ protected:
     virtual void     crtTreeState();
     QTreeWidgetItem *crtTreeState(QTreeWidgetItem *top, std::string name, state_t &state);
     virtual void     crtTest();
+    virtual void     crtJrn();
+    virtual void     crtJrnGlb(QTreeWidgetItem *top);
+    virtual void     crtJrnDef(QTreeWidgetItem *top);
 
     void crtComboBox(eGB_PARAM param);
     void fillComboboxList(QComboBox *combobox, eGB_PARAM param);
@@ -169,6 +179,7 @@ protected:
     virtual void FillComboboxListStatePrd() { }
     void         FillComboboxListStateGlb();
 
+    virtual void FillComboBoxListControl() {};
 
     void crtLineEdit(eGB_PARAM param, std::string);
     void crtSpinBox(eGB_PARAM param);
