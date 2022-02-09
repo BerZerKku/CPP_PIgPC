@@ -29,7 +29,8 @@ using namespace std;
     FRIEND_TEST(clMenu_Test, fillLvlSetupDef_Rzsk);  \
     FRIEND_TEST(clMenu_Test, fillLvlSetupDef_R400m); \
     FRIEND_TEST(clMenu_Test, getEventTextR400m);     \
-    FRIEND_TEST(clMenu_Test, getEventRemotesR400m);
+    FRIEND_TEST(clMenu_Test, getEventRemotesR400m);  \
+    FRIEND_TEST(clMenu_Test, GetTimeAc);
 
 #include "menu/menu.h"
 
@@ -1600,56 +1601,57 @@ TEST_F(clMenu_Test, getEventTextR400m)
         int     comp_mask;  // маска совместимостей в которых выводится эта строка
     };
 
-    int pvzu_pvzue_mask     = (1 << GB_COMP_R400M_PVZU) | (1 << GB_COMP_R400M_PVZUE);
-    int pvz_pvzu_pvzue_mask = (1 << GB_COMP_R400M_PVZ) | pvzu_pvzue_mask;
+    int pvzu_pvzue_mask = (1 << GB_COMP_R400M_PVZU) | (1 << GB_COMP_R400M_PVZUE);
 
     vector<test_t> test_data = {
-        { 0, "Событие - 0", 0xFFFF },                         //
-        { 1, "Неиспр чт/зап FLASH", 0xFFFF },                 //
-        { 2, "ВЧ тракт восстановл.", 0xFFFF },                //
-        { 3, "Неиспр чт/зап ПЛИС", 0xFFFF },                  //
-        { 4, "Автоконтроль", ~(1 << GB_COMP_R400M_PVZ) },     //
-        { 4, "Часы", (1 << GB_COMP_R400M_PVZ) },              //
-        { 5, "Ток покоя", 0xFFFF },                           //
-        { 6, "Неиспр чт/зап 2RAM", 0xFFFF },                  //
-        { 7, "Неиспр работы DSP", 0xFFFF },                   //
-        { 8, "Восстан-е работы DSP", 0xFFFF },                //
-        { 9, "Низкое напр. выхода", 0xFFFF },                 //
-        { 10, "Высокое напр. выхода", 0xFFFF },               //
-        { 11, "Нарушен обмен с УМ", 0xFFFF },                 //
-        { 12, "Неисправность часов", 0xFFFF },                //
-        { 13, "Нет блока БСЗ", 0xFFFF },                      //
-        { 14, "Ошибка версии БСЗ", 0xFFFF },                  //
-        { 15, "Неиспр перекл-ей БСЗ", 0xFFFF },               //
-        { 16, "Нет сигнала МАН", 0xFFFF },                    //
-        { 17, "Вкл.пит/Перезапуск", 0xFFFF },                 //
-        { 18, "Изменение режима", 0xFFFF },                   //
-        { 19, "Неиспр зап. вых.цепи", 0xFFFF },               //
-        { 20, "Изменение параметров", 0xFFFF },               //
-        { 21, "АК - Снижение запаса", ~pvzu_pvzue_mask },     //
-        { 21, "АК - Сниж.запаса %s", pvzu_pvzue_mask },       //
-        { 22, "АК - Нет ответа", ~pvzu_pvzue_mask },          //
-        { 22, "АК - Нет ответа %s", pvzu_pvzue_mask },        //
-        { 23, "Отсут-е сигнала Пуск", 0xFFFF },               //
-        { 24, "Отсут-е сигн Останов", 0xFFFF },               //
-        { 25, "Выключение аппарата", 0xFFFF },                //
-        { 26, "Помеха в линии", ~(1 << GB_COMP_R400M_PVZ) },  //
-        { 26, "Помеха", (1 << GB_COMP_R400M_PVZ) },           //
-        { 27, "Неисправность ДФЗ", 0xFFFF },                  //
-        { 28, "Уд: АК - нет ответа", ~pvz_pvzu_pvzue_mask },  //
-        { 28, "Дальний", (1 << GB_COMP_R400M_PVZ) },          //
-        { 28, "Уд%s: АК - Нет отв", pvzu_pvzue_mask },        //
-        { 29, "Уд: Помеха в линии", ~pvzu_pvzue_mask },       //
-        { 29, "Уд%s: Помеха в лин", pvzu_pvzue_mask },        //
-        { 30, "Уд: Неиспр. ДФЗ", ~pvzu_pvzue_mask },          //
-        { 30, "Уд%s: Неиспр. ДФЗ", pvzu_pvzue_mask },         //
-        { 31, "Уд: Неиспр. цепи вых", ~pvzu_pvzue_mask },     //
-        { 31, "Уд%s: Неиспр. ц.ВЫХ", pvzu_pvzue_mask },       //
-        { 32, "Порог по помехе", 0xFFFF }                     //
+        { 0, "Событие - 0", 0xFFFF },                      //
+        { 1, "Неиспр чт/зап FLASH", 0xFFFF },              //
+        { 2, "ВЧ тракт восстановл.", 0xFFFF },             //
+        { 3, "Неиспр чт/зап ПЛИС", 0xFFFF },               //
+        { 4, "Автоконтроль", 0xFFFF },                     //
+        { 5, "Ток покоя", 0xFFFF },                        //
+        { 6, "Неиспр чт/зап 2RAM", 0xFFFF },               //
+        { 7, "Неиспр работы DSP", 0xFFFF },                //
+        { 8, "Восстан-е работы DSP", 0xFFFF },             //
+        { 9, "Низкое напр. выхода", 0xFFFF },              //
+        { 10, "Высокое напр. выхода", 0xFFFF },            //
+        { 11, "Нарушен обмен с УМ", 0xFFFF },              //
+        { 12, "Неисправность часов", 0xFFFF },             //
+        { 13, "Нет блока БСЗ", 0xFFFF },                   //
+        { 14, "Ошибка версии БСЗ", 0xFFFF },               //
+        { 15, "Неиспр перекл-ей БСЗ", 0xFFFF },            //
+        { 16, "Нет сигнала МАН", 0xFFFF },                 //
+        { 17, "Вкл.пит/Перезапуск", 0xFFFF },              //
+        { 18, "Изменение режима", 0xFFFF },                //
+        { 19, "Неиспр зап. вых.цепи", 0xFFFF },            //
+        { 20, "Изменение параметров", 0xFFFF },            //
+        { 21, "АК - Снижение запаса", ~pvzu_pvzue_mask },  //
+        { 21, "АК - Сниж.запаса %s", pvzu_pvzue_mask },    //
+        { 22, "АК - Нет ответа", ~pvzu_pvzue_mask },       //
+        { 22, "АК - Нет ответа %s", pvzu_pvzue_mask },     //
+        { 23, "Отсут-е сигнала Пуск", 0xFFFF },            //
+        { 24, "Отсут-е сигн Останов", 0xFFFF },            //
+        { 25, "Выключение аппарата", 0xFFFF },             //
+        { 26, "Помеха в линии", 0xFFFF },                  //
+        { 27, "Неисправность ДФЗ", 0xFFFF },               //
+        { 28, "Уд: АК - нет ответа", ~pvzu_pvzue_mask },   //
+        { 28, "Уд%s: АК - Нет отв", pvzu_pvzue_mask },     //
+        { 29, "Уд: Помеха в линии", ~pvzu_pvzue_mask },    //
+        { 29, "Уд%s: Помеха в лин", pvzu_pvzue_mask },     //
+        { 30, "Уд: Неиспр. ДФЗ", ~pvzu_pvzue_mask },       //
+        { 30, "Уд%s: Неиспр. ДФЗ", pvzu_pvzue_mask },      //
+        { 31, "Уд: Неиспр. цепи вых", ~pvzu_pvzue_mask },  //
+        { 31, "Уд%s: Неиспр. ц.ВЫХ", pvzu_pvzue_mask },    //
+        { 32, "Порог по помехе", 0xFFFF },                 //
+        { 33, "Изменение времени", 0xFFFF },               //
+        { 34, "Часы", 0xFFFF },                            //
+        { 35, "Помеха", 0xFFF },                           //
+        { 36, "Дальний", 0xFFF }                           //
     };
 
     // проверка количества возможных записей в журнале событий Р400м
-    ASSERT_EQ(33, JRN_EVENT_R400M_SIZE);
+    ASSERT_EQ(37, JRN_EVENT_R400M_SIZE);
+    ASSERT_LE(JRN_EVENT_R400M_SIZE, MAX_JRN_EVENT_VALUE);
 
     // проверка выхода за диапазон
 
@@ -1733,5 +1735,129 @@ TEST_F(clMenu_Test, getEventRemotesR400m)
                 ASSERT_STREQ("", line);
             }
         }
+    }
+}
+
+TEST_F(clMenu_Test, GetTimeAc)
+{
+    struct test_t
+    {
+        uint16_t    time;        // номер события
+        eGB_TYPE_AC ac;          // тип автоконтроля
+        uint8_t     num_device;  // номер устройства
+        uint8_t     min;         // текущее время, минуты
+        uint8_t     sec;         // текущее время, секунды
+    };
+
+    // Во всех совместимостях кроме GB_COMP_R400M_R400 время до АК принимается с БСП
+    mObj->sParam.def.setTimeToAC(5876589);
+    for (int i = 0; i < GB_COMP_R400M_MAX; i++)
+    {
+        eGB_COMP_R400M comp = static_cast<eGB_COMP_R400M>(i);
+
+        SCOPED_TRACE("Compatibility " + to_string(comp) + ", index " + to_string(i));
+
+        if (comp == GB_COMP_R400M_R400)
+            continue;
+
+        mObj->sParam.glb.setCompatibility(comp);
+
+        ASSERT_EQ(mObj->GetTimeAc(comp), 5876);
+    }
+
+    QVector<test_t> test_data_2 = {
+        { 0, GB_TYPE_AC_AUTO_NORM, 1, 23, 0 },        //
+        { 30, GB_TYPE_AC_AUTO_NORM, 1, 23, 30 },      //
+        { 1, GB_TYPE_AC_AUTO_NORM, 1, 23, 59 },       //
+        { 31, GB_TYPE_AC_AUTO_NORM, 2, 23, 59 },      //
+        { 28, GB_TYPE_AC_AUTO_NORM, 2, 23, 2 },       //
+        { 0, GB_TYPE_AC_AUTO_NORM, 2, 23, 30 },       //
+        { 3, GB_TYPE_AC_AUTO_NORM, 2, 23, 27 },       //
+        { 3, GB_TYPE_AC_ACCEL, 2, 23, 27 },           //
+        { 33, GB_TYPE_AC_ACCEL, 1, 23, 27 },          //
+        { 2193, GB_TYPE_AC_AUTO_REPEAT, 1, 23, 27 },  //
+        { 3573, GB_TYPE_AC_AUTO_REPEAT, 1, 00, 27 },  //
+        { 0, GB_TYPE_AC_AUTO_REPEAT, 1, 00, 00 },     //
+        { 30, GB_TYPE_AC_AUTO_REPEAT, 2, 00, 00 },    //
+        { 1, GB_TYPE_AC_AUTO_REPEAT, 2, 00, 29 },     //
+        { 0, GB_TYPE_AC_AUTO_REPEAT, 2, 00, 30 },     //
+        { 3599, GB_TYPE_AC_AUTO_REPEAT, 2, 00, 31 },  //
+        { 3571, GB_TYPE_AC_AUTO_REPEAT, 2, 00, 59 },  //
+        { 31, GB_TYPE_AC_AUTO_REPEAT, 2, 59, 59 },    //
+        { 1, GB_TYPE_AC_AUTO_REPEAT, 1, 59, 59 },     //
+        { 1801, GB_TYPE_AC_AUTO_REPEAT, 1, 29, 59 },  //
+        { 1853, GB_TYPE_AC_AUTO_REPEAT, 1, 29, 07 },  //
+        { 1883, GB_TYPE_AC_AUTO_REPEAT, 2, 29, 07 },  //
+        { 0, GB_TYPE_AC_OFF, 2, 29, 07 }              //
+    };
+
+    // Своместимость Р400, двухконцевая линия
+    mObj->sParam.def.setTimeToAC(5876589);
+    mObj->sParam.glb.setNumDevices(GB_NUM_DEVICES_2);
+    for (int i = 0; i < test_data_2.size(); i++)
+    {
+        test_t item = test_data_2.at(i);
+
+        SCOPED_TRACE("Time " + to_string(item.time) + ", item " + to_string(i));
+
+        mObj->sParam.def.setTypeAC(item.ac);
+        mObj->sParam.glb.setDeviceNum(item.num_device);
+        mObj->sParam.DateTime.setMinute(item.min, false);
+        mObj->sParam.DateTime.setSecond(item.sec, false);
+
+        uint16_t time = mObj->GetTimeAc(GB_COMP_R400M_R400);
+
+        ASSERT_EQ(item.time, time);
+    }
+
+    QVector<test_t> test_data_3 = {
+        { 0, GB_TYPE_AC_AUTO_NORM, 1, 23, 0 },        //
+        { 30, GB_TYPE_AC_AUTO_NORM, 1, 23, 30 },      //
+        { 1, GB_TYPE_AC_AUTO_NORM, 1, 23, 59 },       //
+        { 21, GB_TYPE_AC_AUTO_NORM, 2, 23, 59 },      //
+        { 18, GB_TYPE_AC_AUTO_NORM, 2, 23, 2 },       //
+        { 0, GB_TYPE_AC_AUTO_NORM, 2, 23, 20 },       //
+        { 53, GB_TYPE_AC_AUTO_NORM, 2, 23, 27 },      //
+        { 13, GB_TYPE_AC_AUTO_NORM, 3, 23, 27 },      //
+        { 0, GB_TYPE_AC_AUTO_NORM, 3, 23, 40 },       //
+        { 40, GB_TYPE_AC_AUTO_NORM, 3, 23, 00 },      //
+        { 40, GB_TYPE_AC_ACCEL, 3, 23, 00 },          //
+        { 0, GB_TYPE_AC_ACCEL, 1, 23, 00 },           //
+        { 20, GB_TYPE_AC_ACCEL, 2, 23, 00 },          //
+        { 2240, GB_TYPE_AC_AUTO_REPEAT, 2, 23, 00 },  //
+        { 2260, GB_TYPE_AC_AUTO_REPEAT, 3, 23, 00 },  //
+        { 2193, GB_TYPE_AC_AUTO_REPEAT, 1, 23, 27 },  //
+        { 3573, GB_TYPE_AC_AUTO_REPEAT, 1, 00, 27 },  //
+        { 0, GB_TYPE_AC_AUTO_REPEAT, 1, 00, 00 },     //
+        { 20, GB_TYPE_AC_AUTO_REPEAT, 2, 00, 00 },    //
+        { 40, GB_TYPE_AC_AUTO_REPEAT, 3, 00, 00 },    //
+        { 1, GB_TYPE_AC_AUTO_REPEAT, 3, 00, 39 },     //
+        { 0, GB_TYPE_AC_AUTO_REPEAT, 3, 00, 40 },     //
+        { 3599, GB_TYPE_AC_AUTO_REPEAT, 3, 00, 41 },  //
+        { 3579, GB_TYPE_AC_AUTO_REPEAT, 2, 00, 41 },  //
+        { 3559, GB_TYPE_AC_AUTO_REPEAT, 1, 00, 41 },  //
+        { 19, GB_TYPE_AC_AUTO_REPEAT, 1, 59, 41 },    //
+        { 1, GB_TYPE_AC_AUTO_REPEAT, 1, 59, 59 },     //
+        { 21, GB_TYPE_AC_AUTO_REPEAT, 2, 59, 59 },    //
+        { 41, GB_TYPE_AC_AUTO_REPEAT, 3, 59, 59 }     //
+    };
+
+    // Своместимость Р400, трехконцевая линия
+    mObj->sParam.def.setTimeToAC(5876589);
+    mObj->sParam.glb.setNumDevices(GB_NUM_DEVICES_3);
+    for (int i = 0; i < test_data_3.size(); i++)
+    {
+        test_t item = test_data_3.at(i);
+
+        SCOPED_TRACE("Time " + to_string(item.time) + ", item " + to_string(i));
+
+        mObj->sParam.def.setTypeAC(item.ac);
+        mObj->sParam.glb.setDeviceNum(item.num_device);
+        mObj->sParam.DateTime.setMinute(item.min, false);
+        mObj->sParam.DateTime.setSecond(item.sec, false);
+
+        uint16_t time = mObj->GetTimeAc(GB_COMP_R400M_R400);
+
+        ASSERT_EQ(item.time, time);
     }
 }

@@ -6219,22 +6219,7 @@ PGM_P clMenu::getEventTextR400m(uint8_t event, eGB_COMP_R400M comp) const
     {
         text = fcJrnEventR400_MSK[event];
 
-        if (comp == GB_COMP_R400M_PVZ)
-        {
-            if (event == 4)
-            {
-                text = PSTR("Часы");
-            }
-            else if (event == 26)
-            {
-                text = PSTR("Помеха");
-            }
-            else if (event == 28)
-            {
-                text = PSTR("Дальний");
-            }
-        }
-        else if (comp == GB_COMP_R400M_PVZU || comp == GB_COMP_R400M_PVZUE)
+        if (comp == GB_COMP_R400M_PVZU || comp == GB_COMP_R400M_PVZUE)
         {
             if (event == 21)
             {

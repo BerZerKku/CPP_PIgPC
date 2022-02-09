@@ -160,9 +160,14 @@ TEST_F(Flash_Test, fcJrnEventR400_MSK)
         "Уд: Помеха в линии",    ///< 29
         "Уд: Неиспр. ДФЗ",       ///< 30
         "Уд: Неиспр. цепи вых",  ///< 31
-        "Порог по помехе"        ///< 32
+        "Порог по помехе",       ///< 32
+        "Изменение времени",     ///< 33
+        "Часы",                  ///< 34
+        "Помеха",                ///< 35
+        "Дальний"                ///< 36
     };
 
+    ASSERT_LE(events.size(), MAX_JRN_EVENT_VALUE);
     ASSERT_EQ(events.size(), JRN_EVENT_R400M_SIZE);
     ASSERT_EQ(events.size(), SIZE_OF(fcJrnEventR400_MSK));
 

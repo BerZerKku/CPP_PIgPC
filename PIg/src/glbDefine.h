@@ -67,7 +67,7 @@
 #define MIN_JRN_EVENT_VALUE 1
 #define MAX_JRN_EVENT_VALUE 41
 
-#define JRN_EVENT_R400M_SIZE 33
+#define JRN_EVENT_R400M_SIZE 37
 
 #define GLB_JRN_EVENT_K400_MAX  512  /// кол-во записей в журнале событый К400
 #define GLB_JRN_EVENT_R400M_MAX 512  /// кол-во записей в журнале событый Р400м

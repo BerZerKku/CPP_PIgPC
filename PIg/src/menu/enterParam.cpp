@@ -84,14 +84,11 @@ uint16_t TEnterParam::incValue(uint8_t velocity)
         // в списке порядок обратный (уменьшение индекса массива)
         val_ = (val_ > min_) ? val_ - 1 : max_;
 
-        // FIXME По приказу Чиркова убрана возможность установки "лишних" совместимостей.
+        // По приказу Чиркова убрана возможность установки "лишних" совместимостей.
+        // В VERSION_1v52 вернули ПВЗУ-Е (предложение Макарова)
         if (param_ == GB_PARAM_COMP_P400)
         {
-            if (val_ == GB_COMP_R400M_PVZUE)
-            {
-                val_ = (val_ > min_) ? val_ - 1 : max_;
-            }
-            else if (val_ == GB_COMP_R400M_LINER)
+            if (val_ == GB_COMP_R400M_LINER)
             {
                 val_ = (val_ > min_) ? val_ - 1 : max_;
             }
