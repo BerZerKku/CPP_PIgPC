@@ -1888,33 +1888,6 @@ void Bsp::procCommandWriteRegime(eGB_COM com, pkg_t &data)
 {
     switch (com)
     {
-    case GB_COM_SET_REG_DISABLED:
-        {
-            if (!data.isEmpty())
-            {
-                qWarning() << kMsgSizeError.arg(com, 2, 16).arg(data.size());
-            }
-
-            setComboBoxValue(stateGlb.regime, eGB_REGIME::GB_REGIME_DISABLED);
-            mPkgTx.append(com);
-        }
-        break;
-    case GB_COM_SET_REG_ENABLED:
-        {
-            if (!data.isEmpty())
-            {
-                qWarning() << kMsgSizeError.arg(com, 2, 16).arg(data.size());
-            }
-
-            setComboBoxValue(stateGlb.regime, eGB_REGIME::GB_REGIME_ENABLED);
-            mPkgTx.append(com);
-        }
-        break;
-    case GB_COM_SET_CONTROL:
-        {
-            hdlrComSetControl(com, data);
-        }
-        break;
     case GB_COM_SET_REG_TEST_1:
         {
             // TODO Сделать для всех тестов
@@ -1989,33 +1962,6 @@ void Bsp::procCommandWriteRegime(eGB_COM com, pkg_t &data)
         {
             qWarning("No command handler: 0x%.2X", com);
         }
-    }
-}
-
-//
-void Bsp::hdlrComSetControl(eGB_COM com, pkg_t &data)
-{
-    mPkgTx.append(com);
-    mPkgTx.append(data);
-
-    if (data.count() != 1)
-    {
-        qWarning() << kMsgSizeError.arg(com, 2, 16).arg(data.size());
-        return;
-    }
-
-    switch (data.at(0))
-    {
-    case 0x08:
-        {  // Пуск налад. вкл.
-            setComboBoxValue(stateDef.state, 7);
-        }
-        break;
-    case 0x09:
-        {  // Пуск налад. выкл.
-            setComboBoxValue(stateDef.state, 1);
-        }
-        break;
     }
 }
 

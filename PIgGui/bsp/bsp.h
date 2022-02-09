@@ -197,8 +197,6 @@ protected:
     void procCommandWriteParam(eGB_COM com, pkg_t &data);
     void procCommandWriteRegime(eGB_COM com, pkg_t &data);
 
-    void hdlrComSetControl(eGB_COM com, pkg_t &data);
-
     void hdlrComGetTest(eGB_COM com, pkg_t &data);
 
     uint8_t getCompatibility(eGB_TYPE_DEVICE device);

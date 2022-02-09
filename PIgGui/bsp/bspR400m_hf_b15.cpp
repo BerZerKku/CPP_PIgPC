@@ -35,6 +35,8 @@ void TBspR400mHf_b15::InitComMap()
     mComMap.insert(0x3B, &Bsp::HdlrComGlbx3B);  // чтение номера аппарата
     mComMap.insert(0x3f, &Bsp::HdlrComGlbx3F);  // чтение информации об устройстве
 
+    mComMap.insert(0x70, &Bsp::HdlrComRegx70);  // запись режима "Выведен"
+    mComMap.insert(0x71, &Bsp::HdlrComRegx71);  // запись режима "Введен"
     mComMap.insert(0x72, &Bsp::HdlrComRegx72);  // запись команды управления
 
     mComMap.insert(0x82, &Bsp::HdlrComDefx02);  // запись количества аппаратов в линии
@@ -1099,6 +1101,58 @@ void TBspR400mHf_b15::HdlrComGlbx3F(eGB_COM com, pkg_t &data)
 /**
  * *****************************************************************************
  *
+ * @brief Обрабатывает команду установки режима "Выведен".
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void TBspR400mHf_b15::HdlrComRegx70(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_SET_REG_DISABLED);
+
+    if (!CheckSize(com, data.size(), { 0 }))
+    {
+        return;
+    }
+
+    // ответ на команду записи совпадает с запросом
+    mPkgTx.append(com);
+    mPkgTx.append(data);
+
+    setComboBoxValue(stateGlb.regime, eGB_REGIME::GB_REGIME_DISABLED);
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду установки режима "Введен".
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void TBspR400mHf_b15::HdlrComRegx71(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_SET_REG_ENABLED);
+
+    if (!CheckSize(com, data.size(), { 0 }))
+    {
+        return;
+    }
+
+    // ответ на команду записи совпадает с запросом
+    mPkgTx.append(com);
+    mPkgTx.append(data);
+
+    setComboBoxValue(stateGlb.regime, eGB_REGIME::GB_REGIME_ENABLED);
+}
+
+
+/**
+ * *****************************************************************************
+ *
  * @brief Обрабатывает команду управления.
  * @param[in] Команда.
  * @param[in] Данные.
@@ -1123,6 +1177,15 @@ void TBspR400mHf_b15::HdlrComRegx72(eGB_COM com, pkg_t &data)
     {
         QString message("Wrong value in command %1: %2");
         qWarning() << message.arg(com, 2, 16, QLatin1Char('0')).arg(control);
+    }
+
+    if (control == 8)
+    {
+        setComboBoxValue(stateDef.state, 7);  // Пуск налад. вкл
+    }
+    else if (control == 9)
+    {
+        setComboBoxValue(stateDef.state, 1);  // Пуск налад. выкл
     }
 
     mControl.setCurrentIndex(mControl.findData(control));

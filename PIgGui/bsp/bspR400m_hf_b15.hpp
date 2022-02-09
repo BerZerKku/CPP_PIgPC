@@ -62,6 +62,8 @@ private:
     void HdlrComGlbx3B(eGB_COM com, pkg_t &data) override;
     void HdlrComGlbx3F(eGB_COM com, pkg_t &data) override;
 
+    void HdlrComRegx70(eGB_COM com, pkg_t &data) override;
+    void HdlrComRegx71(eGB_COM com, pkg_t &data) override;
     void HdlrComRegx72(eGB_COM com, pkg_t &data) override;
 
     void HdlrComJrnxC1(eGB_COM com, pkg_t &data) override;
