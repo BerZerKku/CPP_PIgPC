@@ -54,14 +54,12 @@ public:
         {
             if (val < GB_NUM_DEVICES_MAX)
             {
-                numDevices_ = val;
-                stat        = true;
+                stat = true;
             }
         }
 
-        if (!stat)
-            val = GB_NUM_DEVICES_MAX;
-        numDevices_ = val;
+        numDevices_ = (stat) ? val : GB_NUM_DEVICES_MAX;
+
         return stat;
     }
     eGB_NUM_DEVICES getNumDevices() const { return numDevices_; }

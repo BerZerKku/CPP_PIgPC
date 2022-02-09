@@ -1138,6 +1138,7 @@ void clMenu::lvlStart()
         if (sParam.typeDevice != AVANT_OPTO)
         {
             sParam.txComBuf.addCom1(GB_COM_GET_COM_PRD_KEEP);
+            sParam.txComBuf.addCom2(GB_COM_GET_TIME);
         }
         sParam.txComBuf.addCom1(GB_COM_GET_JRN_CNT);
         if (sParam.def.status.isEnable())
@@ -4720,7 +4721,7 @@ void clMenu::printAc(uint8_t pos)
     {
         if (sParam.def.status.getRegime() == GB_REGIME_ENABLED)
         {
-            uint16_t time = static_cast<uint16_t>(sParam.def.getTimeToAC());
+            uint16_t time = GetTimeAc(comp);
             uint8_t  hour = time / 3600;
             uint8_t  min  = (time % 3600) / 60;
             uint8_t  sec  = time % 60;
@@ -6294,4 +6295,104 @@ PGM_P clMenu::getEventRemotesR400m(uint8_t numbers, eGB_COMP_R400M comp) const
     }
 
     return line;
+}
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Возвращает время до следующего автоконтроля.
+ * @note Только для Р400М.
+ * @param[in] comp Совместимость.
+ * @return Время до АК в секундах.
+ *
+ * *****************************************************************************
+ */
+uint16_t clMenu::GetTimeAc(eGB_COMP_R400M comp)
+{
+    uint16_t time;
+
+    if (comp == GB_COMP_R400M_R400)
+    {
+        time = GetTimeAcR400(sParam.def.getTypeAC(),
+                             sParam.glb.getNumDevices(),
+                             sParam.glb.getDeviceNum(),
+                             sParam.DateTime.getMinute(),
+                             sParam.DateTime.getSecond());
+    }
+    else if (comp < GB_COMP_R400M_MAX)
+    {
+        time = static_cast<uint16_t>(sParam.def.getTimeToAC());
+    }
+    else
+    {
+        time = 0;
+    }
+
+    return time;
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Возвращает время до следующего автоконтроля.
+ * @note Только для Р400М.
+ * @param[in] ac Режим автоконтроля.
+ * @param[in] num_devices Количество устройств в линии.
+ * @param[in] num_device Номер устройства.
+ * @param[in] min Минуты.
+ * @param[in] sec Секунды.
+ * @return Время до АК в секундах.
+ *
+ * *****************************************************************************
+ */
+uint16_t clMenu::GetTimeAcR400(
+    eGB_TYPE_AC ac, eGB_NUM_DEVICES num_devices, uint8_t num_device, uint8_t min, uint8_t sec)
+{
+    uint16_t time;
+    uint8_t  sec_offset;
+
+    if (num_devices == GB_NUM_DEVICES_3)
+    {
+        sec_offset = (num_device == 3) ? (40) : (num_device == 2) ? (20) : 0;
+    }
+    else if (num_devices == GB_NUM_DEVICES_2)
+    {
+        sec_offset = (num_device == 2) ? (30) : 0;
+    }
+    else
+    {
+        sec_offset = 0;
+    }
+
+    if (sec > sec_offset)
+    {
+        min += 1;
+        sec = 60 + sec_offset - sec;
+    }
+    else
+    {
+        sec = sec_offset - sec;
+    }
+
+    if (min >= 60)
+    {
+        min = 60;
+    }
+
+    if (ac == GB_TYPE_AC_AUTO_NORM || ac == GB_TYPE_AC_ACCEL)
+    {
+        time = sec;
+    }
+    else if (ac == GB_TYPE_AC_AUTO_REPEAT)
+    {
+        min  = (min == 0) ? 0 : 60 - min;
+        time = min * 60 + sec;
+    }
+    else
+    {
+        time = 0;
+    }
+
+    return time;
 }

@@ -400,6 +400,10 @@ private:
     PGM_P getEventTextR400m(uint8_t event, eGB_COMP_R400M comp) const;
     PGM_P getEventRemotesR400m(uint8_t numbers, eGB_COMP_R400M comp) const;
 
+    uint16_t GetTimeAc(eGB_COMP_R400M comp);
+    uint16_t GetTimeAcR400(
+        eGB_TYPE_AC ac, eGB_NUM_DEVICES num_devices, uint8_t num_device, uint8_t min, uint8_t sec);
+
 #ifdef TEST_FRIENDS
     TEST_FRIENDS
 #endif
