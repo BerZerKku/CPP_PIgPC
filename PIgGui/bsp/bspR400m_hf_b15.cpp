@@ -39,6 +39,7 @@ void TBspR400mHf_b15::InitComMap()
     mComMap.insert(0x31, &Bsp::HdlrComGlbx31);  // чтение неисправностей
     mComMap.insert(0x32, &Bsp::HdlrComGlbx32);  // чтение времени
     mComMap.insert(0x34, &Bsp::HdlrComGlbx34);  // чтение измерений
+    mComMap.insert(0x35, &Bsp::HdlrComGlbx35);  // чтение синхронизации времени / всех параметров
     mComMap.insert(0x37, &Bsp::HdlrComGlbx37);  // чтение совместимости
     mComMap.insert(0x38, &Bsp::HdlrComGlbx38);  // чтение адреса в локальной сети
     mComMap.insert(0x3B, &Bsp::HdlrComGlbx3B);  // чтение номера аппарата
@@ -61,6 +62,7 @@ void TBspR400mHf_b15::InitComMap()
     mComMap.insert(0x8A, &Bsp::HdlrComDefx0A);  // запись режима АК и времени до АК
 
     mComMap.insert(0xB2, &Bsp::HdlrComGlbx32);  // запись времени
+    mComMap.insert(0xB5, &Bsp::HdlrComGlbx35);  // запись синхронизации времени / всех параметров
     mComMap.insert(0xB7, &Bsp::HdlrComGlbx37);  // запись совместимости
     mComMap.insert(0xB8, &Bsp::HdlrComGlbx38);  // запись адреса в локальной сети
     mComMap.insert(0xBB, &Bsp::HdlrComGlbx3B);  // запись номера аппарата
@@ -585,7 +587,7 @@ void TBspR400mHf_b15::FillComboBoxListControl()
 /**
  * *****************************************************************************
  *
- * @brief Обрабатывает команду чтения/записи параметров с конфигуратора
+ * @brief Обрабатывает команду чтения/записи параметров защиты с конфигуратора.
  * @param[in] Команда.
  * @param[in] Данные.
  *
@@ -1068,6 +1070,8 @@ void TBspR400mHf_b15::HdlrComGlbx30(eGB_COM com, pkg_t &data)
 {
     Q_ASSERT(com == GB_COM_GET_SOST);
 
+    // В сообщении от ПИ передается температура, с ПК нет данных
+    // В Р400м температура не обрабатывается
     if (!CheckSize(com, data.size(), { 0, 1 }))
     {
         return;
@@ -1165,6 +1169,7 @@ void TBspR400mHf_b15::HdlrComGlbx32(eGB_COM com, pkg_t &data)
     if (com == GB_COM_GET_TIME)
     {
         // C ПИ передается флаг запроса сообщения для передачи в АСУ (0..3), с ПК нет данных
+        // В Р400м флаг запроса не обрабатывается
         if (!CheckSize(com, data.size(), { 0, 1 }))
         {
             return;
@@ -1285,6 +1290,88 @@ void TBspR400mHf_b15::HdlrComGlbx34(eGB_COM com, pkg_t &data)
     mPkgTx.append(static_cast<quint8>(value));
 
     Q_ASSERT(mPkgTx.size() == 16);  // команда + 15 байт данных
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду чтения/записи синхронизации времени.
+ * @note Эта же команда используется для чтения/записи всех параметров приемника с конфигуратора
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void TBspR400mHf_b15::HdlrComGlbx35(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_GET_TIME_SINCHR || com == GB_COM_SET_TIME_SINCHR);
+
+    if (com == 0x00)
+    {
+        // 0
+        if (!CheckSize(com, data.size(), { 0, 1 }))
+        {
+            return;
+        }
+
+        if (data.size() == 0)
+        {
+            mPkgTx.append(com);
+            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_DEF_TYPE)));
+            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_NUM_OF_DEVICES)));
+            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_TIME_NO_MAN)));
+            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_SHIFT_FRONT)));
+            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_SHIFT_BACK)));
+            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_SENS_DEC)));
+            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_AC_IN_DEC)));
+            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_FREQ_PRD)));
+            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_FREQ_PRM)));
+            mPkgTx.append(getComboBoxValue(&mAc));
+            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_SHIFT_PRM)));
+            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_SHIFT_PRD)));
+
+
+            int len = 33 - mPkgTx.size();
+            for (int i = 0; i < len; i++)
+            {
+                mPkgTx.append(0);
+            }
+
+            Q_ASSERT(mPkgTx.size() == 33);  // команда + 33 байт данных
+        }
+        else
+        {
+            mPkgTx.append(com);
+            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_TIME_SYNCH)));
+        }
+    }
+
+    if (com == 0x80)
+    {
+        if (!CheckSize(com, data.size(), { 33 }))
+        {
+            return;
+        }
+
+        // ответ на команду записи совпадает с запросом
+        mPkgTx.append(com);
+        mPkgTx.append(data);
+
+        int index = 0;
+        SetParamValue(GB_PARAM_DEF_TYPE, data.at(index++));
+        SetParamValue(GB_PARAM_NUM_OF_DEVICES, data.at(index++));
+        SetParamValue(GB_PARAM_TIME_NO_MAN, data.at(index++));
+        SetParamValue(GB_PARAM_SHIFT_FRONT, data.at(index++));
+        SetParamValue(GB_PARAM_SHIFT_BACK, data.at(index++));
+        SetParamValue(GB_PARAM_SENS_DEC, data.at(index++));
+        SetParamValue(GB_PARAM_AC_IN_DEC, data.at(index++));
+        SetParamValue(GB_PARAM_FREQ_PRD, data.at(index++));
+        SetParamValue(GB_PARAM_FREQ_PRM, data.at(index++));
+        index++;  // Режим АК не меняется
+        SetParamValue(GB_PARAM_SHIFT_PRM, data.at(index++));
+        SetParamValue(GB_PARAM_SHIFT_PRD, data.at(index++));
+    }
 }
 
 
