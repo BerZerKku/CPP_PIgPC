@@ -848,7 +848,7 @@ static const Param fDefType PROGMEM = {
     Param::CHANGE_REG_DISABLE  // условие для изменения параметра
 };
 
-// дополнительное время без манипуляции
+// допустимое время без манипуляции
 static const Param fTimeNoMan PROGMEM = {
     "Доп. время без ман.",    // название параметра
     GB_COM_DEF_GET_T_NO_MAN,  // команда стандартного протокола

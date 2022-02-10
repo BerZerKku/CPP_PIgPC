@@ -38,8 +38,8 @@ private:
     void crtTreeDevieVersions(QTreeWidgetItem *top) override;
     void crtTreeGlb() override;
     void crtTreeMeasure() override;
-    void crtTreePrd() override;
-    void crtTreePrm() override;
+    void crtTreePrd() override { }
+    void crtTreePrm() override { }
     void crtTreeState() override;
     void crtTest() override;
     void crtJrn() override;
@@ -50,7 +50,16 @@ private:
     void FillComboboxListAc();
     void FillComboBoxListControl() override;
 
+    void HdlrComDefx00(eGB_COM com, pkg_t &data) override;
+    void HdlrComDefx01(eGB_COM com, pkg_t &data) override;
     void HdlrComDefx02(eGB_COM com, pkg_t &data) override;
+    void HdlrComDefx03(eGB_COM com, pkg_t &data) override;
+    //    void HdlrComDefx04(eGB_COM com, pkg_t &data) override; // нет команды
+    void HdlrComDefx05(eGB_COM com, pkg_t &data) override;
+    void HdlrComDefx06(eGB_COM com, pkg_t &data) override;
+    void HdlrComDefx07(eGB_COM com, pkg_t &data) override;
+    void HdlrComDefx08(eGB_COM com, pkg_t &data) override;
+    void HdlrComDefx09(eGB_COM com, pkg_t &data) override;
     void HdlrComDefx0A(eGB_COM com, pkg_t &data) override;
 
     void HdlrComGlbx30(eGB_COM com, pkg_t &data) override;

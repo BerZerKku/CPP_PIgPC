@@ -108,6 +108,11 @@ public:
     pkg_t mPkgRx;  ///< Данные на приеме.
     pkg_t mPkgTx;  ///< Данные для передачи.
 
+    void   CrtParamWidget(eGB_PARAM param);
+    qint16 GetParamValue(eGB_PARAM param, quint8 number = 1);
+    void   SetParamValue(eGB_PARAM param, qint16 value, quint8 number = 1);
+
+
     quint8 getComboBoxValue(eGB_PARAM param, uint8_t number = 1);
     quint8 getComboBoxValue(QComboBox *combobox);
     void   setComboBoxValue(eGB_PARAM param, quint8 value, uint8_t number = 1);
@@ -120,8 +125,8 @@ public:
     int     setLineEditValue(QLineEdit *lineedit, std::string value);
 
     qint16 getSpinBoxValue(eGB_PARAM param, uint8_t number = 1);
-    qint16 getSpinBoxValue(QSpinBox *spinbox);
     void   setSpinBoxValue(eGB_PARAM param, qint16 value, uint8_t number = 1);
+    qint16 getSpinBoxValue(QSpinBox *spinbox);
     int    setSpinBoxValue(QSpinBox *spinbox, qint16 value);
 
     device_t  mDevice;
@@ -169,10 +174,14 @@ protected:
     virtual void     crtJrnGlb(QTreeWidgetItem *top);
     virtual void     crtJrnDef(QTreeWidgetItem *top);
 
+
     void crtComboBox(eGB_PARAM param);
     void fillComboboxList(QComboBox *combobox, eGB_PARAM param);
     void fillComboboxListOnOff(QComboBox *combobox);
     void fillComboboxListRegime(QComboBox *combobox);
+
+    void crtLineEdit(eGB_PARAM param, std::string);
+    void crtSpinBox(eGB_PARAM param);
 
     virtual void FillComboboxListStateDef() { }
     virtual void FillComboboxListStatePrm() { }
@@ -181,8 +190,6 @@ protected:
 
     virtual void FillComboBoxListControl() {};
 
-    void crtLineEdit(eGB_PARAM param, std::string);
-    void crtSpinBox(eGB_PARAM param);
 
     void keyPressEvent(QKeyEvent *event) override;
 
@@ -207,6 +214,7 @@ public:
     virtual void HdlrComDummy(eGB_COM com, pkg_t &data);
 
     // Change: 0x80-0x8F
+    virtual void HdlrComDefx00(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
     virtual void HdlrComDefx01(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
     virtual void HdlrComDefx02(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
     virtual void HdlrComDefx03(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };

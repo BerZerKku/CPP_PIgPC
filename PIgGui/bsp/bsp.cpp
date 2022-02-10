@@ -1340,6 +1340,96 @@ QString Bsp::getParamName(eGB_PARAM param)
     return name;
 }
 
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Создает виджет для параметра.
+ * @param[in] param Параметр.
+ *
+ * *****************************************************************************
+ */
+void Bsp::CrtParamWidget(eGB_PARAM param)
+{
+    Q_ASSERT(param < GB_PARAM_MAX);
+
+    switch (getParamType(param))
+    {
+    case Param::PARAM_LIST: crtComboBox(param); break;
+    case Param::PARAM_INT: crtSpinBox(param); break;
+
+    case Param::PARAM_U_COR: Q_FALLTHROUGH();
+    case Param::PARAM_I_COR: Q_FALLTHROUGH();
+    case Param::PARAM_BITES:
+        qWarning() << QString("No get param function for param %1").arg(param);
+        break;
+
+    case Param::PARAM_NO: Q_ASSERT(false);
+    }
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Возвращает значение параметра.
+ * @param[in] param Параметр.
+ * @param[in] number Дополнительный номер параметра.
+ *
+ * *****************************************************************************
+ */
+qint16 Bsp::GetParamValue(eGB_PARAM param, quint8 number)
+{
+    qint16 value = 0;
+
+    switch (getParamType(param))
+    {
+    case Param::PARAM_LIST: value = getComboBoxValue(param, number); break;
+    case Param::PARAM_INT: value = getSpinBoxValue(param, number); break;
+
+    case Param::PARAM_U_COR: Q_FALLTHROUGH();
+    case Param::PARAM_I_COR: Q_FALLTHROUGH();
+    case Param::PARAM_BITES:
+        qWarning() << QString("No get param function for param %1").arg(param);
+        break;
+
+    case Param::PARAM_NO: Q_ASSERT(false);
+    }
+
+    return value;
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Устанавливает значение параметра.
+ * @param[in] param Параметр.
+ * @param[in] value Значение.
+ * @param[in] number Дополнительный номер параметра.
+ *
+ * *****************************************************************************
+ */
+void Bsp::SetParamValue(eGB_PARAM param, qint16 value, quint8 number)
+{
+    Q_ASSERT(param < GB_PARAM_MAX);
+
+    switch (getParamType(param))
+    {
+    case Param::PARAM_LIST: setComboBoxValue(param, quint8(value), number); break;
+    case Param::PARAM_INT: setSpinBoxValue(param, value, number); break;
+
+    case Param::PARAM_U_COR: Q_FALLTHROUGH();
+    case Param::PARAM_I_COR: Q_FALLTHROUGH();
+    case Param::PARAM_BITES:
+        qWarning() << QString("No set param function for param %1").arg(param);
+        break;
+
+    case Param::PARAM_NO: Q_ASSERT(false);
+    }
+}
+
+
 //
 void Bsp::keyPressEvent(QKeyEvent *event)
 {
