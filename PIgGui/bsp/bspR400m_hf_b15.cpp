@@ -96,6 +96,30 @@ void TBspR400mHf_b15::InitParam()
     setComboBoxValue(GB_PARAM_TIME_SYNCH, 0);
     setSpinBoxValue(GB_PARAM_NET_ADDRESS, 17);
 
+    // Параметры общие
+    SetParamValue(GB_PARAM_COMP_P400, GB_COMP_R400M_R400);
+    SetParamValue(GB_PARAM_TIME_SYNCH, 1);  // 1 - вкл.
+    SetParamValue(GB_PARAM_NUM_OF_DEVICE, 1);
+    SetParamValue(GB_PARAM_OUT_CHECK, 0);  // 0 - выкл.
+    SetParamValue(GB_PARAM_WARN_THD, 11);
+    SetParamValue(GB_PARAM_U_OUT_NOM, 20);
+    SetParamValue(GB_PARAM_FREQ, 123);
+    SetParamValue(GB_PARAM_IN_DEC_AC_ANSWER, 7);
+    SetParamValue(GB_PARAM_PVZUE_PROTOCOL, 1);  // 1 - быстрый
+    SetParamValue(GB_PARAM_PVZUE_PARITY, 2);    // 2 - выкл.
+    SetParamValue(GB_PARAM_PVZUE_FAIL, 20);
+    SetParamValue(GB_PARAM_PVZUE_NOISE_THD, 33);
+    SetParamValue(GB_PARAM_PVZUE_NOISE_LVL, 40);
+    SetParamValue(GB_PARAM_PVZUE_AC_TYPE, 2);  // 2 - нормальный
+    SetParamValue(GB_PARAM_PVZUE_AC_PERIOD, 152);
+    SetParamValue(GB_PARAM_PVZUE_AC_PER_RE, 213);
+    SetParamValue(GB_PARAM_PVZU_AC_CORRECT, 5);
+    SetParamValue(GB_PARAM_ALARM_CF, 11);
+    SetParamValue(GB_PARAM_COR_U, -453);      // -45.3
+    SetParamValue(GB_PARAM_COR_I, -123);      // -123
+    SetParamValue(GB_PARAM_COM_PRD_KEEP, 1);  // 1 - вкл.
+    SetParamValue(GB_PARAM_COM_PRM_KEEP, 0);  // 0 - выкл.
+
     // Параметры защиты
     SetParamValue(GB_PARAM_NUM_OF_DEVICES, GB_NUM_DEVICES_2);
     SetParamValue(GB_PARAM_DEF_TYPE, 0);  // 0 - ДФЗ ПрПд
@@ -197,11 +221,28 @@ void TBspR400mHf_b15::crtTreeGlb()
 
     top->setText(0, kCodec->toUnicode("Общие"));
 
-    crtComboBox(GB_PARAM_COMP_P400);
-    crtSpinBox(GB_PARAM_NUM_OF_DEVICE);
-    crtComboBox(GB_PARAM_COM_PRD_KEEP);
-    crtComboBox(GB_PARAM_COM_PRM_KEEP);
-    crtComboBox(GB_PARAM_TIME_SYNCH);
+    CrtParamWidget(GB_PARAM_COMP_P400);
+    CrtParamWidget(GB_PARAM_TIME_SYNCH);
+    CrtParamWidget(GB_PARAM_NUM_OF_DEVICE);
+    CrtParamWidget(GB_PARAM_OUT_CHECK);
+    CrtParamWidget(GB_PARAM_WARN_THD);
+    CrtParamWidget(GB_PARAM_U_OUT_NOM);
+    CrtParamWidget(GB_PARAM_FREQ);
+    CrtParamWidget(GB_PARAM_IN_DEC_AC_ANSWER);
+    CrtParamWidget(GB_PARAM_PVZUE_PROTOCOL);
+    CrtParamWidget(GB_PARAM_PVZUE_PARITY);
+    CrtParamWidget(GB_PARAM_PVZUE_FAIL);
+    CrtParamWidget(GB_PARAM_PVZUE_NOISE_THD);
+    CrtParamWidget(GB_PARAM_PVZUE_NOISE_LVL);
+    CrtParamWidget(GB_PARAM_PVZUE_AC_TYPE);
+    CrtParamWidget(GB_PARAM_PVZUE_AC_PERIOD);
+    CrtParamWidget(GB_PARAM_PVZUE_AC_PER_RE);
+    CrtParamWidget(GB_PARAM_PVZU_AC_CORRECT);
+    CrtParamWidget(GB_PARAM_ALARM_CF);
+    CrtParamWidget(GB_PARAM_COR_U);
+    CrtParamWidget(GB_PARAM_COR_I);
+    CrtParamWidget(GB_PARAM_COM_PRD_KEEP);
+    CrtParamWidget(GB_PARAM_COM_PRM_KEEP);
 
     top->setExpanded(false);
 }
@@ -1318,18 +1359,6 @@ void TBspR400mHf_b15::HdlrComGlbx35(eGB_COM com, pkg_t &data)
         if (data.size() == 0)
         {
             mPkgTx.append(com);
-            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_DEF_TYPE)));
-            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_NUM_OF_DEVICES)));
-            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_TIME_NO_MAN)));
-            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_SHIFT_FRONT)));
-            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_SHIFT_BACK)));
-            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_SENS_DEC)));
-            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_AC_IN_DEC)));
-            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_FREQ_PRD)));
-            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_FREQ_PRM)));
-            mPkgTx.append(getComboBoxValue(&mAc));
-            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_SHIFT_PRM)));
-            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_SHIFT_PRD)));
 
 
             int len = 33 - mPkgTx.size();

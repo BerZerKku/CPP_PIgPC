@@ -3,6 +3,7 @@
 
 #include <QComboBox>
 #include <QDateTime>
+#include <QDoubleSpinBox>
 #include <QLineEdit>
 #include <QMap>
 #include <QRegExp>
@@ -99,9 +100,10 @@ public:
 
     void Init();
 
-    QMap<eGB_PARAM, QVector<QComboBox *>> mapCombobox;
-    QMap<eGB_PARAM, QLineEdit *>          mapLineEdit;
-    QMap<eGB_PARAM, QVector<QSpinBox *>>  mapSpinBox;
+    QMap<eGB_PARAM, QVector<QComboBox *>>      mapCombobox;
+    QMap<eGB_PARAM, QLineEdit *>               mapLineEdit;
+    QMap<eGB_PARAM, QVector<QSpinBox *>>       mapSpinBox;
+    QMap<eGB_PARAM, QVector<QDoubleSpinBox *>> mapDoubleSpinBox;
 
     QString getParamName(eGB_PARAM param);
 
@@ -111,7 +113,6 @@ public:
     void   CrtParamWidget(eGB_PARAM param);
     qint16 GetParamValue(eGB_PARAM param, quint8 number = 1);
     void   SetParamValue(eGB_PARAM param, qint16 value, quint8 number = 1);
-
 
     quint8 getComboBoxValue(eGB_PARAM param, uint8_t number = 1);
     quint8 getComboBoxValue(QComboBox *combobox);
@@ -128,6 +129,9 @@ public:
     void   setSpinBoxValue(eGB_PARAM param, qint16 value, uint8_t number = 1);
     qint16 getSpinBoxValue(QSpinBox *spinbox);
     int    setSpinBoxValue(QSpinBox *spinbox, qint16 value);
+
+    qint16 getDoubleSpinBoxValue(eGB_PARAM param, uint8_t number = 1);
+    void   setDoubleSpinBoxValue(eGB_PARAM param, qint16 value, uint8_t number = 1);
 
     device_t  mDevice;
     state_t   stateDef;
@@ -174,7 +178,6 @@ protected:
     virtual void     crtJrnGlb(QTreeWidgetItem *top);
     virtual void     crtJrnDef(QTreeWidgetItem *top);
 
-
     void crtComboBox(eGB_PARAM param);
     void fillComboboxList(QComboBox *combobox, eGB_PARAM param);
     void fillComboboxListOnOff(QComboBox *combobox);
@@ -182,6 +185,7 @@ protected:
 
     void crtLineEdit(eGB_PARAM param, std::string);
     void crtSpinBox(eGB_PARAM param);
+    void crtDoubleSpinBox(eGB_PARAM param);
 
     virtual void FillComboboxListStateDef() { }
     virtual void FillComboboxListStatePrm() { }

@@ -871,8 +871,8 @@ void Bsp::FillComboboxListStateGlb()
 void Bsp::crtLineEdit(eGB_PARAM param, std::string value)
 {
     QLineEdit *      lineedit = new QLineEdit(this);
-    QTreeWidgetItem *item     = new QTreeWidgetItem();
     QTreeWidgetItem *top      = mTree->topLevelItem(mTree->topLevelItemCount() - 1);
+    QTreeWidgetItem *item     = new QTreeWidgetItem(top);
 
     // TODO Сделать возможность ввода значений руками
     Q_ASSERT(false);
@@ -917,7 +917,7 @@ void Bsp::crtSpinBox(eGB_PARAM param)
     {
         if (num > 1)
         {
-            item = new QTreeWidgetItem();
+            item = new QTreeWidgetItem(top);
             item->setText(0, getParamName(param));
             top->addChild(item);
             top = item;
@@ -925,7 +925,7 @@ void Bsp::crtSpinBox(eGB_PARAM param)
 
         for (uint8_t i = 1; i <= num; i++)
         {
-            item = new QTreeWidgetItem();
+            item = new QTreeWidgetItem(top);
 
             if (num > 1)
             {
@@ -941,7 +941,8 @@ void Bsp::crtSpinBox(eGB_PARAM param)
             spinbox = new QSpinBox(this);
             vspinbox.append(spinbox);
 
-            if (getParamType(param) == Param::PARAM_INT)
+            Param::PARAM_TYPE type = getParamType(param);
+            if (type == Param::PARAM_INT || type == Param::PARAM_I_COR)
             {
                 qint16 min = getAbsMin(param);
                 qint16 max = getAbsMax(param);
@@ -967,6 +968,86 @@ void Bsp::crtSpinBox(eGB_PARAM param)
         }
 
         mapSpinBox.insert(param, vspinbox);
+    }
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Создает виджет для параметров с вещественным значением.
+ * @param[in] param Параметр.
+ *
+ * *****************************************************************************
+ */
+void Bsp::crtDoubleSpinBox(eGB_PARAM param)
+{
+    QVector<QDoubleSpinBox *> vdspinbox;
+    QDoubleSpinBox *          dspinbox;
+    QTreeWidgetItem *         item;
+    QTreeWidgetItem *         top = mTree->topLevelItem(mTree->topLevelItemCount() - 1);
+
+    uint8_t num = getAbsMaxNumOfSameParams(param);
+    if (num == 0)
+    {
+        qCritical() << QString("Number of parameters %1 is 0!").arg(getParamName(param));
+    }
+    else
+    {
+        if (num > 1)
+        {
+            item = new QTreeWidgetItem(top);
+            item->setText(0, getParamName(param));
+            top->addChild(item);
+            top = item;
+        }
+
+        for (uint8_t i = 1; i <= num; i++)
+        {
+            item = new QTreeWidgetItem(top);
+
+            if (num > 1)
+            {
+                std::string name("Номер ");
+                name += std::to_string(i);
+                item->setText(0, kCodec->toUnicode(name.c_str()));
+            }
+            else
+            {
+                item->setText(0, getParamName(param));
+            }
+
+            dspinbox = new QDoubleSpinBox(this);
+            vdspinbox.append(dspinbox);
+
+            Param::PARAM_TYPE type = getParamType(param);
+            if (type == Param::PARAM_U_COR)
+            {
+                double min = getAbsMin(param) / 10;
+                double max = getAbsMax(param) / 10;
+                dspinbox->setRange(min, max);
+                dspinbox->setSingleStep(double(getDisc(param)) / 10);
+                dspinbox->setDecimals(1);
+                dspinbox->setValue(dspinbox->minimum());
+                dspinbox->setToolTip(QString("%1 - %2").arg(min).arg(max));
+            }
+            else
+            {
+                qCritical() << QString("Unknown parameter type %1").arg(getParamName(param));
+            }
+
+            if (getCom(param) == eGB_COM::GB_COM_NO)
+            {
+                QPalette pa;
+                pa.setColor(QPalette::WindowText, Qt::red);
+                item->setForeground(0, Qt::blue);
+            }
+
+            top->addChild(item);
+            mTree->setItemWidget(item, 1, dspinbox);
+        }
+
+        mapDoubleSpinBox.insert(param, vdspinbox);
     }
 }
 
@@ -1220,6 +1301,90 @@ int Bsp::setSpinBoxValue(QSpinBox *spinbox, qint16 value)
 /**
  * *****************************************************************************
  *
+ * @brief Возвращает значение для вещественных параметров.
+ * @param[in] param Параметр.
+ * @param[in] number Подномер для параметра.
+ * @return
+ *
+ * *****************************************************************************
+ */
+qint16 Bsp::getDoubleSpinBoxValue(eGB_PARAM param, uint8_t number)
+{
+    qint16 value = 0;
+
+    if (number > 0 && mapDoubleSpinBox.contains(param)
+        && mapDoubleSpinBox.value(param).size() >= number)
+    {
+        double fvalue = 0.0;
+        number -= 1;
+
+        if (getParamType(param) == Param::PARAM_U_COR)
+        {
+            fvalue = mapDoubleSpinBox.value(param).at(number)->value();
+            value  = fvalue * 10;
+        }
+        else
+        {
+            QString msg = QString("Parameter '%1' type (%2) not found.")
+                              .arg(getParamName(param))
+                              .arg(getParamType(param));
+            qWarning() << msg;
+        }
+    }
+    else
+    {
+        QString msg =
+            QString("Parameter '%1' (%2) not found.").arg(getParamName(param)).arg(number);
+        qWarning() << msg;
+    }
+
+    return value;
+}
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Устаналивает значение для вещественных параметров.
+ * @param[in] param Параметр.
+ * @param[in] value Значение.
+ * @param[in] number Подномер для параметра.
+ *
+ * *****************************************************************************
+ */
+void Bsp::setDoubleSpinBoxValue(eGB_PARAM param, qint16 value, uint8_t number)
+{
+    QDoubleSpinBox *dspinbox = nullptr;
+
+    if ((number > 0) && mapDoubleSpinBox.contains(param)
+        && (mapDoubleSpinBox.value(param).size() >= number))
+    {
+        double fvalue = 0.0;
+
+        if (getParamType(param) == Param::PARAM_U_COR)
+        {
+            fvalue   = double(value) / 10;
+            dspinbox = mapDoubleSpinBox.value(param).at(number - 1);
+            dspinbox->setValue(fvalue);
+        }
+        else
+        {
+            QString msg = QString("Parameter '%1' type (%2) not found.")
+                              .arg(getParamName(param))
+                              .arg(getParamType(param));
+            qWarning() << msg;
+        }
+    }
+    else
+    {
+        QString msg = QString("%1: Parameter '%2' not found.").arg(__FUNCTION__).arg(param);
+        qWarning() << msg;
+    }
+}
+
+
+/**
+ * *****************************************************************************
+ *
  * @brief Вызывает обработчик для принятой команды.
  * @param[in] com Команда.
  * @param[in] data Данные.
@@ -1357,11 +1522,11 @@ void Bsp::CrtParamWidget(eGB_PARAM param)
     {
     case Param::PARAM_LIST: crtComboBox(param); break;
     case Param::PARAM_INT: crtSpinBox(param); break;
+    case Param::PARAM_U_COR: crtDoubleSpinBox(param); break;
+    case Param::PARAM_I_COR: crtSpinBox(param); break;
 
-    case Param::PARAM_U_COR: Q_FALLTHROUGH();
-    case Param::PARAM_I_COR: Q_FALLTHROUGH();
     case Param::PARAM_BITES:
-        qWarning() << QString("No get param function for param %1").arg(param);
+        qWarning() << QString("No create widget function for param %1").arg(param);
         break;
 
     case Param::PARAM_NO: Q_ASSERT(false);
@@ -1386,9 +1551,9 @@ qint16 Bsp::GetParamValue(eGB_PARAM param, quint8 number)
     {
     case Param::PARAM_LIST: value = getComboBoxValue(param, number); break;
     case Param::PARAM_INT: value = getSpinBoxValue(param, number); break;
+    case Param::PARAM_U_COR: value = getDoubleSpinBoxValue(param); break;
+    case Param::PARAM_I_COR: value = getSpinBoxValue(param, number); break;
 
-    case Param::PARAM_U_COR: Q_FALLTHROUGH();
-    case Param::PARAM_I_COR: Q_FALLTHROUGH();
     case Param::PARAM_BITES:
         qWarning() << QString("No get param function for param %1").arg(param);
         break;
@@ -1418,9 +1583,9 @@ void Bsp::SetParamValue(eGB_PARAM param, qint16 value, quint8 number)
     {
     case Param::PARAM_LIST: setComboBoxValue(param, quint8(value), number); break;
     case Param::PARAM_INT: setSpinBoxValue(param, value, number); break;
+    case Param::PARAM_U_COR: setDoubleSpinBoxValue(param, value, number); break;
+    case Param::PARAM_I_COR: setSpinBoxValue(param, value, number); break;
 
-    case Param::PARAM_U_COR: Q_FALLTHROUGH();
-    case Param::PARAM_I_COR: Q_FALLTHROUGH();
     case Param::PARAM_BITES:
         qWarning() << QString("No set param function for param %1").arg(param);
         break;
