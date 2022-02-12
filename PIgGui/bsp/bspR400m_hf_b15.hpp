@@ -33,13 +33,16 @@ private:
     void InitComMap() override;
     void InitParam() override;
 
-    void crtTreeDef() override;
+    void crtTreeDef(QTreeWidgetItem *top) override;
+    void crtTreePrd(QTreeWidgetItem *top) override { Q_UNUSED(top); }
+    void crtTreePrm(QTreeWidgetItem *top) override { Q_UNUSED(top); }
+    void crtTreeGlb(QTreeWidgetItem *top) override;
+    void crtTreeInterface(QTreeWidgetItem *top) override;
     void crtTreeDevice() override;
     void crtTreeDevieVersions(QTreeWidgetItem *top) override;
-    void crtTreeGlb() override;
+
     void crtTreeMeasure() override;
-    void crtTreePrd() override { }
-    void crtTreePrm() override { }
+
     void crtTreeState() override;
     void crtTest() override;
     void crtJrn() override;
@@ -65,11 +68,17 @@ private:
     void HdlrComGlbx30(eGB_COM com, pkg_t &data) override;
     void HdlrComGlbx31(eGB_COM com, pkg_t &data) override;
     void HdlrComGlbx32(eGB_COM com, pkg_t &data) override;
+    void HdlrComGlbx33(eGB_COM com, pkg_t &data) override;
     void HdlrComGlbx34(eGB_COM com, pkg_t &data) override;
     void HdlrComGlbx35(eGB_COM com, pkg_t &data) override;
+    void HdlrComGlbx36(eGB_COM com, pkg_t &data) override;
     void HdlrComGlbx37(eGB_COM com, pkg_t &data) override;
     void HdlrComGlbx38(eGB_COM com, pkg_t &data) override;
+    void HdlrComGlbx39(eGB_COM com, pkg_t &data) override;
+    void HdlrComGlbx3A(eGB_COM com, pkg_t &data) override;
     void HdlrComGlbx3B(eGB_COM com, pkg_t &data) override;
+    void HdlrComGlbx3C(eGB_COM com, pkg_t &data) override;
+    void HdlrComGlbx3D(eGB_COM com, pkg_t &data) override;
     void HdlrComGlbx3F(eGB_COM com, pkg_t &data) override;
 
     void HdlrComRegx70(eGB_COM com, pkg_t &data) override;
@@ -77,7 +86,9 @@ private:
     void HdlrComRegx72(eGB_COM com, pkg_t &data) override;
 
     void HdlrComJrnxC1(eGB_COM com, pkg_t &data) override;
+    void HdlrComJrnxC2(eGB_COM com, pkg_t &data) override;
     void HdlrComJrnxF1(eGB_COM com, pkg_t &data) override;
+    void HdlrComJrnxF2(eGB_COM com, pkg_t &data) override;
 };
 
 #endif  // BSP_R400M_HF_B15_HPP

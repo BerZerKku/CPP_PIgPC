@@ -1,6 +1,7 @@
 #ifndef BSP_H
 #define BSP_H
 
+#include <QCheckBox>
 #include <QComboBox>
 #include <QDateTime>
 #include <QDoubleSpinBox>
@@ -83,10 +84,17 @@ protected:
 
     QMap<uint8_t, HdlrCom_t> mComMap;
 
-    QSpinBox mJrnDefCounter;
-    QSpinBox mJrnPrdCounter;
-    QSpinBox mJrnPrmCounter;
-    QSpinBox mJrnGlbCounter;
+    QSpinBox  mJrnDefCounter;
+    QCheckBox mJrnDefOverflow;
+
+    QSpinBox  mJrnPrdCounter;
+    QCheckBox mJrnPrdOverflow;
+
+    QSpinBox  mJrnPrmCounter;
+    QCheckBox mJrnPrmOverflow;
+
+    QSpinBox  mJrnGlbCounter;
+    QCheckBox mJrnGlbOverflow;
 
     QComboBox mControl;
 
@@ -110,7 +118,7 @@ public:
     pkg_t mPkgRx;  ///< Данные на приеме.
     pkg_t mPkgTx;  ///< Данные для передачи.
 
-    void   CrtParamWidget(eGB_PARAM param);
+    void   CrtParamWidget(QTreeWidgetItem *top, eGB_PARAM param);
     qint16 GetParamValue(eGB_PARAM param, quint8 number = 1);
     void   SetParamValue(eGB_PARAM param, qint16 value, quint8 number = 1);
 
@@ -163,14 +171,15 @@ protected:
     virtual void InitComMap();
     virtual void InitParam();
 
-    virtual void     crtTreeDef();
+    void             crtTreeParam();
+    virtual void     crtTreeDef(QTreeWidgetItem *top);
+    virtual void     crtTreePrd(QTreeWidgetItem *top);
+    virtual void     crtTreePrm(QTreeWidgetItem *top);
+    virtual void     crtTreeGlb(QTreeWidgetItem *top);
+    virtual void     crtTreeInterface(QTreeWidgetItem *top);
     virtual void     crtTreeDevice();
     virtual void     crtTreeDevieVersions(QTreeWidgetItem *top);
-    virtual void     crtTreeGlb();
-    virtual void     crtTreeInterface();
     virtual void     crtTreeMeasure();
-    virtual void     crtTreePrd();
-    virtual void     crtTreePrm();
     virtual void     crtTreeState();
     QTreeWidgetItem *crtTreeState(QTreeWidgetItem *top, std::string name, state_t &state);
     virtual void     crtTest();
@@ -178,32 +187,29 @@ protected:
     virtual void     crtJrnGlb(QTreeWidgetItem *top);
     virtual void     crtJrnDef(QTreeWidgetItem *top);
 
-    void crtComboBox(eGB_PARAM param);
     void fillComboboxList(QComboBox *combobox, eGB_PARAM param);
     void fillComboboxListOnOff(QComboBox *combobox);
     void fillComboboxListRegime(QComboBox *combobox);
 
-    void crtLineEdit(eGB_PARAM param, std::string);
-    void crtSpinBox(eGB_PARAM param);
-    void crtDoubleSpinBox(eGB_PARAM param);
+    void crtComboBox(QTreeWidgetItem *top, eGB_PARAM param);
+    void crtLineEdit(QTreeWidgetItem *top, eGB_PARAM param, std::string);
+    void crtSpinBox(QTreeWidgetItem *top, eGB_PARAM param);
+    void crtDoubleSpinBox(QTreeWidgetItem *top, eGB_PARAM param);
 
     virtual void FillComboboxListStateDef() { }
     virtual void FillComboboxListStatePrm() { }
     virtual void FillComboboxListStatePrd() { }
     void         FillComboboxListStateGlb();
-
     virtual void FillComboBoxListControl() {};
-
 
     void keyPressEvent(QKeyEvent *event) override;
 
     /// Преобразование bcd кода в целое.
-    quint8 bcd2int(quint8 bcd, bool &ok);
+    quint8 bcd2int(quint8 bcd, bool *ok = nullptr);
     /// Преобразование целого числа в bcd код.
-    quint8 int2bcd(quint8 val, bool &ok);
+    quint8 int2bcd(quint8 val, bool *ok = nullptr);
 
     void procCommand(eGB_COM com, pkg_t &data);
-    void procCommandReadJournal(eGB_COM com, pkg_t &data);
     void procCommandReadParam(eGB_COM com, pkg_t &data);
     void procCommandWriteParam(eGB_COM com, pkg_t &data);
     void procCommandWriteRegime(eGB_COM com, pkg_t &data);

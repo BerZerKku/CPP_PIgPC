@@ -40,7 +40,7 @@ include(avr/generic-gcc-avr.cmake)
 project(PIg)
 set(PROJECT_VERSION_MAJOR 1)  # hex
 set(PROJECT_VERSION_MINOR 52) # hex
-set(PROJECT_VERSION_PATH  4)  # hex
+set(PROJECT_VERSION_PATH  5)  # hex
 
 ##########################################################################
 # status messages

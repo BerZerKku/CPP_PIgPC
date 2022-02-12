@@ -111,6 +111,28 @@ void Bsp::InitParam()
     setSpinBoxValue(m_measure.dF, 3);
 }
 
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Создает ветку параметрв.
+ *
+ * *****************************************************************************
+ */
+void Bsp::crtTreeParam()
+{
+    QTreeWidgetItem *top = new QTreeWidgetItem(mTree);
+    top->setText(0, kCodec->toUnicode("Параметры"));
+    mTree->addTopLevelItem(top);
+    //    mTree->insertTopLevelItem(mTree->topLevelItemCount(), top);
+
+    crtTreeDef(top);
+    crtTreePrd(top);
+    crtTreePrm(top);
+    crtTreeGlb(top);
+    crtTreeInterface(top);
+}
+
 void Bsp::InitClock()
 {
     dt = QDateTime::currentDateTime();
@@ -118,6 +140,60 @@ void Bsp::InitClock()
     QTimer *timerClock = new QTimer(this);
     QObject::connect(timerClock, &QTimer::timeout, this, &Bsp::updateClock);
     timerClock->start(1000);
+}
+
+
+void Bsp::crtTreeDef(QTreeWidgetItem *top)
+{
+    QTreeWidgetItem *ltop = new QTreeWidgetItem(top);
+    ltop->setText(0, kCodec->toUnicode("Защита"));
+    top->addChild(ltop);
+
+    // Add params here
+    // ex. CrtParamWidget(ltop, GB_PARAM_NET_ADDRESS);
+}
+
+
+void Bsp::crtTreePrd(QTreeWidgetItem(*top))
+{
+    QTreeWidgetItem *ltop = new QTreeWidgetItem(top);
+    ltop->setText(0, kCodec->toUnicode("Передатчик"));
+    top->addChild(ltop);
+
+    // Add params here
+    // ex. CrtParamWidget(ltop, GB_PARAM_NET_ADDRESS);
+}
+
+
+void Bsp::crtTreePrm(QTreeWidgetItem(*top))
+{
+    QTreeWidgetItem *ltop = new QTreeWidgetItem(top);
+    ltop->setText(0, kCodec->toUnicode("Приемник"));
+    top->addChild(ltop);
+
+    // Add params here
+    // ex. CrtParamWidget(ltop, GB_PARAM_NET_ADDRESS);
+}
+
+
+void Bsp::crtTreeGlb(QTreeWidgetItem *top)
+{
+    QTreeWidgetItem *ltop = new QTreeWidgetItem(top);
+    ltop->setText(0, kCodec->toUnicode("Общие"));
+    top->addChild(ltop);
+
+    // Add params here
+    // ex. CrtParamWidget(ltop, GB_PARAM_NET_ADDRESS);
+}
+
+void Bsp::crtTreeInterface(QTreeWidgetItem *top)
+{
+    QTreeWidgetItem *ltop = new QTreeWidgetItem(top);
+    top->setText(0, kCodec->toUnicode("Интерфейс"));
+    top->addChild(ltop);
+
+    // Add params here
+    // ex. CrtParamWidget(ltop, GB_PARAM_NET_ADDRESS);
 }
 
 
@@ -192,12 +268,8 @@ void Bsp::Init()
 {
     crtTreeDevice();
     crtTreeState();
-    crtTreePrm();
-    crtTreePrd();
-    crtTreeGlb();
-    crtTreeInterface();
+    crtTreeParam();
     crtTest();
-    crtTreeDef();
     crtTreeMeasure();
     crtJrn();
 
@@ -212,16 +284,6 @@ void Bsp::Init()
     InitClock();
 }
 
-void Bsp::crtTreeDef()
-{
-    QTreeWidgetItem *top = new QTreeWidgetItem();
-    mTree->insertTopLevelItem(mTree->topLevelItemCount(), top);
-
-    top->setText(0, kCodec->toUnicode("Защита"));
-    crtComboBox(GB_PARAM_DEF_ONE_SIDE);
-
-    top->setExpanded(false);
-}
 
 void Bsp::crtTreeDevice()
 {
@@ -238,13 +300,13 @@ void Bsp::crtTreeDevice()
     fillComboboxListOnOff(mDevice.isDef);
     mTree->setItemWidget(item, 1, mDevice.isDef);
 
-    crtSpinBox(GB_PARAM_PRM_COM_NUMS);
-    crtSpinBox(GB_PARAM_PRD_COM_NUMS);
-    crtComboBox(GB_PARAM_NUM_OF_DEVICES);
+    crtSpinBox(top, GB_PARAM_PRM_COM_NUMS);
+    crtSpinBox(top, GB_PARAM_PRD_COM_NUMS);
+    crtComboBox(top, GB_PARAM_NUM_OF_DEVICES);
 
-    crtComboBox(GB_PARAM_COMP_K400);
-    crtComboBox(GB_PARAM_COMP_P400);
-    crtComboBox(GB_PARAM_COMP_RZSK);
+    crtComboBox(top, GB_PARAM_COMP_K400);
+    crtComboBox(top, GB_PARAM_COMP_P400);
+    crtComboBox(top, GB_PARAM_COMP_RZSK);
 
     top->setExpanded(true);
 
@@ -318,32 +380,6 @@ void Bsp::crtTreeDevieVersions(QTreeWidgetItem *top)
     branch->setExpanded(false);
 }
 
-void Bsp::crtTreeGlb()
-{
-    QTreeWidgetItem *top = new QTreeWidgetItem();
-    mTree->insertTopLevelItem(mTree->topLevelItemCount(), top);
-
-    top->setText(0, kCodec->toUnicode("Общие"));
-
-    crtSpinBox(GB_PARAM_NUM_OF_DEVICE);
-    crtComboBox(GB_PARAM_COM_PRD_KEEP);
-    crtComboBox(GB_PARAM_COM_PRM_KEEP);
-    crtComboBox(GB_PARAM_TIME_SYNCH);
-
-    top->setExpanded(false);
-}
-
-void Bsp::crtTreeInterface()
-{
-    QTreeWidgetItem *top = new QTreeWidgetItem();
-    mTree->insertTopLevelItem(mTree->topLevelItemCount(), top);
-
-    top->setText(0, kCodec->toUnicode("Интерфейс"));
-
-    crtSpinBox(GB_PARAM_NET_ADDRESS);
-
-    top->setExpanded(false);
-}
 
 void Bsp::crtTreeMeasure()
 {
@@ -470,42 +506,6 @@ void Bsp::crtTreeMeasure()
     top->setExpanded(false);
 }
 
-void Bsp::crtTreePrd()
-{
-    QTreeWidgetItem *top = new QTreeWidgetItem();
-    mTree->insertTopLevelItem(mTree->topLevelItemCount(), top);
-
-    top->setText(0, kCodec->toUnicode("Передатчик"));
-
-    crtSpinBox(GB_PARAM_PRD_IN_DELAY);
-    //    crtComboBox(GB_PARAM_PRD_COM_BLOCK);
-    //    crtSpinBox(GB_PARAM_PRD_DURATION_L);
-    crtSpinBox(GB_PARAM_PRD_DURATION_O);
-    crtComboBox(GB_PARAM_PRD_COM_LONG);
-    crtComboBox(GB_PARAM_PRD_COM_SIGNAL);
-
-    top->setExpanded(false);
-}
-
-void Bsp::crtTreePrm()
-{
-    QTreeWidgetItem *top = new QTreeWidgetItem();
-    mTree->insertTopLevelItem(mTree->topLevelItemCount(), top);
-
-    top->setText(0, kCodec->toUnicode("Приемник"));
-
-    // FIXME Есть два вида задержки на фиксацию команды!
-    crtSpinBox(GB_PARAM_PRM_TIME_ON);
-    //    crtComboBox(GB_PARAM_PRM_COM_BLOCK_ALL);
-    crtComboBox(GB_PARAM_PRM_COM_BLOCK);
-    crtSpinBox(GB_PARAM_PRM_TIME_OFF);
-    crtComboBox(GB_PARAM_PRD_DR_ENABLE);
-    crtComboBox(GB_PARAM_PRM_DR_COM_BLOCK);
-    crtSpinBox(GB_PARAM_PRM_DR_COM_TO_HF);
-    crtComboBox(GB_PARAM_PRM_COM_SIGNAL);
-
-    top->setExpanded(false);
-}
 
 //
 void Bsp::crtTreeState()
@@ -735,72 +735,6 @@ void Bsp::crtJrnGlb(QTreeWidgetItem *top)
 
 
 //
-void Bsp::crtComboBox(eGB_PARAM param)
-{
-    QVector<QComboBox *> vcombobox;
-    QComboBox *          combobox;
-    QTreeWidgetItem *    item;
-    QTreeWidgetItem *    top = mTree->topLevelItem(mTree->topLevelItemCount() - 1);
-
-    uint8_t num = getAbsMaxNumOfSameParams(param);
-    if (num == 0)
-    {
-        qCritical() << QString("Number of parameters %1 is 0!").arg(getParamName(param));
-    }
-    else
-    {
-        if (num > 1)
-        {
-            item = new QTreeWidgetItem();
-            item->setText(0, getParamName(param));
-            top->addChild(item);
-            top = item;
-        }
-
-        for (uint8_t i = 1; i <= num; i++)
-        {
-            item = new QTreeWidgetItem();
-
-            if (num > 1)
-            {
-                std::string name("Номер ");
-                name += std::to_string(i);
-                item->setText(0, kCodec->toUnicode(name.c_str()));
-            }
-            else
-            {
-                item->setText(0, getParamName(param));
-            }
-
-            combobox = new QComboBox(this);
-            vcombobox.append(combobox);
-
-            if (getListOfValues(param) != nullptr)
-            {
-                fillComboboxList(combobox, param);
-                combobox->setCurrentIndex(0);
-            }
-            else
-            {
-                qCritical() << QString("Parameter %1 is not LIST!").arg(getParamName(param));
-            }
-
-            if (getCom(param) == eGB_COM::GB_COM_NO)
-            {
-                QPalette pa;
-                pa.setColor(QPalette::WindowText, Qt::red);
-                item->setForeground(0, Qt::blue);
-            }
-
-            top->addChild(item);
-            mTree->setItemWidget(item, 1, combobox);
-        }
-
-        mapCombobox.insert(param, vcombobox);
-    }
-}
-
-//
 void Bsp::fillComboboxList(QComboBox *combobox, eGB_PARAM param)
 {
     if (param < GB_PARAM_MAX)
@@ -867,11 +801,77 @@ void Bsp::FillComboboxListStateGlb()
     }
 }
 
+
 //
-void Bsp::crtLineEdit(eGB_PARAM param, std::string value)
+void Bsp::crtComboBox(QTreeWidgetItem *top, eGB_PARAM param)
+{
+    QVector<QComboBox *> vcombobox;
+    QComboBox *          combobox;
+    QTreeWidgetItem *    item;
+
+    uint8_t num = getAbsMaxNumOfSameParams(param);
+    if (num == 0)
+    {
+        qCritical() << QString("Number of parameters %1 is 0!").arg(getParamName(param));
+    }
+    else
+    {
+        if (num > 1)
+        {
+            item = new QTreeWidgetItem();
+            item->setText(0, getParamName(param));
+            top->addChild(item);
+            top = item;
+        }
+
+        for (uint8_t i = 1; i <= num; i++)
+        {
+            item = new QTreeWidgetItem();
+
+            if (num > 1)
+            {
+                std::string name("Номер ");
+                name += std::to_string(i);
+                item->setText(0, kCodec->toUnicode(name.c_str()));
+            }
+            else
+            {
+                item->setText(0, getParamName(param));
+            }
+
+            combobox = new QComboBox(this);
+            vcombobox.append(combobox);
+
+            if (getListOfValues(param) != nullptr)
+            {
+                fillComboboxList(combobox, param);
+                combobox->setCurrentIndex(0);
+            }
+            else
+            {
+                qCritical() << QString("Parameter %1 is not LIST!").arg(getParamName(param));
+            }
+
+            if (getCom(param) == eGB_COM::GB_COM_NO)
+            {
+                QPalette pa;
+                pa.setColor(QPalette::WindowText, Qt::red);
+                item->setForeground(0, Qt::blue);
+            }
+
+            top->addChild(item);
+            mTree->setItemWidget(item, 1, combobox);
+        }
+
+        mapCombobox.insert(param, vcombobox);
+    }
+}
+
+
+//
+void Bsp::crtLineEdit(QTreeWidgetItem *top, eGB_PARAM param, std::string value)
 {
     QLineEdit *      lineedit = new QLineEdit(this);
-    QTreeWidgetItem *top      = mTree->topLevelItem(mTree->topLevelItemCount() - 1);
     QTreeWidgetItem *item     = new QTreeWidgetItem(top);
 
     // TODO Сделать возможность ввода значений руками
@@ -900,13 +900,13 @@ void Bsp::crtLineEdit(eGB_PARAM param, std::string value)
     mapLineEdit.insert(param, lineedit);
 }
 
+
 //
-void Bsp::crtSpinBox(eGB_PARAM param)
+void Bsp::crtSpinBox(QTreeWidgetItem *top, eGB_PARAM param)
 {
     QVector<QSpinBox *> vspinbox;
     QSpinBox *          spinbox;
     QTreeWidgetItem *   item;
-    QTreeWidgetItem *   top = mTree->topLevelItem(mTree->topLevelItemCount() - 1);
 
     uint8_t num = getAbsMaxNumOfSameParams(param);
     if (num == 0)
@@ -980,12 +980,11 @@ void Bsp::crtSpinBox(eGB_PARAM param)
  *
  * *****************************************************************************
  */
-void Bsp::crtDoubleSpinBox(eGB_PARAM param)
+void Bsp::crtDoubleSpinBox(QTreeWidgetItem *top, eGB_PARAM param)
 {
     QVector<QDoubleSpinBox *> vdspinbox;
     QDoubleSpinBox *          dspinbox;
     QTreeWidgetItem *         item;
-    QTreeWidgetItem *         top = mTree->topLevelItem(mTree->topLevelItemCount() - 1);
 
     uint8_t num = getAbsMaxNumOfSameParams(param);
     if (num == 0)
@@ -1225,20 +1224,17 @@ qint16 Bsp::getSpinBoxValue(eGB_PARAM param, uint8_t number)
 
     if (number > 0 && mapSpinBox.contains(param) && mapSpinBox.value(param).size() >= number)
     {
-
-        number -= 1;
-        if (getParamType(param) == Param::PARAM_INT)
+        Param::Param::PARAM_TYPE type = getParamType(param);
+        if (type == Param::PARAM_INT || type == Param::Param::PARAM_I_COR)
         {
-            value = getSpinBoxValue(mapSpinBox.value(param).at(number));
+            value = getSpinBoxValue(mapSpinBox.value(param).at(number - 1));
             value = (value / getDisc(param)) * getDisc(param);
             value /= getFract(param);
         }
         else
         {
-            QString msg = QString("Parameter '%1' type (%2) not found.")
-                              .arg(getParamName(param))
-                              .arg(getParamType(param));
-            qWarning() << msg;
+            QString message = QString("Parameter '%1' type (%2) not found.");
+            qWarning() << message.arg(getParamName(param)).arg(type);
         }
     }
     else
@@ -1514,16 +1510,16 @@ QString Bsp::getParamName(eGB_PARAM param)
  *
  * *****************************************************************************
  */
-void Bsp::CrtParamWidget(eGB_PARAM param)
+void Bsp::CrtParamWidget(QTreeWidgetItem *top, eGB_PARAM param)
 {
     Q_ASSERT(param < GB_PARAM_MAX);
 
     switch (getParamType(param))
     {
-    case Param::PARAM_LIST: crtComboBox(param); break;
-    case Param::PARAM_INT: crtSpinBox(param); break;
-    case Param::PARAM_U_COR: crtDoubleSpinBox(param); break;
-    case Param::PARAM_I_COR: crtSpinBox(param); break;
+    case Param::PARAM_LIST: crtComboBox(top, param); break;
+    case Param::PARAM_INT: crtSpinBox(top, param); break;
+    case Param::PARAM_U_COR: crtDoubleSpinBox(top, param); break;
+    case Param::PARAM_I_COR: crtSpinBox(top, param); break;
 
     case Param::PARAM_BITES:
         qWarning() << QString("No create widget function for param %1").arg(param);
@@ -1602,119 +1598,54 @@ void Bsp::keyPressEvent(QKeyEvent *event)
 }
 
 //
-quint8 Bsp::bcd2int(quint8 bcd, bool &ok)
+quint8 Bsp::bcd2int(quint8 bcd, bool *ok)
 {
     quint8 value = 0;
+    bool   t_ok  = ((bcd & 0x0F) < 0x0A) && ((bcd & 0xF0) < 0xA0);
 
-    ok = ((bcd & 0x0F) < 0x0A) && ((bcd & 0xF0) < 0xA0);
-    if (!ok)
+    if (t_ok)
+    {
+        value = bcd & 0x0F;
+        value += ((bcd >> 4) & 0x0F) * 10;
+    }
+    else
     {
         qDebug() << __FILE__ << __FUNCTION__ << __LINE__ << " Error: " << bcd;
     }
 
-    value = bcd & 0x0F;
-    value += ((bcd >> 4) & 0x0F) * 10;
+    if (ok != nullptr)
+    {
+        *ok = t_ok;
+    }
+
 
     return value;
 }
 
 //
-quint8 Bsp::int2bcd(quint8 val, bool &ok)
+quint8 Bsp::int2bcd(quint8 val, bool *ok)
 {
-    quint8 bcd = 0;
+    quint8 bcd  = 0;
+    bool   t_ok = (val < 100);
 
-    ok = (val < 100);
-    if (!ok)
+    if (t_ok)
+    {
+        bcd = (val % 10);
+        bcd += (val / 10) << 4;
+    }
+    else
     {
         qWarning("Can't convert value 0x%.2X to BCD code!", val);
     }
 
-    bcd = (val % 10);
-    bcd += (val / 10) << 4;
+    if (ok != nullptr)
+    {
+        *ok = t_ok;
+    }
 
     return bcd;
 }
 
-//
-void Bsp::procCommandReadJournal(eGB_COM com, pkg_t &data)
-{
-
-    //    int             value       = mDevice.typeDevice->currentData().toInt();
-    //    eGB_TYPE_DEVICE device      = static_cast<eGB_TYPE_DEVICE>(value);
-    //    int log_counter = (device == AVANT_R400M) ? 50 : 0;
-
-    //    switch (com)
-    //    {
-
-    //    case GB_COM_PRM_GET_JRN_CNT:
-    //        {
-    //            if (!data.isEmpty())
-    //            {
-    //                qWarning() << kMsgSizeError.arg(com, 2, 16).arg(data.size());
-    //            }
-    //            // TODO Обработчик для команды чтения количества записей журнала.
-    //            mPkgTx.append(com);
-    //            mPkgTx.append(0);
-    //            mPkgTx.append(0);
-    //            break;
-    //        }
-
-
-    //    case GB_COM_PRD_GET_JRN_CNT:
-    //        {
-    //            if (!data.isEmpty())
-    //            {
-    //                qWarning() << kMsgSizeError.arg(com, 2, 16).arg(data.size());
-    //            }
-    //            // TODO Обработчик для команды чтения количества записей журнала.
-    //            mPkgTx.append(com);
-    //            mPkgTx.append(0);
-    //            mPkgTx.append(0);
-    //            break;
-    //        }
-
-
-    //    case GB_COM_GET_JRN_ENTRY:
-    //        {
-    //            if (data.size() == 2)
-    //            {
-    //                int event_number = data.takeFirst();
-    //                event_number += static_cast<int>(data.takeFirst());
-
-    //                int max_event_value = (device == AVANT_R400M) ? (JRN_EVENT_R400M_SIZE) : 5;
-    //                mPkgTx.append(com);
-    //                mPkgTx.append(event_number % 9);  // удаленный аппарат для ПВЗУ, ПВЗУЕ
-    //                mPkgTx.append(event_number % (max_event_value));  // событие
-    //                mPkgTx.append(event_number % 7);                  // режим
-    //                mPkgTx.append(0);                                 // b4
-    //                mPkgTx.append(0);                                 // b5
-    //                mPkgTx.append(0);                                 // b6
-    //                mPkgTx.append(0);                                 // b7
-    //                mPkgTx.append(999 & 0xFF);  // миллисекунды, младший байт
-    //                mPkgTx.append((999 >> 8) & 0xFF);  // миллисекунды, старший байт
-    //                mPkgTx.append(0x59);               // секунды, bcd
-    //                mPkgTx.append(0x59);               // минуты, bcd
-    //                mPkgTx.append(0x23);               // часы, bcd
-    //                mPkgTx.append(0);                  // день недели
-    //                mPkgTx.append(0x01);               // день, bcd
-    //                mPkgTx.append(0x02);               // месяц, bcd
-    //                mPkgTx.append(0x21);               // год, bcd
-    //            }
-    //            else
-    //            {
-
-    //                qWarning() << kMsgSizeError.arg(com, 2, 16).arg(data.size());
-    //            }
-
-    //            break;
-    //        }
-
-    //    default:
-    //        {
-    //            qWarning("No command handler: 0x%.2X", com);
-    //        }
-    //    }
-}
 
 //
 void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data)
@@ -2291,6 +2222,16 @@ bool Bsp::CheckSize(uint8_t com, int size, QVector<int> size_allowed)
     return check;
 }
 
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Заглушка для команды. Выводит предупреждение.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
 void Bsp::HdlrComDummy(eGB_COM com, pkg_t &data)
 {
     Q_UNUSED(data);

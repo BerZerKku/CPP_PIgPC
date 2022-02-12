@@ -130,7 +130,8 @@ uint8_t clProtocolBspS::sendData(eGB_COM com)
             case GB_SEND_INT16_BE: num = addCom(com, val, dop); break;
 
             case GB_SEND_COR_I: [[fallthrough]];
-            case GB_SEND_COR_U: [[fallthrough]];
+            case GB_SEND_COR_U: num = addCom(com, 3, sParam_->txComBuf.getBuferAddress());
+
             case GB_SEND_NO: break;
             }
         }

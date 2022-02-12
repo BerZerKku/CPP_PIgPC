@@ -4902,6 +4902,7 @@ void clMenu::setupParam()
                         // то передается сообщение с под.байтом равным 4
                         // означающим сброс коррекции
                         int16_t t = EnterParam.getValue();
+
                         if (t == 0)
                             dop = 4;
                         else
@@ -4911,9 +4912,10 @@ void clMenu::setupParam()
                             t -= static_cast<int16_t>(sParam.measParam.getVoltageOut());
                             t += sParam.local.getValue();
                         }
+
                         sParam.txComBuf.setInt8(dop, 0);
                         sParam.txComBuf.setInt8(static_cast<uint8_t>(t / 10), 1);
-                        sParam.txComBuf.setInt8(static_cast<uint8_t>(t % 10) * 10, 2);
+                        sParam.txComBuf.setInt8(static_cast<uint8_t>((t % 10) * 10), 2);
                     }
                     break;
 
