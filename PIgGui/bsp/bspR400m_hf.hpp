@@ -1,5 +1,5 @@
-#ifndef BSP_R400M_HF_B15_HPP
-#define BSP_R400M_HF_B15_HPP
+#ifndef BSP_R400M_HF_HPP
+#define BSP_R400M_HF_HPP
 
 #include "bsp.h"
 
@@ -19,10 +19,10 @@ typedef QVector<uint8_t> pkg_t;
  *
  * *****************************************************************************
  */
-class TBspR400mHf_b15 : public Bsp
+class TBspR400mHf : public Bsp
 {
 public:
-    explicit TBspR400mHf_b15(QTreeWidget *tree, QWidget *parent = nullptr);
+    explicit TBspR400mHf(QTreeWidget *tree, QWidget *parent = nullptr);
 
     QSpinBox mStateFaultDeviceNumber;
 
@@ -91,4 +91,4 @@ private:
     void HdlrComJrnxF2(eGB_COM com, pkg_t &data) override;
 };
 
-#endif  // BSP_R400M_HF_B15_HPP
+#endif  // BSP_R400M_HF_HPP

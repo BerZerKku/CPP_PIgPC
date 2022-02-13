@@ -39,7 +39,7 @@ INCLUDEPATH += \
     $$system(pwd)
 
 HEADERS += \
-    bsp/bspR400m_hf_b15.hpp \
+    bsp/bspR400m_hf.hpp \
     mainwindow.h \
     qkeyboard.h \
     qprotocolviewer.h \
@@ -54,7 +54,7 @@ HEADERS += \
 
 
 SOURCES += \
-    bsp/bspR400m_hf_b15.cpp \
+    bsp/bspR400m_hf.cpp \
     main.cpp \
     mainwindow.cpp \
     qkeyboard.cpp \

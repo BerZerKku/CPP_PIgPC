@@ -1,14 +1,14 @@
 #include <QDebug>
 #include <QHeaderView>
 
-#include "bspR400m_hf_b15.hpp"
+#include "bspR400m_hf.hpp"
 
 #include "PIg/src/flash.h"
 #include "PIg/src/menu/control.h"
 #include "PIg/src/menu/txCom.h"
 #include "PIg/src/parameter/param.h"
 
-TBspR400mHf_b15::TBspR400mHf_b15(QTreeWidget *tree, QWidget *parent) : Bsp(tree, parent)
+TBspR400mHf::TBspR400mHf(QTreeWidget *tree, QWidget *parent) : Bsp(tree, parent)
 {
     FillComboboxListAc();
 }
@@ -21,7 +21,7 @@ TBspR400mHf_b15::TBspR400mHf_b15(QTreeWidget *tree, QWidget *parent) : Bsp(tree,
  *
  * *****************************************************************************
  */
-void TBspR400mHf_b15::InitComMap()
+void TBspR400mHf::InitComMap()
 {
     mComMap.insert(0x00, &Bsp::HdlrComDefx00);  // чтение параметров защиты с конфигуратора
     mComMap.insert(0x01, &Bsp::HdlrComDefx01);  // чтение типа защиты
@@ -88,11 +88,11 @@ void TBspR400mHf_b15::InitComMap()
 
 
 //
-void TBspR400mHf_b15::InitParam()
+void TBspR400mHf::InitParam()
 {
     setComboBoxValue(GB_PARAM_COMP_P400, GB_COMP_R400M_LINER);
 
-    setSpinBoxValue(mDevice.versionBspMcu, 0xF232);
+    setSpinBoxValue(mDevice.versionBspMcu, 0xF233);
     setSpinBoxValue(mDevice.versionBspDsp, 0x5833);
     setSpinBoxValue(mDevice.versionBszPlis, 0x52);
 
@@ -128,6 +128,8 @@ void TBspR400mHf_b15::InitParam()
     SetParamValue(GB_PARAM_PVZUE_AC_TYPE, 2);  // 2 - нормальный
     SetParamValue(GB_PARAM_PVZUE_AC_PERIOD, 152);
     SetParamValue(GB_PARAM_PVZUE_AC_PER_RE, 213);
+    SetParamValue(GB_PARAM_PVZU_AC_CORRECT, 19);
+    SetParamValue(GB_PARAM_ALARM_CF, 11);
     SetParamValue(GB_PARAM_COR_U, -105);  // -10.5 В
     SetParamValue(GB_PARAM_COR_I, 20);    // 20 мА
 
@@ -159,7 +161,7 @@ void TBspR400mHf_b15::InitParam()
 }
 
 
-void TBspR400mHf_b15::crtTreeDef(QTreeWidgetItem *top)
+void TBspR400mHf::crtTreeDef(QTreeWidgetItem *top)
 {
     QTreeWidgetItem *ltop = new QTreeWidgetItem(top);
     ltop->setText(0, kCodec->toUnicode("Защита"));
@@ -179,7 +181,7 @@ void TBspR400mHf_b15::crtTreeDef(QTreeWidgetItem *top)
 }
 
 
-void TBspR400mHf_b15::crtTreeGlb(QTreeWidgetItem(*top))
+void TBspR400mHf::crtTreeGlb(QTreeWidgetItem(*top))
 {
     QTreeWidgetItem *ltop = new QTreeWidgetItem(top);
     ltop->setText(0, kCodec->toUnicode("Общие"));
@@ -201,12 +203,14 @@ void TBspR400mHf_b15::crtTreeGlb(QTreeWidgetItem(*top))
     CrtParamWidget(ltop, GB_PARAM_PVZUE_AC_TYPE);
     CrtParamWidget(ltop, GB_PARAM_PVZUE_AC_PERIOD);
     CrtParamWidget(ltop, GB_PARAM_PVZUE_AC_PER_RE);
+    CrtParamWidget(ltop, GB_PARAM_PVZU_AC_CORRECT);
+    CrtParamWidget(ltop, GB_PARAM_ALARM_CF);
     CrtParamWidget(ltop, GB_PARAM_COR_U);
     CrtParamWidget(ltop, GB_PARAM_COR_I);
 }
 
 
-void TBspR400mHf_b15::crtTreeInterface(QTreeWidgetItem *top)
+void TBspR400mHf::crtTreeInterface(QTreeWidgetItem *top)
 {
     QTreeWidgetItem *ltop = new QTreeWidgetItem(top);
     ltop->setText(0, kCodec->toUnicode("Интерфейс"));
@@ -216,7 +220,7 @@ void TBspR400mHf_b15::crtTreeInterface(QTreeWidgetItem *top)
 }
 
 
-void TBspR400mHf_b15::crtTreeDevice()
+void TBspR400mHf::crtTreeDevice()
 {
     QTreeWidgetItem *top = new QTreeWidgetItem();
     mTree->insertTopLevelItem(mTree->topLevelItemCount(), top);
@@ -228,7 +232,7 @@ void TBspR400mHf_b15::crtTreeDevice()
 }
 
 
-void TBspR400mHf_b15::crtTreeDevieVersions(QTreeWidgetItem *top)
+void TBspR400mHf::crtTreeDevieVersions(QTreeWidgetItem *top)
 {
     QTreeWidgetItem *branch = new QTreeWidgetItem();
     top->addChild(branch);
@@ -259,7 +263,7 @@ void TBspR400mHf_b15::crtTreeDevieVersions(QTreeWidgetItem *top)
 }
 
 
-void TBspR400mHf_b15::crtTreeMeasure()
+void TBspR400mHf::crtTreeMeasure()
 {
     QTreeWidgetItem *item   = nullptr;
     QSpinBox *       widget = nullptr;
@@ -355,7 +359,7 @@ void TBspR400mHf_b15::crtTreeMeasure()
 
 
 //
-void TBspR400mHf_b15::crtTreeState()
+void TBspR400mHf::crtTreeState()
 {
     QTreeWidgetItem *item;
     QTreeWidgetItem *def;
@@ -396,24 +400,24 @@ void TBspR400mHf_b15::crtTreeState()
     connect(stateGlb.regime,
             QOverload<int>::of(&QComboBox::currentIndexChanged),
             this,
-            &TBspR400mHf_b15::setRegime);
+            &TBspR400mHf::setRegime);
 
     connect(stateGlb.state,
             QOverload<int>::of(&QComboBox::currentIndexChanged),
             this,
-            &TBspR400mHf_b15::setState);
+            &TBspR400mHf::setState);
 
     connect(stateGlb.dopByte,
             QOverload<int>::of(&QSpinBox::valueChanged),
             this,
-            &TBspR400mHf_b15::setDopByte);
+            &TBspR400mHf::setDopByte);
 
     top->setExpanded(true);
 }
 
 
 //
-void TBspR400mHf_b15::crtTest()
+void TBspR400mHf::crtTest()
 {
     QTreeWidgetItem *top = new QTreeWidgetItem();
     QTreeWidgetItem *item;
@@ -482,7 +486,7 @@ void TBspR400mHf_b15::crtTest()
  *
  * *****************************************************************************
  */
-void TBspR400mHf_b15::crtJrn()
+void TBspR400mHf::crtJrn()
 {
     QTreeWidgetItem *top = new QTreeWidgetItem(mTree);
     QTreeWidgetItem *ltop;
@@ -510,7 +514,7 @@ void TBspR400mHf_b15::crtJrn()
  *
  * *****************************************************************************
  */
-void TBspR400mHf_b15::crtJrnDef(QTreeWidgetItem *top)
+void TBspR400mHf::crtJrnDef(QTreeWidgetItem *top)
 {
     QTreeWidgetItem *item;
 
@@ -535,7 +539,7 @@ void TBspR400mHf_b15::crtJrnDef(QTreeWidgetItem *top)
  *
  * *****************************************************************************
  */
-void TBspR400mHf_b15::crtJrnGlb(QTreeWidgetItem *top)
+void TBspR400mHf::crtJrnGlb(QTreeWidgetItem *top)
 {
     QTreeWidgetItem *item;
 
@@ -552,7 +556,7 @@ void TBspR400mHf_b15::crtJrnGlb(QTreeWidgetItem *top)
 }
 
 
-void TBspR400mHf_b15::FillComboboxListStateDef()
+void TBspR400mHf::FillComboboxListStateDef()
 {
     QComboBox *combobox = stateDef.state;
 
@@ -583,7 +587,7 @@ void TBspR400mHf_b15::FillComboboxListStateDef()
  *
  * *****************************************************************************
  */
-void TBspR400mHf_b15::FillComboboxListAc()
+void TBspR400mHf::FillComboboxListAc()
 {
     // из fcAcType
 
@@ -619,7 +623,7 @@ void TBspR400mHf_b15::FillComboboxListAc()
  *
  * *****************************************************************************
  */
-void TBspR400mHf_b15::FillComboBoxListControl()
+void TBspR400mHf::FillComboBoxListControl()
 {
     mControl.addItem(kCodec->toUnicode("0 - Нет"), 0);
     mControl.addItem(kCodec->toUnicode("1 - Сброс своего"), 1);
@@ -653,7 +657,7 @@ void TBspR400mHf_b15::FillComboBoxListControl()
  *
  * *****************************************************************************
  */
-void TBspR400mHf_b15::HdlrComDefx00(eGB_COM com, pkg_t &data)
+void TBspR400mHf::HdlrComDefx00(eGB_COM com, pkg_t &data)
 {
     Q_ASSERT(com == 0x00 || com == 0x80);
 
@@ -726,7 +730,7 @@ void TBspR400mHf_b15::HdlrComDefx00(eGB_COM com, pkg_t &data)
  *
  * *****************************************************************************
  */
-void TBspR400mHf_b15::HdlrComDefx01(eGB_COM com, pkg_t &data)
+void TBspR400mHf::HdlrComDefx01(eGB_COM com, pkg_t &data)
 {
     Q_ASSERT(com == GB_COM_DEF_GET_DEF_TYPE || com == GB_COM_DEF_SET_DEF_TYPE);
 
@@ -768,7 +772,7 @@ void TBspR400mHf_b15::HdlrComDefx01(eGB_COM com, pkg_t &data)
  *
  * *****************************************************************************
  */
-void TBspR400mHf_b15::HdlrComDefx02(eGB_COM com, pkg_t &data)
+void TBspR400mHf::HdlrComDefx02(eGB_COM com, pkg_t &data)
 {
     Q_ASSERT(com == GB_COM_DEF_GET_LINE_TYPE || com == GB_COM_DEF_SET_LINE_TYPE);
 
@@ -810,7 +814,7 @@ void TBspR400mHf_b15::HdlrComDefx02(eGB_COM com, pkg_t &data)
  *
  * *****************************************************************************
  */
-void TBspR400mHf_b15::HdlrComDefx03(eGB_COM com, pkg_t &data)
+void TBspR400mHf::HdlrComDefx03(eGB_COM com, pkg_t &data)
 {
     Q_ASSERT(com == GB_COM_DEF_GET_T_NO_MAN || com == GB_COM_DEF_SET_T_NO_MAN);
 
@@ -852,7 +856,7 @@ void TBspR400mHf_b15::HdlrComDefx03(eGB_COM com, pkg_t &data)
  *
  * *****************************************************************************
  */
-void TBspR400mHf_b15::HdlrComDefx05(eGB_COM com, pkg_t &data)
+void TBspR400mHf::HdlrComDefx05(eGB_COM com, pkg_t &data)
 {
     Q_ASSERT(com == GB_COM_DEF_GET_OVERLAP || com == GB_COM_DEF_SET_OVERLAP);
 
@@ -910,7 +914,7 @@ void TBspR400mHf_b15::HdlrComDefx05(eGB_COM com, pkg_t &data)
  *
  * *****************************************************************************
  */
-void TBspR400mHf_b15::HdlrComDefx06(eGB_COM com, pkg_t &data)
+void TBspR400mHf::HdlrComDefx06(eGB_COM com, pkg_t &data)
 {
     Q_ASSERT(com == GB_COM_DEF_GET_RZ_DEC || com == GB_COM_DEF_SET_RZ_DEC);
 
@@ -952,7 +956,7 @@ void TBspR400mHf_b15::HdlrComDefx06(eGB_COM com, pkg_t &data)
  *
  * *****************************************************************************
  */
-void TBspR400mHf_b15::HdlrComDefx07(eGB_COM com, pkg_t &data)
+void TBspR400mHf::HdlrComDefx07(eGB_COM com, pkg_t &data)
 {
     Q_ASSERT(com == GB_COM_DEF_GET_PRM_TYPE || com == GB_COM_DEF_SET_PRM_TYPE);
 
@@ -994,7 +998,7 @@ void TBspR400mHf_b15::HdlrComDefx07(eGB_COM com, pkg_t &data)
  *
  * *****************************************************************************
  */
-void TBspR400mHf_b15::HdlrComDefx08(eGB_COM com, pkg_t &data)
+void TBspR400mHf::HdlrComDefx08(eGB_COM com, pkg_t &data)
 {
     Q_ASSERT(com == GB_COM_DEF_GET_FREQ_PRD || com == GB_COM_DEF_SET_FREQ_PRD);
 
@@ -1036,7 +1040,7 @@ void TBspR400mHf_b15::HdlrComDefx08(eGB_COM com, pkg_t &data)
  *
  * *****************************************************************************
  */
-void TBspR400mHf_b15::HdlrComDefx09(eGB_COM com, pkg_t &data)
+void TBspR400mHf::HdlrComDefx09(eGB_COM com, pkg_t &data)
 {
     Q_ASSERT(com == GB_COM_DEF_GET_RZ_THRESH || com == GB_COM_DEF_SET_RZ_THRESH);
 
@@ -1078,7 +1082,7 @@ void TBspR400mHf_b15::HdlrComDefx09(eGB_COM com, pkg_t &data)
  *
  * *****************************************************************************
  */
-void TBspR400mHf_b15::HdlrComDefx0A(eGB_COM com, pkg_t &data)
+void TBspR400mHf::HdlrComDefx0A(eGB_COM com, pkg_t &data)
 {
     Q_ASSERT(com == GB_COM_DEF_GET_TYPE_AC || com == GB_COM_DEF_SET_TYPE_AC);
 
@@ -1128,7 +1132,7 @@ void TBspR400mHf_b15::HdlrComDefx0A(eGB_COM com, pkg_t &data)
  *
  * *****************************************************************************
  */
-void TBspR400mHf_b15::HdlrComGlbx30(eGB_COM com, pkg_t &data)
+void TBspR400mHf::HdlrComGlbx30(eGB_COM com, pkg_t &data)
 {
     Q_ASSERT(com == GB_COM_GET_SOST || 0xB0);
 
@@ -1202,6 +1206,8 @@ void TBspR400mHf_b15::HdlrComGlbx30(eGB_COM com, pkg_t &data)
         SetParamValue(GB_PARAM_PVZUE_AC_TYPE, data.at(index++));
         SetParamValue(GB_PARAM_PVZUE_AC_PERIOD, data.at(index++));
         SetParamValue(GB_PARAM_PVZUE_AC_PER_RE, data.at(index++));
+        SetParamValue(GB_PARAM_PVZU_AC_CORRECT, data.at(index++));
+        SetParamValue(GB_PARAM_ALARM_CF, data.at(index++));
     }
 }
 
@@ -1215,7 +1221,7 @@ void TBspR400mHf_b15::HdlrComGlbx30(eGB_COM com, pkg_t &data)
  *
  * *****************************************************************************
  */
-void TBspR400mHf_b15::HdlrComGlbx31(eGB_COM com, pkg_t &data)
+void TBspR400mHf::HdlrComGlbx31(eGB_COM com, pkg_t &data)
 {
     bool    ok;
     quint16 def_alarm = getLineEditValue(stateDef.fault).toUInt(&ok, 16);
@@ -1270,7 +1276,7 @@ void TBspR400mHf_b15::HdlrComGlbx31(eGB_COM com, pkg_t &data)
  *
  * *****************************************************************************
  */
-void TBspR400mHf_b15::HdlrComGlbx32(eGB_COM com, pkg_t &data)
+void TBspR400mHf::HdlrComGlbx32(eGB_COM com, pkg_t &data)
 {
     uint16_t msec = dt.time().msec();
 
@@ -1351,7 +1357,7 @@ void TBspR400mHf_b15::HdlrComGlbx32(eGB_COM com, pkg_t &data)
  *
  * *****************************************************************************
  */
-void TBspR400mHf_b15::HdlrComGlbx33(eGB_COM com, pkg_t &data)
+void TBspR400mHf::HdlrComGlbx33(eGB_COM com, pkg_t &data)
 {
     Q_ASSERT(com == GB_COM_GET_COR_U_I || com == GB_COM_SET_COR_U_I);
 
@@ -1426,7 +1432,7 @@ void TBspR400mHf_b15::HdlrComGlbx33(eGB_COM com, pkg_t &data)
  *
  * *****************************************************************************
  */
-void TBspR400mHf_b15::HdlrComGlbx34(eGB_COM com, pkg_t &data)
+void TBspR400mHf::HdlrComGlbx34(eGB_COM com, pkg_t &data)
 {
     qint16 value = 0;
 
@@ -1489,7 +1495,7 @@ void TBspR400mHf_b15::HdlrComGlbx34(eGB_COM com, pkg_t &data)
  *
  * *****************************************************************************
  */
-void TBspR400mHf_b15::HdlrComGlbx35(eGB_COM com, pkg_t &data)
+void TBspR400mHf::HdlrComGlbx35(eGB_COM com, pkg_t &data)
 {
     Q_ASSERT(com == GB_COM_GET_TIME_SINCHR || com == GB_COM_SET_TIME_SINCHR);
 
@@ -1541,6 +1547,8 @@ void TBspR400mHf_b15::HdlrComGlbx35(eGB_COM com, pkg_t &data)
             mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_PVZUE_AC_TYPE)));
             mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_PVZUE_AC_PERIOD)));
             mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_PVZUE_AC_PER_RE)));
+            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_PVZU_AC_CORRECT)));
+            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_ALARM_CF)));
 
             int len = 32 - mPkgTx.size();
             for (int i = 0; i < len; i++)
@@ -1581,7 +1589,7 @@ void TBspR400mHf_b15::HdlrComGlbx35(eGB_COM com, pkg_t &data)
  *
  * *****************************************************************************
  */
-void TBspR400mHf_b15::HdlrComGlbx36(eGB_COM com, pkg_t &data)
+void TBspR400mHf::HdlrComGlbx36(eGB_COM com, pkg_t &data)
 {
     Q_ASSERT(com == GB_COM_GET_COM_PRM_KEEP || com == GB_COM_SET_COM_PRM_KEEP);
 
@@ -1624,7 +1632,7 @@ void TBspR400mHf_b15::HdlrComGlbx36(eGB_COM com, pkg_t &data)
  *
  * *****************************************************************************
  */
-void TBspR400mHf_b15::HdlrComGlbx37(eGB_COM com, pkg_t &data)
+void TBspR400mHf::HdlrComGlbx37(eGB_COM com, pkg_t &data)
 {
     Q_ASSERT(com == GB_COM_GET_COM_PRD_KEEP || com == GB_COM_SET_COM_PRD_KEEP);
 
@@ -1667,7 +1675,7 @@ void TBspR400mHf_b15::HdlrComGlbx37(eGB_COM com, pkg_t &data)
  *
  * *****************************************************************************
  */
-void TBspR400mHf_b15::HdlrComGlbx38(eGB_COM com, pkg_t &data)
+void TBspR400mHf::HdlrComGlbx38(eGB_COM com, pkg_t &data)
 {
     Q_ASSERT(com == GB_COM_GET_NET_ADR || com == GB_COM_SET_NET_ADR);
 
@@ -1709,7 +1717,7 @@ void TBspR400mHf_b15::HdlrComGlbx38(eGB_COM com, pkg_t &data)
  *
  * *****************************************************************************
  */
-void TBspR400mHf_b15::HdlrComGlbx39(eGB_COM com, pkg_t &data)
+void TBspR400mHf::HdlrComGlbx39(eGB_COM com, pkg_t &data)
 {
     Q_ASSERT(com == GB_COM_GET_TIME_RERUN || com == GB_COM_SET_TIME_RERUN);
 
@@ -1729,8 +1737,9 @@ void TBspR400mHf_b15::HdlrComGlbx39(eGB_COM com, pkg_t &data)
         mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_PVZUE_AC_TYPE)));
         mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_PVZUE_AC_PERIOD)));
         mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_PVZUE_AC_PER_RE)));
+        mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_PVZU_AC_CORRECT)));
 
-        Q_ASSERT(mPkgTx.size() == 9);  // команда + 8 байт данных
+        Q_ASSERT(mPkgTx.size() == 10);  // команда + 9 байт данных
     }
 
     if (com == GB_COM_SET_TIME_RERUN)
@@ -1754,6 +1763,7 @@ void TBspR400mHf_b15::HdlrComGlbx39(eGB_COM com, pkg_t &data)
         case 6: SetParamValue(GB_PARAM_PVZUE_AC_TYPE, data.at(1)); break;
         case 7: SetParamValue(GB_PARAM_PVZUE_AC_PERIOD, data.at(1)); break;
         case 8: SetParamValue(GB_PARAM_PVZUE_AC_PER_RE, data.at(1)); break;
+        case 9: SetParamValue(GB_PARAM_PVZU_AC_CORRECT, data.at(1)); break;
         default:
             {
                 QString message("Wrong value in command %1: %2");
@@ -1773,7 +1783,7 @@ void TBspR400mHf_b15::HdlrComGlbx39(eGB_COM com, pkg_t &data)
  *
  * *****************************************************************************
  */
-void TBspR400mHf_b15::HdlrComGlbx3A(eGB_COM com, pkg_t &data)
+void TBspR400mHf::HdlrComGlbx3A(eGB_COM com, pkg_t &data)
 {
     Q_ASSERT(com == GB_COM_GET_FREQ || com == GB_COM_SET_FREQ);
 
@@ -1821,7 +1831,7 @@ void TBspR400mHf_b15::HdlrComGlbx3A(eGB_COM com, pkg_t &data)
  *
  * *****************************************************************************
  */
-void TBspR400mHf_b15::HdlrComGlbx3B(eGB_COM com, pkg_t &data)
+void TBspR400mHf::HdlrComGlbx3B(eGB_COM com, pkg_t &data)
 {
     Q_ASSERT(com == GB_COM_GET_DEVICE_NUM || com == GB_COM_SET_DEVICE_NUM);
 
@@ -1863,7 +1873,7 @@ void TBspR400mHf_b15::HdlrComGlbx3B(eGB_COM com, pkg_t &data)
  *
  * *****************************************************************************
  */
-void TBspR400mHf_b15::HdlrComGlbx3C(eGB_COM com, pkg_t &data)
+void TBspR400mHf::HdlrComGlbx3C(eGB_COM com, pkg_t &data)
 {
     Q_ASSERT(com == GB_COM_GET_CF_THRESHOLD || com == GB_COM_SET_CF_THRESHOLD);
 
@@ -1878,8 +1888,9 @@ void TBspR400mHf_b15::HdlrComGlbx3C(eGB_COM com, pkg_t &data)
         mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_WARN_THD)));
         mPkgTx.append(0);  // нет, загрубление чувствительности по КЧ ПРМ_1
         mPkgTx.append(0);  // нет, загрубление чувствительности по КЧ ПРМ_2
+        mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_ALARM_CF)));
 
-        Q_ASSERT(mPkgTx.size() == 4);  // команда + 3 байта данных
+        Q_ASSERT(mPkgTx.size() == 5);  // команда + 4 байта данных
     }
 
     if (com == GB_COM_SET_CF_THRESHOLD)
@@ -1896,6 +1907,7 @@ void TBspR400mHf_b15::HdlrComGlbx3C(eGB_COM com, pkg_t &data)
         switch (data.at(0))
         {
         case 1: SetParamValue(GB_PARAM_WARN_THD, data.at(1)); break;
+        case 4: SetParamValue(GB_PARAM_ALARM_CF, data.at(1)); break;
         default:
             {
                 QString message("Wrong value in command %1: %2");
@@ -1915,7 +1927,7 @@ void TBspR400mHf_b15::HdlrComGlbx3C(eGB_COM com, pkg_t &data)
  *
  * *****************************************************************************
  */
-void TBspR400mHf_b15::HdlrComGlbx3D(eGB_COM com, pkg_t &data)
+void TBspR400mHf::HdlrComGlbx3D(eGB_COM com, pkg_t &data)
 {
     Q_ASSERT(com == GB_COM_GET_OUT_CHECK || com == GB_COM_SET_OUT_CHECK);
 
@@ -1956,7 +1968,7 @@ void TBspR400mHf_b15::HdlrComGlbx3D(eGB_COM com, pkg_t &data)
  *
  * *****************************************************************************
  */
-void TBspR400mHf_b15::HdlrComGlbx3F(eGB_COM com, pkg_t &data)
+void TBspR400mHf::HdlrComGlbx3F(eGB_COM com, pkg_t &data)
 {
     quint16 vers_bsp_mcu = getSpinBoxValue(mDevice.versionBspMcu);
     quint16 vers_bsp_dsp = getSpinBoxValue(mDevice.versionBspDsp);
@@ -2002,7 +2014,7 @@ void TBspR400mHf_b15::HdlrComGlbx3F(eGB_COM com, pkg_t &data)
  *
  * *****************************************************************************
  */
-void TBspR400mHf_b15::HdlrComRegx70(eGB_COM com, pkg_t &data)
+void TBspR400mHf::HdlrComRegx70(eGB_COM com, pkg_t &data)
 {
     Q_ASSERT(com == GB_COM_SET_REG_DISABLED);
 
@@ -2028,7 +2040,7 @@ void TBspR400mHf_b15::HdlrComRegx70(eGB_COM com, pkg_t &data)
  *
  * *****************************************************************************
  */
-void TBspR400mHf_b15::HdlrComRegx71(eGB_COM com, pkg_t &data)
+void TBspR400mHf::HdlrComRegx71(eGB_COM com, pkg_t &data)
 {
     Q_ASSERT(com == GB_COM_SET_REG_ENABLED);
 
@@ -2054,7 +2066,7 @@ void TBspR400mHf_b15::HdlrComRegx71(eGB_COM com, pkg_t &data)
  *
  * *****************************************************************************
  */
-void TBspR400mHf_b15::HdlrComRegx72(eGB_COM com, pkg_t &data)
+void TBspR400mHf::HdlrComRegx72(eGB_COM com, pkg_t &data)
 {
     Q_ASSERT(com == GB_COM_SET_CONTROL);
 
@@ -2096,7 +2108,7 @@ void TBspR400mHf_b15::HdlrComRegx72(eGB_COM com, pkg_t &data)
  *
  * *****************************************************************************
  */
-void TBspR400mHf_b15::HdlrComJrnxC1(eGB_COM com, pkg_t &data)
+void TBspR400mHf::HdlrComJrnxC1(eGB_COM com, pkg_t &data)
 {
     Q_ASSERT(com == GB_COM_DEF_GET_JRN_CNT);
 
@@ -2129,7 +2141,7 @@ void TBspR400mHf_b15::HdlrComJrnxC1(eGB_COM com, pkg_t &data)
  *
  * *****************************************************************************
  */
-void TBspR400mHf_b15::HdlrComJrnxC2(eGB_COM com, pkg_t &data)
+void TBspR400mHf::HdlrComJrnxC2(eGB_COM com, pkg_t &data)
 {
     Q_ASSERT(com == GB_COM_DEF_GET_JRN_ENTRY);
 
@@ -2172,7 +2184,7 @@ void TBspR400mHf_b15::HdlrComJrnxC2(eGB_COM com, pkg_t &data)
  *
  * *****************************************************************************
  */
-void TBspR400mHf_b15::HdlrComJrnxF1(eGB_COM com, pkg_t &data)
+void TBspR400mHf::HdlrComJrnxF1(eGB_COM com, pkg_t &data)
 {
     Q_ASSERT(com == GB_COM_GET_JRN_CNT);
 
@@ -2206,7 +2218,7 @@ void TBspR400mHf_b15::HdlrComJrnxF1(eGB_COM com, pkg_t &data)
  *
  * *****************************************************************************
  */
-void TBspR400mHf_b15::HdlrComJrnxF2(eGB_COM com, pkg_t &data)
+void TBspR400mHf::HdlrComJrnxF2(eGB_COM com, pkg_t &data)
 {
     Q_ASSERT(com == GB_COM_GET_JRN_ENTRY);
 
