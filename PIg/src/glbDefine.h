@@ -65,9 +65,9 @@
 
 /// максимальное и минимальный код типа событий в журнале событий
 #define MIN_JRN_EVENT_VALUE 1
-#define MAX_JRN_EVENT_VALUE 41
+#define MAX_JRN_EVENT_VALUE 43
 
-#define JRN_EVENT_R400M_SIZE 37
+#define JRN_EVENT_R400M_SIZE 43
 
 #define GLB_JRN_EVENT_K400_MAX  512  /// кол-во записей в журнале событый К400
 #define GLB_JRN_EVENT_R400M_MAX 512  /// кол-во записей в журнале событый Р400м
