@@ -98,6 +98,10 @@ protected:
 
     QComboBox mControl;
 
+    QCheckBox mDefEnable;
+    QSpinBox  mNumComPrm;
+    QSpinBox  mNumComPrd;
+
 public:
     explicit Bsp(QTreeWidget *tree, QWidget *parent = nullptr);
 

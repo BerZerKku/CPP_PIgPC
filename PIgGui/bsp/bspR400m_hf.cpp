@@ -226,8 +226,6 @@ void TBspR400mHf::crtTreeDevice()
     mTree->insertTopLevelItem(mTree->topLevelItemCount(), top);
     top->setText(0, kCodec->toUnicode("Устройство"));
 
-    top->setExpanded(true);
-
     crtTreeDevieVersions(top);
 }
 

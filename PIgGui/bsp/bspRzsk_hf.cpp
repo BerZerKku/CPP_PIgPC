@@ -58,7 +58,7 @@ void TBspRzskHf::InitComMap()
     //    mComMap.insert(0x3B, &Bsp::HdlrComGlbx3B);  // чтение номера аппарата
     //    mComMap.insert(0x3C, &Bsp::HdlrComGlbx3C);  // чтение порога КЧ
     //    mComMap.insert(0x3D, &Bsp::HdlrComGlbx3D);  // чтение контроля выхода
-    //    mComMap.insert(0x3f, &Bsp::HdlrComGlbx3F);  // чтение информации об устройстве
+    mComMap.insert(0x3f, &Bsp::HdlrComGlbx3F);  // чтение информации об устройстве
 
     //    mComMap.insert(0x70, &Bsp::HdlrComRegx70);  // запись режима "Выведен"
     //    mComMap.insert(0x71, &Bsp::HdlrComRegx71);  // запись режима "Введен"
@@ -104,8 +104,10 @@ void TBspRzskHf::InitParam()
     setSpinBoxValue(mDevice.versionBspMcu, 0x0134);
     setSpinBoxValue(mDevice.versionBspDsp, 0x0D33);
     setSpinBoxValue(mDevice.versionBszPlis, 0x52);
-    setSpinBoxValue(mDevice.versionBsk1PrdPlis, 0x0205);
-    setSpinBoxValue(mDevice.versionBsk1PrmPlis, 0x0203);
+    setSpinBoxValue(mDevice.versionBsk1PrdPlis, 0x25);
+    setSpinBoxValue(mDevice.versionBsk2PrdPlis, 0x25);
+    setSpinBoxValue(mDevice.versionBsk1PrmPlis, 0x23);
+    setSpinBoxValue(mDevice.versionBsk2PrmPlis, 0x23);
 
     setComboBoxValue(stateGlb.regime, eGB_REGIME::GB_REGIME_ENABLED);
     setComboBoxValue(stateGlb.state, 1);  // 1 - контроль
@@ -195,7 +197,8 @@ void TBspRzskHf::crtTreeGlb(QTreeWidgetItem(*top))
     ltop->setText(0, kCodec->toUnicode("Общие"));
     top->addChild(ltop);
 
-    CrtParamWidget(ltop, GB_PARAM_COMP_P400);
+    CrtParamWidget(ltop, GB_PARAM_COMP_RZSK);
+
     CrtParamWidget(ltop, GB_PARAM_TIME_SYNCH_SRC);
     CrtParamWidget(ltop, GB_PARAM_NUM_OF_DEVICE);
     CrtParamWidget(ltop, GB_PARAM_OUT_CHECK);
@@ -215,6 +218,12 @@ void TBspRzskHf::crtTreeGlb(QTreeWidgetItem(*top))
     CrtParamWidget(ltop, GB_PARAM_ALARM_CF);
     CrtParamWidget(ltop, GB_PARAM_COR_U);
     CrtParamWidget(ltop, GB_PARAM_COR_I);
+
+    connect(mapCombobox.value(GB_PARAM_COMP_RZSK).at(0),
+            &QComboBox::currentTextChanged,
+            this,
+            &TBspRzskHf::SlotChangeCompatibility);
+    SlotChangeCompatibility();
 }
 
 
@@ -230,11 +239,29 @@ void TBspRzskHf::crtTreeInterface(QTreeWidgetItem *top)
 
 void TBspRzskHf::crtTreeDevice()
 {
-    QTreeWidgetItem *top = new QTreeWidgetItem();
+    QTreeWidgetItem *top  = new QTreeWidgetItem();
+    QTreeWidgetItem *item = nullptr;
+
     mTree->insertTopLevelItem(mTree->topLevelItemCount(), top);
     top->setText(0, kCodec->toUnicode("Устройство"));
 
-    top->setExpanded(true);
+    item = new QTreeWidgetItem(top);
+    item->setText(0, kCodec->toUnicode("Защита"));
+    top->addChild(item);
+    mDefEnable.setEnabled(false);
+    mTree->setItemWidget(item, 1, &mDefEnable);
+
+    item = new QTreeWidgetItem(top);
+    item->setText(0, kCodec->toUnicode("Команды передатчика"));
+    mNumComPrd.setEnabled(false);
+    top->addChild(item);
+    mTree->setItemWidget(item, 1, &mNumComPrd);
+
+    item = new QTreeWidgetItem(top);
+    item->setText(0, kCodec->toUnicode("Команды приемника"));
+    mNumComPrm.setEnabled(false);
+    top->addChild(item);
+    mTree->setItemWidget(item, 1, &mNumComPrm);
 
     crtTreeDevieVersions(top);
 }
@@ -269,15 +296,27 @@ void TBspRzskHf::crtTreeDevieVersions(QTreeWidgetItem *top)
 
     item                       = new QTreeWidgetItem();
     mDevice.versionBsk1PrdPlis = new QHexSpinBox(true);
-    item->setText(0, kCodec->toUnicode("БСК ПЛИС ПРД"));
+    item->setText(0, kCodec->toUnicode("БСК1 ПЛИС ПРД"));
     branch->addChild(item);
     mTree->setItemWidget(item, 1, mDevice.versionBsk1PrdPlis);
 
     item                       = new QTreeWidgetItem();
+    mDevice.versionBsk2PrdPlis = new QHexSpinBox(true);
+    item->setText(0, kCodec->toUnicode("БСК1 ПЛИС ПРД"));
+    branch->addChild(item);
+    mTree->setItemWidget(item, 1, mDevice.versionBsk2PrdPlis);
+
+    item                       = new QTreeWidgetItem();
     mDevice.versionBsk1PrmPlis = new QHexSpinBox(true);
-    item->setText(0, kCodec->toUnicode("БСК ПЛИС ПРМ"));
+    item->setText(0, kCodec->toUnicode("БСК2 ПЛИС ПРМ"));
     branch->addChild(item);
     mTree->setItemWidget(item, 1, mDevice.versionBsk1PrmPlis);
+
+    item                       = new QTreeWidgetItem();
+    mDevice.versionBsk2PrmPlis = new QHexSpinBox(true);
+    item->setText(0, kCodec->toUnicode("БСК2 ПЛИС ПРМ"));
+    branch->addChild(item);
+    mTree->setItemWidget(item, 1, mDevice.versionBsk2PrmPlis);
 
     branch->setExpanded(false);
 }
@@ -1964,50 +2003,81 @@ void TBspRzskHf::HdlrComGlbx30(eGB_COM com, pkg_t &data)
 //    }
 //}
 
-///**
-// * *****************************************************************************
-// *
-// * @brief Обрабатывает команду чтения версии устройства.
-// * @param[in] Команда.
-// * @param[in] Данные.
-// *
-// * *****************************************************************************
-// */
-// void TBspRzskHf::HdlrComGlbx3F(eGB_COM com, pkg_t &data)
-//{
-//    quint16 vers_bsp_mcu = getSpinBoxValue(mDevice.versionBspMcu);
-//    quint16 vers_bsp_dsp = getSpinBoxValue(mDevice.versionBspDsp);
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду чтения версии устройства.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void TBspRzskHf::HdlrComGlbx3F(eGB_COM com, pkg_t &data)
+{
+    quint16 vers_bsp_mcu = getSpinBoxValue(mDevice.versionBspMcu);
+    quint16 vers_bsp_dsp = getSpinBoxValue(mDevice.versionBspDsp);
 
-//    Q_ASSERT(com == GB_COM_GET_VERS);
+    Q_ASSERT(com == GB_COM_GET_VERS);
 
-//    if (!CheckSize(com, data.size(), { 0 }))
-//    {
-//        return;
-//    }
+    if (!CheckSize(com, data.size(), { 0 }))
+    {
+        return;
+    }
 
-//    mPkgTx.append(com);
-//    mPkgTx.append(1);  // защита
-//    mPkgTx.append(0);  // прм1
-//    mPkgTx.append(0);  // прм2
-//    mPkgTx.append(0);  // прд
-//    mPkgTx.append(getComboBoxValue(GB_PARAM_NUM_OF_DEVICES) + 1);
-//    mPkgTx.append(GB_TYPE_LINE_UM);
-//    mPkgTx.append(static_cast<quint8>(vers_bsp_mcu >> 8));
-//    mPkgTx.append(static_cast<quint8>(vers_bsp_mcu));
-//    mPkgTx.append(static_cast<quint8>(vers_bsp_dsp >> 8));
-//    mPkgTx.append(static_cast<quint8>(vers_bsp_dsp));
-//    mPkgTx.append(getComboBoxValue(GB_PARAM_COMP_P400));
-//    mPkgTx.append(0);
-//    mPkgTx.append(0);
-//    mPkgTx.append(0);
-//    mPkgTx.append(0);
-//    mPkgTx.append(static_cast<quint8>(getSpinBoxValue(mDevice.versionBszPlis)));
-//    mPkgTx.append(AVANT_R400M);
-//    mPkgTx.append(0);  // версия БСП-ПИ, старший байт
-//    mPkgTx.append(0);  // версия БСП-ПИ, младший байт
+    mPkgTx.append(com);
+    mPkgTx.append(mDefEnable.isChecked() ? 1 : 0);                         // защита
+    mPkgTx.append(static_cast<quint8>(getSpinBoxValue(&mNumComPrm) / 4));  // прм1
+    mPkgTx.append(0);                                                      // прм2
+    mPkgTx.append(static_cast<quint8>(getSpinBoxValue(&mNumComPrd) / 4));  // прд
+    mPkgTx.append(GetParamValue(GB_PARAM_NUM_OF_DEVICES) + 1);
+    mPkgTx.append(GB_TYPE_LINE_UM);
+    mPkgTx.append(static_cast<quint8>(vers_bsp_mcu >> 8));
+    mPkgTx.append(static_cast<quint8>(vers_bsp_mcu));
+    mPkgTx.append(static_cast<quint8>(vers_bsp_dsp >> 8));
+    mPkgTx.append(static_cast<quint8>(vers_bsp_dsp));
+    mPkgTx.append(GetParamValue(GB_PARAM_COMP_P400));
+    mPkgTx.append(static_cast<quint8>(getSpinBoxValue(mDevice.versionBsk1PrdPlis)));
+    mPkgTx.append(static_cast<quint8>(getSpinBoxValue(mDevice.versionBsk2PrdPlis)));
+    mPkgTx.append(static_cast<quint8>(getSpinBoxValue(mDevice.versionBsk1PrmPlis)));
+    mPkgTx.append(static_cast<quint8>(getSpinBoxValue(mDevice.versionBsk2PrmPlis)));
+    mPkgTx.append(static_cast<quint8>(getSpinBoxValue(mDevice.versionBszPlis)));
+    mPkgTx.append(AVANT_RZSK);
 
-//    Q_ASSERT(mPkgTx.size() == 20);  // команда + 19 байт данных
-//}
+    Q_ASSERT(mPkgTx.size() == 18);  // команда + 17 байт данных
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обработчик изменения совместимости.
+ *
+ * *****************************************************************************
+ */
+void TBspRzskHf::SlotChangeCompatibility()
+{
+    eGB_COMP_RZSK comp = static_cast<eGB_COMP_RZSK>(GetParamValue(GB_PARAM_COMP_RZSK));
+
+    switch (comp)
+    {
+    case GB_COMP_RZSK: [[fallthrow]];
+    case GB_COMP_RZSK_M:
+        mDefEnable.setChecked(true);
+        mNumComPrd.setValue(4);
+        mNumComPrm.setValue(4);
+        break;
+    case GB_COMP_RZSK_3E8:
+        mDefEnable.setChecked(false);
+        mNumComPrd.setValue(8);
+        mNumComPrm.setValue(8);
+        break;
+
+    case GB_COMP_RZSK_MAX:
+        QString message = "Wrong RZSK compatibility value: %1";
+        qWarning() << message.arg(comp);
+        break;
+    }
+}
 
 
 ///**

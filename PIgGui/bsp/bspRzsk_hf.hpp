@@ -78,7 +78,7 @@ private:
     //    void HdlrComGlbx3B(eGB_COM com, pkg_t &data) override;
     //    void HdlrComGlbx3C(eGB_COM com, pkg_t &data) override;
     //    void HdlrComGlbx3D(eGB_COM com, pkg_t &data) override;
-    //    void HdlrComGlbx3F(eGB_COM com, pkg_t &data) override;
+    void HdlrComGlbx3F(eGB_COM com, pkg_t &data) override;
 
     //    void HdlrComRegx70(eGB_COM com, pkg_t &data) override;
     //    void HdlrComRegx71(eGB_COM com, pkg_t &data) override;
@@ -88,6 +88,9 @@ private:
     //    void HdlrComJrnxC2(eGB_COM com, pkg_t &data) override;
     //    void HdlrComJrnxF1(eGB_COM com, pkg_t &data) override;
     //    void HdlrComJrnxF2(eGB_COM com, pkg_t &data) override;
+
+private slots:
+    void SlotChangeCompatibility();
 };
 
 #endif  // BSP_RZSK_HF_HPP
