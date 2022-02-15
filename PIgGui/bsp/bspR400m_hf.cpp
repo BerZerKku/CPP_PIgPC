@@ -49,11 +49,14 @@ void TBspR400mHf::InitComMap()
     mComMap.insert(0x3B, &Bsp::HdlrComGlbx3B);  // чтение номера аппарата
     mComMap.insert(0x3C, &Bsp::HdlrComGlbx3C);  // чтение порога КЧ
     mComMap.insert(0x3D, &Bsp::HdlrComGlbx3D);  // чтение контроля выхода
+    mComMap.insert(0x3E, &Bsp::HdlrComGlbx3E);  // чтение сигналов в тесте
     mComMap.insert(0x3f, &Bsp::HdlrComGlbx3F);  // чтение информации об устройстве
 
     mComMap.insert(0x70, &Bsp::HdlrComRegx70);  // запись режима "Выведен"
     mComMap.insert(0x71, &Bsp::HdlrComRegx71);  // запись режима "Введен"
     mComMap.insert(0x72, &Bsp::HdlrComRegx72);  // запись команды управления
+    mComMap.insert(0x7D, &Bsp::HdlrComRegx7D);  // запись режима "Тест 1 (ПРМ)"
+    mComMap.insert(0x7E, &Bsp::HdlrComRegx7E);  // запись режима "Тест 1 (ПРД)"
 
     mComMap.insert(0x80, &Bsp::HdlrComDefx00);  // запись параметров защиты с конфигуратора
     mComMap.insert(0x81, &Bsp::HdlrComDefx01);  // запись типа защиты
@@ -417,63 +420,20 @@ void TBspR400mHf::crtTreeState()
 //
 void TBspR400mHf::crtTest()
 {
-    QTreeWidgetItem *top = new QTreeWidgetItem();
+    QTreeWidgetItem *top = new QTreeWidgetItem(mTree);
     QTreeWidgetItem *item;
-    QLineEdit *      lineedit;
     mTree->insertTopLevelItem(mTree->topLevelItemCount(), top);
     top->setText(0, kCodec->toUnicode("Тест"));
 
-    item       = new QTreeWidgetItem();
-    lineedit   = new QLineEdit();
-    test.byte1 = lineedit;
-    lineedit->setMaxLength(2);
-    lineedit->setInputMask("HH");
-    lineedit->setText("00");
+    item = new QTreeWidgetItem(top);
     top->addChild(item);
-    item->setText(0, kCodec->toUnicode("Байт 1"));
-    mTree->setItemWidget(item, 1, lineedit);
+    item->setText(0, kCodec->toUnicode("Сигналы КЧ"));
+    mTree->setItemWidget(item, 1, &mTestCf1Signal);
 
-    item       = new QTreeWidgetItem();
-    lineedit   = new QLineEdit();
-    test.byte2 = lineedit;
-    lineedit->setMaxLength(2);
-    lineedit->setInputMask("HH");
-    lineedit->setText("00");
+    item = new QTreeWidgetItem(top);
     top->addChild(item);
-    item->setText(0, kCodec->toUnicode("Байт 2"));
-    mTree->setItemWidget(item, 1, lineedit);
-
-    item       = new QTreeWidgetItem();
-    lineedit   = new QLineEdit();
-    test.byte3 = lineedit;
-    lineedit->setMaxLength(2);
-    lineedit->setInputMask("HH");
-    lineedit->setText("00");
-    top->addChild(item);
-    item->setText(0, kCodec->toUnicode("Байт 3"));
-    mTree->setItemWidget(item, 1, lineedit);
-
-    item       = new QTreeWidgetItem();
-    lineedit   = new QLineEdit();
-    test.byte4 = lineedit;
-    lineedit->setMaxLength(2);
-    lineedit->setInputMask("HH");
-    lineedit->setText("00");
-    top->addChild(item);
-    item->setText(0, kCodec->toUnicode("Байт 4"));
-    mTree->setItemWidget(item, 1, lineedit);
-
-    item       = new QTreeWidgetItem();
-    lineedit   = new QLineEdit();
-    test.byte5 = lineedit;
-    lineedit->setMaxLength(2);
-    lineedit->setInputMask("HH");
-    lineedit->setText("00");
-    top->addChild(item);
-    item->setText(0, kCodec->toUnicode("Байт 5"));
-    mTree->setItemWidget(item, 1, lineedit);
-
-    top->setExpanded(false);
+    item->setText(0, kCodec->toUnicode("Сигналы РЗ"));
+    mTree->setItemWidget(item, 1, &mTestRz1Signal);
 }
 
 
@@ -643,6 +603,28 @@ void TBspR400mHf::FillComboBoxListControl()
     mControl.addItem(kCodec->toUnicode("17 - Пуск уд. МАН (2)"), 17);
     mControl.addItem(kCodec->toUnicode("18 - Пуск уд. МАН (3)"), 18);
     mControl.addItem(kCodec->toUnicode("19 - Пуск удаленных МАН"), 19);
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Заполнение сигналов для тестов.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void TBspR400mHf::FillComboboxListTest()
+{
+    mTestCf1Signal.addItem(kCodec->toUnicode("Нет"), 0x00);
+    mTestCf1Signal.addItem(kCodec->toUnicode("КЧ1"), 0x01);
+    mTestCf1Signal.addItem(kCodec->toUnicode("КЧ2"), 0x02);
+    mTestCf1Signal.addItem(kCodec->toUnicode("КЧ3"), 0x04);
+    mTestCf1Signal.addItem(kCodec->toUnicode("КЧ4"), 0x08);
+
+    mTestRz1Signal.addItem(kCodec->toUnicode("Нет"), 0x00);
+    mTestRz1Signal.addItem(kCodec->toUnicode("РЗ"), 0x01);
 }
 
 
@@ -1959,6 +1941,52 @@ void TBspR400mHf::HdlrComGlbx3D(eGB_COM com, pkg_t &data)
     }
 }
 
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду чтения сигналов в тестах.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void TBspR400mHf::HdlrComGlbx3E(eGB_COM com, pkg_t &data)
+{
+    quint8 cf = mTestCf1Signal.currentData().toUInt();
+    quint8 rz = mTestRz1Signal.currentData().toUInt();
+
+    Q_ASSERT(com == GB_COM_GET_TEST);
+
+    if (!CheckSize(com, data.size(), { 0 }))
+    {
+        return;
+    }
+
+    if (GetParamValue(GB_PARAM_NUM_OF_DEVICES) == GB_NUM_DEVICES_3)
+    {
+        mPkgTx.append(com);
+        mPkgTx.append((cf & 0x0F) | ((rz & 0x0F) << 4));
+        mPkgTx.append(0);
+        mPkgTx.append(0);
+        mPkgTx.append(0);
+        mPkgTx.append(0);
+        mPkgTx.append(0);
+
+        Q_ASSERT(mPkgTx.size() == 7);  // команда + 6 байт данных
+    }
+    else
+    {
+        mPkgTx.append(com);
+        mPkgTx.append((cf & 0x0F) | ((rz & 0x0F) << 4));
+        mPkgTx.append(0);
+        mPkgTx.append(0);
+
+        Q_ASSERT(mPkgTx.size() == 4);  // команда + 3 байт данных
+    }
+}
+
+
 /**
  * *****************************************************************************
  *
@@ -2096,6 +2124,126 @@ void TBspR400mHf::HdlrComRegx72(eGB_COM com, pkg_t &data)
     }
 
     mControl.setCurrentIndex(mControl.findData(control));
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду изменения режима на Тест 2 (приемник)
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void TBspR400mHf::HdlrComRegx7D(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_SET_REG_TEST_2);
+
+    if (!CheckSize(com, data.size(), { 0 }))
+    {
+        return;
+    }
+
+    stateGlb.regime->setCurrentIndex(GB_REGIME_TEST_2);
+    stateGlb.state->setCurrentIndex(12);
+
+    // ответ на команду записи совпадает с запросом (?!)
+    mPkgTx.append(com);
+    mPkgTx.append(data);
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду изменения режима на Тест 1 (передатчик)
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void TBspR400mHf::HdlrComRegx7E(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_SET_REG_TEST_1);
+
+    if (!CheckSize(com, data.size(), { 0, 2 }))
+    {
+        return;
+    }
+
+    if (data.size() == 0)
+    {
+        stateGlb.regime->setCurrentIndex(GB_REGIME_TEST_1);
+        stateGlb.state->setCurrentIndex(11);
+
+        mTestCf1Signal.setCurrentIndex(0);
+        mTestRz1Signal.setCurrentIndex(0);
+    }
+    else
+    {
+        switch (data.at(0))
+        {
+        case 1:
+            {
+                quint8 cf    = data.at(1);
+                int    index = -1;
+
+                switch (cf)
+                {
+                case 0: index = mTestCf1Signal.findData(0x00); break;
+                case 1: index = mTestCf1Signal.findData(0x01); break;
+                case 2: index = mTestCf1Signal.findData(0x02); break;
+                case 3: index = mTestCf1Signal.findData(0x04); break;
+                }
+
+                if (index < 0)
+                {
+                    QString message = "Wrong test CF value: %1";
+                    qWarning() << message.arg(cf);
+                }
+
+                mTestCf1Signal.setCurrentIndex(index);
+
+                // ответ
+                mPkgTx.append(com);
+                mPkgTx.append(mTestCf1Signal.currentData().toUInt());
+                mPkgTx.append(0);
+                mPkgTx.append(0);
+                break;
+            }
+        case 2:
+            {
+                quint8 rz    = data.at(1);
+                int    index = -1;
+
+                switch (rz)
+                {
+                case 0: index = mTestRz1Signal.findData(0x00); break;
+                case 1: index = mTestRz1Signal.findData(0x01); break;
+                }
+
+                if (index < 0)
+                {
+                    QString message = "Wrong test RZ value: %1";
+                    qWarning() << message.arg(rz);
+                }
+
+                mTestRz1Signal.setCurrentIndex(index);
+
+
+                // ответ
+                mPkgTx.append(com);
+                mPkgTx.append(mTestRz1Signal.currentData().toUInt());
+                mPkgTx.append(0);
+                mPkgTx.append(0);
+                break;
+            }
+        default:
+            QString message = "Wrong test group value: %1";
+            qWarning() << message.arg(data.at(0));
+        }
+    }
 }
 
 

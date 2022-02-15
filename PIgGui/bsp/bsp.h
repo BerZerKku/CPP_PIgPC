@@ -57,15 +57,6 @@ protected:
         QSpinBox *versionBszPlis     = nullptr;
     };
 
-    struct test_t
-    {
-        QLineEdit *byte1;
-        QLineEdit *byte2;
-        QLineEdit *byte3;
-        QLineEdit *byte4;
-        QLineEdit *byte5;
-    };
-
     struct measure_t
     {
         QSpinBox *R;
@@ -100,7 +91,13 @@ protected:
 
     QCheckBox mDefEnable;
     QSpinBox  mNumComPrm;
-    QSpinBox  mNumComPrd;
+
+    QSpinBox mNumComPrd;
+
+    QComboBox mTestCf1Signal;
+    QComboBox mTestCf2Signal;
+    QComboBox mTestRz1Signal;
+    QComboBox mTestRz2Signal;
 
 public:
     explicit Bsp(QTreeWidget *tree, QWidget *parent = nullptr);
@@ -151,7 +148,6 @@ public:
     state_t   statePrm;
     state_t   statePrm2;
     state_t   statePrd;
-    test_t    test;
     measure_t m_measure;
 
 public slots:
@@ -206,6 +202,7 @@ protected:
     virtual void FillComboboxListStatePrd() { }
     void         FillComboboxListStateGlb();
     virtual void FillComboBoxListControl() {};
+    virtual void FillComboboxListTest() {};
 
     void keyPressEvent(QKeyEvent *event) override;
 
@@ -217,9 +214,6 @@ protected:
     void procCommand(eGB_COM com, pkg_t &data);
     void procCommandReadParam(eGB_COM com, pkg_t &data);
     void procCommandWriteParam(eGB_COM com, pkg_t &data);
-    void procCommandWriteRegime(eGB_COM com, pkg_t &data);
-
-    void hdlrComGetTest(eGB_COM com, pkg_t &data);
 
     uint8_t getCompatibility(eGB_TYPE_DEVICE device);
 

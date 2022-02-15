@@ -484,63 +484,10 @@ void TBspRzskHf::crtTreeState()
 //
 void TBspRzskHf::crtTest()
 {
-    QTreeWidgetItem *top = new QTreeWidgetItem();
+    QTreeWidgetItem *top = new QTreeWidgetItem(mTree);
     QTreeWidgetItem *item;
-    QLineEdit *      lineedit;
     mTree->insertTopLevelItem(mTree->topLevelItemCount(), top);
     top->setText(0, kCodec->toUnicode("Тест"));
-
-    item       = new QTreeWidgetItem();
-    lineedit   = new QLineEdit();
-    test.byte1 = lineedit;
-    lineedit->setMaxLength(2);
-    lineedit->setInputMask("HH");
-    lineedit->setText("00");
-    top->addChild(item);
-    item->setText(0, kCodec->toUnicode("Байт 1"));
-    mTree->setItemWidget(item, 1, lineedit);
-
-    item       = new QTreeWidgetItem();
-    lineedit   = new QLineEdit();
-    test.byte2 = lineedit;
-    lineedit->setMaxLength(2);
-    lineedit->setInputMask("HH");
-    lineedit->setText("00");
-    top->addChild(item);
-    item->setText(0, kCodec->toUnicode("Байт 2"));
-    mTree->setItemWidget(item, 1, lineedit);
-
-    item       = new QTreeWidgetItem();
-    lineedit   = new QLineEdit();
-    test.byte3 = lineedit;
-    lineedit->setMaxLength(2);
-    lineedit->setInputMask("HH");
-    lineedit->setText("00");
-    top->addChild(item);
-    item->setText(0, kCodec->toUnicode("Байт 3"));
-    mTree->setItemWidget(item, 1, lineedit);
-
-    item       = new QTreeWidgetItem();
-    lineedit   = new QLineEdit();
-    test.byte4 = lineedit;
-    lineedit->setMaxLength(2);
-    lineedit->setInputMask("HH");
-    lineedit->setText("00");
-    top->addChild(item);
-    item->setText(0, kCodec->toUnicode("Байт 4"));
-    mTree->setItemWidget(item, 1, lineedit);
-
-    item       = new QTreeWidgetItem();
-    lineedit   = new QLineEdit();
-    test.byte5 = lineedit;
-    lineedit->setMaxLength(2);
-    lineedit->setInputMask("HH");
-    lineedit->setText("00");
-    top->addChild(item);
-    item->setText(0, kCodec->toUnicode("Байт 5"));
-    mTree->setItemWidget(item, 1, lineedit);
-
-    top->setExpanded(false);
 }
 
 

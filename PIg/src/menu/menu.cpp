@@ -3691,7 +3691,7 @@ void clMenu::lvlTest1()
 
         // дополнительные команды
         sParam.txComBuf.clear();
-        sParam.txComBuf.addCom1(GB_COM_GET_MEAS);  // измерения
+        sParam.txComBuf.addCom2(GB_COM_GET_MEAS);  // измерения
         sParam.txComBuf.addCom2(GB_COM_GET_TEST);  // сигналы
 
         // сигналы для тестов
@@ -3704,6 +3704,20 @@ void clMenu::lvlTest1()
             {
                 sParam.test.addSignalToList(GB_SIGNAL_CF);
             }
+            else if (comp == GB_COMP_R400M_R400)
+            {
+                if (sParam.def.getNumDevices() == GB_NUM_DEVICES_3)
+                {
+                    sParam.test.addSignalToList(GB_SIGNAL_CF1);
+                    sParam.test.addSignalToList(GB_SIGNAL_CF2);
+                    sParam.test.addSignalToList(GB_SIGNAL_CF3);
+                }
+                else
+                {
+                    sParam.test.addSignalToList(GB_SIGNAL_CF1);
+                    sParam.test.addSignalToList(GB_SIGNAL_CF2);
+                }
+            }
             else if (comp == GB_COMP_R400M_LINER)
             {
                 sParam.test.addSignalToList(GB_SIGNAL_CF1);
@@ -3711,6 +3725,10 @@ void clMenu::lvlTest1()
                 sParam.test.addSignalToList(GB_SIGNAL_CF3);
                 sParam.test.addSignalToList(GB_SIGNAL_CF4);
             }
+
+            // совместимость и количество аппаратов
+            sParam.txComBuf.addCom1(GB_COM_GET_COM_PRD_KEEP);
+            sParam.txComBuf.addCom1(GB_COM_DEF_GET_LINE_TYPE);
         }
         else if (device == AVANT_RZSK)
         {

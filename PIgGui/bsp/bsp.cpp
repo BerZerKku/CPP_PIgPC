@@ -278,6 +278,7 @@ void Bsp::Init()
     FillComboboxListStatePrd();
     FillComboboxListStateGlb();
     FillComboBoxListControl();
+    FillComboboxListTest();
 
     InitComMap();
     InitParam();
@@ -607,63 +608,10 @@ QTreeWidgetItem *Bsp::crtTreeState(QTreeWidgetItem *top, std::string name, Bsp::
 //
 void Bsp::crtTest()
 {
-    QTreeWidgetItem *top = new QTreeWidgetItem();
+    QTreeWidgetItem *top = new QTreeWidgetItem(mTree);
     QTreeWidgetItem *item;
-    QLineEdit *      lineedit;
     mTree->insertTopLevelItem(mTree->topLevelItemCount(), top);
     top->setText(0, kCodec->toUnicode("Тест"));
-
-    item       = new QTreeWidgetItem();
-    lineedit   = new QLineEdit();
-    test.byte1 = lineedit;
-    lineedit->setMaxLength(2);
-    lineedit->setInputMask("HH");
-    lineedit->setText("00");
-    top->addChild(item);
-    item->setText(0, kCodec->toUnicode("Байт 1"));
-    mTree->setItemWidget(item, 1, lineedit);
-
-    item       = new QTreeWidgetItem();
-    lineedit   = new QLineEdit();
-    test.byte2 = lineedit;
-    lineedit->setMaxLength(2);
-    lineedit->setInputMask("HH");
-    lineedit->setText("00");
-    top->addChild(item);
-    item->setText(0, kCodec->toUnicode("Байт 2"));
-    mTree->setItemWidget(item, 1, lineedit);
-
-    item       = new QTreeWidgetItem();
-    lineedit   = new QLineEdit();
-    test.byte3 = lineedit;
-    lineedit->setMaxLength(2);
-    lineedit->setInputMask("HH");
-    lineedit->setText("00");
-    top->addChild(item);
-    item->setText(0, kCodec->toUnicode("Байт 3"));
-    mTree->setItemWidget(item, 1, lineedit);
-
-    item       = new QTreeWidgetItem();
-    lineedit   = new QLineEdit();
-    test.byte4 = lineedit;
-    lineedit->setMaxLength(2);
-    lineedit->setInputMask("HH");
-    lineedit->setText("00");
-    top->addChild(item);
-    item->setText(0, kCodec->toUnicode("Байт 4"));
-    mTree->setItemWidget(item, 1, lineedit);
-
-    item       = new QTreeWidgetItem();
-    lineedit   = new QLineEdit();
-    test.byte5 = lineedit;
-    lineedit->setMaxLength(2);
-    lineedit->setInputMask("HH");
-    lineedit->setText("00");
-    top->addChild(item);
-    item->setText(0, kCodec->toUnicode("Байт 5"));
-    mTree->setItemWidget(item, 1, lineedit);
-
-    top->setExpanded(false);
 }
 
 
@@ -1858,17 +1806,6 @@ void Bsp::procCommandReadParam(eGB_COM com, pkg_t &data)
         }
         break;
 
-    case GB_COM_GET_TEST:
-        {
-            if (!data.isEmpty())
-            {
-                qWarning() << kMsgSizeError.arg(com, 2, 16).arg(data.size());
-            }
-            // TODO Сделать тесты для всех типов аппаратов.
-            hdlrComGetTest(com, data);
-        }
-        break;
-
     default:
         {
             qWarning("No command handler: 0x%.2X", com);
@@ -2069,98 +2006,6 @@ void Bsp::procCommandWriteParam(eGB_COM com, pkg_t &data)
     }
 }
 
-//
-void Bsp::procCommandWriteRegime(eGB_COM com, pkg_t &data)
-{
-    switch (com)
-    {
-    case GB_COM_SET_REG_TEST_1:
-        {
-            // TODO Сделать для всех тестов
-            if (data.isEmpty())
-            {
-                setComboBoxValue(stateGlb.regime, eGB_REGIME::GB_REGIME_TEST_1);
-                mPkgTx.append(com);
-            }
-            else if (data.count() == 2)
-            {
-                uint8_t byte1 = 0;
-                uint8_t byte2 = 0;
-                uint8_t byte3 = 0;
-                uint8_t byte4 = 0;
-                uint8_t byte5 = 0;
-                if (data.at(0) == 1)
-                {
-                    if (data.at(1) == 1)
-                    {
-                        byte1 = 1;
-                    }
-                    else if ((data.at(1) >= 3) && (data.at(1) <= 10))
-                    {
-                        byte2 = (1 << (data.at(1) - 3));
-                    }
-                    else if ((data.at(1) >= 11) && (data.at(1) <= 18))
-                    {
-                        byte3 = (1 << (data.at(1) - 11));
-                    }
-                    else if ((data.at(1) >= 19) && (data.at(1) <= 26))
-                    {
-                        byte4 = (1 << (data.at(1) - 19));
-                    }
-                    else if ((data.at(1) >= 27) && (data.at(1) <= 34))
-                    {
-                        byte5 = (1 << (data.at(1) - 27));
-                    }
-
-                    test.byte1->setText(QString("%1").arg(byte1, 2, 16, QLatin1Char('0')));
-                    test.byte2->setText(QString("%1").arg(byte2, 2, 16, QLatin1Char('0')));
-                    test.byte3->setText(QString("%1").arg(byte3, 2, 16, QLatin1Char('0')));
-                    test.byte4->setText(QString("%1").arg(byte4, 2, 16, QLatin1Char('0')));
-                    test.byte5->setText(QString("%1").arg(byte5, 2, 16, QLatin1Char('0')));
-                }
-                else if (data.at(0) == 2)
-                {
-                    if (data.at(1) != 0)
-                    {
-                        qWarning() << "Wrong test value fo RZ byte: " << data.at(1);
-                    }
-                }
-                hdlrComGetTest(com, data);
-            }
-            else
-            {
-                qWarning() << kMsgSizeError.arg(com, 2, 16).arg(data.size());
-            }
-        }
-        break;
-    case GB_COM_SET_REG_TEST_2:
-        {
-            if (!data.isEmpty())
-            {
-                qWarning() << kMsgSizeError.arg(com, 2, 16).arg(data.size());
-            }
-
-            setComboBoxValue(stateGlb.regime, eGB_REGIME::GB_REGIME_TEST_2);
-            mPkgTx.append(com);
-        }
-        break;
-    default:
-        {
-            qWarning("No command handler: 0x%.2X", com);
-        }
-    }
-}
-
-//
-void Bsp::hdlrComGetTest(eGB_COM com, pkg_t &data)
-{
-    mPkgTx.append(com);
-    mPkgTx.append(test.byte1->text().toUInt(nullptr, 16));
-    mPkgTx.append(test.byte2->text().toUInt(nullptr, 16));
-    mPkgTx.append(test.byte3->text().toUInt(nullptr, 16));
-    mPkgTx.append(test.byte4->text().toUInt(nullptr, 16));
-    mPkgTx.append(test.byte5->text().toUInt(nullptr, 16));
-}
 
 uint8_t Bsp::getCompatibility(eGB_TYPE_DEVICE typedevice)
 {

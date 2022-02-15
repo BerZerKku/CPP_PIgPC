@@ -52,6 +52,7 @@ private:
     void FillComboboxListStateDef() override;
     void FillComboboxListAc();
     void FillComboBoxListControl() override;
+    void FillComboboxListTest() override;
 
     void HdlrComDefx00(eGB_COM com, pkg_t &data) override;
     void HdlrComDefx01(eGB_COM com, pkg_t &data) override;
@@ -79,11 +80,14 @@ private:
     void HdlrComGlbx3B(eGB_COM com, pkg_t &data) override;
     void HdlrComGlbx3C(eGB_COM com, pkg_t &data) override;
     void HdlrComGlbx3D(eGB_COM com, pkg_t &data) override;
+    void HdlrComGlbx3E(eGB_COM com, pkg_t &data) override;
     void HdlrComGlbx3F(eGB_COM com, pkg_t &data) override;
 
     void HdlrComRegx70(eGB_COM com, pkg_t &data) override;
     void HdlrComRegx71(eGB_COM com, pkg_t &data) override;
     void HdlrComRegx72(eGB_COM com, pkg_t &data) override;
+    void HdlrComRegx7D(eGB_COM com, pkg_t &data) override;
+    void HdlrComRegx7E(eGB_COM com, pkg_t &data) override;
 
     void HdlrComJrnxC1(eGB_COM com, pkg_t &data) override;
     void HdlrComJrnxC2(eGB_COM com, pkg_t &data) override;
