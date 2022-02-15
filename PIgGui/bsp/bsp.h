@@ -145,6 +145,7 @@ public:
     state_t   stateDef;
     state_t   stateGlb;
     state_t   statePrm;
+    state_t   statePrm2;
     state_t   statePrd;
     test_t    test;
     measure_t m_measure;

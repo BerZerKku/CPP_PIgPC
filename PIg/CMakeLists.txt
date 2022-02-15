@@ -40,7 +40,7 @@ include(avr/generic-gcc-avr.cmake)
 project(PIg)
 set(PROJECT_VERSION_MAJOR 1)  # hex
 set(PROJECT_VERSION_MINOR 52) # hex
-set(PROJECT_VERSION_PATH  5)  # hex
+set(PROJECT_VERSION_PATH  6)  # hex
 
 ##########################################################################
 # status messages
@@ -60,7 +60,7 @@ configure_file(version.hpp.in ../src/version.hpp)
 
 ##########################################################################
 # set build type
-##########################################################################
+################################################################9+````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````                                                                          v##########
 if(NOT CMAKE_BUILD_TYPE)
    set(CMAKE_BUILD_TYPE Release)
 endif(NOT CMAKE_BUILD_TYPE)

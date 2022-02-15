@@ -11,6 +11,7 @@
 #include "PIg/src/flash.h"
 #include "PIg/src/menu/base.h"
 #include "bsp/bspR400m_hf.hpp"
+#include "bsp/bspRzsk_hf.hpp"
 
 //
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
@@ -106,12 +107,12 @@ void MainWindow::initBsp()
     connect(ui->mBspCombo, &QComboBox::currentTextChanged, this, &MainWindow::SlotBspChange);
 
     ui->mBspCombo->addItem(codec->toUnicode("ÀÂÀÍÒ Ð400Ì-100-Â"), DEVICE_R400M_100_HF_b15);
-
     ui->mBspCombo->addItem(codec->toUnicode("ÀÂÀÍÒ ÐÇÑÊ-111-Â"), DEVICE_RZSK_111_HF);
-    ui->mBspCombo->addItem(codec->toUnicode("ÀÂÀÍÒ K400-088-Â"), DEVICE_K400_088_HF);
-    ui->mBspCombo->addItem(codec->toUnicode("ÀÂÀÍÒ Ð400-100-Â"), DEVICE_R400_100_VOLS);
-    ui->mBspCombo->addItem(codec->toUnicode("ÀÂÀÍÒ ÐÇÑÊ-111-Â"), DEVICE_RZSK_111_VOLS);
-    ui->mBspCombo->addItem(codec->toUnicode("ÀÂÀÍÒ K400-088-Â"), DEVICE_K400_088_VOLS);
+
+    //    ui->mBspCombo->addItem(codec->toUnicode("ÀÂÀÍÒ K400-088-Â"), DEVICE_K400_088_HF);
+    //    ui->mBspCombo->addItem(codec->toUnicode("ÀÂÀÍÒ Ð400-100-Â"), DEVICE_R400_100_VOLS);
+    //    ui->mBspCombo->addItem(codec->toUnicode("ÀÂÀÍÒ ÐÇÑÊ-111-Â"), DEVICE_RZSK_111_VOLS);
+    //    ui->mBspCombo->addItem(codec->toUnicode("ÀÂÀÍÒ K400-088-Â"), DEVICE_K400_088_VOLS);
 }
 
 void MainWindow::initEeprom()
@@ -446,6 +447,7 @@ void MainWindow::SlotBspChange()
 
     case DEVICE_RZSK_111_HF:
         {
+            bsp = new TBspRzskHf(ui->mBspTree, this);
             break;
         }
 

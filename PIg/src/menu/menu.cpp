@@ -6188,7 +6188,7 @@ void clMenu::printEventTextR400m(uint8_t pos, uint8_t event, uint8_t remotes, eG
     else
     {
         uint8_t remotes_ram[4] = "?";
-        PGM_P   remotes_rom    = getEventRemotesR400m(sParam.jrnEntry.getRemoteNumbers(), comp);
+        PGM_P   remotes_rom    = getEventRemotesR400m(remotes, comp);
 
         if (remotes_rom != nullptr)
         {
@@ -6273,7 +6273,7 @@ PGM_P clMenu::getEventRemotesR400m(uint8_t numbers, eGB_COMP_R400M comp) const
     {
         if (numbers < SIZE_OF(fcEventRemote))
         {
-            line = fcEventRemote[numbers];
+            line = static_cast<PGM_P>(pgm_read_ptr(&fcEventRemote[numbers]));
         }
     }
     else

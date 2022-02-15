@@ -1158,6 +1158,8 @@ void TBspR400mHf::HdlrComGlbx30(eGB_COM com, pkg_t &data)
         mPkgTx.append(0);
         mPkgTx.append(0);
         mPkgTx.append(0);
+
+        Q_ASSERT(mPkgTx.size() == 13);  // команда + 12 байт данных
     }
 
     if (com == 0xB0)
