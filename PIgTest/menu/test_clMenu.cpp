@@ -1755,7 +1755,6 @@ TEST_F(clMenu_Test, GetTimeAc)
         uint8_t     sec;         // текущее время, секунды
     };
 
-    // Во всех совместимостях кроме GB_COMP_R400M_R400 время до АК принимается с БСП
     mObj->sParam.def.setTimeToAC(5876589);
     for (int i = 0; i < GB_COMP_R400M_MAX; i++)
     {
@@ -1763,107 +1762,8 @@ TEST_F(clMenu_Test, GetTimeAc)
 
         SCOPED_TRACE("Compatibility " + to_string(comp) + ", index " + to_string(i));
 
-        if (comp == GB_COMP_R400M_R400)
-            continue;
-
-        mObj->sParam.glb.setCompatibility(comp);
-
         ASSERT_EQ(mObj->GetTimeAc(comp), 5876);
     }
 
-    QVector<test_t> test_data_2 = {
-        { 0, GB_TYPE_AC_AUTO_NORM, 1, 23, 0 },        //
-        { 30, GB_TYPE_AC_AUTO_NORM, 1, 23, 30 },      //
-        { 1, GB_TYPE_AC_AUTO_NORM, 1, 23, 59 },       //
-        { 31, GB_TYPE_AC_AUTO_NORM, 2, 23, 59 },      //
-        { 28, GB_TYPE_AC_AUTO_NORM, 2, 23, 2 },       //
-        { 0, GB_TYPE_AC_AUTO_NORM, 2, 23, 30 },       //
-        { 3, GB_TYPE_AC_AUTO_NORM, 2, 23, 27 },       //
-        { 3, GB_TYPE_AC_ACCEL, 2, 23, 27 },           //
-        { 33, GB_TYPE_AC_ACCEL, 1, 23, 27 },          //
-        { 2193, GB_TYPE_AC_AUTO_REPEAT, 1, 23, 27 },  //
-        { 3573, GB_TYPE_AC_AUTO_REPEAT, 1, 00, 27 },  //
-        { 0, GB_TYPE_AC_AUTO_REPEAT, 1, 00, 00 },     //
-        { 30, GB_TYPE_AC_AUTO_REPEAT, 2, 00, 00 },    //
-        { 1, GB_TYPE_AC_AUTO_REPEAT, 2, 00, 29 },     //
-        { 0, GB_TYPE_AC_AUTO_REPEAT, 2, 00, 30 },     //
-        { 3599, GB_TYPE_AC_AUTO_REPEAT, 2, 00, 31 },  //
-        { 3571, GB_TYPE_AC_AUTO_REPEAT, 2, 00, 59 },  //
-        { 31, GB_TYPE_AC_AUTO_REPEAT, 2, 59, 59 },    //
-        { 1, GB_TYPE_AC_AUTO_REPEAT, 1, 59, 59 },     //
-        { 1801, GB_TYPE_AC_AUTO_REPEAT, 1, 29, 59 },  //
-        { 1853, GB_TYPE_AC_AUTO_REPEAT, 1, 29, 07 },  //
-        { 1883, GB_TYPE_AC_AUTO_REPEAT, 2, 29, 07 },  //
-        { 0, GB_TYPE_AC_OFF, 2, 29, 07 }              //
-    };
-
-    // Своместимость Р400, двухконцевая линия
-    mObj->sParam.def.setTimeToAC(5876589);
-    mObj->sParam.glb.setNumDevices(GB_NUM_DEVICES_2);
-    for (int i = 0; i < test_data_2.size(); i++)
-    {
-        test_t item = test_data_2.at(i);
-
-        SCOPED_TRACE("Time " + to_string(item.time) + ", item " + to_string(i));
-
-        mObj->sParam.def.setTypeAC(item.ac);
-        mObj->sParam.glb.setDeviceNum(item.num_device);
-        mObj->sParam.DateTime.setMinute(item.min, false);
-        mObj->sParam.DateTime.setSecond(item.sec, false);
-
-        uint16_t time = mObj->GetTimeAc(GB_COMP_R400M_R400);
-
-        ASSERT_EQ(item.time, time);
-    }
-
-    QVector<test_t> test_data_3 = {
-        { 0, GB_TYPE_AC_AUTO_NORM, 1, 23, 0 },        //
-        { 30, GB_TYPE_AC_AUTO_NORM, 1, 23, 30 },      //
-        { 1, GB_TYPE_AC_AUTO_NORM, 1, 23, 59 },       //
-        { 21, GB_TYPE_AC_AUTO_NORM, 2, 23, 59 },      //
-        { 18, GB_TYPE_AC_AUTO_NORM, 2, 23, 2 },       //
-        { 0, GB_TYPE_AC_AUTO_NORM, 2, 23, 20 },       //
-        { 53, GB_TYPE_AC_AUTO_NORM, 2, 23, 27 },      //
-        { 13, GB_TYPE_AC_AUTO_NORM, 3, 23, 27 },      //
-        { 0, GB_TYPE_AC_AUTO_NORM, 3, 23, 40 },       //
-        { 40, GB_TYPE_AC_AUTO_NORM, 3, 23, 00 },      //
-        { 40, GB_TYPE_AC_ACCEL, 3, 23, 00 },          //
-        { 0, GB_TYPE_AC_ACCEL, 1, 23, 00 },           //
-        { 20, GB_TYPE_AC_ACCEL, 2, 23, 00 },          //
-        { 2240, GB_TYPE_AC_AUTO_REPEAT, 2, 23, 00 },  //
-        { 2260, GB_TYPE_AC_AUTO_REPEAT, 3, 23, 00 },  //
-        { 2193, GB_TYPE_AC_AUTO_REPEAT, 1, 23, 27 },  //
-        { 3573, GB_TYPE_AC_AUTO_REPEAT, 1, 00, 27 },  //
-        { 0, GB_TYPE_AC_AUTO_REPEAT, 1, 00, 00 },     //
-        { 20, GB_TYPE_AC_AUTO_REPEAT, 2, 00, 00 },    //
-        { 40, GB_TYPE_AC_AUTO_REPEAT, 3, 00, 00 },    //
-        { 1, GB_TYPE_AC_AUTO_REPEAT, 3, 00, 39 },     //
-        { 0, GB_TYPE_AC_AUTO_REPEAT, 3, 00, 40 },     //
-        { 3599, GB_TYPE_AC_AUTO_REPEAT, 3, 00, 41 },  //
-        { 3579, GB_TYPE_AC_AUTO_REPEAT, 2, 00, 41 },  //
-        { 3559, GB_TYPE_AC_AUTO_REPEAT, 1, 00, 41 },  //
-        { 19, GB_TYPE_AC_AUTO_REPEAT, 1, 59, 41 },    //
-        { 1, GB_TYPE_AC_AUTO_REPEAT, 1, 59, 59 },     //
-        { 21, GB_TYPE_AC_AUTO_REPEAT, 2, 59, 59 },    //
-        { 41, GB_TYPE_AC_AUTO_REPEAT, 3, 59, 59 }     //
-    };
-
-    // Своместимость Р400, трехконцевая линия
-    mObj->sParam.def.setTimeToAC(5876589);
-    mObj->sParam.glb.setNumDevices(GB_NUM_DEVICES_3);
-    for (int i = 0; i < test_data_3.size(); i++)
-    {
-        test_t item = test_data_3.at(i);
-
-        SCOPED_TRACE("Time " + to_string(item.time) + ", item " + to_string(i));
-
-        mObj->sParam.def.setTypeAC(item.ac);
-        mObj->sParam.glb.setDeviceNum(item.num_device);
-        mObj->sParam.DateTime.setMinute(item.min, false);
-        mObj->sParam.DateTime.setSecond(item.sec, false);
-
-        uint16_t time = mObj->GetTimeAc(GB_COMP_R400M_R400);
-
-        ASSERT_EQ(item.time, time);
-    }
+    ASSERT_EQ(mObj->GetTimeAc(GB_COMP_R400M_MAX), 0);
 }
