@@ -4705,27 +4705,25 @@ void clMenu::printAc(uint8_t pos)
     {
         if (comp == GB_COMP_R400M_LINER)
         {
-            // в Р400м совместимость ЛинияР подменяем название ""АК-норм"
-            // на "АК-авто"
             if (ac == GB_TYPE_AC_AUTO_NORM)
             {
-                ac = GB_TYPE_AC_AUTO;
+                ac = GB_TYPE_AC_AUTO;  // "АК-норм" -> "АК-авто"
             }
         }
-        else if (comp == GB_COMP_R400M_AVZK80)
+        else if (comp == GB_COMP_R400M_R400)
         {
-            // в Р400м совместимость АВЗК-80 подменяем название ""АК-бегл"
-            // на "АК-пров"
-            if (ac == GB_TYPE_AC_CHECK)
+            if (ac == GB_TYPE_AC_AUTO_NORM || ac == GB_TYPE_AC_AUTO_REPEAT)
             {
-                ac = GB_TYPE_AC_CHECK_1;
+                ac = GB_TYPE_AC_AUTO;  // "АК-норм" -> "АК-авто"
             }
         }
-        else if (comp == GB_COMP_R400M_PVZ90)
+        else if (comp == GB_COMP_R400M_AVZK80 || comp == GB_COMP_R400M_PVZ90)
         {
+            // в Р400м совместимость АВЗК-80 подменяем название "
+            // на
             if (ac == GB_TYPE_AC_CHECK)
             {
-                ac = GB_TYPE_AC_CHECK_1;
+                ac = GB_TYPE_AC_CHECK_1;  // "АК-бегл" -> "АК-пров"
             }
         }
     }
