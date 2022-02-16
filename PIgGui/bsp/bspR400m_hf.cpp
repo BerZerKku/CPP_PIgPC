@@ -556,7 +556,7 @@ void TBspR400mHf::FillComboboxListAc()
                           .arg(kCodec->toUnicode(fcAcType[GB_TYPE_AC_AUTO]));
     mAc.addItem(value_1, 1);
 
-    mAc.addItem(kCodec->toUnicode(fcAcType[GB_TYPE_AC_AUTO_REPEAT]), GB_TYPE_AC_AUTO_REPEAT);
+    mAc.addItem(value_1, GB_TYPE_AC_AUTO_REPEAT);
     mAc.addItem(kCodec->toUnicode(fcAcType[GB_TYPE_AC_ACCEL]), GB_TYPE_AC_ACCEL);
     mAc.addItem(kCodec->toUnicode(fcAcType[GB_TYPE_AC_OFF]), GB_TYPE_AC_OFF);
 
@@ -2195,6 +2195,7 @@ void TBspR400mHf::HdlrComRegx7E(eGB_COM com, pkg_t &data)
                 case 1: index = mTestCf1Signal.findData(0x01); break;
                 case 2: index = mTestCf1Signal.findData(0x02); break;
                 case 3: index = mTestCf1Signal.findData(0x04); break;
+                case 4: index = mTestCf1Signal.findData(0x08); break;
                 }
 
                 if (index < 0)

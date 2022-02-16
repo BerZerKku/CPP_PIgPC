@@ -3706,16 +3706,13 @@ void clMenu::lvlTest1()
             }
             else if (comp == GB_COMP_R400M_R400)
             {
+                sParam.test.addSignalToList(GB_SIGNAL_CF1);
+                sParam.test.addSignalToList(GB_SIGNAL_CF2);
+
                 if (sParam.def.getNumDevices() == GB_NUM_DEVICES_3)
                 {
-                    sParam.test.addSignalToList(GB_SIGNAL_CF1);
-                    sParam.test.addSignalToList(GB_SIGNAL_CF2);
                     sParam.test.addSignalToList(GB_SIGNAL_CF3);
-                }
-                else
-                {
-                    sParam.test.addSignalToList(GB_SIGNAL_CF1);
-                    sParam.test.addSignalToList(GB_SIGNAL_CF2);
+                    sParam.test.addSignalToList(GB_SIGNAL_CF4);
                 }
             }
             else if (comp == GB_COMP_R400M_LINER)
