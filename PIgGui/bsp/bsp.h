@@ -59,18 +59,19 @@ protected:
 
     struct measure_t
     {
-        QSpinBox *R;
-        QSpinBox *I;
-        QSpinBox *U;
-        QSpinBox *Udef1;
-        QSpinBox *Udef2;
-        QSpinBox *Ucf1;
-        QSpinBox *Ucf2;
-        QSpinBox *Un1;
-        QSpinBox *Un2;
-        QSpinBox *Sd;
-        QSpinBox *T;
-        QSpinBox *dF;
+        QSpinBox *R;      // сопротивление линии
+        QSpinBox *I;      // ток выхода
+        QSpinBox *U;      // напряжение выхода
+        QSpinBox *Udef1;  // запас по защите, Uз1
+        QSpinBox *Udef2;  // запас по защите, Uз2
+        QSpinBox *Ucf1;   // запас по КС, Uк1
+        QSpinBox *Ucf2;   // запас по КС, Uк2
+        QSpinBox *Un1;    // уровень шумов, Uш1
+        QSpinBox *Un2;    // уровень шумов, Uш2
+        QSpinBox *Sd;  // просечки в сигнале (длит. импульсов ВЧ блокировки ?!)
+        QSpinBox *D;   // отношение сигнал/помеха
+        QSpinBox *T;   // температура
+        QSpinBox *dF;  // отклонение частоты КС на приеме
     };
 
     QMap<uint8_t, HdlrCom_t> mComMap;
@@ -269,7 +270,7 @@ public:
     virtual void HdlrComGlbx30(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
     virtual void HdlrComGlbx31(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
     virtual void HdlrComGlbx32(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComGlbx33(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
+    virtual void HdlrComGlbx33(eGB_COM com, pkg_t &data);
     virtual void HdlrComGlbx34(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
     virtual void HdlrComGlbx35(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
     virtual void HdlrComGlbx36(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };

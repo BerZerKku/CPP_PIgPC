@@ -1025,10 +1025,8 @@ quint8 Bsp::getComboBoxValue(eGB_PARAM param, uint8_t number)
     }
     else
     {
-        QString msg = QString("%1: Parameter '%2' (%3) not found.")
-                          .arg(__FUNCTION__)
-                          .arg(getParamName(param))
-                          .arg(number);
+        QString msg =
+            QString("%1: Parameter '%2' (%3) not found.").arg(__FUNCTION__).arg(param).arg(number);
         qWarning() << msg;
     }
 
@@ -2082,6 +2080,81 @@ void Bsp::HdlrComDummy(eGB_COM com, pkg_t &data)
     Q_UNUSED(data);
 
     qWarning() << QString("Command handler missing: 0x%1").arg(com, 2, 16, QLatin1Char('0'));
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду чтения коррекция тока и напряжения.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void Bsp::HdlrComGlbx33(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_GET_COR_U_I || com == GB_COM_SET_COR_U_I);
+
+    if (com == GB_COM_GET_COR_U_I)
+    {
+        if (!CheckSize(com, data.size(), { 0 }))
+        {
+            return;
+        }
+
+        qint16 value;
+
+        mPkgTx.append(com);
+
+        value = GetParamValue(GB_PARAM_COR_U);
+        mPkgTx.append(static_cast<uint8_t>(value / 10));
+        mPkgTx.append(static_cast<uint8_t>(value % 10) * 10);
+
+        value = GetParamValue(GB_PARAM_COR_I);
+        mPkgTx.append(static_cast<uint8_t>(value >> 8));
+        mPkgTx.append(static_cast<uint8_t>(value));
+        mPkgTx.append(0);  // коррекция тока 2, старший байт
+        mPkgTx.append(0);  // коррекция тока 2, младший байт
+
+        Q_ASSERT(mPkgTx.size() == 7);  // команда + 6 байт данных
+    }
+
+    if (com == GB_COM_SET_COR_U_I)
+    {
+        if (!CheckSize(com, data.size(), { 3 }))
+        {
+            return;
+        }
+
+        // ответ на команду записи совпадает с запросом
+        mPkgTx.append(com);
+        mPkgTx.append(data);
+
+        qint16 value;
+
+        switch (data.at(0))
+        {
+        case 1:
+            value = static_cast<qint16>(static_cast<qint8>(data.at(1))) * 10;
+            value += static_cast<qint16>(static_cast<qint8>(data.at(2))) / 10;
+            SetParamValue(GB_PARAM_COR_U, value);
+            break;
+        case 2:
+            value = static_cast<qint16>(data.at(1)) << 8;
+            value += static_cast<qint16>(data.at(2));
+            SetParamValue(GB_PARAM_COR_I, value);
+            break;
+        case 4: SetParamValue(GB_PARAM_COR_U, 0); break;
+        case 5: SetParamValue(GB_PARAM_COR_I, 0); break;
+
+        default:
+            // 3 - коррекция тока 2 для трешки
+            // 6 - сброс коррекции тока 2 для трешки
+            QString message = "Wrong data in command %1: %2";
+            qWarning() << message.arg(com, 2, 16, QLatin1Char('0')).arg(data.at(0));
+        }
+    }
 }
 
 //

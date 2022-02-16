@@ -32,7 +32,7 @@ TBspRzskHf::TBspRzskHf(QTreeWidget *tree, QWidget *parent) : Bsp(tree, parent)
  */
 void TBspRzskHf::InitComMap()
 {
-    //    mComMap.insert(0x00, &Bsp::HdlrComDefx00);  // чтение параметров защиты с конфигуратора
+    mComMap.insert(0x00, &Bsp::HdlrComDefx00);  // чтение параметров защиты с конфигуратора
     //    mComMap.insert(0x01, &Bsp::HdlrComDefx01);  // чтение типа защиты
     //    mComMap.insert(0x02, &Bsp::HdlrComDefx02);  // чтение количества аппаратов в линии
     //    mComMap.insert(0x03, &Bsp::HdlrComDefx03);  // чтение допустимого времени без манипуляции
@@ -45,11 +45,11 @@ void TBspRzskHf::InitComMap()
     //    mComMap.insert(0x0A, &Bsp::HdlrComDefx0A);  // чтение режима АК и времени до АК
 
     mComMap.insert(0x30, &Bsp::HdlrComGlbx30);  // чтение режимов
-    //    mComMap.insert(0x31, &Bsp::HdlrComGlbx31);  // чтение неисправностей
-    //    mComMap.insert(0x32, &Bsp::HdlrComGlbx32);  // чтение времени
-    //    mComMap.insert(0x33, &Bsp::HdlrComGlbx33);  // чтение коррекций тока и напряжения
-    //    mComMap.insert(0x34, &Bsp::HdlrComGlbx34);  // чтение измерений
-    //    mComMap.insert(0x35, &Bsp::HdlrComGlbx35);  // чтение синхронизации времени / всех
+    mComMap.insert(0x31, &Bsp::HdlrComGlbx31);  // чтение неисправностей
+    mComMap.insert(0x32, &Bsp::HdlrComGlbx32);  // чтение времени
+    mComMap.insert(0x33, &Bsp::HdlrComGlbx33);  // чтение коррекций тока и напряжения
+    mComMap.insert(0x34, &Bsp::HdlrComGlbx34);  // чтение измерений
+    mComMap.insert(0x35, &Bsp::HdlrComGlbx35);  // чтение синхронизации времени / всех
     //    параметров mComMap.insert(0x36, &Bsp::HdlrComGlbx36);  // чтение уровня выходного
     //    напряжения mComMap.insert(0x37, &Bsp::HdlrComGlbx37);  // чтение совместимости
     //    mComMap.insert(0x38, &Bsp::HdlrComGlbx38);  // чтение адреса в локальной сети
@@ -64,7 +64,7 @@ void TBspRzskHf::InitComMap()
     //    mComMap.insert(0x71, &Bsp::HdlrComRegx71);  // запись режима "Введен"
     //    mComMap.insert(0x72, &Bsp::HdlrComRegx72);  // запись команды управления
 
-    //    mComMap.insert(0x80, &Bsp::HdlrComDefx00);  // запись параметров защиты с конфигуратора
+    mComMap.insert(0x80, &Bsp::HdlrComDefx00);  // запись параметров защиты с конфигуратора
     //    mComMap.insert(0x81, &Bsp::HdlrComDefx01);  // запись типа защиты
     //    mComMap.insert(0x82, &Bsp::HdlrComDefx02);  // запись количества аппаратов в линии
     //    mComMap.insert(0x83, &Bsp::HdlrComDefx03);  // запись допустимого времени без манипуляции
@@ -76,10 +76,10 @@ void TBspRzskHf::InitComMap()
     //    mComMap.insert(0x89, &Bsp::HdlrComDefx09);  // запись смещения частоты ПРМ
     //    mComMap.insert(0x8A, &Bsp::HdlrComDefx0A);  // запись режима АК и времени до АК
 
-    //    mComMap.insert(0xB0, &Bsp::HdlrComGlbx30);  // запись общих параметров с конфигуратора
-    //    mComMap.insert(0xB2, &Bsp::HdlrComGlbx32);  // запись времени
-    //    mComMap.insert(0xB3, &Bsp::HdlrComGlbx33);  // записькоррекций тока и напряжения
-    //    mComMap.insert(0xB5, &Bsp::HdlrComGlbx35);  // запись синхронизации времени / всех
+    mComMap.insert(0xB0, &Bsp::HdlrComGlbx30);  // запись общих параметров с конфигуратора
+    mComMap.insert(0xB2, &Bsp::HdlrComGlbx32);  // запись времени
+    mComMap.insert(0xB3, &Bsp::HdlrComGlbx33);  // записькоррекций тока и напряжения
+    mComMap.insert(0xB5, &Bsp::HdlrComGlbx35);  // запись синхронизации времени / всех
     //    параметров mComMap.insert(0xB6, &Bsp::HdlrComGlbx36);  // запись уровня выходного
     //    напряжения mComMap.insert(0xB7, &Bsp::HdlrComGlbx37);  // запись совместимости
     //    mComMap.insert(0xB8, &Bsp::HdlrComGlbx38);  // запись адреса в локальной сети
@@ -99,8 +99,6 @@ void TBspRzskHf::InitComMap()
 //
 void TBspRzskHf::InitParam()
 {
-    setComboBoxValue(GB_PARAM_COMP_P400, GB_COMP_R400M_LINER);
-
     setSpinBoxValue(mDevice.versionBspMcu, 0x0134);
     setSpinBoxValue(mDevice.versionBspDsp, 0x0D33);
     setSpinBoxValue(mDevice.versionBszPlis, 0x52);
@@ -122,39 +120,31 @@ void TBspRzskHf::InitParam()
     setSpinBoxValue(GB_PARAM_NET_ADDRESS, 17);
 
     // Параметры общие
-    SetParamValue(GB_PARAM_COMP_P400, GB_COMP_R400M_R400);
-    SetParamValue(GB_PARAM_TIME_SYNCH_SRC, 1);  // 1 - по каналу связи
+    SetParamValue(GB_PARAM_COMP_RZSK, GB_COMP_RZSK);
+    //    SetParamValue(GB_PARAM_NUM_OF_DEVICES, 1); - auto change
+    SetParamValue(GB_PARAM_TIME_SYNCH, 1);  // 1 - вкл.
     SetParamValue(GB_PARAM_NUM_OF_DEVICE, 1);
     SetParamValue(GB_PARAM_OUT_CHECK, 0);  // 0 - выкл.
-    SetParamValue(GB_PARAM_WARN_THD, 11);
-    SetParamValue(GB_PARAM_U_OUT_NOM, 20);
+    SetParamValue(GB_PARAM_WARN_THD_CF, 11);
+    SetParamValue(GB_PARAM_TIME_RERUN, 3);
+    SetParamValue(GB_PARAM_COM_PRD_KEEP, 0);  // 0 - выкл.
+    SetParamValue(GB_PARAM_COM_PRM_KEEP, 1);  // 1 - вкл.
+    SetParamValue(GB_PARAM_IN_DEC, 12, 1);
+    SetParamValue(GB_PARAM_IN_DEC, 13, 2);
     SetParamValue(GB_PARAM_FREQ, 123);
-    SetParamValue(GB_PARAM_IN_DEC_AC_ANSWER, 7);
-    SetParamValue(GB_PARAM_PVZUE_PROTOCOL, 1);  // 1 - быстрый
-    SetParamValue(GB_PARAM_PVZUE_PARITY, 2);    // 2 - выкл.
-    SetParamValue(GB_PARAM_PVZUE_FAIL, 20);
-    SetParamValue(GB_PARAM_PVZUE_NOISE_THD, 33);
-    SetParamValue(GB_PARAM_PVZUE_NOISE_LVL, 40);
-    SetParamValue(GB_PARAM_PVZUE_AC_TYPE, 2);  // 2 - нормальный
-    SetParamValue(GB_PARAM_PVZUE_AC_PERIOD, 152);
-    SetParamValue(GB_PARAM_PVZUE_AC_PER_RE, 213);
-    SetParamValue(GB_PARAM_PVZU_AC_CORRECT, 19);
-    SetParamValue(GB_PARAM_ALARM_CF, 11);
+    SetParamValue(GB_PARAM_DETECTOR, 2);
     SetParamValue(GB_PARAM_COR_U, -105);  // -10.5 В
     SetParamValue(GB_PARAM_COR_I, 20);    // 20 мА
 
     // Параметры защиты
-    SetParamValue(GB_PARAM_NUM_OF_DEVICES, GB_NUM_DEVICES_2);
     SetParamValue(GB_PARAM_DEF_TYPE, 0);  // 0 - ДФЗ ПрПд
     SetParamValue(GB_PARAM_TIME_NO_MAN, 10);
-    SetParamValue(GB_PARAM_SHIFT_FRONT, 18);
-    SetParamValue(GB_PARAM_SHIFT_BACK, 36);
-    SetParamValue(GB_PARAM_SHIFT_PRM, 48);
-    SetParamValue(GB_PARAM_SHIFT_PRD, 64);
-    SetParamValue(GB_PARAM_SENS_DEC, 6);
-    SetParamValue(GB_PARAM_AC_IN_DEC, 0);  // 0 - выкл
-    SetParamValue(GB_PARAM_FREQ_PRD, 1);   // -500 Гц
-    SetParamValue(GB_PARAM_FREQ_PRM, 3);   // 500 Гц
+    SetParamValue(GB_PARAM_OVERLAP, 28);
+    SetParamValue(GB_PARAM_DELAY, 8);
+    SetParamValue(GB_PARAM_WARN_THD_RZ, 13);
+    SetParamValue(GB_PARAM_SENS_DEC_RZ, 31);
+    SetParamValue(GB_PARAM_PRM_TYPE, 0);      // 0 - акт+пасс
+    SetParamValue(GB_PARAM_DEF_ONE_SIDE, 0);  // 0 - выкл.
 
     setSpinBoxValue(m_measure.I, 101);
     setSpinBoxValue(m_measure.U, 251);
@@ -164,7 +154,6 @@ void TBspRzskHf::InitParam()
     setSpinBoxValue(m_measure.Ucf2, 16);
     setSpinBoxValue(m_measure.Un1, -7);
     setSpinBoxValue(m_measure.Un2, 7);
-    setSpinBoxValue(m_measure.Sd, 321);
 
     mJrnDefCounter.setValue(15);
     mJrnGlbCounter.setValue(15);
@@ -177,17 +166,15 @@ void TBspRzskHf::crtTreeDef(QTreeWidgetItem *top)
     ltop->setText(0, kCodec->toUnicode("Защита"));
     top->addChild(ltop);
 
-    CrtParamWidget(ltop, GB_PARAM_NUM_OF_DEVICES);
     CrtParamWidget(ltop, GB_PARAM_DEF_TYPE);
     CrtParamWidget(ltop, GB_PARAM_TIME_NO_MAN);
-    CrtParamWidget(ltop, GB_PARAM_SHIFT_FRONT);
-    CrtParamWidget(ltop, GB_PARAM_SHIFT_BACK);
-    CrtParamWidget(ltop, GB_PARAM_SHIFT_PRM);
-    CrtParamWidget(ltop, GB_PARAM_SHIFT_PRD);
-    CrtParamWidget(ltop, GB_PARAM_SENS_DEC);
-    CrtParamWidget(ltop, GB_PARAM_AC_IN_DEC);
-    CrtParamWidget(ltop, GB_PARAM_FREQ_PRD);
-    CrtParamWidget(ltop, GB_PARAM_FREQ_PRM);
+    CrtParamWidget(ltop, GB_PARAM_OVERLAP);
+    CrtParamWidget(ltop, GB_PARAM_DELAY);
+    CrtParamWidget(ltop, GB_PARAM_WARN_THD_RZ);
+    CrtParamWidget(ltop, GB_PARAM_SENS_DEC_RZ);
+    CrtParamWidget(ltop, GB_PARAM_PRM_TYPE);
+    // параметр Односторонний режим меняется командой управления
+    CrtParamWidget(ltop, GB_PARAM_DEF_ONE_SIDE);
 }
 
 
@@ -198,26 +185,22 @@ void TBspRzskHf::crtTreeGlb(QTreeWidgetItem(*top))
     top->addChild(ltop);
 
     CrtParamWidget(ltop, GB_PARAM_COMP_RZSK);
-
-    CrtParamWidget(ltop, GB_PARAM_TIME_SYNCH_SRC);
+    CrtParamWidget(ltop, GB_PARAM_NUM_OF_DEVICES);
+    CrtParamWidget(ltop, GB_PARAM_TIME_SYNCH);
     CrtParamWidget(ltop, GB_PARAM_NUM_OF_DEVICE);
     CrtParamWidget(ltop, GB_PARAM_OUT_CHECK);
-    CrtParamWidget(ltop, GB_PARAM_WARN_THD);
-    CrtParamWidget(ltop, GB_PARAM_U_OUT_NOM);
+    CrtParamWidget(ltop, GB_PARAM_WARN_THD_CF);
+    CrtParamWidget(ltop, GB_PARAM_TIME_RERUN);
+    CrtParamWidget(ltop, GB_PARAM_COM_PRD_KEEP);
+    CrtParamWidget(ltop, GB_PARAM_COM_PRM_KEEP);
+    CrtParamWidget(ltop, GB_PARAM_IN_DEC);
     CrtParamWidget(ltop, GB_PARAM_FREQ);
-    CrtParamWidget(ltop, GB_PARAM_IN_DEC_AC_ANSWER);
-    CrtParamWidget(ltop, GB_PARAM_PVZUE_PROTOCOL);
-    CrtParamWidget(ltop, GB_PARAM_PVZUE_PARITY);
-    CrtParamWidget(ltop, GB_PARAM_PVZUE_FAIL);
-    CrtParamWidget(ltop, GB_PARAM_PVZUE_NOISE_THD);
-    CrtParamWidget(ltop, GB_PARAM_PVZUE_NOISE_LVL);
-    CrtParamWidget(ltop, GB_PARAM_PVZUE_AC_TYPE);
-    CrtParamWidget(ltop, GB_PARAM_PVZUE_AC_PERIOD);
-    CrtParamWidget(ltop, GB_PARAM_PVZUE_AC_PER_RE);
-    CrtParamWidget(ltop, GB_PARAM_PVZU_AC_CORRECT);
-    CrtParamWidget(ltop, GB_PARAM_ALARM_CF);
+    CrtParamWidget(ltop, GB_PARAM_DETECTOR);
     CrtParamWidget(ltop, GB_PARAM_COR_U);
     CrtParamWidget(ltop, GB_PARAM_COR_I);
+
+    // параметр выставляется автоматически при смене совместимости
+    mapCombobox.value(GB_PARAM_NUM_OF_DEVICES).at(0)->setEnabled(false);
 
     connect(mapCombobox.value(GB_PARAM_COMP_RZSK).at(0),
             &QComboBox::currentTextChanged,
@@ -335,6 +318,15 @@ void TBspRzskHf::crtTreeMeasure()
     item   = new QTreeWidgetItem();
     widget = new QSpinBox();
     widget->setRange(0, 999);
+    widget->setToolTip(QString("[%1, %2] Ohm").arg(widget->minimum()).arg(widget->maximum()));
+    item->setText(0, kCodec->toUnicode("R"));
+    top->addChild(item);
+    mTree->setItemWidget(item, 1, widget);
+    m_measure.R = widget;
+
+    item   = new QTreeWidgetItem();
+    widget = new QSpinBox();
+    widget->setRange(0, 999);
     widget->setToolTip(QString("[%1, %2] mA").arg(widget->minimum()).arg(widget->maximum()));
     item->setText(0, kCodec->toUnicode("I"));
     top->addChild(item);
@@ -403,15 +395,6 @@ void TBspRzskHf::crtTreeMeasure()
     top->addChild(item);
     mTree->setItemWidget(item, 1, widget);
     m_measure.Un2 = widget;
-
-    item   = new QTreeWidgetItem();
-    widget = new QSpinBox();
-    widget->setRange(0, 360);
-    widget->setToolTip(QString("[%1, %2] deg").arg(widget->minimum()).arg(widget->maximum()));
-    item->setText(0, kCodec->toUnicode("Sд"));
-    top->addChild(item);
-    mTree->setItemWidget(item, 1, widget);
-    m_measure.Sd = widget;
 
     top->setExpanded(false);
 }
@@ -626,77 +609,73 @@ void TBspRzskHf::FillComboBoxListControl()
 }
 
 
-///**
-// * *****************************************************************************
-// *
-// * @brief Обрабатывает команду чтения/записи параметров защиты с конфигуратора.
-// * @param[in] Команда.
-// * @param[in] Данные.
-// *
-// * *****************************************************************************
-// */
-// void TBspRzskHf::HdlrComDefx00(eGB_COM com, pkg_t &data)
-//{
-//    Q_ASSERT(com == 0x00 || com == 0x80);
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду чтения/записи параметров защиты с конфигуратора.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void TBspRzskHf::HdlrComDefx00(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == 0x00 || com == 0x80);
 
-//    if (com == 0x00)
-//    {
-//        if (!CheckSize(com, data.size(), { 0 }))
-//        {
-//            return;
-//        }
+    if (com == 0x00)
+    {
+        if (!CheckSize(com, data.size(), { 0 }))
+        {
+            return;
+        }
 
-//        mPkgTx.append(com);
-//        mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_DEF_TYPE)));
-//        mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_NUM_OF_DEVICES)));
-//        mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_TIME_NO_MAN)));
-//        mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_SHIFT_FRONT)));
-//        mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_SHIFT_BACK)));
-//        mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_SENS_DEC)));
-//        mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_AC_IN_DEC)));
-//        mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_FREQ_PRD)));
-//        mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_FREQ_PRM)));
-//        mPkgTx.append(getComboBoxValue(&mAc));
-//        mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_SHIFT_PRM)));
-//        mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_SHIFT_PRD)));
+        mPkgTx.append(com);
+        mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_DEF_TYPE)));
+        mPkgTx.append(0);  // тип линии
+        mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_TIME_NO_MAN)));
+        mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_DELAY)));
+        mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_OVERLAP)));
+        mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_SENS_DEC_RZ)));
+        mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_PRM_TYPE)));
+        mPkgTx.append(0);  // задержка на линии 2
+        mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_WARN_THD_RZ)));
+        mPkgTx.append(0);  // загрубление ДФЗ 2
+        mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_DEF_ONE_SIDE)));
 
+        int len = 16 - mPkgTx.size();
+        for (int i = 0; i < len; i++)
+        {
+            mPkgTx.append(0);
+        }
 
-//        int len = 32 - mPkgTx.size();
-//        for (int i = 0; i < len; i++)
-//        {
-//            mPkgTx.append(0);
-//        }
+        Q_ASSERT(mPkgTx.size() == 16);  // команда + 15 байт данных
+    }
 
-//        Q_ASSERT(mPkgTx.size() == 33);  // команда + 31 байт данных
-//    }
+    if (com == 0x80)
+    {
+        if (!CheckSize(com, data.size(), { 15 }))
+        {
+            return;
+        }
 
-//    if (com == 0x80)
-//    {
-//        // c ПК почему-то идет только 15 байт
-//        if (!CheckSize(com, data.size(), { 15, 31 }))
-//        {
-//            return;
-//        }
+        // ответ на команду записи совпадает с запросом
+        mPkgTx.append(com);
+        mPkgTx.append(data);
 
-//        // ответ на команду записи совпадает с запросом
-//        mPkgTx.append(com);
-//        mPkgTx.append(data);
-
-//        int index = 0;
-//        SetParamValue(GB_PARAM_DEF_TYPE, data.at(index++));
-//        SetParamValue(GB_PARAM_NUM_OF_DEVICES, data.at(index++));
-//        SetParamValue(GB_PARAM_TIME_NO_MAN, data.at(index++));
-//        SetParamValue(GB_PARAM_SHIFT_FRONT, data.at(index++));
-//        SetParamValue(GB_PARAM_SHIFT_BACK, data.at(index++));
-//        SetParamValue(GB_PARAM_SENS_DEC, data.at(index++));
-//        SetParamValue(GB_PARAM_AC_IN_DEC, data.at(index++));
-//        SetParamValue(GB_PARAM_FREQ_PRD, data.at(index++));
-//        SetParamValue(GB_PARAM_FREQ_PRM, data.at(index++));
-//        index++;  // Режим АК не меняется
-//        SetParamValue(GB_PARAM_SHIFT_PRM, data.at(index++));
-//        SetParamValue(GB_PARAM_SHIFT_PRD, data.at(index++));
-//    }
-//}
+        int index = 0;
+        SetParamValue(GB_PARAM_DEF_TYPE, data.at(index++));
+        index++;  // тип линии
+        SetParamValue(GB_PARAM_TIME_NO_MAN, data.at(index++));
+        SetParamValue(GB_PARAM_DELAY, data.at(index++));
+        SetParamValue(GB_PARAM_OVERLAP, data.at(index++));
+        SetParamValue(GB_PARAM_SENS_DEC_RZ, data.at(index++));
+        SetParamValue(GB_PARAM_PRM_TYPE, data.at(index++));
+        index++;  // задержка на линии 2
+        SetParamValue(GB_PARAM_WARN_THD_RZ, data.at(index++));
+        index++;  // загрубление ДФЗ 2
+        index++;  // односторонний режимSetParamValue(GB_PARAM_DEF_ONE_SIDE)));
+    }
+}
 
 
 ///**
@@ -1151,425 +1130,365 @@ void TBspRzskHf::HdlrComGlbx30(eGB_COM com, pkg_t &data)
         Q_ASSERT(mPkgTx.size() == 22);  // команда + 21 байт данных
     }
 
-    //    if (com == 0xB0)
-    //    {
-    //        if (!CheckSize(com, data.size(), { 31 }))
-    //        {
-    //            return;
-    //        }
+    if (com == 0xB0)
+    {
+        if (!CheckSize(com, data.size(), { 31 }))
+        {
+            return;
+        }
 
-    //        // ответ на команду записи совпадает с запросом
-    //        mPkgTx.append(com);
-    //        mPkgTx.append(data);
+        // ответ на команду записи совпадает с запросом
+        mPkgTx.append(com);
+        mPkgTx.append(data);
 
-    //        int index = 0;
-    //        SetParamValue(GB_PARAM_TIME_SYNCH_SRC, data.at(index++));
-    //        SetParamValue(GB_PARAM_U_OUT_NOM, data.at(index++));
-    //        SetParamValue(GB_PARAM_COMP_P400, data.at(index++));
-    //        SetParamValue(GB_PARAM_NET_ADDRESS, data.at(index++));
-    //        index++;  // время перезапуска ПРМ
+        int index = 0;
+        SetParamValue(GB_PARAM_IN_DEC, data.at(index++), 1);
+        SetParamValue(GB_PARAM_COM_PRM_KEEP, data.at(index++));
+        SetParamValue(GB_PARAM_COM_PRD_KEEP, data.at(index++));
+        SetParamValue(GB_PARAM_IN_DEC, data.at(index++), 2);
+        SetParamValue(GB_PARAM_TIME_RERUN, data.at(index++));
+        SetParamValue(GB_PARAM_OUT_CHECK, data.at(index++));
+        SetParamValue(GB_PARAM_WARN_THD_CF, data.at(index++));
+        SetParamValue(GB_PARAM_DETECTOR, data.at(index++));
 
-    //        quint16 freq = data.at(index++);
-    //        freq += static_cast<quint16>(data.at(index++)) << 8;
-    //        SetParamValue(GB_PARAM_FREQ, freq);
+        // коррекции с ПК не устанавливаются
+        index++;  // Коррекция значения выходного напряжения (целая часть)
+        index++;  // Коррекция значения выходного напряжения (дробная цасть)
+        index++;  // Коррекция значения тока 1 (младший байт)
+        index++;  // Коррекция значения тока 1 (старший байт)
+        index++;  // Коррекция значения тока 2 (младший байт)
+        index++;  // Коррекция значения тока 2 (старший байт)
 
-    //        SetParamValue(GB_PARAM_NUM_OF_DEVICE, data.at(index++));
-    //        SetParamValue(GB_PARAM_OUT_CHECK, data.at(index++));
-    //        SetParamValue(GB_PARAM_WARN_THD, data.at(index++));
+        SetParamValue(GB_PARAM_TIME_SYNCH, data.at(index++));
+        SetParamValue(GB_PARAM_NET_ADDRESS, data.at(index++));
+        SetParamValue(GB_PARAM_NUM_OF_DEVICE, data.at(index++));
 
-    //        // @fixme Разобраться что тут должно быть
-    //        index++;  // загрубление чувствительности по КЧ ПРМ_1
-    //        index++;  // загрубление чувствительности по КЧ ПРМ_2
+        quint16 freq = data.at(index++);
+        freq += static_cast<quint16>(data.at(index++)) << 8;
+        SetParamValue(GB_PARAM_FREQ, freq);
 
-    //        // коррекции с ПК не устанавливаются
-    //        index++;  // Коррекция значения выходного напряжения (целая часть)
-    //        index++;  // Коррекция значения выходного напряжения (дробная цасть)
-    //        index++;  // Коррекция значения тока 1 (младший байт)
-    //        index++;  // Коррекция значения тока 1 (старший байт)
-    //        index++;  // Коррекция значения тока 2 (младший байт)
-    //        index++;  // Коррекция значения тока 2 (старший байт)
-
-    //        SetParamValue(GB_PARAM_PVZUE_PROTOCOL, data.at(index++));
-    //        SetParamValue(GB_PARAM_PVZUE_PARITY, data.at(index++));
-    //        SetParamValue(GB_PARAM_PVZUE_FAIL, data.at(index++));
-    //        SetParamValue(GB_PARAM_PVZUE_NOISE_THD, data.at(index++));
-    //        SetParamValue(GB_PARAM_PVZUE_NOISE_LVL, data.at(index++));
-    //        SetParamValue(GB_PARAM_PVZUE_AC_TYPE, data.at(index++));
-    //        SetParamValue(GB_PARAM_PVZUE_AC_PERIOD, data.at(index++));
-    //        SetParamValue(GB_PARAM_PVZUE_AC_PER_RE, data.at(index++));
-    //        SetParamValue(GB_PARAM_PVZU_AC_CORRECT, data.at(index++));
-    //        SetParamValue(GB_PARAM_ALARM_CF, data.at(index++));
-    //    }
+        SetParamValue(GB_PARAM_NUM_OF_DEVICES, data.at(index++));
+        SetParamValue(GB_PARAM_COMP_RZSK, data.at(index++));
+    }
 }
 
 
-///**
-// * *****************************************************************************
-// *
-// * @brief Обрабатывает команду чтения несиправностей и предупреждений.
-// * @param[in] Команда.
-// * @param[in] Данные.
-// *
-// * *****************************************************************************
-// */
-// void TBspRzskHf::HdlrComGlbx31(eGB_COM com, pkg_t &data)
-//{
-//    bool    ok;
-//    quint16 def_alarm = getLineEditValue(stateDef.fault).toUInt(&ok, 16);
-//    quint16 def_warn  = getLineEditValue(stateDef.warning).toUInt(&ok, 16);
-//    quint16 glb_alarm = getLineEditValue(stateGlb.fault).toUInt(&ok, 16);
-//    quint16 glb_warn  = getLineEditValue(stateGlb.warning).toUInt(&ok, 16);
-
-//    Q_ASSERT(com == GB_COM_GET_FAULT);
-
-//    if (!CheckSize(com, data.size(), { 0 }))
-//    {
-//        return;
-//    }
-
-//    mPkgTx.append(com);
-//    mPkgTx.append(static_cast<uint8_t>(def_alarm >> 8));
-//    mPkgTx.append(static_cast<uint8_t>(def_alarm));
-//    mPkgTx.append(static_cast<uint8_t>(def_warn >> 8));
-//    mPkgTx.append(static_cast<uint8_t>(def_warn));
-
-//    mPkgTx.append(getSpinBoxValue(&mStateFaultDeviceNumber));
-//    mPkgTx.append(0);
-//    mPkgTx.append(0);
-//    mPkgTx.append(0);
-
-//    mPkgTx.append(0);
-//    mPkgTx.append(0);
-//    mPkgTx.append(0);
-//    mPkgTx.append(0);
-
-//    mPkgTx.append(static_cast<uint8_t>(glb_alarm >> 8));
-//    mPkgTx.append(static_cast<uint8_t>(glb_alarm));
-//    mPkgTx.append(static_cast<uint8_t>(glb_warn >> 8));
-//    mPkgTx.append(static_cast<uint8_t>(glb_warn));
-
-//    mPkgTx.append(0);
-//    mPkgTx.append(0);
-//    mPkgTx.append(0);
-//    mPkgTx.append(0);
-
-
-//    Q_ASSERT(mPkgTx.size() == 21);  // команда + 20 байт данных
-//}
-
-
-///**
-// * *****************************************************************************
-// *
-// * @brief Обрабатывает команду чтения/записи даты и времени.
-// * @param[in] Команда.
-// * @param[in] Данные.
-// *
-// * *****************************************************************************
-// */
-// void TBspRzskHf::HdlrComGlbx32(eGB_COM com, pkg_t &data)
-//{
-//    uint16_t msec = dt.time().msec();
-
-//    Q_ASSERT(com == GB_COM_GET_TIME || com == GB_COM_SET_TIME);
-
-//    if (com == GB_COM_GET_TIME)
-//    {
-//        // C ПИ передается флаг запроса сообщения для передачи в АСУ (0..3), с ПК нет данных
-//        // В Р400м флаг запроса не обрабатывается
-//        if (!CheckSize(com, data.size(), { 0, 1 }))
-//        {
-//            return;
-//        }
-
-//        mPkgTx.append(com);
-//        mPkgTx.append(int2bcd(dt.date().year() - 2000));
-//        mPkgTx.append(int2bcd(dt.date().month()));
-//        mPkgTx.append(int2bcd(dt.date().day()));
-//        mPkgTx.append(int2bcd(dt.time().hour()));
-//        mPkgTx.append(int2bcd(dt.time().minute()));
-//        mPkgTx.append(int2bcd(dt.time().second()));
-//        mPkgTx.append(static_cast<uint8_t>(msec));
-//        mPkgTx.append(static_cast<uint8_t>(msec >> 8));
-
-//        Q_ASSERT(mPkgTx.size() == 9);  // команда + 8 байт данных
-//    }
-
-//    if (com == GB_COM_SET_TIME)
-//    {
-//        // с ПК передается 6 байт, без мс / c МК передается 9 байт
-//        if (!CheckSize(com, data.size(), { 6, 9 }))
-//        {
-//            return;
-//        }
-
-//        // ответ на команду записи совпадает с запросом
-//        mPkgTx.append(com);
-//        mPkgTx.append(data);
-
-//        // @todo Добавить обработку флага источника синхронизации времени
-//        // При установке времени надо проверить флаг источника:
-//        // - 0, изменение с клавиатуры/пк
-//        // - 1, изменение по АСУ, надо учитывать параметр "Синхр. времени"
-
-//        quint16 year  = bcd2int(data.takeFirst()) + 2000;
-//        quint8  month = bcd2int(data.takeFirst());
-//        quint8  day   = bcd2int(data.takeFirst());
-
-//        quint8 hour   = bcd2int(data.takeFirst());
-//        quint8 minute = bcd2int(data.takeFirst());
-//        quint8 second = bcd2int(data.takeFirst());
-
-//        quint16 ms = 0;
-//        if (data.size() >= 3)
-//        {
-//            ms = data.takeFirst();
-//            ms += static_cast<quint16>(data.takeFirst()) << 8;
-
-//            quint8 source = data.takeFirst();
-//            if (source > 1)
-//            {
-//                qWarning() << kMsgTimeSourceError.arg(source);
-//            }
-//        }
-
-//        dt.setDate(QDate(year, month, day));
-//        dt.setTime(QTime(hour, minute, second, ms));
-//    }
-//}
-
-
-///**
-// * *****************************************************************************
-// *
-// * @brief Обрабатывает команду чтения коррекция тока и напряжения.
-// * @param[in] Команда.
-// * @param[in] Данные.
-// *
-// * *****************************************************************************
-// */
-// void TBspRzskHf::HdlrComGlbx33(eGB_COM com, pkg_t &data)
-//{
-//    Q_ASSERT(com == GB_COM_GET_COR_U_I || com == GB_COM_SET_COR_U_I);
-
-//    if (com == GB_COM_GET_COR_U_I)
-//    {
-//        if (!CheckSize(com, data.size(), { 0 }))
-//        {
-//            return;
-//        }
-
-//        qint16 value;
-
-//        mPkgTx.append(com);
-
-//        value = GetParamValue(GB_PARAM_COR_U);
-//        mPkgTx.append(static_cast<uint8_t>(value / 10));
-//        mPkgTx.append(static_cast<uint8_t>(value % 10) * 10);
-
-//        value = GetParamValue(GB_PARAM_COR_I);
-//        mPkgTx.append(static_cast<uint8_t>(value >> 8));
-//        mPkgTx.append(static_cast<uint8_t>(value));
-//        mPkgTx.append(0);  // коррекция тока 2, старший байт
-//        mPkgTx.append(0);  // коррекция тока 2, младший байт
-
-//        Q_ASSERT(mPkgTx.size() == 7);  // команда + 6 байт данных
-//    }
-
-//    if (com == GB_COM_SET_COR_U_I)
-//    {
-//        if (!CheckSize(com, data.size(), { 3 }))
-//        {
-//            return;
-//        }
-
-//        // ответ на команду записи совпадает с запросом
-//        mPkgTx.append(com);
-//        mPkgTx.append(data);
-
-//        qint16 value;
-
-//        switch (data.at(0))
-//        {
-//        case 1:
-//            value = static_cast<qint16>(static_cast<qint8>(data.at(1))) * 10;
-//            value += static_cast<qint16>(static_cast<qint8>(data.at(2))) / 10;
-//            SetParamValue(GB_PARAM_COR_U, value);
-//            break;
-//        case 2:
-//            value = static_cast<qint16>(data.at(1)) << 8;
-//            value += static_cast<qint16>(data.at(2));
-//            SetParamValue(GB_PARAM_COR_I, value);
-//            break;
-//        case 4: SetParamValue(GB_PARAM_COR_U, 0); break;
-//        case 5: SetParamValue(GB_PARAM_COR_I, 0); break;
-
-//        default:
-//            // 3 - коррекция тока 2 для трешки
-//            // 6 - сброс коррекции тока 2 для трешки
-//            QString message = "Wrong data in command %1: %2";
-//            qWarning() << message.arg(com, 2, 16, QLatin1Char('0')).arg(data.at(0));
-//        }
-//    }
-//}
-
-
-///**
-// * *****************************************************************************
-// *
-// * @brief Обрабатывает команду чтения измерений.
-// * @param[in] Команда.
-// * @param[in] Данные.
-// *
-// * *****************************************************************************
-// */
-// void TBspRzskHf::HdlrComGlbx34(eGB_COM com, pkg_t &data)
-//{
-//    qint16 value = 0;
-
-//    Q_ASSERT(com == GB_COM_GET_MEAS);
-
-//    // передается код необходимых измерений
-//    if (!CheckSize(com, data.size(), { 1 }))
-//    {
-//        return;
-//    }
-
-//    // в запросе всегда 0, т.е. запрос всех измерений
-//    if (data.at(0) != 0)
-//    {
-//        QString message = "Wrong data in command %1: %2";
-//        qWarning() << message.arg(com, 2, 16, QLatin1Char('0')).arg(data.at(0));
-//        return;
-//    }
-
-//    mPkgTx.append(com);
-//    mPkgTx.append(data.at(0));
-
-//    mPkgTx.append(0);
-//    mPkgTx.append(0);
-
-//    value = getSpinBoxValue(m_measure.I);
-//    value += GetParamValue(GB_PARAM_COR_I);
-
-//    mPkgTx.append(static_cast<quint8>(value >> 8));
-//    mPkgTx.append(static_cast<quint8>(value));
-
-//    value = getSpinBoxValue(m_measure.U);
-//    value += GetParamValue(GB_PARAM_COR_U);
-//    mPkgTx.append(static_cast<quint8>(value / 10));
-//    mPkgTx.append(static_cast<quint8>((value % 10) * 10));
-
-//    // @todo Разобраться нужен ли Uз2, в меню не выводится
-//    mPkgTx.append(static_cast<quint8>(getSpinBoxValue(m_measure.Udef1)));
-//    mPkgTx.append(static_cast<quint8>(getSpinBoxValue(m_measure.Udef2)));
-//    mPkgTx.append(static_cast<quint8>(getSpinBoxValue(m_measure.Ucf1)));
-//    mPkgTx.append(static_cast<quint8>(getSpinBoxValue(m_measure.Ucf2)));
-//    mPkgTx.append(static_cast<quint8>(getSpinBoxValue(m_measure.Un1)));
-//    mPkgTx.append(static_cast<quint8>(getSpinBoxValue(m_measure.Un2)));
-
-//    value = getSpinBoxValue(m_measure.Sd);
-//    mPkgTx.append(static_cast<quint8>(value >> 8));
-//    mPkgTx.append(static_cast<quint8>(value));
-
-//    Q_ASSERT(mPkgTx.size() == 16);  // команда + 15 байт данных
-//}
-
-
-///**
-// * *****************************************************************************
-// *
-// * @brief Обрабатывает команду чтения/записи синхронизации времени.
-// * @note Эта же команда используется для чтения/записи всех параметров приемника с конфигуратора
-// * @param[in] Команда.
-// * @param[in] Данные.
-// *
-// * *****************************************************************************
-// */
-// void TBspRzskHf::HdlrComGlbx35(eGB_COM com, pkg_t &data)
-//{
-//    Q_ASSERT(com == GB_COM_GET_TIME_SINCHR || com == GB_COM_SET_TIME_SINCHR);
-
-//    if (com == GB_COM_GET_TIME_SINCHR)
-//    {
-//        // При считывании всех параметров передается один байт данных
-//        // При считывании синхронизации времени данных нет
-//        if (!CheckSize(com, data.size(), { 0, 1 }))
-//        {
-//            qDebug() << Qt::hex << com << ", " << data;
-//            return;
-//        }
-
-//        if (data.size() == 1)
-//        {
-//            mPkgTx.append(com);
-//            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_TIME_SYNCH_SRC)));
-//            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_U_OUT_NOM)));
-//            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_COMP_P400)));
-//            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_NET_ADDRESS)));
-//            mPkgTx.append(0);  // время перезапуска ПРМ, сек
-
-//            quint16 freq = GetParamValue(GB_PARAM_FREQ);
-//            mPkgTx.append(static_cast<uint8_t>(freq));
-//            mPkgTx.append(static_cast<uint8_t>(freq >> 8));
-
-//            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_NUM_OF_DEVICE)));
-//            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_OUT_CHECK)));  // 0 - выкл.
-//            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_WARN_THD)));
-
-//            mPkgTx.append(0);  // загрубление чувствительности по КЧ ПРМ_1
-//            mPkgTx.append(0);  // загрубление чувствительности по КЧ ПРМ_2
-
-//            qint16 corr_u = GetParamValue(GB_PARAM_COR_U);
-//            mPkgTx.append(corr_u / 10);
-//            mPkgTx.append((corr_u % 10) * 10);
-
-//            qint16 corr_i = GetParamValue(GB_PARAM_COR_I);
-//            mPkgTx.append(static_cast<uint8_t>(corr_i));
-//            mPkgTx.append(static_cast<uint8_t>(corr_i >> 8));
-//            mPkgTx.append(0);  // Коррекция значения тока 2, младший байт
-//            mPkgTx.append(0);  // Коррекция значения тока 2, старший байт
-
-//            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_PVZUE_PROTOCOL)));
-//            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_PVZUE_PARITY)));
-//            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_PVZUE_FAIL)));
-//            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_PVZUE_NOISE_THD)));
-//            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_PVZUE_NOISE_LVL)));
-//            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_PVZUE_AC_TYPE)));
-//            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_PVZUE_AC_PERIOD)));
-//            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_PVZUE_AC_PER_RE)));
-//            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_PVZU_AC_CORRECT)));
-//            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_ALARM_CF)));
-
-//            int len = 32 - mPkgTx.size();
-//            for (int i = 0; i < len; i++)
-//            {
-//                mPkgTx.append(0);
-//            }
-
-//            Q_ASSERT(mPkgTx.size() == 32);  // команда + 31 байт данных
-//        }
-//        else
-//        {
-//            mPkgTx.append(com);
-//            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_TIME_SYNCH_SRC)));
-//        }
-//    }
-
-//    if (com == GB_COM_SET_TIME_SINCHR)
-//    {
-//        if (!CheckSize(com, data.size(), { 1, 2 }))
-//        {
-//            return;
-//        }
-
-//        // ответ на команду записи совпадает с запросом
-//        mPkgTx.append(com);
-//        mPkgTx.append(data);
-
-//        SetParamValue(GB_PARAM_TIME_SYNCH_SRC, data.at(0));
-//    }
-//}
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду чтения несиправностей и предупреждений.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void TBspRzskHf::HdlrComGlbx31(eGB_COM com, pkg_t &data)
+{
+    bool    ok;
+    quint16 def_alarm = getLineEditValue(stateDef.fault).toUInt(&ok, 16);
+    quint16 def_warn  = getLineEditValue(stateDef.warning).toUInt(&ok, 16);
+    quint16 prm_alarm = getLineEditValue(statePrm.fault).toUInt(&ok, 16);
+    quint16 prm_warn  = getLineEditValue(statePrm.warning).toUInt(&ok, 16);
+    quint16 prd_alarm = getLineEditValue(statePrd.fault).toUInt(&ok, 16);
+    quint16 glb_alarm = getLineEditValue(stateGlb.fault).toUInt(&ok, 16);
+    quint16 glb_warn  = getLineEditValue(stateGlb.warning).toUInt(&ok, 16);
+
+    Q_ASSERT(com == GB_COM_GET_FAULT);
+
+    if (!CheckSize(com, data.size(), { 0 }))
+    {
+        return;
+    }
+
+    mPkgTx.append(com);
+    mPkgTx.append(static_cast<uint8_t>(def_alarm >> 8));
+    mPkgTx.append(static_cast<uint8_t>(def_alarm));
+    mPkgTx.append(static_cast<uint8_t>(def_warn >> 8));
+    mPkgTx.append(static_cast<uint8_t>(def_warn));
+
+    mPkgTx.append(static_cast<uint8_t>(prm_alarm >> 8));
+    mPkgTx.append(static_cast<uint8_t>(prm_alarm));
+    mPkgTx.append(static_cast<uint8_t>(prm_warn >> 8));
+    mPkgTx.append(static_cast<uint8_t>(prm_warn));
+
+    mPkgTx.append(static_cast<uint8_t>(prd_alarm >> 8));
+    mPkgTx.append(static_cast<uint8_t>(prd_alarm));
+    mPkgTx.append(0);
+    mPkgTx.append(0);
+
+    mPkgTx.append(static_cast<uint8_t>(glb_alarm >> 8));
+    mPkgTx.append(static_cast<uint8_t>(glb_alarm));
+    mPkgTx.append(static_cast<uint8_t>(glb_warn >> 8));
+    mPkgTx.append(static_cast<uint8_t>(glb_warn));
+
+    // @todo Разобраться что за коды удаленных неисправностей, в меню их нет
+
+    mPkgTx.append(0);  // код неисправности удаленной защиты 02
+    mPkgTx.append(0);  // код неисправности удаленной защиты 01
+    mPkgTx.append(0);  // код неисправности удаленного приемника 02
+    mPkgTx.append(0);  // код неисправности удаленного приемника 01
+
+    mPkgTx.append(0);  // код неисправности удаленного передатчика 02
+    mPkgTx.append(0);  // код неисправности удаленнного передатчика 01
+    mPkgTx.append(0);  // код неисправности удаленного общий 02
+    mPkgTx.append(0);  // код неисправности удаленного общий 01
+
+    Q_ASSERT(mPkgTx.size() == 25);  // команда + 24 байт данных
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду чтения/записи даты и времени.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void TBspRzskHf::HdlrComGlbx32(eGB_COM com, pkg_t &data)
+{
+    uint16_t msec = dt.time().msec();
+
+    Q_ASSERT(com == GB_COM_GET_TIME || com == GB_COM_SET_TIME);
+
+    if (com == GB_COM_GET_TIME)
+    {
+        // C ПИ передается флаг запроса сообщения для передачи в АСУ (0..3), с ПК нет данных
+        // В Р400м флаг запроса не обрабатывается
+        if (!CheckSize(com, data.size(), { 0, 1 }))
+        {
+            return;
+        }
+
+        // @todo Добавить обработчик команды запроса времени с байтом чтения журналов
+        // Для запроса журналов передается один байт данных:
+        // 0 - передать только дату и время
+        // 1 - повторить последнюю запись журнала
+        // 2 - передать новую запись журнала (предыдущая принята)
+        // иначе в ответ возвращается команда ошибки 55 AA FF 00 FF
+
+        mPkgTx.append(com);
+        mPkgTx.append(int2bcd(dt.date().year() - 2000));
+        mPkgTx.append(int2bcd(dt.date().month()));
+        mPkgTx.append(int2bcd(dt.date().day()));
+        mPkgTx.append(int2bcd(dt.time().hour()));
+        mPkgTx.append(int2bcd(dt.time().minute()));
+        mPkgTx.append(int2bcd(dt.time().second()));
+        mPkgTx.append(static_cast<uint8_t>(msec));
+        mPkgTx.append(static_cast<uint8_t>(msec >> 8));
+
+        Q_ASSERT(mPkgTx.size() == 9);  // команда + 8 байт данных
+    }
+
+    if (com == GB_COM_SET_TIME)
+    {
+        // с ПК передается 6 байт, без мс / c МК передается 9 байт
+        if (!CheckSize(com, data.size(), { 6, 9 }))
+        {
+            return;
+        }
+
+        // ответ на команду записи совпадает с запросом
+        mPkgTx.append(com);
+        mPkgTx.append(data);
+
+        // @todo Добавить обработку флага источника синхронизации времени
+        // При установке времени надо проверить флаг источника:
+        // - 0, изменение с клавиатуры/пк
+        // - 1, изменение по АСУ, надо учитывать параметр "Синхр. времени"
+
+        quint16 year  = bcd2int(data.takeFirst()) + 2000;
+        quint8  month = bcd2int(data.takeFirst());
+        quint8  day   = bcd2int(data.takeFirst());
+
+        quint8 hour   = bcd2int(data.takeFirst());
+        quint8 minute = bcd2int(data.takeFirst());
+        quint8 second = bcd2int(data.takeFirst());
+
+        quint16 ms = 0;
+        if (data.size() >= 3)
+        {
+            ms = data.takeFirst();
+            ms += static_cast<quint16>(data.takeFirst()) << 8;
+
+            quint8 source = data.takeFirst();
+            if (source > 1)
+            {
+                qWarning() << kMsgTimeSourceError.arg(source);
+            }
+        }
+
+        dt.setDate(QDate(year, month, day));
+        dt.setTime(QTime(hour, minute, second, ms));
+    }
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду чтения измерений.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void TBspRzskHf::HdlrComGlbx34(eGB_COM com, pkg_t &data)
+{
+    qint16 value = 0;
+
+    Q_ASSERT(com == GB_COM_GET_MEAS);
+
+    // передается код необходимых измерений
+    if (!CheckSize(com, data.size(), { 1 }))
+    {
+        return;
+    }
+
+    // в запросе всегда 0, т.е. запрос всех измерений
+    if (data.at(0) != 0)
+    {
+        QString message = "Wrong data in command %1: %2";
+        qWarning() << message.arg(com, 2, 16, QLatin1Char('0')).arg(data.at(0));
+        return;
+    }
+
+    mPkgTx.append(com);
+    mPkgTx.append(data.at(0));
+
+    value = getSpinBoxValue(m_measure.R);
+    mPkgTx.append(static_cast<quint8>(value >> 8));
+    mPkgTx.append(static_cast<quint8>(value));
+
+    value = getSpinBoxValue(m_measure.I);
+    value += GetParamValue(GB_PARAM_COR_I);
+    mPkgTx.append(static_cast<quint8>(value >> 8));
+    mPkgTx.append(static_cast<quint8>(value));
+
+    value = getSpinBoxValue(m_measure.U);
+    value += GetParamValue(GB_PARAM_COR_U);
+    mPkgTx.append(static_cast<quint8>(value / 10));
+    mPkgTx.append(static_cast<quint8>((value % 10) * 10));
+
+    // @todo Разобраться нужен ли Uз2, в меню не выводится
+    mPkgTx.append(static_cast<quint8>(getSpinBoxValue(m_measure.Udef1)));
+    mPkgTx.append(static_cast<quint8>(getSpinBoxValue(m_measure.Udef2)));
+    mPkgTx.append(static_cast<quint8>(getSpinBoxValue(m_measure.Ucf1)));
+    mPkgTx.append(static_cast<quint8>(getSpinBoxValue(m_measure.Ucf2)));
+
+    // В БСП: Коэфф. использ. динамич. диапазона ПРМ
+    mPkgTx.append(static_cast<quint8>(getSpinBoxValue(m_measure.Un1)));  // K_Din;
+    // В БСП: Коэфф. переполнения АЦП
+    mPkgTx.append(static_cast<quint8>(getSpinBoxValue(m_measure.Un2)));  // K_Over
+    // В БСП: Вероятность пропуска команд
+    mPkgTx.append(0);  // P_PA_High
+    mPkgTx.append(0);  // P_PA_Low
+
+    Q_ASSERT(mPkgTx.size() == 16);  // команда + 15 байт данных
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду чтения/записи синхронизации времени.
+ * @note Эта же команда используется для чтения/записи всех параметров приемника с конфигуратора
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void TBspRzskHf::HdlrComGlbx35(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_GET_TIME_SINCHR || com == GB_COM_SET_TIME_SINCHR);
+
+    if (com == GB_COM_GET_TIME_SINCHR)
+    {
+        // При считывании всех параметров передается один байт данных
+        // При считывании синхронизации времени данных нет
+        if (!CheckSize(com, data.size(), { 0, 1 }))
+        {
+            qDebug() << Qt::hex << com << ", " << data;
+            return;
+        }
+
+        if (data.size() == 1)
+        {
+            mPkgTx.append(com);
+            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_IN_DEC, 1)));
+            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_COM_PRM_KEEP)));
+            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_COM_PRD_KEEP)));
+            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_IN_DEC, 2)));
+            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_TIME_RERUN)));
+            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_OUT_CHECK)));
+            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_WARN_THD_CF)));
+            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_DETECTOR)));
+
+            qint16 corr_u = GetParamValue(GB_PARAM_COR_U);
+            mPkgTx.append(corr_u / 10);
+            mPkgTx.append((corr_u % 10) * 10);
+
+            qint16 corr_i = GetParamValue(GB_PARAM_COR_I);
+            mPkgTx.append(static_cast<uint8_t>(corr_i));
+            mPkgTx.append(static_cast<uint8_t>(corr_i >> 8));
+            mPkgTx.append(0);  // Коррекция значения тока 2, младший байт
+            mPkgTx.append(0);  // Коррекция значения тока 2, старший байт
+
+            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_TIME_SYNCH)));
+            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_NET_ADDRESS)));
+            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_NUM_OF_DEVICE)));
+
+            quint16 freq = GetParamValue(GB_PARAM_FREQ);
+            mPkgTx.append(static_cast<uint8_t>(freq));
+            mPkgTx.append(static_cast<uint8_t>(freq >> 8));
+
+            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_NUM_OF_DEVICES)));
+            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_COMP_RZSK)));
+
+            int len = 32 - mPkgTx.size();
+            for (int i = 0; i < len; i++)
+            {
+                mPkgTx.append(0);
+            }
+
+            Q_ASSERT(mPkgTx.size() == 32);  // команда + 31 байт данных
+        }
+        else
+        {
+            mPkgTx.append(com);
+            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_TIME_SYNCH)));
+            mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_DETECTOR)));
+
+            Q_ASSERT(mPkgTx.size() == 3);  // команда + 2 байт данных
+        }
+    }
+
+    if (com == GB_COM_SET_TIME_SINCHR)
+    {
+        if (!CheckSize(com, data.size(), { 1, 2 }))
+        {
+            return;
+        }
+
+        // ответ на команду записи совпадает с запросом
+        mPkgTx.append(com);
+        mPkgTx.append(data);
+
+        int param = (data.size() == 1) ? 1 : data.at(0);
+
+        switch (param)
+        {
+        case 1: SetParamValue(GB_PARAM_TIME_SYNCH, data.at(0)); break;
+        case 2: SetParamValue(GB_PARAM_DETECTOR, data.at(0)); break;
+        default:
+            {
+                QString message("Wrong value in command %1: %2");
+                qWarning() << message.arg(com, 2, 16, QLatin1Char('0')).arg(data.at(0));
+            }
+        }
+    }
+}
 
 ///**
 // * *****************************************************************************
@@ -1982,7 +1901,7 @@ void TBspRzskHf::HdlrComGlbx3F(eGB_COM com, pkg_t &data)
     mPkgTx.append(static_cast<quint8>(vers_bsp_mcu));
     mPkgTx.append(static_cast<quint8>(vers_bsp_dsp >> 8));
     mPkgTx.append(static_cast<quint8>(vers_bsp_dsp));
-    mPkgTx.append(GetParamValue(GB_PARAM_COMP_P400));
+    mPkgTx.append(GetParamValue(GB_PARAM_COMP_RZSK));
     mPkgTx.append(static_cast<quint8>(getSpinBoxValue(mDevice.versionBsk1PrdPlis)));
     mPkgTx.append(static_cast<quint8>(getSpinBoxValue(mDevice.versionBsk2PrdPlis)));
     mPkgTx.append(static_cast<quint8>(getSpinBoxValue(mDevice.versionBsk1PrmPlis)));
@@ -2012,11 +1931,13 @@ void TBspRzskHf::SlotChangeCompatibility()
         mDefEnable.setChecked(true);
         mNumComPrd.setValue(4);
         mNumComPrm.setValue(4);
+        SetParamValue(GB_PARAM_NUM_OF_DEVICES, GB_NUM_DEVICES_2);
         break;
     case GB_COMP_RZSK_3E8:
         mDefEnable.setChecked(false);
         mNumComPrd.setValue(8);
         mNumComPrm.setValue(8);
+        SetParamValue(GB_PARAM_NUM_OF_DEVICES, GB_NUM_DEVICES_3);
         break;
 
     case GB_COMP_RZSK_MAX:

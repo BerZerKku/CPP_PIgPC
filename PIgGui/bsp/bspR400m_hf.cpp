@@ -93,8 +93,6 @@ void TBspR400mHf::InitComMap()
 //
 void TBspR400mHf::InitParam()
 {
-    setComboBoxValue(GB_PARAM_COMP_P400, GB_COMP_R400M_LINER);
-
     setSpinBoxValue(mDevice.versionBspMcu, 0xF233);
     setSpinBoxValue(mDevice.versionBspDsp, 0x5833);
     setSpinBoxValue(mDevice.versionBszPlis, 0x52);
@@ -112,7 +110,7 @@ void TBspR400mHf::InitParam()
     setSpinBoxValue(&mStateFaultDeviceNumber, 0);
 
     // Параметры интерфейса
-    setSpinBoxValue(GB_PARAM_NET_ADDRESS, 17);
+    SetParamValue(GB_PARAM_NET_ADDRESS, 17);
 
     // Параметры общие
     SetParamValue(GB_PARAM_COMP_P400, GB_COMP_R400M_R400);
