@@ -27,10 +27,6 @@ public:
     explicit TBspRzskHf(QTreeWidget *tree, QWidget *parent = nullptr);
 
 private:
-    QSpinBox mPrdLightPA;           // светодиоды БСК передатчика
-    QSpinBox mPrmLightPA;           // светодиоды БСК приемника
-    QSpinBox mExternalInputsState;  // внешние входы КВП
-
     void InitComMap() override;
     void InitParam() override;
 
@@ -75,7 +71,7 @@ private:
     void HdlrComGlbx3E(eGB_COM com, pkg_t &data) override;
     void HdlrComGlbx3F(eGB_COM com, pkg_t &data) override;
 
-    //    void HdlrComRegx72(eGB_COM com, pkg_t &data) override;
+    void HdlrComRegx72(eGB_COM com, pkg_t &data) override;
     void HdlrComRegx7E(eGB_COM com, pkg_t &data) override;
 
 private slots:

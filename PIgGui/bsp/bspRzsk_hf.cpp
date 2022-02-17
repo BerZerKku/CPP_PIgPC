@@ -60,11 +60,11 @@ void TBspRzskHf::InitComMap()
     mComMap.insert(0x3E, &Bsp::HdlrComGlbx3E);  // чтение сигналов в тесте
     mComMap.insert(0x3f, &Bsp::HdlrComGlbx3F);  // чтение информации об устройстве
 
-    mComMap.insert(0x70, &Bsp::HdlrComRegx70);  // запись режима "Выведен"
-    mComMap.insert(0x71, &Bsp::HdlrComRegx71);  // запись режима "Введен"
-    //    mComMap.insert(0x72, &Bsp::HdlrComRegx72);  // запись команды управления
-    mComMap.insert(0x7D, &Bsp::HdlrComRegx7D);  // запись режима "Тест 1 (ПРМ)"
-    mComMap.insert(0x7E, &Bsp::HdlrComRegx7E);  // запись режима "Тест 1 (ПРД)"
+    mComMap.insert(0x70, &Bsp::HdlrComRegx70);  // смена режима на "Выведен"
+    mComMap.insert(0x71, &Bsp::HdlrComRegx71);  // смена режима на "Введен"
+    mComMap.insert(0x72, &Bsp::HdlrComRegx72);  // команда управления
+    mComMap.insert(0x7D, &Bsp::HdlrComRegx7D);  // смена режима на "Тест 2 (ПРМ)"
+    mComMap.insert(0x7E, &Bsp::HdlrComRegx7E);  // смена режима на "Тест 1 (ПРД)"
 
     mComMap.insert(0x80, &Bsp::HdlrComDefx00);  // запись параметров защиты с конфигуратора
     mComMap.insert(0x81, &Bsp::HdlrComDefx01);  // запись типа защиты
@@ -76,6 +76,8 @@ void TBspRzskHf::InitComMap()
     mComMap.insert(0x87, &Bsp::HdlrComDefx07);  // запись количества полупериодов
     mComMap.insert(0x89, &Bsp::HdlrComDefx09);  // запись порога предупреждения по РЗ
     mComMap.insert(0x8A, &Bsp::HdlrComDefx0A);  // запись одностороннего режима
+
+    mComMap.insert(0x9A, &Bsp::HdlrComRegx9A);  // команда сброса индикации
 
     mComMap.insert(0xB0, &Bsp::HdlrComGlbx30);  // запись общих параметров с конфигуратора
     mComMap.insert(0xB2, &Bsp::HdlrComGlbx32);  // запись времени
@@ -463,6 +465,11 @@ void TBspRzskHf::crtTreeState()
     Bsp::crtTreeState(top, "Передатчик", statePrd);
 
     item = new QTreeWidgetItem(top);
+    item->setText(0, kCodec->toUnicode("Управление"));
+    top->insertChild(0, item);
+    mTree->setItemWidget(item, 1, &mControl);
+
+    item = new QTreeWidgetItem(top);
     item->setText(0, kCodec->toUnicode("Светодиоды БСК ПРМ"));
     top->insertChild(0, item);
     mPrmLightPA.setMinimum(0x00);
@@ -713,16 +720,8 @@ void TBspRzskHf::FillComboBoxListControl()
     mControl.addItem(kCodec->toUnicode("7 - Вызов"), 7);
     mControl.addItem(kCodec->toUnicode("8 - Наладочный пуск вкл."), 8);
     mControl.addItem(kCodec->toUnicode("9 - Наладочный пуск выкл."), 9);
-    mControl.addItem(kCodec->toUnicode("10 - Пуск АК удаленный"), 10);
-    mControl.addItem(kCodec->toUnicode("11 - Сброс удаленного (1)"), 11);
-    mControl.addItem(kCodec->toUnicode("12 - Сброс удаленного (2)"), 12);
     mControl.addItem(kCodec->toUnicode("13 - Пуск удаленного (3)"), 13);
     mControl.addItem(kCodec->toUnicode("14 - Режим АК"), 14);
-    mControl.addItem(kCodec->toUnicode("15 - Сброс удаленного (3)"), 15);
-    mControl.addItem(kCodec->toUnicode("16 - Пуск уд. МАН (1)"), 16);
-    mControl.addItem(kCodec->toUnicode("17 - Пуск уд. МАН (2)"), 17);
-    mControl.addItem(kCodec->toUnicode("18 - Пуск уд. МАН (3)"), 18);
-    mControl.addItem(kCodec->toUnicode("19 - Пуск удаленных МАН"), 19);
 }
 
 
@@ -832,90 +831,6 @@ void TBspRzskHf::HdlrComDefx00(eGB_COM com, pkg_t &data)
         index++;  // односторонний режимSetParamValue(GB_PARAM_DEF_ONE_SIDE)));
     }
 }
-
-
-///**
-// * *****************************************************************************
-// *
-// * @brief Обрабатывает команду чтения/записи количества аппаратов в линии.
-// * @param[in] Команда.
-// * @param[in] Данные.
-// *
-// * *****************************************************************************
-// */
-// void TBspRzskHf::HdlrComDefx02(eGB_COM com, pkg_t &data)
-//{
-//    Q_ASSERT(com == GB_COM_DEF_GET_LINE_TYPE || com == GB_COM_DEF_SET_LINE_TYPE);
-
-//    if (com == GB_COM_DEF_GET_LINE_TYPE)
-//    {
-//        if (!CheckSize(com, data.size(), { 0 }))
-//        {
-//            return;
-//        }
-
-//        mPkgTx.append(com);
-//        mPkgTx.append(getComboBoxValue(GB_PARAM_NUM_OF_DEVICES));
-
-//        Q_ASSERT(mPkgTx.size() == 2);  // команда + байт данных
-//    }
-
-//    if (com == GB_COM_DEF_SET_LINE_TYPE)
-//    {
-//        if (!CheckSize(com, data.size(), { 1 }))
-//        {
-//            return;
-//        }
-
-//        // ответ на команду записи совпадает с запросом
-//        mPkgTx.append(com);
-//        mPkgTx.append(data);
-
-//        setComboBoxValue(GB_PARAM_NUM_OF_DEVICES, data.at(0));
-//    }
-//}
-
-
-///**
-// * *****************************************************************************
-// *
-// * @brief Обрабатывает команду чтения/записи допустимого времени без манипуляции.
-// * @param[in] Команда.
-// * @param[in] Данные.
-// *
-// * *****************************************************************************
-// */
-// void TBspRzskHf::HdlrComDefx03(eGB_COM com, pkg_t &data)
-//{
-//    Q_ASSERT(com == GB_COM_DEF_GET_T_NO_MAN || com == GB_COM_DEF_SET_T_NO_MAN);
-
-//    if (com == GB_COM_DEF_GET_T_NO_MAN)
-//    {
-//        if (!CheckSize(com, data.size(), { 0 }))
-//        {
-//            return;
-//        }
-
-//        mPkgTx.append(com);
-//        mPkgTx.append(uint8_t(GetParamValue(GB_PARAM_TIME_NO_MAN)));
-
-//        Q_ASSERT(mPkgTx.size() == 2);  // команда + байт данных
-//    }
-
-//    if (com == GB_COM_DEF_SET_T_NO_MAN)
-//    {
-//        if (!CheckSize(com, data.size(), { 1 }))
-//        {
-//            return;
-//        }
-
-//        // ответ на команду записи совпадает с запросом
-//        mPkgTx.append(com);
-//        mPkgTx.append(data);
-
-//        SetParamValue(GB_PARAM_TIME_NO_MAN, data.at(0));
-//    }
-//}
 
 
 /**
@@ -1050,48 +965,6 @@ void TBspRzskHf::HdlrComDefx07(eGB_COM com, pkg_t &data)
         SetParamValue(GB_PARAM_PRM_TYPE, data.at(0));
     }
 }
-
-
-///**
-// * *****************************************************************************
-// *
-// * @brief Обрабатывает команду чтения/записи смещения частоты ПРД
-// * @param[in] Команда.
-// * @param[in] Данные.
-// *
-// * *****************************************************************************
-// */
-// void TBspRzskHf::HdlrComDefx08(eGB_COM com, pkg_t &data)
-//{
-//    Q_ASSERT(com == GB_COM_DEF_GET_FREQ_PRD || com == GB_COM_DEF_SET_FREQ_PRD);
-
-//    if (com == GB_COM_DEF_GET_FREQ_PRD)
-//    {
-//        if (!CheckSize(com, data.size(), { 0 }))
-//        {
-//            return;
-//        }
-
-//        mPkgTx.append(com);
-//        mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_FREQ_PRD)));
-
-//        Q_ASSERT(mPkgTx.size() == 2);  // команда + 1 байт данных
-//    }
-
-//    if (com == GB_COM_DEF_SET_FREQ_PRD)
-//    {
-//        if (!CheckSize(com, data.size(), { 1 }))
-//        {
-//            return;
-//        }
-
-//        // ответ на команду записи совпадает с запросом
-//        mPkgTx.append(com);
-//        mPkgTx.append(data);
-
-//        SetParamValue(GB_PARAM_FREQ_PRD, data.at(0));
-//    }
-//}
 
 
 /**
@@ -2012,95 +1885,44 @@ void TBspRzskHf::SlotChangeCompatibility()
 }
 
 
-///**
-// * *****************************************************************************
-// *
-// * @brief Обрабатывает команду установки режима "Выведен".
-// * @param[in] Команда.
-// * @param[in] Данные.
-// *
-// * *****************************************************************************
-// */
-// void TBspRzskHf::HdlrComRegx70(eGB_COM com, pkg_t &data)
-//{
-//    Q_ASSERT(com == GB_COM_SET_REG_DISABLED);
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду управления.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void TBspRzskHf::HdlrComRegx72(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_SET_CONTROL);
 
-//    if (!CheckSize(com, data.size(), { 0 }))
-//    {
-//        return;
-//    }
+    if (!CheckSize(com, data.size(), { 1 }))
+    {
+        return;
+    }
 
-//    // ответ на команду записи совпадает с запросом
-//    mPkgTx.append(com);
-//    mPkgTx.append(data);
+    // ответ на команду записи совпадает с запросом
+    mPkgTx.append(com);
+    mPkgTx.append(data);
 
-//    setComboBoxValue(stateGlb.regime, eGB_REGIME::GB_REGIME_DISABLED);
-//}
+    uint8_t control = data.takeFirst();
 
+    if (control == 8)
+    {
+        setComboBoxValue(stateDef.state, 7);  // Пуск налад. вкл
+    }
+    else if (control == 9)
+    {
+        setComboBoxValue(stateDef.state, 1);  // Пуск налад. выкл
+    }
 
-///**
-// * *****************************************************************************
-// *
-// * @brief Обрабатывает команду установки режима "Введен".
-// * @param[in] Команда.
-// * @param[in] Данные.
-// *
-// * *****************************************************************************
-// */
-// void TBspRzskHf::HdlrComRegx71(eGB_COM com, pkg_t &data)
-//{
-//    Q_ASSERT(com == GB_COM_SET_REG_ENABLED);
-
-//    if (!CheckSize(com, data.size(), { 0 }))
-//    {
-//        return;
-//    }
-
-//    // ответ на команду записи совпадает с запросом
-//    mPkgTx.append(com);
-//    mPkgTx.append(data);
-
-//    setComboBoxValue(stateGlb.regime, eGB_REGIME::GB_REGIME_ENABLED);
-//}
-
-
-///**
-// * *****************************************************************************
-// *
-// * @brief Обрабатывает команду управления.
-// * @param[in] Команда.
-// * @param[in] Данные.
-// *
-// * *****************************************************************************
-// */
-// void TBspRzskHf::HdlrComRegx72(eGB_COM com, pkg_t &data)
-//{
-//    Q_ASSERT(com == GB_COM_SET_CONTROL);
-
-//    if (!CheckSize(com, data.size(), { 1 }))
-//    {
-//        return;
-//    }
-
-//    // ответ на команду записи совпадает с запросом
-//    mPkgTx.append(com);
-//    mPkgTx.append(data);
-
-//    uint8_t control = data.takeFirst();
-//    if (control >= mControl.count())
-//    {
-//        QString message("Wrong value in command %1: %2");
-//        qWarning() << message.arg(com, 2, 16, QLatin1Char('0')).arg(control);
-//    }
-
-//    if (control == 8)
-//    {
-//        setComboBoxValue(stateDef.state, 7);  // Пуск налад. вкл
-//    }
-//    else if (control == 9)
-//    {
-//        setComboBoxValue(stateDef.state, 1);  // Пуск налад. выкл
-//    }
-
-//    mControl.setCurrentIndex(mControl.findData(control));
-//}
+    int index = mControl.findData(control);
+    if (index < 0)
+    {
+        QString message("Wrong value in command %1: %2");
+        qWarning() << message.arg(com, 2, 16, QLatin1Char('0')).arg(control);
+    }
+    mControl.setCurrentIndex(index);
+}

@@ -166,6 +166,9 @@ protected:
     QRegExp          errRegExp;
     QRegExpValidator errValidator;
     QTimer           mTimerSignalSendFinished;
+    QSpinBox         mPrdLightPA;           // светодиоды БСК передатчика
+    QSpinBox         mPrmLightPA;           // светодиоды БСК приемника
+    QSpinBox         mExternalInputsState;  // внешние входы КВП
 
     void         InitClock();
     virtual void InitComMap();
@@ -294,6 +297,8 @@ public:
     virtual void HdlrComRegx74(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
     void         HdlrComRegx7D(eGB_COM com, pkg_t &data);
     virtual void HdlrComRegx7E(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
+
+    void HdlrComRegx9A(eGB_COM com, pkg_t &data);
 
     virtual void HdlrComJrnxC1(eGB_COM com, pkg_t &data);
     virtual void HdlrComJrnxC2(eGB_COM com, pkg_t &data);
