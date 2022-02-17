@@ -57,11 +57,14 @@ void TBspRzskHf::InitComMap()
     mComMap.insert(0x3B, &Bsp::HdlrComGlbx3B);  // чтение номера аппарата
     mComMap.insert(0x3C, &Bsp::HdlrComGlbx3C);  // чтение порога предупр. КЧ и загр. чувств.
     mComMap.insert(0x3D, &Bsp::HdlrComGlbx3D);  // чтение контроля выхода
+    mComMap.insert(0x3E, &Bsp::HdlrComGlbx3E);  // чтение сигналов в тесте
     mComMap.insert(0x3f, &Bsp::HdlrComGlbx3F);  // чтение информации об устройстве
 
     mComMap.insert(0x70, &Bsp::HdlrComRegx70);  // запись режима "Выведен"
     mComMap.insert(0x71, &Bsp::HdlrComRegx71);  // запись режима "Введен"
     //    mComMap.insert(0x72, &Bsp::HdlrComRegx72);  // запись команды управления
+    mComMap.insert(0x7D, &Bsp::HdlrComRegx7D);  // запись режима "Тест 1 (ПРМ)"
+    mComMap.insert(0x7E, &Bsp::HdlrComRegx7E);  // запись режима "Тест 1 (ПРД)"
 
     mComMap.insert(0x80, &Bsp::HdlrComDefx00);  // запись параметров защиты с конфигуратора
     mComMap.insert(0x81, &Bsp::HdlrComDefx01);  // запись типа защиты
@@ -87,10 +90,14 @@ void TBspRzskHf::InitComMap()
     mComMap.insert(0xBC, &Bsp::HdlrComGlbx3C);  // запись порога предупр. КЧ и загр. чувств.
     mComMap.insert(0xBD, &Bsp::HdlrComGlbx3D);  // запись контроля выхода
 
-    //    mComMap.insert(0xC1, &Bsp::HdlrComJrnxC1);  // чтение количества записей в журнале защиты
-    //    mComMap.insert(0xC2, &Bsp::HdlrComJrnxC2);  // чтение записей журнала защиты
-    //    mComMap.insert(0xF1, &Bsp::HdlrComJrnxF1);  // чтение количества записей в журнале событий
-    //    mComMap.insert(0xF2, &Bsp::HdlrComJrnxF2);  // чтение записей журнала событий
+    mComMap.insert(0xC1, &Bsp::HdlrComJrnxC1);  // чтение количества записей в журнале защиты
+    mComMap.insert(0xC2, &Bsp::HdlrComJrnxC2);  // чтение записей журнала защиты
+    mComMap.insert(0xD1, &Bsp::HdlrComJrnxD1);  // чтение количества записей в журнале прм
+    mComMap.insert(0xD2, &Bsp::HdlrComJrnxD2);  // чтение записей журнала прм
+    mComMap.insert(0xE1, &Bsp::HdlrComJrnxE1);  // чтение количества записей в журнале прд
+    mComMap.insert(0xE2, &Bsp::HdlrComJrnxE2);  // чтение записей журнала прд
+    mComMap.insert(0xF1, &Bsp::HdlrComJrnxF1);  // чтение количества записей в журнале событий
+    mComMap.insert(0xF2, &Bsp::HdlrComJrnxF2);  // чтение записей журнала событий
 }
 
 
@@ -166,8 +173,10 @@ void TBspRzskHf::InitParam()
     setSpinBoxValue(m_measure.Un1, -7);
     setSpinBoxValue(m_measure.Un2, 7);
 
-    mJrnDefCounter.setValue(15);
     mJrnGlbCounter.setValue(15);
+    mJrnDefCounter.setValue(16);
+    mJrnPrmCounter.setValue(17);
+    mJrnPrdCounter.setValue(18);
 }
 
 
@@ -506,6 +515,26 @@ void TBspRzskHf::crtTest()
     QTreeWidgetItem *item;
     mTree->insertTopLevelItem(mTree->topLevelItemCount(), top);
     top->setText(0, kCodec->toUnicode("Тест"));
+
+    item = new QTreeWidgetItem(top);
+    top->addChild(item);
+    item->setText(0, kCodec->toUnicode("Сигналы КЧ1"));
+    mTree->setItemWidget(item, 1, &mTestCf1Signal);
+
+    item = new QTreeWidgetItem(top);
+    top->addChild(item);
+    item->setText(0, kCodec->toUnicode("Сигналы РЗ1"));
+    mTree->setItemWidget(item, 1, &mTestRz1Signal);
+
+    item = new QTreeWidgetItem(top);
+    top->addChild(item);
+    item->setText(0, kCodec->toUnicode("Сигналы КЧ2"));
+    mTree->setItemWidget(item, 1, &mTestCf2Signal);
+
+    item = new QTreeWidgetItem(top);
+    top->addChild(item);
+    item->setText(0, kCodec->toUnicode("Сигналы РЗ2"));
+    mTree->setItemWidget(item, 1, &mTestRz2Signal);
 }
 
 
@@ -533,6 +562,16 @@ void TBspRzskHf::crtJrn()
     ltop->setText(0, kCodec->toUnicode("Журнал защиты"));
     top->insertChild(0, ltop);
     crtJrnDef(ltop);
+
+    ltop = new QTreeWidgetItem(top);
+    ltop->setText(0, kCodec->toUnicode("Журнал приемника"));
+    top->insertChild(0, ltop);
+    crtJrnPrm(ltop);
+
+    ltop = new QTreeWidgetItem(top);
+    ltop->setText(0, kCodec->toUnicode("Журнал передатчика"));
+    top->insertChild(0, ltop);
+    crtJrnPrd(ltop);
 }
 
 
@@ -551,13 +590,11 @@ void TBspRzskHf::crtJrnDef(QTreeWidgetItem *top)
     item = new QTreeWidgetItem(top);
     item->setText(0, kCodec->toUnicode("Количество записей"));
     mTree->setItemWidget(item, 1, &mJrnDefCounter);
-    mJrnDefCounter.setRange(0, 1024);
+    mJrnDefCounter.setRange(0, 256);
 
     item = new QTreeWidgetItem(top);
     item->setText(0, kCodec->toUnicode("Переполнение"));
     mTree->setItemWidget(item, 1, &mJrnDefOverflow);
-
-    top->setExpanded(false);
 }
 
 
@@ -576,16 +613,61 @@ void TBspRzskHf::crtJrnGlb(QTreeWidgetItem *top)
     item = new QTreeWidgetItem(top);
     item->setText(0, kCodec->toUnicode("Количество записей"));
     mTree->setItemWidget(item, 1, &mJrnGlbCounter);
-    mJrnGlbCounter.setRange(0, 1024);
+    mJrnGlbCounter.setRange(0, 256);
 
     item = new QTreeWidgetItem(top);
     item->setText(0, kCodec->toUnicode("Переполнение"));
     mTree->setItemWidget(item, 1, &mJrnGlbOverflow);
-
-    top->setExpanded(false);
 }
 
 
+/**
+ * *****************************************************************************
+ *
+ * @brief Создает журнал приемника.
+ * @param[in] top Верхний уровень.
+ *
+ * *****************************************************************************
+ */
+void TBspRzskHf::crtJrnPrm(QTreeWidgetItem *top)
+{
+    QTreeWidgetItem *item;
+
+    item = new QTreeWidgetItem(top);
+    item->setText(0, kCodec->toUnicode("Количество записей"));
+    mTree->setItemWidget(item, 1, &mJrnPrmCounter);
+    mJrnPrmCounter.setRange(0, 256);
+
+    item = new QTreeWidgetItem(top);
+    item->setText(0, kCodec->toUnicode("Переполнение"));
+    mTree->setItemWidget(item, 1, &mJrnPrmOverflow);
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Создает журнал передатчика.
+ * @param[in] top Верхний уровень.
+ *
+ * *****************************************************************************
+ */
+void TBspRzskHf::crtJrnPrd(QTreeWidgetItem *top)
+{
+    QTreeWidgetItem *item;
+
+    item = new QTreeWidgetItem(top);
+    item->setText(0, kCodec->toUnicode("Количество записей"));
+    mTree->setItemWidget(item, 1, &mJrnPrdCounter);
+    mJrnPrdCounter.setRange(0, 256);
+
+    item = new QTreeWidgetItem(top);
+    item->setText(0, kCodec->toUnicode("Переполнение"));
+    mTree->setItemWidget(item, 1, &mJrnPrdOverflow);
+}
+
+
+//
 void TBspRzskHf::FillComboboxListStateDef()
 {
     QComboBox *combobox = stateDef.state;
@@ -641,6 +723,45 @@ void TBspRzskHf::FillComboBoxListControl()
     mControl.addItem(kCodec->toUnicode("17 - Пуск уд. МАН (2)"), 17);
     mControl.addItem(kCodec->toUnicode("18 - Пуск уд. МАН (3)"), 18);
     mControl.addItem(kCodec->toUnicode("19 - Пуск удаленных МАН"), 19);
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Заполнение сигналов для тестов.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void TBspRzskHf::FillComboboxListTest()
+{
+    mTestCf1Signal.addItem(kCodec->toUnicode("Нет"), 0);
+    mTestCf1Signal.addItem(kCodec->toUnicode("КЧ1"), 1);
+    mTestCf1Signal.addItem(kCodec->toUnicode("КЧ2"), 2);
+    mTestCf1Signal.addItem(kCodec->toUnicode("Команда 1"), 3);
+    mTestCf1Signal.addItem(kCodec->toUnicode("Команда 2"), 4);
+    mTestCf1Signal.addItem(kCodec->toUnicode("Команда 3"), 5);
+    mTestCf1Signal.addItem(kCodec->toUnicode("Команда 4"), 6);
+    mTestCf1Signal.addItem(kCodec->toUnicode("Команда 5"), 7);
+    mTestCf1Signal.addItem(kCodec->toUnicode("Команда 6"), 8);
+    mTestCf1Signal.addItem(kCodec->toUnicode("Команда 7"), 9);
+    mTestCf1Signal.addItem(kCodec->toUnicode("Команда 8"), 10);
+
+    for (int i = 0; i < mTestCf1Signal.count(); i++)
+    {
+        mTestCf2Signal.addItem(mTestCf1Signal.itemText(i), mTestCf1Signal.itemData(i));
+    }
+
+    mTestRz1Signal.addItem(kCodec->toUnicode("Нет"), 0);
+    mTestRz1Signal.addItem(kCodec->toUnicode("РЗ1"), 1);
+    mTestRz1Signal.addItem(kCodec->toUnicode("РЗ2"), 2);
+
+    for (int i = 0; i < mTestRz1Signal.count(); i++)
+    {
+        mTestRz2Signal.addItem(mTestRz1Signal.itemText(i), mTestRz1Signal.itemData(i));
+    }
 }
 
 
@@ -1667,6 +1788,55 @@ void TBspRzskHf::HdlrComGlbx3C(eGB_COM com, pkg_t &data)
 /**
  * *****************************************************************************
  *
+ * @brief Обрабатывает команду чтения сигналов в тестах.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void TBspRzskHf::HdlrComGlbx3E(eGB_COM com, pkg_t &data)
+{
+    quint8 value;
+    quint8 cf1, cf2;
+    quint8 rz1, rz2;
+    quint8 cm1, cm2;
+
+    Q_ASSERT(com == GB_COM_GET_TEST);
+
+    if (!CheckSize(com, data.size(), { 0 }))
+    {
+        return;
+    }
+
+    value = mTestCf1Signal.currentData().toUInt();
+    cf1   = ((value > 0) && (value < 3)) ? (1 << (value - 1)) : (0);
+    cm1   = (value >= 3) ? (1 << (value - 3)) : (0);
+
+    value = mTestCf2Signal.currentData().toUInt();
+    cf2   = ((value > 0) && (value < 3)) ? (1 << (value - 1)) : (0);
+    cm2   = (value >= 3) ? (1 << (value - 3)) : (0);
+
+    value = mTestRz1Signal.currentData().toUInt();
+    rz1   = ((value > 0) && (value < 3)) ? (1 << (value - 1)) : (0);
+
+    value = mTestRz2Signal.currentData().toUInt();
+    rz2   = ((value > 0) && (value < 3)) ? (1 << (value - 1)) : (0);
+
+    mPkgTx.append(com);
+    mPkgTx.append(((rz1 & 0x03) << 2) | (cf1 & 0x03));
+    mPkgTx.append(cm1);
+    mPkgTx.append(0);
+    mPkgTx.append(((rz2 & 0x03) << 2) | (cf2 & 0x03));
+    mPkgTx.append(cm2);
+    mPkgTx.append(0);
+
+    Q_ASSERT(mPkgTx.size() == 7);  // команда + 6 байт данных
+}
+
+
+/**
+ * *****************************************************************************
+ *
  * @brief Обрабатывает команду чтения версии устройства.
  * @param[in] Команда.
  * @param[in] Данные.
@@ -1705,6 +1875,104 @@ void TBspRzskHf::HdlrComGlbx3F(eGB_COM com, pkg_t &data)
     mPkgTx.append(AVANT_RZSK);
 
     Q_ASSERT(mPkgTx.size() == 18);  // команда + 17 байт данных
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду изменения режима на Тест 1 (передатчик)
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void TBspRzskHf::HdlrComRegx7E(eGB_COM com, pkg_t &data)
+{
+
+    Q_ASSERT(com == GB_COM_SET_REG_TEST_1);
+
+    if (!CheckSize(com, data.size(), { 0, 2 }))
+    {
+        return;
+    }
+
+    if (data.size() == 0)
+    {
+        stateGlb.regime->setCurrentIndex(GB_REGIME_TEST_1);
+        stateGlb.state->setCurrentIndex(11);
+
+        mTestCf1Signal.setCurrentIndex(0);
+        mTestRz1Signal.setCurrentIndex(0);
+
+        mPkgTx.append(com);
+        mPkgTx.append(0);
+        mPkgTx.append(0);
+        mPkgTx.append(0);
+    }
+    else
+    {
+        switch (data.at(0))
+        {
+        case 1:
+            {
+                quint8 cf    = data.at(1);
+                int    index = mTestCf1Signal.findData(cf);
+
+                if (index < 0)
+                {
+                    QString message = "Wrong test CF value: %1";
+                    qWarning() << message.arg(cf);
+                }
+
+                mTestCf1Signal.setCurrentIndex(index);
+
+                quint32 value = mTestCf1Signal.currentData().toUInt();
+                if (value > 1)
+                {
+                    value = 1 << value;
+                }
+
+                // ответ
+                mPkgTx.append(com);
+                mPkgTx.append(static_cast<quint8>(value));
+                mPkgTx.append(static_cast<quint8>(value >> 8));
+                mPkgTx.append(static_cast<quint8>(value >> 16));
+                break;
+            }
+        case 2:
+            {
+                quint8 rz    = data.at(1);
+                int    index = mTestRz1Signal.findData(rz);
+
+                if (index < 0)
+                {
+                    QString message = "Wrong test RZ value: %1";
+                    qWarning() << message.arg(rz);
+                }
+
+                mTestRz1Signal.setCurrentIndex(index);
+
+                quint32 value = mTestCf1Signal.currentData().toUInt();
+                if (value > 1)
+                {
+                    value = 1 << value;
+                }
+
+                // ответ
+                mPkgTx.append(com);
+                mPkgTx.append(static_cast<quint8>(value));
+                mPkgTx.append(0);
+                mPkgTx.append(0);
+                break;
+            }
+        default:
+            QString message = "Wrong test group value: %1";
+            qWarning() << message.arg(data.at(0));
+        }
+    }
+
+    Q_ASSERT(mPkgTx.size() == 4);  // команда + 3 байт данных
 }
 
 
@@ -1835,157 +2103,4 @@ void TBspRzskHf::SlotChangeCompatibility()
 //    }
 
 //    mControl.setCurrentIndex(mControl.findData(control));
-//}
-
-
-///**
-// * *****************************************************************************
-// *
-// * @brief Обрабатывает команду чтения количества записей в журнале защиты.
-// * @param[in] Команда.
-// * @param[in] Данные.
-// *
-// * *****************************************************************************
-// */
-// void TBspRzskHf::HdlrComJrnxC1(eGB_COM com, pkg_t &data)
-//{
-//    Q_ASSERT(com == GB_COM_DEF_GET_JRN_CNT);
-
-//    if (!CheckSize(com, data.size(), { 0 }))
-//    {
-//        return;
-//    }
-
-//    uint16_t len = static_cast<uint16_t>(mJrnDefCounter.value());
-
-//    if (mJrnDefOverflow.isChecked())
-//    {
-//        len |= 0x8000;
-//    }
-
-//    mPkgTx.append(com);
-//    mPkgTx.append(uint8_t(len));
-//    mPkgTx.append(uint8_t(len >> 8));
-
-//    Q_ASSERT(mPkgTx.size() == 3);  // команда + 2 байта данных
-//}
-
-
-///**
-// * *****************************************************************************
-// *
-// * @brief Обрабатывает команду чтения записей журнала защиты.
-// * @param[in] Команда.
-// * @param[in] Данные.
-// *
-// * *****************************************************************************
-// */
-// void TBspRzskHf::HdlrComJrnxC2(eGB_COM com, pkg_t &data)
-//{
-//    Q_ASSERT(com == GB_COM_DEF_GET_JRN_ENTRY);
-
-//    if (!CheckSize(com, data.size(), { 2 }))
-//    {
-//        return;
-//    }
-
-//    int event_number = data.takeFirst();
-//    event_number += static_cast<int>(data.takeFirst());
-
-//    mPkgTx.append(com);
-//    mPkgTx.append(GB_DEVICE_K400_DEF);          // устройство
-//    mPkgTx.append(event_number);                // zzzz z[ман][пуск][стоп]
-//    mPkgTx.append(event_number % 17);           // состояние защиты
-//    mPkgTx.append(event_number);                // zzzz z[вых][прд][прм]
-//    mPkgTx.append(0);                           // b5
-//    mPkgTx.append(0);                           // b6
-//    mPkgTx.append(0);                           // b7
-//    mPkgTx.append(999 & 0xFF);                  // миллисекунды, младший байт
-//    mPkgTx.append((999 >> 8) & 0xFF);           // миллисекунды, старший байт
-//    mPkgTx.append(int2bcd(event_number % 60));  // секунды, bcd
-//    mPkgTx.append(int2bcd(event_number / 60));  // минуты, bcd
-//    mPkgTx.append(0x23);                        // часы, bcd
-//    mPkgTx.append(0);                           // день недели
-//    mPkgTx.append(0x01);                        // день, bcd
-//    mPkgTx.append(0x02);                        // месяц, bcd
-//    mPkgTx.append(0x21);                        // год, bcd
-
-//    Q_ASSERT(mPkgTx.size() == 17);  // команда + 16 байт данных
-//}
-
-
-///**
-// * *****************************************************************************
-// *
-// * @brief Обрабатывает команду чтения количества записей в журнале событий.
-// * @param[in] Команда.
-// * @param[in] Данные.
-// *
-// * *****************************************************************************
-// */
-// void TBspRzskHf::HdlrComJrnxF1(eGB_COM com, pkg_t &data)
-//{
-//    Q_ASSERT(com == GB_COM_GET_JRN_CNT);
-
-//    if (!CheckSize(com, data.size(), { 0 }))
-//    {
-//        return;
-//    }
-
-//    // @todo Добавить возможность переполнени
-//    uint16_t len = static_cast<uint16_t>(mJrnGlbCounter.value());
-
-//    if (mJrnGlbOverflow.isChecked())
-//    {
-//        len |= 0x8000;
-//    }
-
-//    mPkgTx.append(com);
-//    mPkgTx.append(uint8_t(len));
-//    mPkgTx.append(uint8_t(len >> 8));
-
-//    Q_ASSERT(mPkgTx.size() == 3);  // команда + 2 байта данных
-//}
-
-
-///**
-// * *****************************************************************************
-// *
-// * @brief Обрабатывает команду чтения записей журнала событий.
-// * @param[in] Команда.
-// * @param[in] Данные.
-// *
-// * *****************************************************************************
-// */
-// void TBspRzskHf::HdlrComJrnxF2(eGB_COM com, pkg_t &data)
-//{
-//    Q_ASSERT(com == GB_COM_GET_JRN_ENTRY);
-
-//    if (!CheckSize(com, data.size(), { 2 }))
-//    {
-//        return;
-//    }
-
-//    int event_number = data.takeFirst();
-//    event_number += static_cast<int>(data.takeFirst());
-
-//    mPkgTx.append(com);
-//    mPkgTx.append(event_number % 10);  // удаленный аппарат для ПВЗУ, ПВЗУЕ
-//    mPkgTx.append(event_number % (JRN_EVENT_R400M_SIZE + 1));  // событие
-//    mPkgTx.append(event_number % 8);                           // режим
-//    mPkgTx.append(0);                                          // b4
-//    mPkgTx.append(0);                                          // b5
-//    mPkgTx.append(0);                                          // b6
-//    mPkgTx.append(0);                                          // b7
-//    mPkgTx.append(999 & 0xFF);                  // миллисекунды, младший байт
-//    mPkgTx.append((999 >> 8) & 0xFF);           // миллисекунды, старший байт
-//    mPkgTx.append(int2bcd(event_number % 60));  // секунды, bcd
-//    mPkgTx.append(int2bcd(event_number / 60));  // минуты, bcd
-//    mPkgTx.append(0x23);                        // часы, bcd
-//    mPkgTx.append(0);                           // день недели
-//    mPkgTx.append(0x01);                        // день, bcd
-//    mPkgTx.append(0x02);                        // месяц, bcd
-//    mPkgTx.append(0x21);                        // год, bcd
-
-//    Q_ASSERT(mPkgTx.size() == 17);  // команда + 16 байт данных
 //}

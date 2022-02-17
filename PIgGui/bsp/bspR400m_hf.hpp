@@ -76,11 +76,6 @@ private:
 
     void HdlrComRegx72(eGB_COM com, pkg_t &data) override;
     void HdlrComRegx7E(eGB_COM com, pkg_t &data) override;
-
-    void HdlrComJrnxC1(eGB_COM com, pkg_t &data) override;
-    void HdlrComJrnxC2(eGB_COM com, pkg_t &data) override;
-    void HdlrComJrnxF1(eGB_COM com, pkg_t &data) override;
-    void HdlrComJrnxF2(eGB_COM com, pkg_t &data) override;
 };
 
 #endif  // BSP_R400M_HF_HPP

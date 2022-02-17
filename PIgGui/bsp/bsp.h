@@ -186,6 +186,8 @@ protected:
     virtual void     crtJrn();
     virtual void     crtJrnGlb(QTreeWidgetItem *top);
     virtual void     crtJrnDef(QTreeWidgetItem *top);
+    virtual void     crtJrnPrm(QTreeWidgetItem *top);
+    virtual void     crtJrnPrd(QTreeWidgetItem *top);
 
     void fillComboboxList(QComboBox *combobox, eGB_PARAM param);
     void fillComboboxListOnOff(QComboBox *combobox);
@@ -293,17 +295,17 @@ public:
     void         HdlrComRegx7D(eGB_COM com, pkg_t &data);
     virtual void HdlrComRegx7E(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
 
-    virtual void HdlrComJrnxC1(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComJrnxC2(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
+    virtual void HdlrComJrnxC1(eGB_COM com, pkg_t &data);
+    virtual void HdlrComJrnxC2(eGB_COM com, pkg_t &data);
     virtual void HdlrComJrnxCA(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComJrnxD1(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComJrnxD2(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
+    virtual void HdlrComJrnxD1(eGB_COM com, pkg_t &data);
+    virtual void HdlrComJrnxD2(eGB_COM com, pkg_t &data);
     virtual void HdlrComJrnxDA(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComJrnxE1(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComJrnxE2(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
+    virtual void HdlrComJrnxE1(eGB_COM com, pkg_t &data);
+    virtual void HdlrComJrnxE2(eGB_COM com, pkg_t &data);
     virtual void HdlrComJrnxEA(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComJrnxF1(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComJrnxF2(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
+    virtual void HdlrComJrnxF1(eGB_COM com, pkg_t &data);
+    virtual void HdlrComJrnxF2(eGB_COM com, pkg_t &data);
     virtual void HdlrComJrnxFA(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
 
 protected slots:

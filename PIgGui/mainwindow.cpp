@@ -109,6 +109,8 @@ void MainWindow::initBsp()
     ui->mBspCombo->addItem(codec->toUnicode("ภยภอา ะ400ฬ-100-ย"), DEVICE_R400M_100_HF_b15);
     ui->mBspCombo->addItem(codec->toUnicode("ภยภอา ะวัส-111-ย"), DEVICE_RZSK_111_HF);
 
+    ui->mBspCombo->setCurrentIndex(1);
+
     //    ui->mBspCombo->addItem(codec->toUnicode("ภยภอา K400-088-ย"), DEVICE_K400_088_HF);
     //    ui->mBspCombo->addItem(codec->toUnicode("ภยภอา ะ400-100-ย"), DEVICE_R400_100_VOLS);
     //    ui->mBspCombo->addItem(codec->toUnicode("ภยภอา ะวัส-111-ย"), DEVICE_RZSK_111_VOLS);

@@ -663,6 +663,42 @@ void Bsp::crtJrnDef(QTreeWidgetItem *top)
 /**
  * *****************************************************************************
  *
+ * @brief Создает журнал приемника.
+ * @param[in] top Верхний уровень.
+ *
+ * *****************************************************************************
+ */
+void Bsp::crtJrnPrm(QTreeWidgetItem *top)
+{
+    QTreeWidgetItem *item;
+
+    item = new QTreeWidgetItem(top);
+    item->setText(0, kCodec->toUnicode("Количество записей"));
+    mTree->setItemWidget(item, 1, &mJrnPrmCounter);
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Создает журнал передатчика.
+ * @param[in] top Верхний уровень.
+ *
+ * *****************************************************************************
+ */
+void Bsp::crtJrnPrd(QTreeWidgetItem *top)
+{
+    QTreeWidgetItem *item;
+
+    item = new QTreeWidgetItem(top);
+    item->setText(0, kCodec->toUnicode("Количество записей"));
+    mTree->setItemWidget(item, 1, &mJrnPrdCounter);
+}
+
+
+/**
+ * *****************************************************************************
+ *
  * @brief Создает журнал событий.
  * @param[in] top Верхний уровень.
  *
@@ -2677,6 +2713,311 @@ void Bsp::HdlrComRegx7D(eGB_COM com, pkg_t &data)
     // ответ на команду записи совпадает с запросом (?!)
     mPkgTx.append(com);
     mPkgTx.append(data);
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду чтения количества записей в журнале защиты.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void Bsp::HdlrComJrnxC1(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_DEF_GET_JRN_CNT);
+
+    if (!CheckSize(com, data.size(), { 0 }))
+    {
+        return;
+    }
+
+    uint16_t len = static_cast<uint16_t>(mJrnDefCounter.value());
+
+    if (mJrnDefOverflow.isChecked())
+    {
+        len |= 0x8000;
+    }
+
+    mPkgTx.append(com);
+    mPkgTx.append(uint8_t(len));
+    mPkgTx.append(uint8_t(len >> 8));
+
+    Q_ASSERT(mPkgTx.size() == 3);  // команда + 2 байта данных
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду чтения записей журнала защиты.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void Bsp::HdlrComJrnxC2(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_DEF_GET_JRN_ENTRY);
+
+    if (!CheckSize(com, data.size(), { 2 }))
+    {
+        return;
+    }
+
+    int event_number = data.takeFirst();
+    event_number += static_cast<int>(data.takeFirst());
+
+    mPkgTx.append(com);
+    mPkgTx.append(GB_DEVICE_DEF);             // устройство
+    mPkgTx.append(event_number);              // zzzz z[ман][пуск][стоп]
+    mPkgTx.append(event_number % 17);         // состояние защиты
+    mPkgTx.append(event_number);              // zzzz z[вых][прд][прм]
+    mPkgTx.append(0);                         // b5
+    mPkgTx.append(0);                         // b6
+    mPkgTx.append(0);                         // b7
+    mPkgTx.append(static_cast<quint8>(999));  // миллисекунды, младший байт
+    mPkgTx.append(static_cast<quint8>(999 >> 8));  // миллисекунды, старший байт
+    mPkgTx.append(int2bcd(event_number % 60));     // секунды, bcd
+    mPkgTx.append(int2bcd(event_number / 60));     // минуты, bcd
+    mPkgTx.append(0x23);                           // часы, bcd
+    mPkgTx.append(1);                              // день недели
+    mPkgTx.append(0x01);                           // день, bcd
+    mPkgTx.append(0x02);                           // месяц, bcd
+    mPkgTx.append(0x21);                           // год, bcd
+
+    Q_ASSERT(mPkgTx.size() == 17);  // команда + 16 байт данных
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду чтения количества записей в журнале прм.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void Bsp::HdlrComJrnxD1(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_PRM_GET_JRN_CNT);
+
+    if (!CheckSize(com, data.size(), { 0 }))
+    {
+        return;
+    }
+
+    uint16_t len = static_cast<uint16_t>(mJrnPrmCounter.value());
+
+    if (mJrnPrmOverflow.isChecked())
+    {
+        len |= 0x8000;
+    }
+
+    mPkgTx.append(com);
+    mPkgTx.append(uint8_t(len));
+    mPkgTx.append(uint8_t(len >> 8));
+
+    Q_ASSERT(mPkgTx.size() == 3);  // команда + 2 байта данных
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду чтения записей журнала приемника.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void Bsp::HdlrComJrnxD2(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_PRM_GET_JRN_ENTRY);
+
+    if (!CheckSize(com, data.size(), { 2 }))
+    {
+        return;
+    }
+
+    int event_number = data.takeFirst();
+    event_number += static_cast<int>(data.takeFirst());
+
+    mPkgTx.append(com);
+    mPkgTx.append(GB_DEVICE_PRM);               // устройство
+    mPkgTx.append(event_number % 33);           // номер команды
+    mPkgTx.append(event_number % 3);            // 0 - конец, 1 - начало
+    mPkgTx.append(0);                           // b4
+    mPkgTx.append(0);                           // b5
+    mPkgTx.append(0);                           // b6
+    mPkgTx.append(0);                           // b7
+    mPkgTx.append(999 & 0xFF);                  // миллисекунды, младший байт
+    mPkgTx.append((999 >> 8) & 0xFF);           // миллисекунды, старший байт
+    mPkgTx.append(int2bcd(event_number % 60));  // секунды, bcd
+    mPkgTx.append(int2bcd(event_number / 60));  // минуты, bcd
+    mPkgTx.append(0x23);                        // часы, bcd
+    mPkgTx.append(0);                           // день недели
+    mPkgTx.append(0x01);                        // день, bcd
+    mPkgTx.append(0x02);                        // месяц, bcd
+    mPkgTx.append(0x21);                        // год, bcd
+
+    Q_ASSERT(mPkgTx.size() == 17);  // команда + 16 байт данных
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду чтения количества записей в журнале прд.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void Bsp::HdlrComJrnxE1(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_PRD_GET_JRN_CNT);
+
+    if (!CheckSize(com, data.size(), { 0 }))
+    {
+        return;
+    }
+
+    uint16_t len = static_cast<uint16_t>(mJrnPrdCounter.value());
+
+    if (mJrnPrdOverflow.isChecked())
+    {
+        len |= 0x8000;
+    }
+
+    mPkgTx.append(com);
+    mPkgTx.append(uint8_t(len));
+    mPkgTx.append(uint8_t(len >> 8));
+
+    Q_ASSERT(mPkgTx.size() == 3);  // команда + 2 байта данных
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду чтения записей журнала передатчика.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void Bsp::HdlrComJrnxE2(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_PRD_GET_JRN_ENTRY);
+
+    if (!CheckSize(com, data.size(), { 2 }))
+    {
+        return;
+    }
+
+    int event_number = data.takeFirst();
+    event_number += static_cast<int>(data.takeFirst());
+
+    mPkgTx.append(com);
+    mPkgTx.append(GB_DEVICE_PRD);               // устройство
+    mPkgTx.append(event_number % 33);           // номер команды
+    mPkgTx.append(event_number % 3);            // 0 - конец, 1 - начало
+    mPkgTx.append(0);                           // b4
+    mPkgTx.append(0);                           // b5
+    mPkgTx.append(0);                           // b6
+    mPkgTx.append(0);                           // b7
+    mPkgTx.append(999 & 0xFF);                  // миллисекунды, младший байт
+    mPkgTx.append((999 >> 8) & 0xFF);           // миллисекунды, старший байт
+    mPkgTx.append(int2bcd(event_number % 60));  // секунды, bcd
+    mPkgTx.append(int2bcd(event_number / 60));  // минуты, bcd
+    mPkgTx.append(0x23);                        // часы, bcd
+    mPkgTx.append(0);                           // день недели
+    mPkgTx.append(0x01);                        // день, bcd
+    mPkgTx.append(0x02);                        // месяц, bcd
+    mPkgTx.append(0x21);                        // год, bcd
+
+    Q_ASSERT(mPkgTx.size() == 17);  // команда + 16 байт данных
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду чтения количества записей в журнале событий.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void Bsp::HdlrComJrnxF1(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_GET_JRN_CNT);
+
+    if (!CheckSize(com, data.size(), { 0 }))
+    {
+        return;
+    }
+
+    // @todo Добавить возможность переполнени
+    uint16_t len = static_cast<uint16_t>(mJrnGlbCounter.value());
+
+    if (mJrnGlbOverflow.isChecked())
+    {
+        len |= 0x8000;
+    }
+
+    mPkgTx.append(com);
+    mPkgTx.append(uint8_t(len));
+    mPkgTx.append(uint8_t(len >> 8));
+
+    Q_ASSERT(mPkgTx.size() == 3);  // команда + 2 байта данных
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду чтения записей журнала событий.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void Bsp::HdlrComJrnxF2(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_GET_JRN_ENTRY);
+
+    if (!CheckSize(com, data.size(), { 2 }))
+    {
+        return;
+    }
+
+    int event_number = data.takeFirst();
+    event_number += static_cast<int>(data.takeFirst());
+
+    mPkgTx.append(com);
+    mPkgTx.append(GB_DEVICE_GLB);               // устройство
+    mPkgTx.append(event_number % 43);           // событие
+    mPkgTx.append(event_number % 8);            // режим
+    mPkgTx.append(0);                           // b4
+    mPkgTx.append(0);                           // b5
+    mPkgTx.append(0);                           // b6
+    mPkgTx.append(0);                           // b7
+    mPkgTx.append(999 & 0xFF);                  // миллисекунды, младший байт
+    mPkgTx.append((999 >> 8) & 0xFF);           // миллисекунды, старший байт
+    mPkgTx.append(int2bcd(event_number % 60));  // секунды, bcd
+    mPkgTx.append(int2bcd(event_number / 60));  // минуты, bcd
+    mPkgTx.append(0x23);                        // часы, bcd
+    mPkgTx.append(0);                           // день недели
+    mPkgTx.append(0x01);                        // день, bcd
+    mPkgTx.append(0x02);                        // месяц, bcd
+    mPkgTx.append(0x21);                        // год, bcd
+
+    Q_ASSERT(mPkgTx.size() == 17);  // команда + 16 байт данных
 }
 
 

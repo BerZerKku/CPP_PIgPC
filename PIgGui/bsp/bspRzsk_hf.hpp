@@ -49,9 +49,12 @@ private:
     void crtJrn() override;
     void crtJrnDef(QTreeWidgetItem *top) override;
     void crtJrnGlb(QTreeWidgetItem *top) override;
+    void crtJrnPrm(QTreeWidgetItem *top) override;
+    void crtJrnPrd(QTreeWidgetItem *top) override;
 
     void FillComboboxListStateDef() override;
     void FillComboBoxListControl() override;
+    void FillComboboxListTest() override;
 
     void HdlrComDefx00(eGB_COM com, pkg_t &data) override;
     void HdlrComDefx05(eGB_COM com, pkg_t &data) override;
@@ -69,17 +72,11 @@ private:
     void HdlrComGlbx37(eGB_COM com, pkg_t &data) override;
     void HdlrComGlbx39(eGB_COM com, pkg_t &data) override;
     void HdlrComGlbx3C(eGB_COM com, pkg_t &data) override;
-    //    void HdlrComGlbx3E(eGB_COM com, pkg_t &data) override;
+    void HdlrComGlbx3E(eGB_COM com, pkg_t &data) override;
     void HdlrComGlbx3F(eGB_COM com, pkg_t &data) override;
 
-    //    void HdlrComRegx70(eGB_COM com, pkg_t &data) override;
-    //    void HdlrComRegx71(eGB_COM com, pkg_t &data) override;
     //    void HdlrComRegx72(eGB_COM com, pkg_t &data) override;
-
-    //    void HdlrComJrnxC1(eGB_COM com, pkg_t &data) override;
-    //    void HdlrComJrnxC2(eGB_COM com, pkg_t &data) override;
-    //    void HdlrComJrnxF1(eGB_COM com, pkg_t &data) override;
-    //    void HdlrComJrnxF2(eGB_COM com, pkg_t &data) override;
+    void HdlrComRegx7E(eGB_COM com, pkg_t &data) override;
 
 private slots:
     void SlotChangeCompatibility();
