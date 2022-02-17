@@ -60,19 +60,19 @@ protected:
 
     struct measure_t
     {
-        QSpinBox *R;      // сопротивление линии
-        QSpinBox *I;      // ток выхода
-        QSpinBox *U;      // напряжение выхода
-        QSpinBox *Udef1;  // запас по защите, Uз1
-        QSpinBox *Udef2;  // запас по защите, Uз2
-        QSpinBox *Ucf1;   // запас по КС, Uк1
-        QSpinBox *Ucf2;   // запас по КС, Uк2
-        QSpinBox *Un1;    // уровень шумов, Uш1
-        QSpinBox *Un2;    // уровень шумов, Uш2
-        QSpinBox *Sd;  // просечки в сигнале (длит. импульсов ВЧ блокировки ?!)
-        QSpinBox *D;   // отношение сигнал/помеха
-        QSpinBox *T;   // температура
-        QSpinBox *dF;  // отклонение частоты КС на приеме
+        QSpinBox *R     = nullptr;  // сопротивление линии
+        QSpinBox *I     = nullptr;  // ток выхода
+        QSpinBox *U     = nullptr;  // напряжение выхода
+        QSpinBox *Udef1 = nullptr;  // запас по защите, Uз1
+        QSpinBox *Udef2 = nullptr;  // запас по защите, Uз2
+        QSpinBox *Ucf1  = nullptr;  // запас по КС, Uк1
+        QSpinBox *Ucf2  = nullptr;  // запас по КС, Uк2
+        QSpinBox *Un1   = nullptr;  // уровень шумов, Uш1
+        QSpinBox *Un2   = nullptr;  // уровень шумов, Uш2
+        QSpinBox *Sd    = nullptr;  // просечки в сигнале (длит. импульсов ВЧ блокировки ?!)
+        QSpinBox *D     = nullptr;  // отношение сигнал/помеха
+        QSpinBox *T     = nullptr;  // температура
+        QSpinBox *dF    = nullptr;  // отклонение частоты КС на приеме
     };
 
     QMap<uint8_t, HdlrCom_t> mComMap;
@@ -202,9 +202,9 @@ protected:
     void crtSpinBox(QTreeWidgetItem *top, eGB_PARAM param);
     void crtDoubleSpinBox(QTreeWidgetItem *top, eGB_PARAM param);
 
-    virtual void FillComboboxListStateDef() { }
-    virtual void FillComboboxListStatePrm() { }
-    virtual void FillComboboxListStatePrd() { }
+    virtual void FillComboboxListStateDef();
+    virtual void FillComboboxListStatePrm();
+    virtual void FillComboboxListStatePrd();
     void         FillComboboxListStateGlb();
     virtual void FillComboBoxListControl() {};
     virtual void FillComboboxListTest() {};
@@ -289,6 +289,8 @@ public:
     void         HdlrComGlbx3D(eGB_COM com, pkg_t &data);
     virtual void HdlrComGlbx3E(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
     virtual void HdlrComGlbx3F(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
+
+    void HdlrComRegx51(eGB_COM com, pkg_t &data);
 
     void         HdlrComRegx70(eGB_COM com, pkg_t &data);
     void         HdlrComRegx71(eGB_COM com, pkg_t &data);

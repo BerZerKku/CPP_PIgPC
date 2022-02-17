@@ -511,30 +511,6 @@ void TBspR400mHf::crtJrnGlb(QTreeWidgetItem *top)
 }
 
 
-void TBspR400mHf::FillComboboxListStateDef()
-{
-    QComboBox *combobox = stateDef.state;
-
-    if (combobox == nullptr)
-        return;
-
-    combobox->addItem(kCodec->toUnicode(fcDefSost00), 0);
-    combobox->addItem(kCodec->toUnicode(fcDefSost01), 1);
-    combobox->addItem(kCodec->toUnicode(fcDefSost02), 2);
-    combobox->addItem(kCodec->toUnicode(fcDefSost03), 3);
-    combobox->addItem(kCodec->toUnicode(fcDefSost04), 4);
-    combobox->addItem(kCodec->toUnicode(fcDefSost05), 5);
-    combobox->addItem(kCodec->toUnicode(fcDefSost06), 6);
-    combobox->addItem(kCodec->toUnicode(fcDefSost07), 7);
-    combobox->addItem(kCodec->toUnicode(fcDefSost08), 8);
-    combobox->addItem(kCodec->toUnicode(fcDefSost09), 9);
-    combobox->addItem(kCodec->toUnicode(fcDefSost10), 10);
-    combobox->addItem(kCodec->toUnicode(fcDefSost11), 11);
-    combobox->addItem(kCodec->toUnicode(fcDefSost12), 12);
-    combobox->addItem(kCodec->toUnicode(fcDefSost13), 13);
-}
-
-
 /**
  * *****************************************************************************
  *

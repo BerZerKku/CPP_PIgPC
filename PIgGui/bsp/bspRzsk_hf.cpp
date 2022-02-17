@@ -60,6 +60,8 @@ void TBspRzskHf::InitComMap()
     mComMap.insert(0x3E, &Bsp::HdlrComGlbx3E);  // чтение сигналов в тесте
     mComMap.insert(0x3f, &Bsp::HdlrComGlbx3F);  // чтение информации об устройстве
 
+    mComMap.insert(0x51, &Bsp::HdlrComRegx51);  // пуск ПРМ
+
     mComMap.insert(0x70, &Bsp::HdlrComRegx70);  // смена режима на "Выведен"
     mComMap.insert(0x71, &Bsp::HdlrComRegx71);  // смена режима на "Введен"
     mComMap.insert(0x72, &Bsp::HdlrComRegx72);  // команда управления
@@ -674,28 +676,61 @@ void TBspRzskHf::crtJrnPrd(QTreeWidgetItem *top)
 }
 
 
-//
+/**
+ * *****************************************************************************
+ *
+ * @brief Заполняет список состояний защиты.
+ *
+ * *****************************************************************************
+ */
 void TBspRzskHf::FillComboboxListStateDef()
 {
     QComboBox *combobox = stateDef.state;
 
-    if (combobox == nullptr)
-        return;
+    Bsp::FillComboboxListStateDef();
 
-    combobox->addItem(kCodec->toUnicode(fcDefSost00), 0);
-    combobox->addItem(kCodec->toUnicode(fcDefSost01), 1);
-    combobox->addItem(kCodec->toUnicode(fcDefSost02), 2);
-    combobox->addItem(kCodec->toUnicode(fcDefSost03), 3);
-    combobox->addItem(kCodec->toUnicode(fcDefSost04), 4);
-    combobox->addItem(kCodec->toUnicode(fcDefSost05), 5);
-    combobox->addItem(kCodec->toUnicode(fcDefSost06), 6);
-    combobox->addItem(kCodec->toUnicode(fcDefSost07), 7);
-    combobox->addItem(kCodec->toUnicode(fcDefSost08), 8);
-    combobox->addItem(kCodec->toUnicode(fcDefSost09), 9);
-    combobox->addItem(kCodec->toUnicode(fcDefSost10), 10);
-    combobox->addItem(kCodec->toUnicode(fcDefSost11), 11);
-    combobox->addItem(kCodec->toUnicode(fcDefSost12), 12);
-    combobox->addItem(kCodec->toUnicode(fcDefSost13), 13);
+    if (combobox != nullptr)
+    {
+        int index = combobox->findData(14);
+        if (index > 0)
+        {
+            combobox->setItemText(index, kCodec->toUnicode(fcDefSost14rzsk));
+        }
+    }
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Заполняет список состояний приемника.
+ *
+ * *****************************************************************************
+ */
+void TBspRzskHf::FillComboboxListStatePrm()
+{
+    QComboBox *combobox  = statePrm.state;
+    QComboBox *combobox2 = statePrm2.state;
+
+    Bsp::FillComboboxListStatePrm();
+
+    if (combobox != nullptr)
+    {
+        int index = combobox->findData(14);
+        if (index > 0)
+        {
+            combobox->setItemText(index, kCodec->toUnicode(fcPrmSost14rzsk));
+        }
+    }
+
+    if (combobox2 != nullptr)
+    {
+        int index = combobox2->findData(14);
+        if (index > 0)
+        {
+            combobox2->setItemText(index, kCodec->toUnicode(fcPrmSost14rzsk));
+        }
+    }
 }
 
 

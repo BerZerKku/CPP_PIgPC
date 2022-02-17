@@ -1133,6 +1133,111 @@ void Bsp::crtDoubleSpinBox(QTreeWidgetItem *top, eGB_PARAM param)
 }
 
 
+/**
+ * *****************************************************************************
+ *
+ * @brief Заполняет список состояний защиты.
+ *
+ * *****************************************************************************
+ */
+void Bsp::FillComboboxListStateDef()
+{
+    QComboBox *combobox = stateDef.state;
+
+    if (combobox == nullptr)
+        return;
+
+    combobox->addItem(kCodec->toUnicode(fcDefSost00), 0);
+    combobox->addItem(kCodec->toUnicode(fcDefSost01), 1);
+    combobox->addItem(kCodec->toUnicode(fcDefSost02), 2);
+    combobox->addItem(kCodec->toUnicode(fcDefSost03), 3);
+    combobox->addItem(kCodec->toUnicode(fcDefSost04), 4);
+    combobox->addItem(kCodec->toUnicode(fcDefSost05), 5);
+    combobox->addItem(kCodec->toUnicode(fcDefSost06), 6);
+    combobox->addItem(kCodec->toUnicode(fcDefSost07), 7);
+    combobox->addItem(kCodec->toUnicode(fcDefSost08), 8);
+    combobox->addItem(kCodec->toUnicode(fcDefSost09), 9);
+    combobox->addItem(kCodec->toUnicode(fcDefSost10), 10);
+    combobox->addItem(kCodec->toUnicode(fcDefSost11), 11);
+    combobox->addItem(kCodec->toUnicode(fcDefSost12), 12);
+    combobox->addItem(kCodec->toUnicode(fcDefSost13), 13);
+    combobox->addItem(kCodec->toUnicode(fcDefSost14), 14);
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Заполняет список состояний приемника.
+ *
+ * *****************************************************************************
+ */
+void Bsp::FillComboboxListStatePrm()
+{
+    QComboBox *combobox  = statePrm.state;
+    QComboBox *combobox2 = statePrm2.state;
+
+    if (combobox == nullptr)
+        return;
+
+    combobox->addItem(kCodec->toUnicode(fcPrmSost00), 0);
+    combobox->addItem(kCodec->toUnicode(fcPrmSost01), 1);
+    combobox->addItem(kCodec->toUnicode(fcPrmSost02), 2);
+    combobox->addItem(kCodec->toUnicode(fcPrmSost03), 3);
+    combobox->addItem(kCodec->toUnicode(fcPrmSost04), 4);
+    combobox->addItem(kCodec->toUnicode(fcPrmSost05), 5);
+    combobox->addItem(kCodec->toUnicode(fcPrmSost06), 6);
+    combobox->addItem(kCodec->toUnicode(fcPrmSost07), 7);
+    combobox->addItem(kCodec->toUnicode(fcPrmSost08), 8);
+    combobox->addItem(kCodec->toUnicode(fcPrmSost09), 9);
+    combobox->addItem(kCodec->toUnicode(fcPrmSost10), 10);
+    combobox->addItem(kCodec->toUnicode(fcPrmSost11), 11);
+    combobox->addItem(kCodec->toUnicode(fcPrmSost12), 12);
+    combobox->addItem(kCodec->toUnicode(fcPrmSost13), 13);
+    combobox->addItem(kCodec->toUnicode(fcPrmSost14), 14);
+
+    if (combobox2 != nullptr)
+    {
+        for (int i = 0; i < combobox->count(); i++)
+        {
+            combobox2->addItem(combobox->itemText(i), combobox->itemData(i));
+        }
+    }
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Заполняет список состояний передатчика.
+ *
+ * *****************************************************************************
+ */
+void Bsp::FillComboboxListStatePrd()
+{
+    QComboBox *combobox = statePrd.state;
+
+    if (combobox == nullptr)
+        return;
+
+    combobox->addItem(kCodec->toUnicode(fcPrdSost00), 0);
+    combobox->addItem(kCodec->toUnicode(fcPrdSost01), 1);
+    combobox->addItem(kCodec->toUnicode(fcPrdSost02), 2);
+    combobox->addItem(kCodec->toUnicode(fcPrdSost03), 3);
+    combobox->addItem(kCodec->toUnicode(fcPrdSost04), 4);
+    combobox->addItem(kCodec->toUnicode(fcPrdSost05), 5);
+    combobox->addItem(kCodec->toUnicode(fcPrdSost06), 6);
+    combobox->addItem(kCodec->toUnicode(fcPrdSost07), 7);
+    combobox->addItem(kCodec->toUnicode(fcPrdSost08), 8);
+    combobox->addItem(kCodec->toUnicode(fcPrdSost09), 9);
+    combobox->addItem(kCodec->toUnicode(fcPrdSost10), 10);
+    combobox->addItem(kCodec->toUnicode(fcPrdSost11), 11);
+    combobox->addItem(kCodec->toUnicode(fcPrdSost12), 12);
+    combobox->addItem(kCodec->toUnicode(fcPrdSost13), 13);
+    combobox->addItem(kCodec->toUnicode(fcPrdSost14), 14);
+}
+
+
 //
 quint8 Bsp::getComboBoxValue(eGB_PARAM param, uint8_t number)
 {
@@ -2637,6 +2742,39 @@ void Bsp::HdlrComGlbx3D(eGB_COM com, pkg_t &data)
     }
 }
 
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду пуск ПРМ
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void Bsp::HdlrComRegx51(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_PRM_ENTER);
+
+    if (!CheckSize(com, data.size(), { 0 }))
+    {
+        return;
+    }
+
+    // ответ на команду записи совпадает с запросом
+    mPkgTx.append(com);
+    mPkgTx.append(data);
+
+    if (statePrm.regime != nullptr)
+    {
+        if (statePrm.regime->currentData().toUInt() == GB_REGIME_READY)
+        {
+            statePrm.regime->setCurrentIndex(statePrm.regime->findData(GB_REGIME_ENABLED));
+        }
+    }
+}
+
+
 /**
  * *****************************************************************************
  *
@@ -3063,6 +3201,11 @@ void Bsp::setRegime(int index)
         statePrm.regime->setCurrentIndex(index);
     }
 
+    if (statePrm2.regime != nullptr)
+    {
+        statePrm2.regime->setCurrentIndex(index);
+    }
+
     if (statePrd.regime != nullptr)
     {
         statePrd.regime->setCurrentIndex(index);
@@ -3084,6 +3227,11 @@ void Bsp::setState(int index)
         statePrm.state->setCurrentIndex(statePrm.state->findData(index));
     }
 
+    if (statePrm2.state != nullptr)
+    {
+        statePrm2.state->setCurrentIndex(statePrm2.state->findData(index));
+    }
+
     if (statePrd.state != nullptr)
     {
         statePrd.state->setCurrentIndex(statePrd.state->findData(index));
@@ -3103,6 +3251,11 @@ void Bsp::setDopByte(int index)
     if (statePrm.dopByte != nullptr)
     {
         statePrm.dopByte->setValue(index);
+    }
+
+    if (statePrm2.dopByte != nullptr)
+    {
+        statePrm2.dopByte->setValue(index);
     }
 
     if (statePrd.dopByte != nullptr)

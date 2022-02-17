@@ -49,7 +49,6 @@ private:
     void crtJrnDef(QTreeWidgetItem *top) override;
     void crtJrnGlb(QTreeWidgetItem *top) override;
 
-    void FillComboboxListStateDef() override;
     void FillComboboxListAc();
     void FillComboBoxListControl() override;
     void FillComboboxListTest() override;
