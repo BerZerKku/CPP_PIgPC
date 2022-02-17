@@ -1,13 +1,12 @@
 #include <QDebug>
 #include <QHeaderView>
 #include <QTextCodec>
+#include <cmath>
 
 #include "bsp.h"
 
 #include "PIg/src/flash.h"
 #include "PIg/src/menu/txCom.h"
-#include "PIg/src/parameter/param.h"
-
 
 const QString Bsp::kMsgSizeError       = "Wrong size of data in command %1: %2";
 const QString Bsp::kMsgTimeSourceError = "Wrong source of time: %1";
@@ -124,12 +123,11 @@ void Bsp::crtTreeParam()
     QTreeWidgetItem *top = new QTreeWidgetItem(mTree);
     top->setText(0, kCodec->toUnicode("Параметры"));
     mTree->addTopLevelItem(top);
-    //    mTree->insertTopLevelItem(mTree->topLevelItemCount(), top);
 
-    crtTreeDef(top);
     crtTreePrd(top);
     crtTreePrm(top);
     crtTreeGlb(top);
+    crtTreeDef(top);  // под глобальными, т.к. нужно количество аппаратов в линии
     crtTreeInterface(top);
 }
 
@@ -750,6 +748,49 @@ void Bsp::FillComboboxListStateGlb()
 }
 
 
+/**
+ * *****************************************************************************
+ *
+ * @brief Возвращает максимальное количество однотипных параметров.
+ * @param[in] param Параметр.
+ * @return Количество однотипных параметрв.
+ * @retval 0 В случае ошибки.
+ *
+ * *****************************************************************************
+ */
+quint16 Bsp::GetDependSame(eGB_PARAM param) const
+{
+    int qty = 0;
+
+    Param::DEPEND_SAME depend = getDependSame(param);
+    switch (depend)
+    {
+    case Param::DEPEND_SAME_NO: qty = getAbsMaxNumOfSameParams(param); break;
+    case Param::DEPEND_SAME_ON_COM_PRD:
+        qty = mapSpinBox.value(GB_PARAM_PRD_COM_NUMS).at(0)->maximum();
+        break;
+    case Param::DEPEND_SAME_ON_COM_PRM:
+        qty = mapSpinBox.value(GB_PARAM_PRM_COM_NUMS).at(0)->maximum();
+        break;
+    case Param::DEPEND_SAME_ON_NUM_DEVS:
+        {
+            QComboBox *combobox = mapCombobox.value(GB_PARAM_NUM_OF_DEVICES).at(0);
+            qty                 = combobox->itemData(combobox->count() - 1).toUInt();
+            break;
+        }
+    default: qty = 0;
+    }
+
+    if (qty == 0)
+    {
+        qCritical() << QString("Number of parameters %1 is 0!").arg(param);
+        Q_ASSERT(false);
+    }
+
+    return qty;
+}
+
+
 //
 void Bsp::crtComboBox(QTreeWidgetItem *top, eGB_PARAM param)
 {
@@ -757,7 +798,7 @@ void Bsp::crtComboBox(QTreeWidgetItem *top, eGB_PARAM param)
     QComboBox *          combobox;
     QTreeWidgetItem *    item;
 
-    uint8_t num = getAbsMaxNumOfSameParams(param);
+    uint8_t num = GetDependSame(param);
     if (num == 0)
     {
         qCritical() << QString("Number of parameters %1 is 0!").arg(getParamName(param));
@@ -816,6 +857,63 @@ void Bsp::crtComboBox(QTreeWidgetItem *top, eGB_PARAM param)
 }
 
 
+/**
+ * *****************************************************************************
+ *
+ * @brief Создает SpinBox для каждого байта битовых наборов
+ * @param[in] top
+ * @param[in] param Параметр.
+ *
+ * *****************************************************************************
+ */
+void Bsp::crtSpinbBoxBits(QTreeWidgetItem *top, eGB_PARAM param)
+{
+    QVector<QSpinBox *> vspinbox;
+    QSpinBox *          spinbox;
+    QTreeWidgetItem *   ltop;
+    QTreeWidgetItem *   item;
+
+    Q_ASSERT(param < GB_PARAM_MAX);
+    Q_ASSERT(getParamType(param) == Param::PARAM_BITES);
+
+    uint8_t qty = GetDependSame(param);
+    if (qty == 0)
+    {
+        return;
+    }
+
+    ltop = new QTreeWidgetItem(top);
+    ltop->setText(0, getParamName(param));
+    top->addChild(ltop);
+
+    for (int i = 0; i < qty; i++)
+    {
+        if (i % 8 == 0)
+        {
+            spinbox = new QSpinBox(this);
+
+            int    bits = (qty - i > 7) ? 8 : qty - i;
+            qint16 min  = 0;
+            qint16 max  = std::pow(2, bits);
+            spinbox->setRange(min, max);
+            spinbox->setPrefix("0x");
+            spinbox->setDisplayIntegerBase(16);
+            spinbox->setToolTip(QString("%1 - %2").arg(min).arg(max));
+
+            item         = new QTreeWidgetItem(ltop);
+            QString text = kCodec->toUnicode("Номера [%1..%2]");
+            item->setText(0, text.arg(i + bits).arg(i + 1));
+            ltop->addChild(item);
+            mTree->setItemWidget(item, 1, spinbox);
+
+            vspinbox.append(spinbox);
+        }
+    }
+
+    mapSpinBox.insert(param, vspinbox);
+}
+
+
 //
 void Bsp::crtLineEdit(QTreeWidgetItem *top, eGB_PARAM param, std::string value)
 {
@@ -856,7 +954,7 @@ void Bsp::crtSpinBox(QTreeWidgetItem *top, eGB_PARAM param)
     QSpinBox *          spinbox;
     QTreeWidgetItem *   item;
 
-    uint8_t num = getAbsMaxNumOfSameParams(param);
+    uint8_t num = GetDependSame(param);
     if (num == 0)
     {
         qCritical() << QString("Number of parameters %1 is 0!").arg(getParamName(param));
@@ -1394,7 +1492,8 @@ void Bsp::SlotReadByte(int value)
                 {
                     //                    if (viewCom.count(com) != 0)
                     //                    {
-                    //                    qDebug() << "comRx <<< " << showbase << hex << mPkgRx <<
+                    //                    qDebug() << "comRx <<< " << showbase << hex << mPkgRx
+                    //                    <<
                     //                    ", com = " << com;
                     //                    }
 
@@ -1410,8 +1509,8 @@ void Bsp::SlotReadByte(int value)
                         com = static_cast<eGB_COM>(mPkgTx.at(2));
                         //                        if (viewCom.count(com) != 0)
                         //                        {
-                        //                            qDebug() << "comTx >>> " << showbase << hex <<
-                        //                            Bsp::pkgTx;
+                        //                            qDebug() << "comTx >>> " << showbase <<
+                        //                            hex << Bsp::pkgTx;
                         //                        }
 
                         for (uint8_t byte : mPkgTx)
@@ -1466,10 +1565,7 @@ void Bsp::CrtParamWidget(QTreeWidgetItem *top, eGB_PARAM param)
     case Param::PARAM_INT: crtSpinBox(top, param); break;
     case Param::PARAM_U_COR: crtDoubleSpinBox(top, param); break;
     case Param::PARAM_I_COR: crtSpinBox(top, param); break;
-
-    case Param::PARAM_BITES:
-        qWarning() << QString("No create widget function for param %1").arg(param);
-        break;
+    case Param::PARAM_BITES: crtSpinbBoxBits(top, param); break;
 
     case Param::PARAM_NO: Q_ASSERT(false);
     }
@@ -1495,10 +1591,7 @@ qint16 Bsp::GetParamValue(eGB_PARAM param, quint8 number)
     case Param::PARAM_INT: value = getSpinBoxValue(param, number); break;
     case Param::PARAM_U_COR: value = getDoubleSpinBoxValue(param); break;
     case Param::PARAM_I_COR: value = getSpinBoxValue(param, number); break;
-
-    case Param::PARAM_BITES:
-        qWarning() << QString("No get param function for param %1").arg(param);
-        break;
+    case Param::PARAM_BITES: value = getSpinBoxValue(param, number % 8); break;
 
     case Param::PARAM_NO: Q_ASSERT(false);
     }
@@ -1527,10 +1620,7 @@ void Bsp::SetParamValue(eGB_PARAM param, qint16 value, quint8 number)
     case Param::PARAM_INT: setSpinBoxValue(param, value, number); break;
     case Param::PARAM_U_COR: setDoubleSpinBoxValue(param, value, number); break;
     case Param::PARAM_I_COR: setSpinBoxValue(param, value, number); break;
-
-    case Param::PARAM_BITES:
-        qWarning() << QString("No set param function for param %1").arg(param);
-        break;
+    case Param::PARAM_BITES: setSpinBoxValue(param, value, number % 8); break;
 
     case Param::PARAM_NO: Q_ASSERT(false);
     }
@@ -2086,6 +2176,185 @@ void Bsp::HdlrComDummy(eGB_COM com, pkg_t &data)
 /**
  * *****************************************************************************
  *
+ * @brief Обрабатывает команду чтения/записи типа защиты.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void Bsp::HdlrComDefx01(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_DEF_GET_DEF_TYPE || com == GB_COM_DEF_SET_DEF_TYPE);
+
+    if (com == GB_COM_DEF_GET_DEF_TYPE)
+    {
+        if (!CheckSize(com, data.size(), { 0 }))
+        {
+            return;
+        }
+
+        mPkgTx.append(com);
+        mPkgTx.append(getComboBoxValue(GB_PARAM_DEF_TYPE));
+
+        Q_ASSERT(mPkgTx.size() == 2);  // команда + байт данных
+    }
+
+    if (com == GB_COM_DEF_SET_DEF_TYPE)
+    {
+        if (!CheckSize(com, data.size(), { 1 }))
+        {
+            return;
+        }
+
+        // ответ на команду записи совпадает с запросом
+        mPkgTx.append(com);
+        mPkgTx.append(data);
+
+        setComboBoxValue(GB_PARAM_DEF_TYPE, data.at(0));
+    }
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду чтения/записи количества аппаратов в линии.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void Bsp::HdlrComDefx02(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_DEF_GET_LINE_TYPE || com == GB_COM_DEF_SET_LINE_TYPE);
+
+    if (com == GB_COM_DEF_GET_LINE_TYPE)
+    {
+        if (!CheckSize(com, data.size(), { 0 }))
+        {
+            return;
+        }
+
+        mPkgTx.append(com);
+        mPkgTx.append(getComboBoxValue(GB_PARAM_NUM_OF_DEVICES));
+
+        Q_ASSERT(mPkgTx.size() == 2);  // команда + байт данных
+    }
+
+    if (com == GB_COM_DEF_SET_LINE_TYPE)
+    {
+        if (!CheckSize(com, data.size(), { 1 }))
+        {
+            return;
+        }
+
+        // ответ на команду записи совпадает с запросом
+        mPkgTx.append(com);
+        mPkgTx.append(data);
+
+        setComboBoxValue(GB_PARAM_NUM_OF_DEVICES, data.at(0));
+    }
+}
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду чтения/записи допустимого времени без манипуляции.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void Bsp::HdlrComDefx03(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_DEF_GET_T_NO_MAN || com == GB_COM_DEF_SET_T_NO_MAN);
+
+    if (com == GB_COM_DEF_GET_T_NO_MAN)
+    {
+        if (!CheckSize(com, data.size(), { 0 }))
+        {
+            return;
+        }
+
+        mPkgTx.append(com);
+        mPkgTx.append(uint8_t(GetParamValue(GB_PARAM_TIME_NO_MAN)));
+
+        Q_ASSERT(mPkgTx.size() == 2);  // команда + байт данных
+    }
+
+    if (com == GB_COM_DEF_SET_T_NO_MAN)
+    {
+        if (!CheckSize(com, data.size(), { 1 }))
+        {
+            return;
+        }
+
+        // ответ на команду записи совпадает с запросом
+        mPkgTx.append(com);
+        mPkgTx.append(data);
+
+        SetParamValue(GB_PARAM_TIME_NO_MAN, data.at(0));
+    }
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду чтения/записи компенсации задержки линии 1 и 2
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void Bsp::HdlrComDefx04(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_DEF_GET_DELAY || com == GB_COM_DEF_SET_DELAY);
+
+    if (com == GB_COM_DEF_GET_DELAY)
+    {
+        if (!CheckSize(com, data.size(), { 0 }))
+        {
+            return;
+        }
+
+        mPkgTx.append(com);
+        mPkgTx.append(uint8_t(GetParamValue(GB_PARAM_DELAY, 1)));
+        mPkgTx.append(uint8_t(GetParamValue(GB_PARAM_DELAY, 2)));
+
+        Q_ASSERT(mPkgTx.size() == 3);  // команда + 2 байт данных
+    }
+
+    if (com == GB_COM_DEF_SET_DELAY)
+    {
+        if (!CheckSize(com, data.size(), { 2 }))
+        {
+            return;
+        }
+
+        // ответ на команду записи совпадает с запросом
+        mPkgTx.append(com);
+        mPkgTx.append(data);
+
+        uint8_t index = data.at(1);
+        switch (index)
+        {
+        case 1: [[fallthrow]];
+        case 2: SetParamValue(GB_PARAM_DELAY, data.at(0), index); break;
+        default:
+            QString message = "Wrong data in command %1: %2";
+            qWarning() << message.arg(com, 2, 16, QLatin1Char('0')).arg(data.at(0));
+        }
+
+
+        SetParamValue(GB_PARAM_TIME_NO_MAN, data.at(0));
+    }
+}
+
+
+/**
+ * *****************************************************************************
+ *
  * @brief Обрабатывает команду чтения коррекция тока и напряжения.
  * @param[in] Команда.
  * @param[in] Данные.
@@ -2156,6 +2425,260 @@ void Bsp::HdlrComGlbx33(eGB_COM com, pkg_t &data)
         }
     }
 }
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду чтения/записи адреса в локальной сети.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void Bsp::HdlrComGlbx38(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_GET_NET_ADR || com == GB_COM_SET_NET_ADR);
+
+    if (com == GB_COM_GET_NET_ADR)
+    {
+        if (!CheckSize(com, data.size(), { 0 }))
+        {
+            return;
+        }
+
+        mPkgTx.append(com);
+        mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_NET_ADDRESS)));
+
+        Q_ASSERT(mPkgTx.size() == 2);  // команда + байт данных
+    }
+
+    if (com == GB_COM_SET_NET_ADR)
+    {
+        if (!CheckSize(com, data.size(), { 1 }))
+        {
+            return;
+        }
+
+        // ответ на команду записи совпадает с запросом
+        mPkgTx.append(com);
+        mPkgTx.append(data);
+
+        SetParamValue(GB_PARAM_NET_ADDRESS, data.at(0));
+    }
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду чтения/записи частоты.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void Bsp::HdlrComGlbx3A(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_GET_FREQ || com == GB_COM_SET_FREQ);
+
+    quint16 freq;
+
+    if (com == GB_COM_GET_FREQ)
+    {
+        if (!CheckSize(com, data.size(), { 0 }))
+        {
+            return;
+        }
+
+
+        mPkgTx.append(com);
+        freq = GetParamValue(GB_PARAM_FREQ);
+        mPkgTx.append(static_cast<uint8_t>(freq >> 8));
+        mPkgTx.append(static_cast<uint8_t>(freq));
+
+        Q_ASSERT(mPkgTx.size() == 3);  // команда + 2 байта данных
+    }
+
+    if (com == GB_COM_SET_FREQ)
+    {
+        if (!CheckSize(com, data.size(), { 2 }))
+        {
+            return;
+        }
+
+        // ответ на команду записи совпадает с запросом
+        mPkgTx.append(com);
+        mPkgTx.append(data);
+
+        freq = (static_cast<quint16>(data.at(0)) << 8) + data.at(1);
+        SetParamValue(GB_PARAM_FREQ, freq);
+    }
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду чтения/записи номера аппарата.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void Bsp::HdlrComGlbx3B(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_GET_DEVICE_NUM || com == GB_COM_SET_DEVICE_NUM);
+
+    if (com == GB_COM_GET_DEVICE_NUM)
+    {
+        if (!CheckSize(com, data.size(), { 0 }))
+        {
+            return;
+        }
+
+        mPkgTx.append(com);
+        mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_NUM_OF_DEVICE)));
+
+        Q_ASSERT(mPkgTx.size() == 2);  // команда + байт данных
+    }
+
+    if (com == GB_COM_SET_DEVICE_NUM)
+    {
+        if (!CheckSize(com, data.size(), { 1 }))
+        {
+            return;
+        }
+
+        // ответ на команду записи совпадает с запросом
+        mPkgTx.append(com);
+        mPkgTx.append(data);
+
+        SetParamValue(GB_PARAM_NUM_OF_DEVICE, data.at(0));
+    }
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду чтения контроля напряжения выхода.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void Bsp::HdlrComGlbx3D(eGB_COM com, pkg_t &data)
+{
+
+    Q_ASSERT(com == GB_COM_GET_OUT_CHECK || com == GB_COM_SET_OUT_CHECK);
+
+    if (com == GB_COM_GET_OUT_CHECK)
+    {
+        if (!CheckSize(com, data.size(), { 0 }))
+        {
+            return;
+        }
+
+        mPkgTx.append(com);
+        mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_OUT_CHECK)));
+
+        Q_ASSERT(mPkgTx.size() == 2);  // команда + байт данных
+    }
+
+    if (com == GB_COM_SET_OUT_CHECK)
+    {
+        if (!CheckSize(com, data.size(), { 1 }))
+        {
+            return;
+        }
+
+        // ответ на команду записи совпадает с запросом
+        mPkgTx.append(com);
+        mPkgTx.append(data);
+
+        SetParamValue(GB_PARAM_OUT_CHECK, data.at(0));
+    }
+}
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду установки режима "Выведен".
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void Bsp::HdlrComRegx70(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_SET_REG_DISABLED);
+
+    if (!CheckSize(com, data.size(), { 0 }))
+    {
+        return;
+    }
+
+    // ответ на команду записи совпадает с запросом
+    mPkgTx.append(com);
+    mPkgTx.append(data);
+
+    setComboBoxValue(stateGlb.regime, eGB_REGIME::GB_REGIME_DISABLED);
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду установки режима "Введен".
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void Bsp::HdlrComRegx71(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_SET_REG_ENABLED);
+
+    if (!CheckSize(com, data.size(), { 0 }))
+    {
+        return;
+    }
+
+    // ответ на команду записи совпадает с запросом
+    mPkgTx.append(com);
+    mPkgTx.append(data);
+
+    setComboBoxValue(stateGlb.regime, eGB_REGIME::GB_REGIME_ENABLED);
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду изменения режима на Тест 2 (приемник)
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void Bsp::HdlrComRegx7D(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_SET_REG_TEST_2);
+
+    if (!CheckSize(com, data.size(), { 0 }))
+    {
+        return;
+    }
+
+    stateGlb.regime->setCurrentIndex(GB_REGIME_TEST_2);
+    stateGlb.state->setCurrentIndex(12);
+
+    // ответ на команду записи совпадает с запросом (?!)
+    mPkgTx.append(com);
+    mPkgTx.append(data);
+}
+
 
 //
 void Bsp::setRegime(int index)

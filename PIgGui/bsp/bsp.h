@@ -17,6 +17,7 @@
 #include <QTreeWidgetItem>
 
 #include "PIg/src/glbDefine.h"
+#include "PIg/src/parameter/param.h"
 #include "widget/qhexspinbox.h"
 
 typedef QVector<uint8_t> pkg_t;
@@ -91,9 +92,6 @@ protected:
     QComboBox mControl;
 
     QCheckBox mDefEnable;
-    QSpinBox  mNumComPrm;
-
-    QSpinBox mNumComPrd;
 
     QComboBox mTestCf1Signal;
     QComboBox mTestCf2Signal;
@@ -194,6 +192,7 @@ protected:
     void fillComboboxListRegime(QComboBox *combobox);
 
     void crtComboBox(QTreeWidgetItem *top, eGB_PARAM param);
+    void crtSpinbBoxBits(QTreeWidgetItem *top, eGB_PARAM param);
     void crtLineEdit(QTreeWidgetItem *top, eGB_PARAM param, std::string);
     void crtSpinBox(QTreeWidgetItem *top, eGB_PARAM param);
     void crtDoubleSpinBox(QTreeWidgetItem *top, eGB_PARAM param);
@@ -204,6 +203,8 @@ protected:
     void         FillComboboxListStateGlb();
     virtual void FillComboBoxListControl() {};
     virtual void FillComboboxListTest() {};
+
+    quint16 GetDependSame(eGB_PARAM param) const;
 
     void keyPressEvent(QKeyEvent *event) override;
 
@@ -225,10 +226,10 @@ public:
 
     // Change: 0x80-0x8F
     virtual void HdlrComDefx00(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComDefx01(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComDefx02(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComDefx03(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComDefx04(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
+    void         HdlrComDefx01(eGB_COM com, pkg_t &data);
+    void         HdlrComDefx02(eGB_COM com, pkg_t &data);
+    void         HdlrComDefx03(eGB_COM com, pkg_t &data);
+    void         HdlrComDefx04(eGB_COM com, pkg_t &data);
     virtual void HdlrComDefx05(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
     virtual void HdlrComDefx06(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); }
     virtual void HdlrComDefx07(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
@@ -270,26 +271,26 @@ public:
     virtual void HdlrComGlbx30(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
     virtual void HdlrComGlbx31(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
     virtual void HdlrComGlbx32(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComGlbx33(eGB_COM com, pkg_t &data);
+    void         HdlrComGlbx33(eGB_COM com, pkg_t &data);
     virtual void HdlrComGlbx34(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
     virtual void HdlrComGlbx35(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
     virtual void HdlrComGlbx36(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
     virtual void HdlrComGlbx37(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComGlbx38(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
+    void         HdlrComGlbx38(eGB_COM com, pkg_t &data);
     virtual void HdlrComGlbx39(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComGlbx3A(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComGlbx3B(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
+    void         HdlrComGlbx3A(eGB_COM com, pkg_t &data);
+    void         HdlrComGlbx3B(eGB_COM com, pkg_t &data);
     virtual void HdlrComGlbx3C(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComGlbx3D(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
+    void         HdlrComGlbx3D(eGB_COM com, pkg_t &data);
     virtual void HdlrComGlbx3E(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
     virtual void HdlrComGlbx3F(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
 
-    virtual void HdlrComRegx70(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComRegx71(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
+    void         HdlrComRegx70(eGB_COM com, pkg_t &data);
+    void         HdlrComRegx71(eGB_COM com, pkg_t &data);
     virtual void HdlrComRegx72(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
     virtual void HdlrComRegx73(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
     virtual void HdlrComRegx74(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComRegx7D(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
+    void         HdlrComRegx7D(eGB_COM com, pkg_t &data);
     virtual void HdlrComRegx7E(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
 
     virtual void HdlrComJrnxC1(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };

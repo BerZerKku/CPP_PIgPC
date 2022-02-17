@@ -55,10 +55,6 @@ private:
     void FillComboboxListTest() override;
 
     void HdlrComDefx00(eGB_COM com, pkg_t &data) override;
-    void HdlrComDefx01(eGB_COM com, pkg_t &data) override;
-    void HdlrComDefx02(eGB_COM com, pkg_t &data) override;
-    void HdlrComDefx03(eGB_COM com, pkg_t &data) override;
-    //    void HdlrComDefx04(eGB_COM com, pkg_t &data) override; // нет команды
     void HdlrComDefx05(eGB_COM com, pkg_t &data) override;
     void HdlrComDefx06(eGB_COM com, pkg_t &data) override;
     void HdlrComDefx07(eGB_COM com, pkg_t &data) override;
@@ -69,24 +65,16 @@ private:
     void HdlrComGlbx30(eGB_COM com, pkg_t &data) override;
     void HdlrComGlbx31(eGB_COM com, pkg_t &data) override;
     void HdlrComGlbx32(eGB_COM com, pkg_t &data) override;
-    void HdlrComGlbx33(eGB_COM com, pkg_t &data) override;
     void HdlrComGlbx34(eGB_COM com, pkg_t &data) override;
     void HdlrComGlbx35(eGB_COM com, pkg_t &data) override;
     void HdlrComGlbx36(eGB_COM com, pkg_t &data) override;
     void HdlrComGlbx37(eGB_COM com, pkg_t &data) override;
-    void HdlrComGlbx38(eGB_COM com, pkg_t &data) override;
     void HdlrComGlbx39(eGB_COM com, pkg_t &data) override;
-    void HdlrComGlbx3A(eGB_COM com, pkg_t &data) override;
-    void HdlrComGlbx3B(eGB_COM com, pkg_t &data) override;
     void HdlrComGlbx3C(eGB_COM com, pkg_t &data) override;
-    void HdlrComGlbx3D(eGB_COM com, pkg_t &data) override;
     void HdlrComGlbx3E(eGB_COM com, pkg_t &data) override;
     void HdlrComGlbx3F(eGB_COM com, pkg_t &data) override;
 
-    void HdlrComRegx70(eGB_COM com, pkg_t &data) override;
-    void HdlrComRegx71(eGB_COM com, pkg_t &data) override;
     void HdlrComRegx72(eGB_COM com, pkg_t &data) override;
-    void HdlrComRegx7D(eGB_COM com, pkg_t &data) override;
     void HdlrComRegx7E(eGB_COM com, pkg_t &data) override;
 
     void HdlrComJrnxC1(eGB_COM com, pkg_t &data) override;

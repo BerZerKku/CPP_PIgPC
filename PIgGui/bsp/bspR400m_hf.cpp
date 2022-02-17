@@ -27,7 +27,6 @@ void TBspR400mHf::InitComMap()
     mComMap.insert(0x01, &Bsp::HdlrComDefx01);  // чтение типа защиты
     mComMap.insert(0x02, &Bsp::HdlrComDefx02);  // чтение количества аппаратов в линии
     mComMap.insert(0x03, &Bsp::HdlrComDefx03);  // чтение допустимого времени без манипуляции
-                                                // 0x04 - команды нет
     mComMap.insert(0x05, &Bsp::HdlrComDefx05);  // чтение сдвигов ПРД и ПРМ
     mComMap.insert(0x06, &Bsp::HdlrComDefx06);  // чтение загрубления чувств.
     mComMap.insert(0x07, &Bsp::HdlrComDefx07);  // чтение снижения уровня АК
@@ -78,7 +77,7 @@ void TBspR400mHf::InitComMap()
     mComMap.insert(0xB7, &Bsp::HdlrComGlbx37);  // запись совместимости
     mComMap.insert(0xB8, &Bsp::HdlrComGlbx38);  // запись адреса в локальной сети
     mComMap.insert(0xB9, &Bsp::HdlrComGlbx39);  // запись параметров ПВЗУ-Е
-    mComMap.insert(0xBA, &Bsp::HdlrComGlbx3A);  // чтение частоты
+    mComMap.insert(0xBA, &Bsp::HdlrComGlbx3A);  // запись частоты
     mComMap.insert(0xBB, &Bsp::HdlrComGlbx3B);  // запись номера аппарата
     mComMap.insert(0xBC, &Bsp::HdlrComGlbx3C);  // запись порога КЧ
     mComMap.insert(0xBD, &Bsp::HdlrComGlbx3D);  // запись контроля выхода
@@ -702,132 +701,6 @@ void TBspR400mHf::HdlrComDefx00(eGB_COM com, pkg_t &data)
 /**
  * *****************************************************************************
  *
- * @brief Обрабатывает команду чтения/записи типа защиты.
- * @param[in] Команда.
- * @param[in] Данные.
- *
- * *****************************************************************************
- */
-void TBspR400mHf::HdlrComDefx01(eGB_COM com, pkg_t &data)
-{
-    Q_ASSERT(com == GB_COM_DEF_GET_DEF_TYPE || com == GB_COM_DEF_SET_DEF_TYPE);
-
-    if (com == GB_COM_DEF_GET_DEF_TYPE)
-    {
-        if (!CheckSize(com, data.size(), { 0 }))
-        {
-            return;
-        }
-
-        mPkgTx.append(com);
-        mPkgTx.append(getComboBoxValue(GB_PARAM_DEF_TYPE));
-
-        Q_ASSERT(mPkgTx.size() == 2);  // команда + байт данных
-    }
-
-    if (com == GB_COM_DEF_SET_DEF_TYPE)
-    {
-        if (!CheckSize(com, data.size(), { 1 }))
-        {
-            return;
-        }
-
-        // ответ на команду записи совпадает с запросом
-        mPkgTx.append(com);
-        mPkgTx.append(data);
-
-        setComboBoxValue(GB_PARAM_DEF_TYPE, data.at(0));
-    }
-}
-
-
-/**
- * *****************************************************************************
- *
- * @brief Обрабатывает команду чтения/записи количества аппаратов в линии.
- * @param[in] Команда.
- * @param[in] Данные.
- *
- * *****************************************************************************
- */
-void TBspR400mHf::HdlrComDefx02(eGB_COM com, pkg_t &data)
-{
-    Q_ASSERT(com == GB_COM_DEF_GET_LINE_TYPE || com == GB_COM_DEF_SET_LINE_TYPE);
-
-    if (com == GB_COM_DEF_GET_LINE_TYPE)
-    {
-        if (!CheckSize(com, data.size(), { 0 }))
-        {
-            return;
-        }
-
-        mPkgTx.append(com);
-        mPkgTx.append(getComboBoxValue(GB_PARAM_NUM_OF_DEVICES));
-
-        Q_ASSERT(mPkgTx.size() == 2);  // команда + байт данных
-    }
-
-    if (com == GB_COM_DEF_SET_LINE_TYPE)
-    {
-        if (!CheckSize(com, data.size(), { 1 }))
-        {
-            return;
-        }
-
-        // ответ на команду записи совпадает с запросом
-        mPkgTx.append(com);
-        mPkgTx.append(data);
-
-        setComboBoxValue(GB_PARAM_NUM_OF_DEVICES, data.at(0));
-    }
-}
-
-
-/**
- * *****************************************************************************
- *
- * @brief Обрабатывает команду чтения/записи допустимого времени без манипуляции.
- * @param[in] Команда.
- * @param[in] Данные.
- *
- * *****************************************************************************
- */
-void TBspR400mHf::HdlrComDefx03(eGB_COM com, pkg_t &data)
-{
-    Q_ASSERT(com == GB_COM_DEF_GET_T_NO_MAN || com == GB_COM_DEF_SET_T_NO_MAN);
-
-    if (com == GB_COM_DEF_GET_T_NO_MAN)
-    {
-        if (!CheckSize(com, data.size(), { 0 }))
-        {
-            return;
-        }
-
-        mPkgTx.append(com);
-        mPkgTx.append(uint8_t(GetParamValue(GB_PARAM_TIME_NO_MAN)));
-
-        Q_ASSERT(mPkgTx.size() == 2);  // команда + байт данных
-    }
-
-    if (com == GB_COM_DEF_SET_T_NO_MAN)
-    {
-        if (!CheckSize(com, data.size(), { 1 }))
-        {
-            return;
-        }
-
-        // ответ на команду записи совпадает с запросом
-        mPkgTx.append(com);
-        mPkgTx.append(data);
-
-        SetParamValue(GB_PARAM_TIME_NO_MAN, data.at(0));
-    }
-}
-
-
-/**
- * *****************************************************************************
- *
  * @brief Обрабатывает команду чтения/записи сдвигов ПРД и ПРМ
  * @param[in] Команда.
  * @param[in] Данные.
@@ -905,6 +778,7 @@ void TBspR400mHf::HdlrComDefx06(eGB_COM com, pkg_t &data)
 
         mPkgTx.append(com);
         mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_SENS_DEC)));
+        mPkgTx.append(0);  // RpsDesense2
 
         Q_ASSERT(mPkgTx.size() == 2);  // команда + 1 байт данных
     }
@@ -1331,81 +1205,6 @@ void TBspR400mHf::HdlrComGlbx32(eGB_COM com, pkg_t &data)
 /**
  * *****************************************************************************
  *
- * @brief Обрабатывает команду чтения коррекция тока и напряжения.
- * @param[in] Команда.
- * @param[in] Данные.
- *
- * *****************************************************************************
- */
-void TBspR400mHf::HdlrComGlbx33(eGB_COM com, pkg_t &data)
-{
-    Q_ASSERT(com == GB_COM_GET_COR_U_I || com == GB_COM_SET_COR_U_I);
-
-    if (com == GB_COM_GET_COR_U_I)
-    {
-        if (!CheckSize(com, data.size(), { 0 }))
-        {
-            return;
-        }
-
-        qint16 value;
-
-        mPkgTx.append(com);
-
-        value = GetParamValue(GB_PARAM_COR_U);
-        mPkgTx.append(static_cast<uint8_t>(value / 10));
-        mPkgTx.append(static_cast<uint8_t>(value % 10) * 10);
-
-        value = GetParamValue(GB_PARAM_COR_I);
-        mPkgTx.append(static_cast<uint8_t>(value >> 8));
-        mPkgTx.append(static_cast<uint8_t>(value));
-        mPkgTx.append(0);  // коррекция тока 2, старший байт
-        mPkgTx.append(0);  // коррекция тока 2, младший байт
-
-        Q_ASSERT(mPkgTx.size() == 7);  // команда + 6 байт данных
-    }
-
-    if (com == GB_COM_SET_COR_U_I)
-    {
-        if (!CheckSize(com, data.size(), { 3 }))
-        {
-            return;
-        }
-
-        // ответ на команду записи совпадает с запросом
-        mPkgTx.append(com);
-        mPkgTx.append(data);
-
-        qint16 value;
-
-        switch (data.at(0))
-        {
-        case 1:
-            value = static_cast<qint16>(static_cast<qint8>(data.at(1))) * 10;
-            value += static_cast<qint16>(static_cast<qint8>(data.at(2))) / 10;
-            SetParamValue(GB_PARAM_COR_U, value);
-            break;
-        case 2:
-            value = static_cast<qint16>(data.at(1)) << 8;
-            value += static_cast<qint16>(data.at(2));
-            SetParamValue(GB_PARAM_COR_I, value);
-            break;
-        case 4: SetParamValue(GB_PARAM_COR_U, 0); break;
-        case 5: SetParamValue(GB_PARAM_COR_I, 0); break;
-
-        default:
-            // 3 - коррекция тока 2 для трешки
-            // 6 - сброс коррекции тока 2 для трешки
-            QString message = "Wrong data in command %1: %2";
-            qWarning() << message.arg(com, 2, 16, QLatin1Char('0')).arg(data.at(0));
-        }
-    }
-}
-
-
-/**
- * *****************************************************************************
- *
  * @brief Обрабатывает команду чтения измерений.
  * @param[in] Команда.
  * @param[in] Данные.
@@ -1649,48 +1448,6 @@ void TBspR400mHf::HdlrComGlbx37(eGB_COM com, pkg_t &data)
 /**
  * *****************************************************************************
  *
- * @brief Обрабатывает команду чтения/записи адреса в локальной сети.
- * @param[in] Команда.
- * @param[in] Данные.
- *
- * *****************************************************************************
- */
-void TBspR400mHf::HdlrComGlbx38(eGB_COM com, pkg_t &data)
-{
-    Q_ASSERT(com == GB_COM_GET_NET_ADR || com == GB_COM_SET_NET_ADR);
-
-    if (com == GB_COM_GET_NET_ADR)
-    {
-        if (!CheckSize(com, data.size(), { 0 }))
-        {
-            return;
-        }
-
-        mPkgTx.append(com);
-        mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_NET_ADDRESS)));
-
-        Q_ASSERT(mPkgTx.size() == 2);  // команда + байт данных
-    }
-
-    if (com == GB_COM_SET_NET_ADR)
-    {
-        if (!CheckSize(com, data.size(), { 1 }))
-        {
-            return;
-        }
-
-        // ответ на команду записи совпадает с запросом
-        mPkgTx.append(com);
-        mPkgTx.append(data);
-
-        SetParamValue(GB_PARAM_NET_ADDRESS, data.at(0));
-    }
-}
-
-
-/**
- * *****************************************************************************
- *
  * @brief Обрабатывает команду чтения/записи параметров ПВЗУ-Е
  * @param[in] Команда.
  * @param[in] Данные.
@@ -1757,97 +1514,7 @@ void TBspR400mHf::HdlrComGlbx39(eGB_COM com, pkg_t &data)
 /**
  * *****************************************************************************
  *
- * @brief Обрабатывает команду чтения/записи частоты.
- * @param[in] Команда.
- * @param[in] Данные.
- *
- * *****************************************************************************
- */
-void TBspR400mHf::HdlrComGlbx3A(eGB_COM com, pkg_t &data)
-{
-    Q_ASSERT(com == GB_COM_GET_FREQ || com == GB_COM_SET_FREQ);
-
-    quint16 freq;
-
-    if (com == GB_COM_GET_FREQ)
-    {
-        if (!CheckSize(com, data.size(), { 0 }))
-        {
-            return;
-        }
-
-
-        mPkgTx.append(com);
-        freq = GetParamValue(GB_PARAM_FREQ);
-        mPkgTx.append(static_cast<uint8_t>(freq >> 8));
-        mPkgTx.append(static_cast<uint8_t>(freq));
-
-        Q_ASSERT(mPkgTx.size() == 3);  // команда + 2 байта данных
-    }
-
-    if (com == GB_COM_SET_FREQ)
-    {
-        if (!CheckSize(com, data.size(), { 2 }))
-        {
-            return;
-        }
-
-        // ответ на команду записи совпадает с запросом
-        mPkgTx.append(com);
-        mPkgTx.append(data);
-
-        freq = (static_cast<quint16>(data.at(0)) << 8) + data.at(1);
-        SetParamValue(GB_PARAM_FREQ, freq);
-    }
-}
-
-
-/**
- * *****************************************************************************
- *
- * @brief Обрабатывает команду чтения/записи номера аппарата.
- * @param[in] Команда.
- * @param[in] Данные.
- *
- * *****************************************************************************
- */
-void TBspR400mHf::HdlrComGlbx3B(eGB_COM com, pkg_t &data)
-{
-    Q_ASSERT(com == GB_COM_GET_DEVICE_NUM || com == GB_COM_SET_DEVICE_NUM);
-
-    if (com == GB_COM_GET_DEVICE_NUM)
-    {
-        if (!CheckSize(com, data.size(), { 0 }))
-        {
-            return;
-        }
-
-        mPkgTx.append(com);
-        mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_NUM_OF_DEVICE)));
-
-        Q_ASSERT(mPkgTx.size() == 2);  // команда + байт данных
-    }
-
-    if (com == GB_COM_SET_DEVICE_NUM)
-    {
-        if (!CheckSize(com, data.size(), { 1 }))
-        {
-            return;
-        }
-
-        // ответ на команду записи совпадает с запросом
-        mPkgTx.append(com);
-        mPkgTx.append(data);
-
-        SetParamValue(GB_PARAM_NUM_OF_DEVICE, data.at(0));
-    }
-}
-
-
-/**
- * *****************************************************************************
- *
- * @brief Обрабатывает команду чтения порога КЧ.
+ * @brief Обрабатывает команду чтения/записи порога КЧ.
  * @param[in] Команда.
  * @param[in] Данные.
  *
@@ -1894,48 +1561,6 @@ void TBspR400mHf::HdlrComGlbx3C(eGB_COM com, pkg_t &data)
                 qWarning() << message.arg(com, 2, 16, QLatin1Char('0')).arg(data.at(0));
             }
         }
-    }
-}
-
-
-/**
- * *****************************************************************************
- *
- * @brief Обрабатывает команду чтения контроля напряжения выхода.
- * @param[in] Команда.
- * @param[in] Данные.
- *
- * *****************************************************************************
- */
-void TBspR400mHf::HdlrComGlbx3D(eGB_COM com, pkg_t &data)
-{
-    Q_ASSERT(com == GB_COM_GET_OUT_CHECK || com == GB_COM_SET_OUT_CHECK);
-
-    if (com == GB_COM_GET_OUT_CHECK)
-    {
-        if (!CheckSize(com, data.size(), { 0 }))
-        {
-            return;
-        }
-
-        mPkgTx.append(com);
-        mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_OUT_CHECK)));
-
-        Q_ASSERT(mPkgTx.size() == 2);  // команда + байт данных
-    }
-
-    if (com == GB_COM_SET_OUT_CHECK)
-    {
-        if (!CheckSize(com, data.size(), { 1 }))
-        {
-            return;
-        }
-
-        // ответ на команду записи совпадает с запросом
-        mPkgTx.append(com);
-        mPkgTx.append(data);
-
-        SetParamValue(GB_PARAM_OUT_CHECK, data.at(0));
     }
 }
 
@@ -2034,58 +1659,6 @@ void TBspR400mHf::HdlrComGlbx3F(eGB_COM com, pkg_t &data)
 /**
  * *****************************************************************************
  *
- * @brief Обрабатывает команду установки режима "Выведен".
- * @param[in] Команда.
- * @param[in] Данные.
- *
- * *****************************************************************************
- */
-void TBspR400mHf::HdlrComRegx70(eGB_COM com, pkg_t &data)
-{
-    Q_ASSERT(com == GB_COM_SET_REG_DISABLED);
-
-    if (!CheckSize(com, data.size(), { 0 }))
-    {
-        return;
-    }
-
-    // ответ на команду записи совпадает с запросом
-    mPkgTx.append(com);
-    mPkgTx.append(data);
-
-    setComboBoxValue(stateGlb.regime, eGB_REGIME::GB_REGIME_DISABLED);
-}
-
-
-/**
- * *****************************************************************************
- *
- * @brief Обрабатывает команду установки режима "Введен".
- * @param[in] Команда.
- * @param[in] Данные.
- *
- * *****************************************************************************
- */
-void TBspR400mHf::HdlrComRegx71(eGB_COM com, pkg_t &data)
-{
-    Q_ASSERT(com == GB_COM_SET_REG_ENABLED);
-
-    if (!CheckSize(com, data.size(), { 0 }))
-    {
-        return;
-    }
-
-    // ответ на команду записи совпадает с запросом
-    mPkgTx.append(com);
-    mPkgTx.append(data);
-
-    setComboBoxValue(stateGlb.regime, eGB_REGIME::GB_REGIME_ENABLED);
-}
-
-
-/**
- * *****************************************************************************
- *
  * @brief Обрабатывает команду управления.
  * @param[in] Команда.
  * @param[in] Данные.
@@ -2122,33 +1695,6 @@ void TBspR400mHf::HdlrComRegx72(eGB_COM com, pkg_t &data)
     }
 
     mControl.setCurrentIndex(mControl.findData(control));
-}
-
-
-/**
- * *****************************************************************************
- *
- * @brief Обрабатывает команду изменения режима на Тест 2 (приемник)
- * @param[in] Команда.
- * @param[in] Данные.
- *
- * *****************************************************************************
- */
-void TBspR400mHf::HdlrComRegx7D(eGB_COM com, pkg_t &data)
-{
-    Q_ASSERT(com == GB_COM_SET_REG_TEST_2);
-
-    if (!CheckSize(com, data.size(), { 0 }))
-    {
-        return;
-    }
-
-    stateGlb.regime->setCurrentIndex(GB_REGIME_TEST_2);
-    stateGlb.state->setCurrentIndex(12);
-
-    // ответ на команду записи совпадает с запросом (?!)
-    mPkgTx.append(com);
-    mPkgTx.append(data);
 }
 
 
