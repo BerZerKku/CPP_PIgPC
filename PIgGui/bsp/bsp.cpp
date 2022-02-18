@@ -2419,7 +2419,7 @@ void Bsp::HdlrComDefx03(eGB_COM com, pkg_t &data)
         }
 
         mPkgTx.append(com);
-        mPkgTx.append(uint8_t(GetParamValue(GB_PARAM_TIME_NO_MAN)));
+        mPkgTx.append(GetParamValue(GB_PARAM_TIME_NO_MAN));
 
         Q_ASSERT(mPkgTx.size() == 2);  // команда + байт данных
     }
@@ -2461,8 +2461,8 @@ void Bsp::HdlrComDefx04(eGB_COM com, pkg_t &data)
         }
 
         mPkgTx.append(com);
-        mPkgTx.append(uint8_t(GetParamValue(GB_PARAM_DELAY, 1)));
-        mPkgTx.append(uint8_t(GetParamValue(GB_PARAM_DELAY, 2)));
+        mPkgTx.append(GetParamValue(GB_PARAM_DELAY, 1));
+        mPkgTx.append(GetParamValue(GB_PARAM_DELAY, 2));
 
         Q_ASSERT(mPkgTx.size() == 3);  // команда + 2 байт данных
     }
@@ -2487,9 +2487,6 @@ void Bsp::HdlrComDefx04(eGB_COM com, pkg_t &data)
             QString message = "Wrong data in command %1: %2";
             qWarning() << message.arg(com, 2, 16, QLatin1Char('0')).arg(data.at(0));
         }
-
-
-        SetParamValue(GB_PARAM_TIME_NO_MAN, data.at(0));
     }
 }
 

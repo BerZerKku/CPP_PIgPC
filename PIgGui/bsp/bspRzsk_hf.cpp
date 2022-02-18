@@ -172,9 +172,11 @@ void TBspRzskHf::InitParam()
     SetParamValue(GB_PARAM_DEF_TYPE, 0);  // 0 - ДФЗ ПрПд
     SetParamValue(GB_PARAM_TIME_NO_MAN, 10);
     SetParamValue(GB_PARAM_OVERLAP, 28);
-    SetParamValue(GB_PARAM_DELAY, 8);
+    SetParamValue(GB_PARAM_DELAY, 8, 1);
+    SetParamValue(GB_PARAM_DELAY, 6, 2);
     SetParamValue(GB_PARAM_WARN_THD_RZ, 13);
-    SetParamValue(GB_PARAM_SENS_DEC_RZ, 31);
+    SetParamValue(GB_PARAM_SENS_DEC_RZ, 31, 1);
+    SetParamValue(GB_PARAM_SENS_DEC_RZ, 32, 2);
     SetParamValue(GB_PARAM_PRM_TYPE, 0);      // 0 - акт+пасс
     SetParamValue(GB_PARAM_DEF_ONE_SIDE, 0);  // 0 - выкл.
 
@@ -485,8 +487,7 @@ void TBspRzskHf::crtTreeState()
 
     Bsp::crtTreeState(top, "Общее", stateGlb);
     Bsp::crtTreeState(top, "Защита", stateDef);
-    Bsp::crtTreeState(top, "Приемник 1", statePrm);
-    Bsp::crtTreeState(top, "Приемник 2", statePrm2);
+    Bsp::crtTreeState(top, "Приемник", statePrm);
     Bsp::crtTreeState(top, "Передатчик", statePrd);
 
     item = new QTreeWidgetItem(top);
@@ -843,17 +844,17 @@ void TBspRzskHf::HdlrComDefx00(eGB_COM com, pkg_t &data)
         }
 
         mPkgTx.append(com);
-        mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_DEF_TYPE)));
-        mPkgTx.append(0);  // тип линии
-        mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_TIME_NO_MAN)));
-        mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_DELAY)));
-        mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_OVERLAP)));
-        mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_SENS_DEC_RZ)));
-        mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_PRM_TYPE)));
-        mPkgTx.append(0);  // задержка на линии 2
-        mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_WARN_THD_RZ)));
-        mPkgTx.append(0);  // загрубление ДФЗ 2
-        mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_DEF_ONE_SIDE)));
+        mPkgTx.append(GetParamValue(GB_PARAM_DEF_TYPE));
+        mPkgTx.append(0);  // тип линии перешел в общие параметры
+        mPkgTx.append(GetParamValue(GB_PARAM_TIME_NO_MAN));
+        mPkgTx.append(GetParamValue(GB_PARAM_DELAY, 1));
+        mPkgTx.append(GetParamValue(GB_PARAM_OVERLAP));
+        mPkgTx.append(GetParamValue(GB_PARAM_SENS_DEC_RZ, 1));
+        mPkgTx.append(GetParamValue(GB_PARAM_PRM_TYPE));
+        mPkgTx.append(GetParamValue(GB_PARAM_DELAY, 2));
+        mPkgTx.append(GetParamValue(GB_PARAM_WARN_THD_RZ));
+        mPkgTx.append(GetParamValue(GB_PARAM_SENS_DEC_RZ, 2));
+        mPkgTx.append(GetParamValue(GB_PARAM_DEF_ONE_SIDE));
 
         int len = 16 - mPkgTx.size();
         for (int i = 0; i < len; i++)
@@ -877,15 +878,15 @@ void TBspRzskHf::HdlrComDefx00(eGB_COM com, pkg_t &data)
 
         int index = 0;
         SetParamValue(GB_PARAM_DEF_TYPE, data.at(index++));
-        index++;  // тип линии
+        index++;  // тип линии перешел в общие параметры
         SetParamValue(GB_PARAM_TIME_NO_MAN, data.at(index++));
-        SetParamValue(GB_PARAM_DELAY, data.at(index++));
+        SetParamValue(GB_PARAM_DELAY, data.at(index++), 1);
         SetParamValue(GB_PARAM_OVERLAP, data.at(index++));
-        SetParamValue(GB_PARAM_SENS_DEC_RZ, data.at(index++));
+        SetParamValue(GB_PARAM_SENS_DEC_RZ, data.at(index++), 1);
         SetParamValue(GB_PARAM_PRM_TYPE, data.at(index++));
-        index++;  // задержка на линии 2
+        SetParamValue(GB_PARAM_DELAY, data.at(index++), 2);
         SetParamValue(GB_PARAM_WARN_THD_RZ, data.at(index++));
-        index++;  // загрубление ДФЗ 2
+        SetParamValue(GB_PARAM_SENS_DEC_RZ, data.at(index++), 2);
         index++;  // односторонний режимSetParamValue(GB_PARAM_DEF_ONE_SIDE)));
     }
 }
@@ -954,9 +955,10 @@ void TBspRzskHf::HdlrComDefx06(eGB_COM com, pkg_t &data)
         }
 
         mPkgTx.append(com);
-        mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_SENS_DEC_RZ)));
+        mPkgTx.append(GetParamValue(GB_PARAM_SENS_DEC_RZ, 1));
+        mPkgTx.append(GetParamValue(GB_PARAM_SENS_DEC_RZ, 2));
 
-        Q_ASSERT(mPkgTx.size() == 2);  // команда + 1 байт данных
+        Q_ASSERT(mPkgTx.size() == 3);  // команда + 2 байт данных
     }
 
     if (com == GB_COM_DEF_SET_RZ_DEC)
@@ -1172,14 +1174,14 @@ void TBspRzskHf::HdlrComPrmx10(eGB_COM com, pkg_t &data)
         index++;  // блокированные команды 16..9
         index++;  // блокированные команды 24..17
         index++;  // блокированные команды 32..25
-        SetParamValue(GB_PARAM_PRM_TIME_OFF, 1);
-        SetParamValue(GB_PARAM_PRM_TIME_OFF, 2);
-        SetParamValue(GB_PARAM_PRM_TIME_OFF, 3);
-        SetParamValue(GB_PARAM_PRM_TIME_OFF, 4);
-        SetParamValue(GB_PARAM_PRM_TIME_OFF, 5);
-        SetParamValue(GB_PARAM_PRM_TIME_OFF, 6);
-        SetParamValue(GB_PARAM_PRM_TIME_OFF, 7);
-        SetParamValue(GB_PARAM_PRM_TIME_OFF, 8);
+        SetParamValue(GB_PARAM_PRM_TIME_OFF, data.at(index++), 1);
+        SetParamValue(GB_PARAM_PRM_TIME_OFF, data.at(index++), 2);
+        SetParamValue(GB_PARAM_PRM_TIME_OFF, data.at(index++), 3);
+        SetParamValue(GB_PARAM_PRM_TIME_OFF, data.at(index++), 4);
+        SetParamValue(GB_PARAM_PRM_TIME_OFF, data.at(index++), 5);
+        SetParamValue(GB_PARAM_PRM_TIME_OFF, data.at(index++), 6);
+        SetParamValue(GB_PARAM_PRM_TIME_OFF, data.at(index++), 7);
+        SetParamValue(GB_PARAM_PRM_TIME_OFF, data.at(index++), 8);
     }
 }
 
@@ -1689,9 +1691,9 @@ void TBspRzskHf::HdlrComGlbx30(eGB_COM com, pkg_t &data)
         mPkgTx.append(getComboBoxValue(statePrd.regime));
         mPkgTx.append(getComboBoxValue(statePrd.state));
         mPkgTx.append(getSpinBoxValue(statePrd.dopByte));
-        mPkgTx.append(getComboBoxValue(statePrm2.regime));
-        mPkgTx.append(getComboBoxValue(statePrm2.state));
-        mPkgTx.append(getSpinBoxValue(statePrm2.dopByte));
+        mPkgTx.append(0);  // прм режим
+        mPkgTx.append(0);  // прм2 состояние
+        mPkgTx.append(0);  // прм2 доп
 
         mPkgTx.append(getSpinBoxValue(&mPrmLightPA));
         mPkgTx.append(0);
