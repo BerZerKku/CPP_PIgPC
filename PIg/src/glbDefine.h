@@ -301,7 +301,7 @@ enum eGB_COM
     GB_COM_PRM_SET_TIME_OFF     = 0x93,  // +
     GB_COM_PRM_SET_BLOCK_COM    = 0x94,  // +
     GB_COM_PRM_SET_FREQ_CORR    = 0x95,  // +
-    GB_COM_PRM_SET_INC_SAFETY   = 0x16,  // +
+    GB_COM_PRM_SET_INC_SAFETY   = 0x96,  // +
     GB_COM_PRM_SET_DR_STATE     = 0x97,  // +
     GB_COM_PRM_SET_DR_BLOCK     = 0x98,  // +
     GB_COM_PRM_SET_DR_COM       = 0x99,  // +

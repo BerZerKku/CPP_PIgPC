@@ -2914,10 +2914,12 @@ void clMenu::lvlSetupParamPrm()
         sParam.local.clearParams();
 
         uint8_t numcom = sParam.prm.getNumCom();
-        sParam.txComBuf.addCom2(GB_COM_PRM_GET_COM);
+
 
         if (device == AVANT_K400)
         {
+            sParam.txComBuf.addCom2(GB_COM_PRM_GET_COM);
+
             sParam.local.addParam(GB_PARAM_PRM_COM_NUMS);
             sParam.local.addParam(GB_PARAM_PRM_TIME_ON);
             if (numcom != 0)
@@ -2937,6 +2939,8 @@ void clMenu::lvlSetupParamPrm()
         }
         else if (device == AVANT_RZSK)
         {
+            sParam.txComBuf.addCom2(GB_COM_GET_COM_PRD_KEEP);
+
             sParam.local.addParam(GB_PARAM_PRM_TIME_ON);
             if (numcom != 0)
             {
@@ -2947,6 +2951,8 @@ void clMenu::lvlSetupParamPrm()
         }
         else if (device == AVANT_OPTO)
         {
+            sParam.txComBuf.addCom2(GB_COM_PRM_GET_COM);
+
             sParam.local.addParam(GB_PARAM_PRM_TIME_ON);
             if (numcom != 0)
             {
@@ -3013,11 +3019,11 @@ void clMenu::lvlSetupParamPrd()
 
         sParam.local.clearParams();
         uint8_t numcom = sParam.prd.getNumCom();
-        sParam.txComBuf.addCom2(GB_COM_PRD_GET_COM);
 
         if (device == AVANT_K400)
-        {  // совместимость
-            sParam.txComBuf.addCom2(GB_COM_GET_COM_PRD_KEEP);
+        {
+            sParam.txComBuf.addCom2(GB_COM_PRD_GET_COM);       // количество команд
+            sParam.txComBuf.addCom2(GB_COM_GET_COM_PRD_KEEP);  // совместимость
 
             sParam.local.addParam(GB_PARAM_PRD_COM_NUMS);
             sParam.local.addParam(GB_PARAM_PRD_IN_DELAY);
@@ -3043,6 +3049,8 @@ void clMenu::lvlSetupParamPrd()
         }
         else if (device == AVANT_RZSK)
         {
+            sParam.txComBuf.addCom2(GB_COM_GET_COM_PRD_KEEP);  // совместимость
+
             sParam.local.addParam(GB_PARAM_PRD_IN_DELAY);
             sParam.local.addParam(GB_PARAM_PRD_DURATION_L);
             sParam.local.addParam(GB_PARAM_PRD_COM_LONG);
@@ -3050,6 +3058,8 @@ void clMenu::lvlSetupParamPrd()
         }
         else if (device == AVANT_OPTO)
         {
+            sParam.txComBuf.addCom2(GB_COM_PRD_GET_COM);  // количество команд
+
             sParam.local.addParam(GB_PARAM_PRD_IN_DELAY);
             sParam.local.addParam(GB_PARAM_PRD_DURATION_O);
             sParam.local.addParam(GB_PARAM_PRD_COM_LONG);
@@ -5251,13 +5261,7 @@ eGB_TYPE_DEVICE clMenu::getKeyboardLayout()
     case AVANT_R400:
     case AVANT_R400M: layout = AVANT_R400M; break;
 
-    case AVANT_RZSK:
-        {
-            eGB_COMP_RZSK comp = sParam.glb.getCompRZSK();
-
-            layout = (comp == GB_COMP_RZSK_3E8) ? AVANT_K400 : AVANT_RZSK;
-            break;
-        }
+    case AVANT_RZSK: layout = AVANT_RZSK; break;
 
     case AVANT_OPTO:
         {

@@ -1410,7 +1410,8 @@ qint16 Bsp::getSpinBoxValue(eGB_PARAM param, uint8_t number)
     if (number > 0 && mapSpinBox.contains(param) && mapSpinBox.value(param).size() >= number)
     {
         Param::Param::PARAM_TYPE type = getParamType(param);
-        if (type == Param::PARAM_INT || type == Param::Param::PARAM_I_COR)
+        if (type == Param::PARAM_INT || type == Param::Param::PARAM_I_COR
+            || type == Param::PARAM_BITES)
         {
             value = getSpinBoxValue(mapSpinBox.value(param).at(number - 1));
             value = (value / getDisc(param)) * getDisc(param);
@@ -1732,7 +1733,7 @@ qint16 Bsp::GetParamValue(eGB_PARAM param, quint8 number)
     case Param::PARAM_INT: value = getSpinBoxValue(param, number); break;
     case Param::PARAM_U_COR: value = getDoubleSpinBoxValue(param); break;
     case Param::PARAM_I_COR: value = getSpinBoxValue(param, number); break;
-    case Param::PARAM_BITES: value = getSpinBoxValue(param, number % 8); break;
+    case Param::PARAM_BITES: value = getSpinBoxValue(param, number); break;
 
     case Param::PARAM_NO: Q_ASSERT(false);
     }

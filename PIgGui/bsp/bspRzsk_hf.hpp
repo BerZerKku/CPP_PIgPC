@@ -60,6 +60,18 @@ private:
     void HdlrComDefx09(eGB_COM com, pkg_t &data) override;
     void HdlrComDefx0A(eGB_COM com, pkg_t &data) override;
 
+    void HdlrComPrmx10(eGB_COM com, pkg_t &data) override;
+    void HdlrComPrmx11(eGB_COM com, pkg_t &data) override;
+    void HdlrComPrmx13(eGB_COM com, pkg_t &data) override;
+    void HdlrComPrmx14(eGB_COM com, pkg_t &data) override;
+    void HdlrComPrmx16(eGB_COM com, pkg_t &data) override;
+
+    void HdlrComPrdx20(eGB_COM com, pkg_t &data) override;
+    void HdlrComPrdx21(eGB_COM com, pkg_t &data) override;
+    void HdlrComPrdx22(eGB_COM com, pkg_t &data) override;
+    void HdlrComPrdx24(eGB_COM com, pkg_t &data) override;
+    void HdlrComPrdx25(eGB_COM com, pkg_t &data) override;
+
     void HdlrComGlbx30(eGB_COM com, pkg_t &data) override;
     void HdlrComGlbx31(eGB_COM com, pkg_t &data) override;
     void HdlrComGlbx32(eGB_COM com, pkg_t &data) override;
