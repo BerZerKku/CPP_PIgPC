@@ -143,55 +143,65 @@ void Bsp::InitClock()
 
 void Bsp::crtTreeDef(QTreeWidgetItem *top)
 {
-    QTreeWidgetItem *ltop = new QTreeWidgetItem(top);
-    ltop->setText(0, kCodec->toUnicode("Защита"));
-    top->addChild(ltop);
+    Q_UNUSED(top);
+
+    //    QTreeWidgetItem *ltop = new QTreeWidgetItem(top);
+    //    ltop->setText(0, kCodec->toUnicode("Защита"));
+    //    top->addChild(ltop);
 
     // Add params here
-    // ex. CrtParamWidget(ltop, GB_PARAM_NET_ADDRESS);
+    //    CrtParamWidget(ltop, GB_PARAM_NET_ADDRESS);
 }
 
 
-void Bsp::crtTreePrd(QTreeWidgetItem(*top))
+void Bsp::crtTreePrd(QTreeWidgetItem *top)
 {
-    QTreeWidgetItem *ltop = new QTreeWidgetItem(top);
-    ltop->setText(0, kCodec->toUnicode("Передатчик"));
-    top->addChild(ltop);
+    Q_UNUSED(top);
+
+    //    QTreeWidgetItem *ltop = new QTreeWidgetItem(top);
+    //    ltop->setText(0, kCodec->toUnicode("Передатчик"));
+    //    top->addChild(ltop);
 
     // Add params here
-    // ex. CrtParamWidget(ltop, GB_PARAM_NET_ADDRESS);
+    //    CrtParamWidget(ltop, GB_PARAM_NET_ADDRESS);
 }
 
 
-void Bsp::crtTreePrm(QTreeWidgetItem(*top))
+void Bsp::crtTreePrm(QTreeWidgetItem *top)
 {
-    QTreeWidgetItem *ltop = new QTreeWidgetItem(top);
-    ltop->setText(0, kCodec->toUnicode("Приемник"));
-    top->addChild(ltop);
+    Q_UNUSED(top);
+
+    //    QTreeWidgetItem *ltop = new QTreeWidgetItem(top);
+    //    ltop->setText(0, kCodec->toUnicode("Приемник"));
+    //    top->addChild(ltop);
 
     // Add params here
-    // ex. CrtParamWidget(ltop, GB_PARAM_NET_ADDRESS);
+    //    ex.CrtParamWidget(ltop, GB_PARAM_NET_ADDRESS);
 }
 
 
 void Bsp::crtTreeGlb(QTreeWidgetItem *top)
 {
-    QTreeWidgetItem *ltop = new QTreeWidgetItem(top);
-    ltop->setText(0, kCodec->toUnicode("Общие"));
-    top->addChild(ltop);
+    Q_UNUSED(top);
+
+    //    QTreeWidgetItem *ltop = new QTreeWidgetItem(top);
+    //    ltop->setText(0, kCodec->toUnicode("Общие"));
+    //    top->addChild(ltop);
 
     // Add params here
-    // ex. CrtParamWidget(ltop, GB_PARAM_NET_ADDRESS);
+    //    CrtParamWidget(ltop, GB_PARAM_NET_ADDRESS);
 }
 
 void Bsp::crtTreeInterface(QTreeWidgetItem *top)
 {
-    QTreeWidgetItem *ltop = new QTreeWidgetItem(top);
-    top->setText(0, kCodec->toUnicode("Интерфейс"));
-    top->addChild(ltop);
+    Q_UNUSED(top);
+
+    //    QTreeWidgetItem *ltop = new QTreeWidgetItem(top);
+    //    top->setText(0, kCodec->toUnicode("Интерфейс"));
+    //    top->addChild(ltop);
 
     // Add params here
-    // ex. CrtParamWidget(ltop, GB_PARAM_NET_ADDRESS);
+    //    CrtParamWidget(ltop, GB_PARAM_NET_ADDRESS);
 }
 
 
@@ -1425,8 +1435,7 @@ qint16 Bsp::getSpinBoxValue(eGB_PARAM param, uint8_t number)
     }
     else
     {
-        QString msg =
-            QString("Parameter '%1' (%2) not found.").arg(getParamName(param)).arg(number);
+        QString msg = QString("Parameter '%1' (%2) not found.").arg(param).arg(number);
         qWarning() << msg;
     }
 
@@ -2494,6 +2503,1200 @@ void Bsp::HdlrComDefx04(eGB_COM com, pkg_t &data)
 /**
  * *****************************************************************************
  *
+ * @brief Обрабатывает команду чтения/записи задержки на включение.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void Bsp::HdlrComPrmx11(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_PRM_GET_TIME_ON || com == GB_COM_PRM_SET_TIME_ON);
+
+    if (com == GB_COM_PRM_GET_TIME_ON)
+    {
+        if (!CheckSize(com, data.size(), { 0 }))
+        {
+            return;
+        }
+
+        mPkgTx.append(com);
+        mPkgTx.append(GetParamValue(GB_PARAM_PRM_TIME_ON));
+
+        Q_ASSERT(mPkgTx.size() == 2);  // команда + 1 байт данных
+    }
+
+    if (com == GB_COM_PRM_SET_TIME_ON)
+    {
+        // используется только первый байт
+        if (!CheckSize(com, data.size(), { 1 }))
+        {
+            return;
+        }
+
+        // ответ на команду записи совпадает с запросом
+        mPkgTx.append(com);
+        mPkgTx.append(data);
+
+        SetParamValue(GB_PARAM_PRM_TIME_ON, data.at(0));
+    }
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду чтения/записи включения тестовой команды.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void Bsp::HdlrComPrmx12(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_PRM_GET_TEST_COM || com == GB_COM_PRM_SET_TEST_COM);
+
+    if (com == GB_COM_PRM_GET_TEST_COM)
+    {
+        if (!CheckSize(com, data.size(), { 0 }))
+        {
+            return;
+        }
+
+        mPkgTx.append(com);
+        mPkgTx.append(GetParamValue(GB_PARAM_PRM_TEST_COM));
+
+        Q_ASSERT(mPkgTx.size() == 2);  // команда + 1 байт данных
+    }
+
+    if (com == GB_COM_PRM_SET_TEST_COM)
+    {
+        // используется только первый байт
+        if (!CheckSize(com, data.size(), { 1 }))
+        {
+            return;
+        }
+
+        // ответ на команду записи совпадает с запросом
+        mPkgTx.append(com);
+        mPkgTx.append(data);
+
+        SetParamValue(GB_PARAM_PRM_TEST_COM, data.at(0));
+    }
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду чтения/записи задержки на выключение.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void Bsp::HdlrComPrmx13(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_PRM_GET_TIME_OFF || com == GB_COM_PRM_SET_TIME_OFF);
+
+    if (com == GB_COM_PRM_GET_TIME_OFF)
+    {
+        if (!CheckSize(com, data.size(), { 0 }))
+        {
+            return;
+        }
+
+        mPkgTx.append(com);
+
+        quint8 max = mapSpinBox.value(GB_PARAM_PRM_COM_NUMS).at(0)->maximum();
+        for (int i = 1; i <= 32; i++)
+        {
+            quint8 value = (i <= max) ? (GetParamValue(GB_PARAM_PRM_TIME_OFF, i)) : (0);
+            mPkgTx.append(value);
+        }
+
+        Q_ASSERT(mPkgTx.size() == 33);  // команда + 32 байт данных
+    }
+
+    if (com == GB_COM_PRM_SET_TIME_OFF)
+    {
+        // используется только первый байт
+        if (!CheckSize(com, data.size(), { 2 }))
+        {
+            return;
+        }
+
+        // ответ на команду записи совпадает с запросом
+        mPkgTx.append(com);
+        mPkgTx.append(data);
+
+        quint8 index = data.at(0);
+        quint8 max   = mapSpinBox.value(GB_PARAM_PRM_COM_NUMS).at(0)->maximum();
+        if (index >= 1 && index <= max)
+        {
+            SetParamValue(GB_PARAM_PRM_TIME_OFF, data.at(1), index);
+        }
+        else
+        {
+            QString message("Wrong index in command %1: %2");
+            qWarning() << message.arg(com, 2, 16, QLatin1Char('0')).arg(index);
+        }
+    }
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду чтения/записи блокированных команд.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void Bsp::HdlrComPrmx14(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_PRM_GET_BLOCK_COM || com == GB_COM_PRM_SET_BLOCK_COM);
+
+    if (com == GB_COM_PRM_GET_BLOCK_COM)
+    {
+        if (!CheckSize(com, data.size(), { 0 }))
+        {
+            return;
+        }
+
+        mPkgTx.append(com);
+
+        quint8 max = (mapSpinBox.value(GB_PARAM_PRM_COM_NUMS).at(0)->maximum() + 7) / 8;
+        for (int i = 1; i <= 4; i++)
+        {
+            quint8 value = (i <= max) ? GetParamValue(GB_PARAM_PRM_COM_BLOCK, i) : 0;
+            mPkgTx.append(value);
+        }
+
+        Q_ASSERT(mPkgTx.size() == 5);  // команда + 4 байт данных
+    }
+
+    if (com == GB_COM_PRM_SET_BLOCK_COM)
+    {
+        // используется только первый байт
+        if (!CheckSize(com, data.size(), { 2 }))
+        {
+            return;
+        }
+
+        // ответ на команду записи совпадает с запросом
+        mPkgTx.append(com);
+        mPkgTx.append(data);
+
+        int    index = data.at(0);
+        quint8 max   = (mapSpinBox.value(GB_PARAM_PRM_COM_NUMS).at(0)->maximum() + 7) / 8;
+        if (index >= 1 && index <= max)
+        {
+            SetParamValue(GB_PARAM_PRM_COM_BLOCK, data.at(1), index);
+        }
+        else
+        {
+            QString message("Wrong index in command %1: %2");
+            qWarning() << message.arg(com, 2, 16, QLatin1Char('0')).arg(index);
+        }
+    }
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду чтения/записи коррекции частоты ПРМ.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void Bsp::HdlrComPrmx15(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_PRM_GET_FREQ_CORR || com == GB_COM_PRM_SET_FREQ_CORR);
+
+    if (com == GB_COM_PRM_GET_FREQ_CORR)
+    {
+        if (!CheckSize(com, data.size(), { 0 }))
+        {
+            return;
+        }
+
+        mPkgTx.append(com);
+        mPkgTx.append(GetParamValue(GB_PARAM_PRM_FREQ_CORR));
+
+        Q_ASSERT(mPkgTx.size() == 2);  // команда + 1 байт данных
+    }
+
+    if (com == GB_COM_PRM_SET_FREQ_CORR)
+    {
+        // используется только первый байт
+        if (!CheckSize(com, data.size(), { 1 }))
+        {
+            return;
+        }
+
+        // ответ на команду записи совпадает с запросом
+        mPkgTx.append(com);
+        mPkgTx.append(data);
+
+        SetParamValue(GB_PARAM_PRM_FREQ_CORR, data.at(0));
+    }
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду чтения/записи влючения ЦПП.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void Bsp::HdlrComPrmx17(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_PRM_GET_DR_STATE || com == GB_COM_PRM_SET_DR_STATE);
+
+    if (com == GB_COM_PRM_GET_DR_STATE)
+    {
+        if (!CheckSize(com, data.size(), { 0 }))
+        {
+            return;
+        }
+
+        mPkgTx.append(com);
+        mPkgTx.append(GetParamValue(GB_PARAM_PRM_DR_ENABLE));
+
+        Q_ASSERT(mPkgTx.size() == 2);  // команда + 1 байт данных
+    }
+
+    if (com == GB_COM_PRM_SET_DR_STATE)
+    {
+        // используется только первый байт
+        if (!CheckSize(com, data.size(), { 1 }))
+        {
+            return;
+        }
+
+        // ответ на команду записи совпадает с запросом
+        mPkgTx.append(com);
+        mPkgTx.append(data);
+
+        SetParamValue(GB_PARAM_PRM_DR_ENABLE, data.at(0));
+    }
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду чтения/записи блокированных команд ЦПП.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void Bsp::HdlrComPrmx18(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_PRM_GET_DR_BLOCK || com == GB_COM_PRM_SET_DR_BLOCK);
+
+    if (com == GB_COM_PRM_GET_DR_BLOCK)
+    {
+        if (!CheckSize(com, data.size(), { 0 }))
+        {
+            return;
+        }
+
+        mPkgTx.append(com);
+
+        quint8 max = (mapSpinBox.value(GB_PARAM_PRM_COM_NUMS).at(0)->maximum() + 7) / 8;
+        for (int i = 1; i <= 4; i++)
+        {
+            quint8 value = (i <= max) ? (GetParamValue(GB_PARAM_PRM_DR_COM_BLOCK, i)) : 0;
+            mPkgTx.append(value);  // блокированные команды 16..9
+        }
+
+        Q_ASSERT(mPkgTx.size() == 5);  // команда + 4 байт данных
+    }
+
+    if (com == GB_COM_PRM_SET_DR_BLOCK)
+    {
+        // используется только первый байт
+        if (!CheckSize(com, data.size(), { 2 }))
+        {
+            return;
+        }
+
+        // ответ на команду записи совпадает с запросом
+        mPkgTx.append(com);
+        mPkgTx.append(data);
+
+        int    index = data.at(0);
+        quint8 max   = (mapSpinBox.value(GB_PARAM_PRM_COM_NUMS).at(0)->maximum() + 7) / 8;
+        if (index >= 1 && index <= max)
+        {
+            // на самом деле тут index всегда должен быть 1
+            SetParamValue(GB_PARAM_PRM_DR_COM_BLOCK, data.at(1), index);
+        }
+        else
+        {
+            QString message("Wrong index in command %1: %2");
+            qWarning() << message.arg(com, 2, 16, QLatin1Char('0')).arg(index);
+        }
+    }
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду чтения/записи переназначения команд ЦПП.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void Bsp::HdlrComPrmx19(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_PRM_GET_DR_COM || com == GB_COM_PRM_SET_DR_COM);
+
+    if (com == GB_COM_PRM_GET_DR_COM)
+    {
+        if (!CheckSize(com, data.size(), { 0 }))
+        {
+            return;
+        }
+
+        mPkgTx.append(com);
+
+        quint8 max = mapSpinBox.value(GB_PARAM_PRM_COM_NUMS).at(0)->maximum();
+        for (int i = 1; i <= 32; i++)
+        {
+            quint8 value = (i <= max) ? GetParamValue(GB_PARAM_PRM_DR_COM_TO_HF, i) : 0;
+            mPkgTx.append(value);  // блокированные команды 16..9
+        }
+
+        Q_ASSERT(mPkgTx.size() == 33);  // команда + 32 байт данных
+    }
+
+    if (com == GB_COM_PRM_SET_DR_COM)
+    {
+        // используется только первый байт
+        if (!CheckSize(com, data.size(), { 2 }))
+        {
+            return;
+        }
+
+        // ответ на команду записи совпадает с запросом
+        mPkgTx.append(com);
+        mPkgTx.append(data);
+
+        quint8 index = data.at(0);
+        quint8 max   = mapSpinBox.value(GB_PARAM_PRM_COM_NUMS).at(0)->maximum();
+        if (index >= 1 && index <= max)
+        {
+            SetParamValue(GB_PARAM_PRM_DR_COM_TO_HF, data.at(1), index);
+        }
+        else
+        {
+            QString message("Wrong index in command %1: %2");
+            qWarning() << message.arg(com, 2, 16, QLatin1Char('0')).arg(index);
+        }
+    }
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду чтения/записи количества команд ПРМ.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void Bsp::HdlrComPrmx1C(eGB_COM com, pkg_t &data)
+{
+
+    Q_ASSERT(com == GB_COM_PRM_GET_COM || com == GB_COM_PRM_SET_COM);
+
+    if (com == GB_COM_PRM_GET_COM)
+    {
+        if (!CheckSize(com, data.size(), { 0 }))
+        {
+            return;
+        }
+
+        mPkgTx.append(com);
+        mPkgTx.append(GetParamValue(GB_PARAM_PRM_COM_NUMS));
+
+        Q_ASSERT(mPkgTx.size() == 2);  // команда + 1 байт данных
+    }
+
+    if (com == GB_COM_PRM_SET_COM)
+    {
+        // используется только первый байт
+        if (!CheckSize(com, data.size(), { 1 }))
+        {
+            return;
+        }
+
+        // ответ на команду записи совпадает с запросом
+        mPkgTx.append(com);
+        mPkgTx.append(data);
+
+        SetParamValue(GB_PARAM_PRM_COM_NUMS, data.at(0));
+    }
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду чтения/записи команд с разрешенной сигнализацией.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void Bsp::HdlrComPrmx1D(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_PRM_GET_COM_SIGN || com == GB_COM_PRM_SET_COM_SIGN);
+
+    if (com == GB_COM_PRM_GET_COM_SIGN)
+    {
+        if (!CheckSize(com, data.size(), { 0 }))
+        {
+            return;
+        }
+
+        mPkgTx.append(com);
+
+        quint8 max = (mapSpinBox.value(GB_PARAM_PRM_COM_NUMS).at(0)->maximum() + 7) / 8;
+        for (int i = 1; i <= 4; i++)
+        {
+            quint8 value = (i <= max) ? GetParamValue(GB_PARAM_PRM_COM_SIGNAL, i) : 0;
+            mPkgTx.append(value);  // блокированные команды 16..9
+        }
+
+        Q_ASSERT(mPkgTx.size() == 5);  // команда + 4 байт данных
+    }
+
+    if (com == GB_COM_PRM_SET_COM_SIGN)
+    {
+        // используется только первый байт
+        if (!CheckSize(com, data.size(), { 2 }))
+        {
+            return;
+        }
+
+        // ответ на команду записи совпадает с запросом
+        mPkgTx.append(com);
+        mPkgTx.append(data);
+
+        int    index = data.at(0);
+        quint8 max   = (mapSpinBox.value(GB_PARAM_PRM_COM_NUMS).at(0)->maximum() + 7) / 8;
+        if (index >= 1 && index <= max)
+        {
+            // на самом деле тут index всегда должен быть 1
+            SetParamValue(GB_PARAM_PRM_COM_SIGNAL, data.at(1), index);
+        }
+        else
+        {
+            QString message("Wrong index in command %1: %2");
+            qWarning() << message.arg(com, 2, 16, QLatin1Char('0')).arg(index);
+        }
+    }
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду чтения/записи задержки на включение.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void Bsp::HdlrComPrdx21(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_PRD_GET_TIME_ON || com == GB_COM_PRD_SET_TIME_ON);
+
+    if (com == GB_COM_PRD_GET_TIME_ON)
+    {
+        if (!CheckSize(com, data.size(), { 0 }))
+        {
+            return;
+        }
+
+        mPkgTx.append(com);
+        mPkgTx.append(GetParamValue(GB_PARAM_PRD_IN_DELAY));
+
+        Q_ASSERT(mPkgTx.size() == 2);  // команда + 1 байт данных
+    }
+
+    if (com == GB_COM_PRD_SET_TIME_ON)
+    {
+        // используется только первый байт
+        if (!CheckSize(com, data.size(), { 1 }))
+        {
+            return;
+        }
+
+        // ответ на команду записи совпадает с запросом
+        mPkgTx.append(com);
+        mPkgTx.append(data);
+
+        SetParamValue(GB_PARAM_PRD_IN_DELAY, data.at(0));
+    }
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду чтения/записи длительности команды.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void Bsp::HdlrComPrdx22(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_PRD_GET_DURATION || com == GB_COM_PRD_SET_DURATION);
+
+    if (com == GB_COM_PRD_GET_DURATION)
+    {
+        if (!CheckSize(com, data.size(), { 0 }))
+        {
+            return;
+        }
+
+        mPkgTx.append(com);
+        mPkgTx.append(GetParamValue(GB_PARAM_PRD_DURATION_L));
+
+        Q_ASSERT(mPkgTx.size() == 2);  // команда + 1 байт данных
+    }
+
+    if (com == GB_COM_PRD_SET_DURATION)
+    {
+        // используется только первый байт
+        if (!CheckSize(com, data.size(), { 1 }))
+        {
+            return;
+        }
+
+        // ответ на команду записи совпадает с запросом
+        mPkgTx.append(com);
+        mPkgTx.append(data);
+
+        SetParamValue(GB_PARAM_PRD_DURATION_L, data.at(0));
+    }
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду чтения/записи коррекции частоты ПРД.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void Bsp::HdlrComPrdx23(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_PRD_GET_FREQ_CORR || com == GB_COM_PRD_SET_FREQ_CORR);
+
+    if (com == GB_COM_PRD_GET_FREQ_CORR)
+    {
+        if (!CheckSize(com, data.size(), { 0 }))
+        {
+            return;
+        }
+
+        mPkgTx.append(com);
+        mPkgTx.append(GetParamValue(GB_PARAM_PRD_FREQ_CORR));
+
+        Q_ASSERT(mPkgTx.size() == 2);  // команда + 1 байт данных
+    }
+
+    if (com == GB_COM_PRD_SET_FREQ_CORR)
+    {
+        // используется только первый байт
+        if (!CheckSize(com, data.size(), { 1 }))
+        {
+            return;
+        }
+
+        // ответ на команду записи совпадает с запросом
+        mPkgTx.append(com);
+        mPkgTx.append(data);
+
+        SetParamValue(GB_PARAM_PRD_FREQ_CORR, static_cast<qint8>(data.at(0)));
+    }
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду чтения/записи блокированных команд.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void Bsp::HdlrComPrdx24(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_PRD_GET_BLOCK_COM || com == GB_COM_PRD_SET_BLOCK_COM);
+
+    if (com == GB_COM_PRD_GET_BLOCK_COM)
+    {
+        if (!CheckSize(com, data.size(), { 0 }))
+        {
+            return;
+        }
+
+        mPkgTx.append(com);
+
+        quint8 max = (mapSpinBox.value(GB_PARAM_PRD_COM_NUMS).at(0)->maximum() + 7) / 8;
+        for (int i = 1; i <= 4; i++)
+        {
+            quint8 value = (i <= max) ? GetParamValue(GB_PARAM_PRD_COM_BLOCK, i) : 0;
+            mPkgTx.append(value);
+        }
+
+        Q_ASSERT(mPkgTx.size() == 5);  // команда + 4 байт данных
+    }
+
+    if (com == GB_COM_PRD_SET_BLOCK_COM)
+    {
+        // используется только первый байт
+        if (!CheckSize(com, data.size(), { 2 }))
+        {
+            return;
+        }
+
+        // ответ на команду записи совпадает с запросом
+        mPkgTx.append(com);
+        mPkgTx.append(data);
+
+        int    index = data.at(0);
+        quint8 max   = (mapSpinBox.value(GB_PARAM_PRD_COM_NUMS).at(0)->maximum() + 7) / 8;
+        if (index >= 1 && index <= max)
+        {
+            SetParamValue(GB_PARAM_PRD_COM_BLOCK, data.at(1), index);
+        }
+        else
+        {
+            QString message("Wrong index in command %1: %2");
+            qWarning() << message.arg(com, 2, 16, QLatin1Char('0')).arg(index);
+        }
+    }
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду чтения/записи длительных команд.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void Bsp::HdlrComPrdx25(eGB_COM com, pkg_t &data)
+{
+
+    Q_ASSERT(com == GB_COM_PRD_GET_LONG_COM || com == GB_COM_PRD_SET_LONG_COM);
+
+    if (com == GB_COM_PRD_GET_LONG_COM)
+    {
+        if (!CheckSize(com, data.size(), { 0 }))
+        {
+            return;
+        }
+
+        mPkgTx.append(com);
+
+        quint8 max = (mapSpinBox.value(GB_PARAM_PRD_COM_NUMS).at(0)->maximum() + 7) / 8;
+        for (int i = 1; i <= 4; i++)
+        {
+            quint8 value = (i <= max) ? GetParamValue(GB_PARAM_PRD_COM_LONG, i) : 0;
+            mPkgTx.append(value);
+        }
+
+        Q_ASSERT(mPkgTx.size() == 5);  // команда + 4 байт данных
+    }
+
+    if (com == GB_COM_PRD_SET_LONG_COM)
+    {
+        // используется только первый байт
+        if (!CheckSize(com, data.size(), { 2 }))
+        {
+            return;
+        }
+
+        // ответ на команду записи совпадает с запросом
+        mPkgTx.append(com);
+        mPkgTx.append(data);
+
+        int    index = data.at(0);
+        quint8 max   = (mapSpinBox.value(GB_PARAM_PRD_COM_NUMS).at(0)->maximum() + 7) / 8;
+        if (index >= 1 && index <= max)
+        {
+            SetParamValue(GB_PARAM_PRD_COM_LONG, data.at(1), index);
+        }
+        else
+        {
+            QString message("Wrong index in command %1: %2");
+            qWarning() << message.arg(com, 2, 16, QLatin1Char('0')).arg(index);
+        }
+    }
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду чтения/записи включения тестовой команды.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void Bsp::HdlrComPrdx26(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_PRD_GET_TEST_COM || com == GB_COM_PRD_SET_TEST_COM);
+
+    if (com == GB_COM_PRD_GET_TEST_COM)
+    {
+        if (!CheckSize(com, data.size(), { 0 }))
+        {
+            return;
+        }
+
+        mPkgTx.append(com);
+        mPkgTx.append(GetParamValue(GB_PARAM_PRD_TEST_COM));
+
+        Q_ASSERT(mPkgTx.size() == 2);  // команда + 1 байт данных
+    }
+
+    if (com == GB_COM_PRD_SET_TEST_COM)
+    {
+        // используется только первый байт
+        if (!CheckSize(com, data.size(), { 1 }))
+        {
+            return;
+        }
+
+        // ответ на команду записи совпадает с запросом
+        mPkgTx.append(com);
+        mPkgTx.append(data);
+
+        SetParamValue(GB_PARAM_PRD_TEST_COM, data.at(0));
+    }
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду чтения/записи включения ЦПП.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void Bsp::HdlrComPrdx27(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_PRD_GET_DR_STATE || com == GB_COM_PRD_SET_DR_STATE);
+
+    if (com == GB_COM_PRD_GET_DR_STATE)
+    {
+        if (!CheckSize(com, data.size(), { 0 }))
+        {
+            return;
+        }
+
+        mPkgTx.append(com);
+        mPkgTx.append(GetParamValue(GB_PARAM_PRD_DR_ENABLE));
+
+        Q_ASSERT(mPkgTx.size() == 2);  // команда + 1 байт данных
+    }
+
+    if (com == GB_COM_PRD_SET_DR_STATE)
+    {
+        // используется только первый байт
+        if (!CheckSize(com, data.size(), { 1 }))
+        {
+            return;
+        }
+
+        // ответ на команду записи совпадает с запросом
+        mPkgTx.append(com);
+        mPkgTx.append(data);
+
+        SetParamValue(GB_PARAM_PRD_DR_ENABLE, data.at(0));
+    }
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду чтения/записи блокированных на ЦПП команд.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void Bsp::HdlrComPrdx28(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_PRD_GET_DR_BLOCK || com == GB_COM_PRD_SET_DR_BLOCK);
+
+    if (com == GB_COM_PRD_GET_DR_BLOCK)
+    {
+        if (!CheckSize(com, data.size(), { 0 }))
+        {
+            return;
+        }
+
+        mPkgTx.append(com);
+
+        quint8 max = (mapSpinBox.value(GB_PARAM_PRD_COM_NUMS).at(0)->maximum() + 7) / 8;
+        for (int i = 1; i <= 4; i++)
+        {
+            quint8 value = (i <= max) ? GetParamValue(GB_PARAM_PRD_DR_COM_BLOCK, i) : 0;
+            mPkgTx.append(value);
+        }
+
+        Q_ASSERT(mPkgTx.size() == 5);  // команда + 4 байт данных
+    }
+
+    if (com == GB_COM_PRD_SET_DR_BLOCK)
+    {
+        // используется только первый байт
+        if (!CheckSize(com, data.size(), { 2 }))
+        {
+            return;
+        }
+
+        // ответ на команду записи совпадает с запросом
+        mPkgTx.append(com);
+        mPkgTx.append(data);
+
+        int    index = data.at(0);
+        quint8 max   = (mapSpinBox.value(GB_PARAM_PRD_COM_NUMS).at(0)->maximum() + 7) / 8;
+        if (index >= 1 && index <= max)
+        {
+            SetParamValue(GB_PARAM_PRD_DR_COM_BLOCK, data.at(1), index);
+        }
+        else
+        {
+            QString message("Wrong index in command %1: %2");
+            qWarning() << message.arg(com, 2, 16, QLatin1Char('0')).arg(index);
+        }
+    }
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду чтения/записи количества команд группы А.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void Bsp::HdlrComPrdx29(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_PRD_GET_COM_A || com == GB_COM_PRD_SET_COM_A);
+
+    if (com == GB_COM_PRD_GET_COM_A)
+    {
+        if (!CheckSize(com, data.size(), { 0 }))
+        {
+            return;
+        }
+
+        mPkgTx.append(com);
+        mPkgTx.append(GetParamValue(GB_PARAM_PRD_COM_NUMS_A));
+
+        Q_ASSERT(mPkgTx.size() == 2);  // команда + 1 байт данных
+    }
+
+    if (com == GB_COM_PRD_SET_COM_A)
+    {
+        // используется только первый байт
+        if (!CheckSize(com, data.size(), { 1 }))
+        {
+            return;
+        }
+
+        // ответ на команду записи совпадает с запросом
+        mPkgTx.append(com);
+        mPkgTx.append(data);
+
+        SetParamValue(GB_PARAM_PRD_COM_NUMS_A, data.at(0));
+    }
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду чтения/записи количества команд передатчика.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void Bsp::HdlrComPrdx2C(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_PRD_GET_COM || com == GB_COM_PRD_SET_COM);
+
+    if (com == GB_COM_PRD_GET_COM)
+    {
+        if (!CheckSize(com, data.size(), { 0 }))
+        {
+            return;
+        }
+
+        mPkgTx.append(com);
+        mPkgTx.append(GetParamValue(GB_PARAM_PRD_COM_NUMS));
+
+        Q_ASSERT(mPkgTx.size() == 2);  // команда + 1 байт данных
+    }
+
+    if (com == GB_COM_PRD_SET_COM)
+    {
+        // используется только первый байт
+        if (!CheckSize(com, data.size(), { 1 }))
+        {
+            return;
+        }
+
+        // ответ на команду записи совпадает с запросом
+        mPkgTx.append(com);
+        mPkgTx.append(data);
+
+        SetParamValue(GB_PARAM_PRD_COM_NUMS, data.at(0));
+    }
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду чтения/записи снижения уровня КС и ТМ.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void Bsp::HdlrComPrdx2D(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_PRD_GET_CF_TM || com == GB_COM_PRD_SET_CF_TM);
+
+    if (com == GB_COM_PRD_GET_CF_TM)
+    {
+        if (!CheckSize(com, data.size(), { 0 }))
+        {
+            return;
+        }
+
+        mPkgTx.append(com);
+        mPkgTx.append(GetParamValue(GB_PARAM_PRD_DEC_CF));
+        mPkgTx.append(GetParamValue(GB_PARAM_PRD_DEC_TM));
+        mPkgTx.append(0);  // уровень КС по умолчанию ?!
+
+        Q_ASSERT(mPkgTx.size() == 4);  // команда + 3 байт данных
+    }
+
+    if (com == GB_COM_PRD_SET_CF_TM)
+    {
+        // используется только первый байт
+        if (!CheckSize(com, data.size(), { 2 }))
+        {
+            return;
+        }
+
+        // ответ на команду записи совпадает с запросом
+        mPkgTx.append(com);
+        mPkgTx.append(data);
+
+        int index = data.at(0);
+        switch (index)
+        {
+        case 1: SetParamValue(GB_PARAM_PRD_DEC_CF, data.at(1)); break;
+        case 2: SetParamValue(GB_PARAM_PRD_DEC_TM, data.at(1)); break;
+
+        default:
+            // 3 - уровень КС по умолчанию ?!
+            QString message = "Wrong data in command %1: %2";
+            qWarning() << message.arg(com, 2, 16, QLatin1Char('0')).arg(index);
+        }
+    }
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду чтения/записи команд с разрешенной сигнализацией
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void Bsp::HdlrComPrdx2E(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_PRD_GET_COM_SIGN || com == GB_COM_PRD_SET_COM_SIGN);
+
+    if (com == GB_COM_PRD_GET_COM_SIGN)
+    {
+        if (!CheckSize(com, data.size(), { 0 }))
+        {
+            return;
+        }
+
+        mPkgTx.append(com);
+
+        quint8 max = (mapSpinBox.value(GB_PARAM_PRD_COM_NUMS).at(0)->maximum() + 7) / 8;
+        for (int i = 1; i <= 4; i++)
+        {
+            quint8 value = (i <= max) ? GetParamValue(GB_PARAM_PRD_COM_SIGNAL, i) : 0;
+            mPkgTx.append(value);
+        }
+
+        Q_ASSERT(mPkgTx.size() == 5);  // команда + 4 байт данных
+    }
+
+    if (com == GB_COM_PRD_SET_COM_SIGN)
+    {
+        // используется только первый байт
+        if (!CheckSize(com, data.size(), { 2 }))
+        {
+            return;
+        }
+
+        // ответ на команду записи совпадает с запросом
+        mPkgTx.append(com);
+        mPkgTx.append(data);
+
+        int    index = data.at(0);
+        quint8 max   = (mapSpinBox.value(GB_PARAM_PRD_COM_NUMS).at(0)->maximum() + 7) / 8;
+        if (index >= 1 && index <= max)
+        {
+            SetParamValue(GB_PARAM_PRD_COM_SIGNAL, data.at(1), index);
+        }
+        else
+        {
+            QString message("Wrong index in command %1: %2");
+            qWarning() << message.arg(com, 2, 16, QLatin1Char('0')).arg(index);
+        }
+    }
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду чтения/записи даты и времени.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void Bsp::HdlrComGlbx32(eGB_COM com, pkg_t &data)
+{
+    uint16_t msec = dt.time().msec();
+
+    Q_ASSERT(com == GB_COM_GET_TIME || com == GB_COM_SET_TIME);
+
+    if (com == GB_COM_GET_TIME)
+    {
+        // C ПИ передается флаг запроса сообщения для передачи в АСУ (0..3), с ПК нет данных
+        // В Р400м флаг запроса не обрабатывается
+        if (!CheckSize(com, data.size(), { 0, 1 }))
+        {
+            return;
+        }
+
+        // @todo Добавить обработчик команды запроса времени с байтом чтения журналов
+        // Для запроса журналов передается один байт данных:
+        // 0 - передать только дату и время
+        // 1 - повторить последнюю запись журнала
+        // 2 - передать новую запись журнала (предыдущая принята)
+        // иначе в ответ возвращается команда ошибки 55 AA FF 00 FF
+
+        mPkgTx.append(com);
+        mPkgTx.append(int2bcd(dt.date().year() - 2000));
+        mPkgTx.append(int2bcd(dt.date().month()));
+        mPkgTx.append(int2bcd(dt.date().day()));
+        mPkgTx.append(int2bcd(dt.time().hour()));
+        mPkgTx.append(int2bcd(dt.time().minute()));
+        mPkgTx.append(int2bcd(dt.time().second()));
+        mPkgTx.append(static_cast<uint8_t>(msec));
+        mPkgTx.append(static_cast<uint8_t>(msec >> 8));
+
+        Q_ASSERT(mPkgTx.size() == 9);  // команда + 8 байт данных
+    }
+
+    if (com == GB_COM_SET_TIME)
+    {
+        // с ПК передается 6 байт, без мс / c МК передается 9 байт
+        if (!CheckSize(com, data.size(), { 6, 9 }))
+        {
+            return;
+        }
+
+        // ответ на команду записи совпадает с запросом
+        mPkgTx.append(com);
+        mPkgTx.append(data);
+
+        // @todo Добавить обработку флага источника синхронизации времени
+        // При установке времени надо проверить флаг источника:
+        // - 0, изменение с клавиатуры/пк
+        // - 1, изменение по АСУ, надо учитывать параметр "Синхр. времени"
+
+        quint16 year  = bcd2int(data.takeFirst()) + 2000;
+        quint8  month = bcd2int(data.takeFirst());
+        quint8  day   = bcd2int(data.takeFirst());
+
+        quint8 hour   = bcd2int(data.takeFirst());
+        quint8 minute = bcd2int(data.takeFirst());
+        quint8 second = bcd2int(data.takeFirst());
+
+        quint16 ms = 0;
+        if (data.size() >= 3)
+        {
+            ms = data.takeFirst();
+            ms += static_cast<quint16>(data.takeFirst()) << 8;
+
+            quint8 source = data.takeFirst();
+            if (source > 1)
+            {
+                qWarning() << kMsgTimeSourceError.arg(source);
+            }
+        }
+
+        dt.setDate(QDate(year, month, day));
+        dt.setTime(QTime(hour, minute, second, ms));
+    }
+}
+
+
+/**
+ * *****************************************************************************
+ *
  * @brief Обрабатывает команду чтения коррекция тока и напряжения.
  * @param[in] Команда.
  * @param[in] Данные.
@@ -2569,6 +3772,49 @@ void Bsp::HdlrComGlbx33(eGB_COM com, pkg_t &data)
 /**
  * *****************************************************************************
  *
+ * @brief Обрабатывает команду чтения/записи удержания реле команд приемника.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void Bsp::HdlrComGlbx36(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_GET_COM_PRM_KEEP || com == GB_COM_SET_COM_PRM_KEEP);
+
+    if (com == GB_COM_GET_COM_PRM_KEEP)
+    {
+        if (!CheckSize(com, data.size(), { 0 }))
+        {
+            return;
+        }
+
+        mPkgTx.append(com);
+        mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_COM_PRM_KEEP)));
+
+        Q_ASSERT(mPkgTx.size() == 2);  // команда + 1 байт данных
+    }
+
+    if (com == GB_COM_SET_COM_PRM_KEEP)
+    {
+        // используется только первый байт
+        if (!CheckSize(com, data.size(), { 1 }))
+        {
+            return;
+        }
+
+        // ответ на команду записи совпадает с запросом
+        mPkgTx.append(com);
+        mPkgTx.append(data);
+
+        SetParamValue(GB_PARAM_COM_PRM_KEEP, data.at(0));
+    }
+}
+
+
+/**
+ * *****************************************************************************
+ *
  * @brief Обрабатывает команду чтения/записи адреса в локальной сети.
  * @param[in] Команда.
  * @param[in] Данные.
@@ -2604,6 +3850,48 @@ void Bsp::HdlrComGlbx38(eGB_COM com, pkg_t &data)
         mPkgTx.append(data);
 
         SetParamValue(GB_PARAM_NET_ADDRESS, data.at(0));
+    }
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду чтения/записи времени перезапуска.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void Bsp::HdlrComGlbx39(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_GET_TIME_RERUN || com == GB_COM_SET_TIME_RERUN);
+
+    if (com == GB_COM_GET_TIME_RERUN)
+    {
+        if (!CheckSize(com, data.size(), { 0 }))
+        {
+            return;
+        }
+
+        mPkgTx.append(com);
+        mPkgTx.append(static_cast<uint8_t>(GetParamValue(GB_PARAM_TIME_RERUN)));
+
+        Q_ASSERT(mPkgTx.size() == 2);  // команда + 1 байт данных
+    }
+
+    if (com == GB_COM_SET_TIME_RERUN)
+    {
+        if (!CheckSize(com, data.size(), { 1 }))
+        {
+            return;
+        }
+
+        // ответ на команду записи совпадает с запросом
+        mPkgTx.append(com);
+        mPkgTx.append(data);
+
+        SetParamValue(GB_PARAM_TIME_RERUN, data.at(0));
     }
 }
 
@@ -2828,6 +4116,53 @@ void Bsp::HdlrComRegx71(eGB_COM com, pkg_t &data)
 /**
  * *****************************************************************************
  *
+ * @brief Обрабатывает команду управления.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void Bsp::HdlrComRegx72(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_SET_CONTROL);
+
+    if (!CheckSize(com, data.size(), { 1 }))
+    {
+        return;
+    }
+
+    // ответ на команду записи совпадает с запросом
+    mPkgTx.append(com);
+    mPkgTx.append(data);
+
+    uint8_t control = data.takeFirst();
+
+    // Только при наличии защиты
+    if (stateDef.state != nullptr)
+    {
+        if (control == 8)
+        {
+            setComboBoxValue(stateDef.state, 7);  // Пуск налад. вкл
+        }
+        else if (control == 9)
+        {
+            setComboBoxValue(stateDef.state, 1);  // Пуск налад. выкл
+        }
+    }
+
+    int index = mControl.findData(control);
+    if (index < 0)
+    {
+        QString message("Wrong value in command %1: %2");
+        qWarning() << message.arg(com, 2, 16, QLatin1Char('0')).arg(control);
+    }
+    mControl.setCurrentIndex(index);
+}
+
+
+/**
+ * *****************************************************************************
+ *
  * @brief Обрабатывает команду изменения режима на Тест 2 (приемник)
  * @param[in] Команда.
  * @param[in] Данные.
@@ -3013,7 +4348,7 @@ void Bsp::HdlrComJrnxD2(eGB_COM com, pkg_t &data)
     mPkgTx.append(GB_DEVICE_PRM);               // устройство
     mPkgTx.append(event_number % 33);           // номер команды
     mPkgTx.append(event_number % 3);            // 0 - конец, 1 - начало
-    mPkgTx.append(0);                           // b4
+    mPkgTx.append(event_number % 2);            // b4, в К400 источник 0-ДВ / 1-ЦПП
     mPkgTx.append(0);                           // b5
     mPkgTx.append(0);                           // b6
     mPkgTx.append(0);                           // b7
@@ -3089,7 +4424,7 @@ void Bsp::HdlrComJrnxE2(eGB_COM com, pkg_t &data)
     mPkgTx.append(GB_DEVICE_PRD);               // устройство
     mPkgTx.append(event_number % 33);           // номер команды
     mPkgTx.append(event_number % 3);            // 0 - конец, 1 - начало
-    mPkgTx.append(0);                           // b4
+    mPkgTx.append(event_number % 2);            // b4, в К400 источник 0-ДВ / 1-ЦПП
     mPkgTx.append(0);                           // b5
     mPkgTx.append(0);                           // b6
     mPkgTx.append(0);                           // b7

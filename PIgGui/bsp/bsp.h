@@ -56,6 +56,7 @@ protected:
         QSpinBox *versionBsk2PrmPlis = nullptr;
         QSpinBox *versionBsk2PrdPlis = nullptr;
         QSpinBox *versionBszPlis     = nullptr;
+        QSpinBox *versionDspPlis     = nullptr;
     };
 
     struct measure_t
@@ -169,6 +170,7 @@ protected:
     QSpinBox         mPrdLightPA;           // светодиоды БСК передатчика
     QSpinBox         mPrmLightPA;           // светодиоды БСК приемника
     QSpinBox         mExternalInputsState;  // внешние входы КВП
+    QCheckBox        mLcdLightOn;           // управление подсветкой ПИ
 
     void         InitClock();
     virtual void InitComMap();
@@ -245,46 +247,46 @@ public:
 
     // Change: 0x90-0x9F
     virtual void HdlrComPrmx10(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComPrmx11(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComPrmx12(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComPrmx13(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComPrmx14(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComPrmx15(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
+    void         HdlrComPrmx11(eGB_COM com, pkg_t &data);
+    void         HdlrComPrmx12(eGB_COM com, pkg_t &data);
+    void         HdlrComPrmx13(eGB_COM com, pkg_t &data);
+    void         HdlrComPrmx14(eGB_COM com, pkg_t &data);
+    void         HdlrComPrmx15(eGB_COM com, pkg_t &data);
     virtual void HdlrComPrmx16(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComPrmx17(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComPrmx18(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComPrmx19(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
+    void         HdlrComPrmx17(eGB_COM com, pkg_t &data);
+    void         HdlrComPrmx18(eGB_COM com, pkg_t &data);
+    void         HdlrComPrmx19(eGB_COM com, pkg_t &data);
     virtual void HdlrComPrmx1B(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComPrmx1C(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComPrmx1D(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
+    void         HdlrComPrmx1C(eGB_COM com, pkg_t &data);
+    void         HdlrComPrmx1D(eGB_COM com, pkg_t &data);
 
     // Change: 0xA0-0xAF
     virtual void HdlrComPrdx20(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComPrdx21(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComPrdx22(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComPrdx23(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComPrdx24(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComPrdx25(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComPrdx26(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComPrdx27(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComPrdx28(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComPrdx29(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
+    void         HdlrComPrdx21(eGB_COM com, pkg_t &data);
+    void         HdlrComPrdx22(eGB_COM com, pkg_t &data);
+    void         HdlrComPrdx23(eGB_COM com, pkg_t &data);
+    void         HdlrComPrdx24(eGB_COM com, pkg_t &data);
+    void         HdlrComPrdx25(eGB_COM com, pkg_t &data);
+    void         HdlrComPrdx26(eGB_COM com, pkg_t &data);
+    void         HdlrComPrdx27(eGB_COM com, pkg_t &data);
+    void         HdlrComPrdx28(eGB_COM com, pkg_t &data);
+    void         HdlrComPrdx29(eGB_COM com, pkg_t &data);
     virtual void HdlrComPrdx2B(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComPrdx2C(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComPrdx2D(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComPrdx2E(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
+    void         HdlrComPrdx2C(eGB_COM com, pkg_t &data);
+    void         HdlrComPrdx2D(eGB_COM com, pkg_t &data);
+    void         HdlrComPrdx2E(eGB_COM com, pkg_t &data);
 
     // Change:0xB0-0xBF
     virtual void HdlrComGlbx30(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
     virtual void HdlrComGlbx31(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComGlbx32(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
+    virtual void HdlrComGlbx32(eGB_COM com, pkg_t &data);
     void         HdlrComGlbx33(eGB_COM com, pkg_t &data);
     virtual void HdlrComGlbx34(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
     virtual void HdlrComGlbx35(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComGlbx36(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
+    virtual void HdlrComGlbx36(eGB_COM com, pkg_t &data);
     virtual void HdlrComGlbx37(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
     void         HdlrComGlbx38(eGB_COM com, pkg_t &data);
-    virtual void HdlrComGlbx39(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
+    virtual void HdlrComGlbx39(eGB_COM com, pkg_t &data);
     void         HdlrComGlbx3A(eGB_COM com, pkg_t &data);
     void         HdlrComGlbx3B(eGB_COM com, pkg_t &data);
     virtual void HdlrComGlbx3C(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
@@ -296,7 +298,7 @@ public:
 
     void         HdlrComRegx70(eGB_COM com, pkg_t &data);
     void         HdlrComRegx71(eGB_COM com, pkg_t &data);
-    virtual void HdlrComRegx72(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
+    void         HdlrComRegx72(eGB_COM com, pkg_t &data);
     virtual void HdlrComRegx73(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
     virtual void HdlrComRegx74(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
     void         HdlrComRegx7D(eGB_COM com, pkg_t &data);

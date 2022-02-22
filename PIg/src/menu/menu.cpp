@@ -1671,7 +1671,7 @@ void clMenu::lvlJournalEvent()
         }
         else if (device == AVANT_K400)
         {
-            if (event <= MAX_JRN_EVENT_VALUE)
+            if (event < MAX_JRN_EVENT_VALUE)
             {
                 uint8_t dev = static_cast<uint8_t>(sParam.jrnEntry.getDeviceJrn());
 

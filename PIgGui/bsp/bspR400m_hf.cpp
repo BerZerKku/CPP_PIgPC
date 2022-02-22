@@ -962,7 +962,7 @@ void TBspR400mHf::HdlrComDefx0A(eGB_COM com, pkg_t &data)
  */
 void TBspR400mHf::HdlrComGlbx30(eGB_COM com, pkg_t &data)
 {
-    Q_ASSERT(com == GB_COM_GET_SOST || 0xB0);
+    Q_ASSERT(com == GB_COM_GET_SOST || com == 0xB0);
 
     if (com == GB_COM_GET_SOST)
     {
@@ -1629,48 +1629,6 @@ void TBspR400mHf::HdlrComGlbx3F(eGB_COM com, pkg_t &data)
     mPkgTx.append(0);  // версия БСП-ПИ, младший байт
 
     Q_ASSERT(mPkgTx.size() == 20);  // команда + 19 байт данных
-}
-
-
-/**
- * *****************************************************************************
- *
- * @brief Обрабатывает команду управления.
- * @param[in] Команда.
- * @param[in] Данные.
- *
- * *****************************************************************************
- */
-void TBspR400mHf::HdlrComRegx72(eGB_COM com, pkg_t &data)
-{
-    Q_ASSERT(com == GB_COM_SET_CONTROL);
-
-    if (!CheckSize(com, data.size(), { 1 }))
-    {
-        return;
-    }
-
-    // ответ на команду записи совпадает с запросом
-    mPkgTx.append(com);
-    mPkgTx.append(data);
-
-    uint8_t control = data.takeFirst();
-    if (control >= mControl.count())
-    {
-        QString message("Wrong value in command %1: %2");
-        qWarning() << message.arg(com, 2, 16, QLatin1Char('0')).arg(control);
-    }
-
-    if (control == 8)
-    {
-        setComboBoxValue(stateDef.state, 7);  // Пуск налад. вкл
-    }
-    else if (control == 9)
-    {
-        setComboBoxValue(stateDef.state, 1);  // Пуск налад. выкл
-    }
-
-    mControl.setCurrentIndex(mControl.findData(control));
 }
 
 

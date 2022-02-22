@@ -3,8 +3,6 @@
 
 #include "bsp.h"
 
-typedef QVector<uint8_t> pkg_t;
-
 /**
  * *****************************************************************************
  *
@@ -61,30 +59,19 @@ private:
     void HdlrComDefx0A(eGB_COM com, pkg_t &data) override;
 
     void HdlrComPrmx10(eGB_COM com, pkg_t &data) override;
-    void HdlrComPrmx11(eGB_COM com, pkg_t &data) override;
-    void HdlrComPrmx13(eGB_COM com, pkg_t &data) override;
-    void HdlrComPrmx14(eGB_COM com, pkg_t &data) override;
     void HdlrComPrmx16(eGB_COM com, pkg_t &data) override;
 
     void HdlrComPrdx20(eGB_COM com, pkg_t &data) override;
-    void HdlrComPrdx21(eGB_COM com, pkg_t &data) override;
-    void HdlrComPrdx22(eGB_COM com, pkg_t &data) override;
-    void HdlrComPrdx24(eGB_COM com, pkg_t &data) override;
-    void HdlrComPrdx25(eGB_COM com, pkg_t &data) override;
 
     void HdlrComGlbx30(eGB_COM com, pkg_t &data) override;
     void HdlrComGlbx31(eGB_COM com, pkg_t &data) override;
-    void HdlrComGlbx32(eGB_COM com, pkg_t &data) override;
     void HdlrComGlbx34(eGB_COM com, pkg_t &data) override;
     void HdlrComGlbx35(eGB_COM com, pkg_t &data) override;
-    void HdlrComGlbx36(eGB_COM com, pkg_t &data) override;
     void HdlrComGlbx37(eGB_COM com, pkg_t &data) override;
-    void HdlrComGlbx39(eGB_COM com, pkg_t &data) override;
     void HdlrComGlbx3C(eGB_COM com, pkg_t &data) override;
     void HdlrComGlbx3E(eGB_COM com, pkg_t &data) override;
     void HdlrComGlbx3F(eGB_COM com, pkg_t &data) override;
 
-    void HdlrComRegx72(eGB_COM com, pkg_t &data) override;
     void HdlrComRegx7E(eGB_COM com, pkg_t &data) override;
 
 private slots:
