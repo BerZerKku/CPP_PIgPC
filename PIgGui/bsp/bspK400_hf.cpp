@@ -821,6 +821,7 @@ void TBspK400Hf::HdlrComPrmx10(eGB_COM com, pkg_t &data)
 
         mPkgTx.append(com);
         mPkgTx.append(GetParamValue(GB_PARAM_PRM_TIME_ON));
+        mPkgTx.append(0);  // контроль длительности
         mPkgTx.append(GetParamValue(GB_PARAM_PRM_COM_BLOCK, 1));
         mPkgTx.append(GetParamValue(GB_PARAM_PRM_COM_BLOCK, 2));
         mPkgTx.append(GetParamValue(GB_PARAM_PRM_COM_BLOCK, 3));
@@ -831,7 +832,7 @@ void TBspK400Hf::HdlrComPrmx10(eGB_COM com, pkg_t &data)
             mPkgTx.append(GetParamValue(GB_PARAM_PRM_TIME_OFF, i));
         }
 
-        mPkgTx.append(GetParamValue(GB_PARAM_PRM_COM_NUMS));
+        mPkgTx.append(GetParamValue(GB_PARAM_PRM_COM_NUMS) * 4);
         mPkgTx.append(GetParamValue(GB_PARAM_PRM_TEST_COM));
         mPkgTx.append(GetParamValue(GB_PARAM_PRM_FREQ_CORR));
         mPkgTx.append(0);
@@ -873,6 +874,7 @@ void TBspK400Hf::HdlrComPrmx10(eGB_COM com, pkg_t &data)
 
         int index = 0;
         SetParamValue(GB_PARAM_PRM_TIME_ON, data.at(index++));
+        index++;  // контроль длительности
         SetParamValue(GB_PARAM_PRM_COM_BLOCK, data.at(index++), 1);
         SetParamValue(GB_PARAM_PRM_COM_BLOCK, data.at(index++), 2);
         SetParamValue(GB_PARAM_PRM_COM_BLOCK, data.at(index++), 3);
@@ -883,7 +885,7 @@ void TBspK400Hf::HdlrComPrmx10(eGB_COM com, pkg_t &data)
             SetParamValue(GB_PARAM_PRM_TIME_OFF, data.at(index++), i);
         }
 
-        SetParamValue(GB_PARAM_PRM_COM_NUMS, data.at(index++));
+        SetParamValue(GB_PARAM_PRM_COM_NUMS, data.at(index++) / 4);
         SetParamValue(GB_PARAM_PRM_TEST_COM, data.at(index++));
         SetParamValue(GB_PARAM_PRM_FREQ_CORR, data.at(index++));
         index++;
@@ -893,46 +895,6 @@ void TBspK400Hf::HdlrComPrmx10(eGB_COM com, pkg_t &data)
         SetParamValue(GB_PARAM_PRM_COM_SIGNAL, data.at(index++), 2);
         SetParamValue(GB_PARAM_PRM_COM_SIGNAL, data.at(index++), 3);
         SetParamValue(GB_PARAM_PRM_COM_SIGNAL, data.at(index++), 4);
-    }
-}
-
-
-/**
- * *****************************************************************************
- *
- * @brief Обрабатывает команду записи всех переназначенных команд команд ЦПП.
- * @param[in] Команда.
- * @param[in] Данные.
- *
- * *****************************************************************************
- */
-void TBspK400Hf::HdlrComPrmx1B(eGB_COM com, pkg_t &data)
-{
-    Q_ASSERT(com == GB_COM_PRM_SET_RING_COM_REC);
-
-    if (com == GB_COM_PRM_SET_RING_COM_REC)
-    {
-        // используется только первый байт
-        if (!CheckSize(com, data.size(), { 32 }))
-        {
-            return;
-        }
-
-        // ответ на команду записи совпадает с запросом
-        mPkgTx.append(com);
-        mPkgTx.append(data);
-
-        quint8 index = data.at(0);
-        quint8 max   = mapSpinBox.value(GB_PARAM_PRM_COM_NUMS).at(0)->maximum();
-        if (index >= 1 && index <= max && index <= 32)
-        {
-            SetParamValue(GB_PARAM_PRM_DR_COM_TO_HF, data.at(1), index);
-        }
-        else
-        {
-            QString message("Wrong index in command %1: %2");
-            qWarning() << message.arg(com, 2, 16, QLatin1Char('0')).arg(index);
-        }
     }
 }
 
@@ -970,7 +932,7 @@ void TBspK400Hf::HdlrComPrdx20(eGB_COM com, pkg_t &data)
         mPkgTx.append(GetParamValue(GB_PARAM_PRD_COM_LONG, 4));
         mPkgTx.append(GetParamValue(GB_PARAM_PRD_TEST_COM));
         mPkgTx.append(GetParamValue(GB_PARAM_PRD_COM_NUMS_A));
-        mPkgTx.append(GetParamValue(GB_PARAM_PRD_COM_NUMS));
+        mPkgTx.append(GetParamValue(GB_PARAM_PRD_COM_NUMS) * 4);
         mPkgTx.append(GetParamValue(GB_PARAM_PRD_FREQ_CORR));
         mPkgTx.append(GetParamValue(GB_PARAM_PRD_DR_ENABLE));
         mPkgTx.append(GetParamValue(GB_PARAM_PRD_DR_COM_BLOCK, 1));
@@ -986,7 +948,7 @@ void TBspK400Hf::HdlrComPrdx20(eGB_COM com, pkg_t &data)
         mPkgTx.append(GetParamValue(GB_PARAM_PRD_COM_SIGNAL, 4));
 
 
-        int len = 16 - mPkgTx.size();
+        int len = 32 - mPkgTx.size();
         for (int i = 0; i < len; i++)
         {
             mPkgTx.append(0);
@@ -997,7 +959,8 @@ void TBspK400Hf::HdlrComPrdx20(eGB_COM com, pkg_t &data)
 
     if (com == 0xA0)
     {
-        if (!CheckSize(com, data.size(), { 31 }))
+        // из конфигуратора почему-то передается 32 байта
+        if (!CheckSize(com, data.size(), { 31, 32 }))
         {
             return;
         }
@@ -1019,8 +982,8 @@ void TBspK400Hf::HdlrComPrdx20(eGB_COM com, pkg_t &data)
         SetParamValue(GB_PARAM_PRD_COM_LONG, data.at(index++), 4);
         SetParamValue(GB_PARAM_PRD_TEST_COM, data.at(index++));
         SetParamValue(GB_PARAM_PRD_COM_NUMS_A, data.at(index++));
-        SetParamValue(GB_PARAM_PRD_COM_NUMS, data.at(index++));
-        SetParamValue(GB_PARAM_PRD_FREQ_CORR, data.at(index++));
+        SetParamValue(GB_PARAM_PRD_COM_NUMS, data.at(index++) / 4);
+        SetParamValue(GB_PARAM_PRD_FREQ_CORR, static_cast<qint8>(data.at(index++)));
         index += 5;  // параметры ЦПП
         SetParamValue(GB_PARAM_PRD_DEC_CF, data.at(index++));
         SetParamValue(GB_PARAM_PRD_DEC_TM, data.at(index++));
@@ -1127,8 +1090,8 @@ void TBspK400Hf::HdlrComGlbx30(eGB_COM com, pkg_t &data)
         SetParamValue(GB_PARAM_NUM_OF_DEVICES, data.at(index++));
         SetParamValue(GB_PARAM_COMP_K400, data.at(index++));
         SetParamValue(GB_PARAM_TM_K400, data.at(index++));
-        SetParamValue(GB_PARAM_WARN_D, data.at(index++));
-        SetParamValue(GB_PARAM_ALARM_D, data.at(index++));
+        SetParamValue(GB_PARAM_WARN_D, static_cast<qint8>(data.at(index++)));
+        SetParamValue(GB_PARAM_ALARM_D, static_cast<qint8>(data.at(index++)));
         SetParamValue(GB_PARAM_TEMP_MONITOR, data.at(index++));
         SetParamValue(GB_PARAM_TEMP_THR_HI, data.at(index++));
         SetParamValue(GB_PARAM_TEMP_THR_LOW, data.at(index++));

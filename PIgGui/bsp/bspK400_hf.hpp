@@ -49,7 +49,6 @@ private:
     void FillComboboxListTest() override;
 
     void HdlrComPrmx10(eGB_COM com, pkg_t &data) override;
-    void HdlrComPrmx1B(eGB_COM com, pkg_t &data) override;
 
     void HdlrComPrdx20(eGB_COM com, pkg_t &data) override;
 

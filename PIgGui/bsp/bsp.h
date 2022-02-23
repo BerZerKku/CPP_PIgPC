@@ -256,7 +256,7 @@ public:
     void         HdlrComPrmx17(eGB_COM com, pkg_t &data);
     void         HdlrComPrmx18(eGB_COM com, pkg_t &data);
     void         HdlrComPrmx19(eGB_COM com, pkg_t &data);
-    virtual void HdlrComPrmx1B(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
+    void         HdlrComPrmx1B(eGB_COM com, pkg_t &data);
     void         HdlrComPrmx1C(eGB_COM com, pkg_t &data);
     void         HdlrComPrmx1D(eGB_COM com, pkg_t &data);
 
@@ -271,7 +271,7 @@ public:
     void         HdlrComPrdx27(eGB_COM com, pkg_t &data);
     void         HdlrComPrdx28(eGB_COM com, pkg_t &data);
     void         HdlrComPrdx29(eGB_COM com, pkg_t &data);
-    virtual void HdlrComPrdx2B(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
+    virtual void HdlrComPrdx2B(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); }
     void         HdlrComPrdx2C(eGB_COM com, pkg_t &data);
     void         HdlrComPrdx2D(eGB_COM com, pkg_t &data);
     void         HdlrComPrdx2E(eGB_COM com, pkg_t &data);

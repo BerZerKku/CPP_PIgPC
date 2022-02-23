@@ -2528,7 +2528,6 @@ void Bsp::HdlrComPrmx11(eGB_COM com, pkg_t &data)
 
     if (com == GB_COM_PRM_SET_TIME_ON)
     {
-        // используется только первый байт
         if (!CheckSize(com, data.size(), { 1 }))
         {
             return;
@@ -2571,7 +2570,6 @@ void Bsp::HdlrComPrmx12(eGB_COM com, pkg_t &data)
 
     if (com == GB_COM_PRM_SET_TEST_COM)
     {
-        // используется только первый байт
         if (!CheckSize(com, data.size(), { 1 }))
         {
             return;
@@ -2620,7 +2618,6 @@ void Bsp::HdlrComPrmx13(eGB_COM com, pkg_t &data)
 
     if (com == GB_COM_PRM_SET_TIME_OFF)
     {
-        // используется только первый байт
         if (!CheckSize(com, data.size(), { 2 }))
         {
             return;
@@ -2679,7 +2676,6 @@ void Bsp::HdlrComPrmx14(eGB_COM com, pkg_t &data)
 
     if (com == GB_COM_PRM_SET_BLOCK_COM)
     {
-        // используется только первый байт
         if (!CheckSize(com, data.size(), { 2 }))
         {
             return;
@@ -2732,7 +2728,6 @@ void Bsp::HdlrComPrmx15(eGB_COM com, pkg_t &data)
 
     if (com == GB_COM_PRM_SET_FREQ_CORR)
     {
-        // используется только первый байт
         if (!CheckSize(com, data.size(), { 1 }))
         {
             return;
@@ -2775,7 +2770,6 @@ void Bsp::HdlrComPrmx17(eGB_COM com, pkg_t &data)
 
     if (com == GB_COM_PRM_SET_DR_STATE)
     {
-        // используется только первый байт
         if (!CheckSize(com, data.size(), { 1 }))
         {
             return;
@@ -2824,7 +2818,6 @@ void Bsp::HdlrComPrmx18(eGB_COM com, pkg_t &data)
 
     if (com == GB_COM_PRM_SET_DR_BLOCK)
     {
-        // используется только первый байт
         if (!CheckSize(com, data.size(), { 2 }))
         {
             return;
@@ -2838,7 +2831,6 @@ void Bsp::HdlrComPrmx18(eGB_COM com, pkg_t &data)
         quint8 max   = (mapSpinBox.value(GB_PARAM_PRM_COM_NUMS).at(0)->maximum() + 7) / 8;
         if (index >= 1 && index <= max)
         {
-            // на самом деле тут index всегда должен быть 1
             SetParamValue(GB_PARAM_PRM_DR_COM_BLOCK, data.at(1), index);
         }
         else
@@ -2884,7 +2876,6 @@ void Bsp::HdlrComPrmx19(eGB_COM com, pkg_t &data)
 
     if (com == GB_COM_PRM_SET_DR_COM)
     {
-        // используется только первый байт
         if (!CheckSize(com, data.size(), { 2 }))
         {
             return;
@@ -2904,6 +2895,42 @@ void Bsp::HdlrComPrmx19(eGB_COM com, pkg_t &data)
         {
             QString message("Wrong index in command %1: %2");
             qWarning() << message.arg(com, 2, 16, QLatin1Char('0')).arg(index);
+        }
+    }
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Обрабатывает команду записи всех переназначенных команд команд ЦПП.
+ * @param[in] Команда.
+ * @param[in] Данные.
+ *
+ * *****************************************************************************
+ */
+void Bsp::HdlrComPrmx1B(eGB_COM com, pkg_t &data)
+{
+    Q_ASSERT(com == GB_COM_PRM_SET_RING_COM_REC);
+
+    if (com == GB_COM_PRM_SET_RING_COM_REC)
+    {
+        if (!CheckSize(com, data.size(), { 32 }))
+        {
+            return;
+        }
+
+        // ответ на команду записи совпадает с запросом
+        mPkgTx.append(com);
+        mPkgTx.append(data);
+
+        quint8 max = mapSpinBox.value(GB_PARAM_PRM_COM_NUMS).at(0)->maximum();
+        for (int i = 1; i <= 32; i++)
+        {
+            if (i > max)
+                break;
+
+            SetParamValue(GB_PARAM_PRM_DR_COM_TO_HF, data.takeFirst(), i);
         }
     }
 }
@@ -2938,7 +2965,6 @@ void Bsp::HdlrComPrmx1C(eGB_COM com, pkg_t &data)
 
     if (com == GB_COM_PRM_SET_COM)
     {
-        // используется только первый байт
         if (!CheckSize(com, data.size(), { 1 }))
         {
             return;
@@ -2987,7 +3013,6 @@ void Bsp::HdlrComPrmx1D(eGB_COM com, pkg_t &data)
 
     if (com == GB_COM_PRM_SET_COM_SIGN)
     {
-        // используется только первый байт
         if (!CheckSize(com, data.size(), { 2 }))
         {
             return;
@@ -3041,7 +3066,6 @@ void Bsp::HdlrComPrdx21(eGB_COM com, pkg_t &data)
 
     if (com == GB_COM_PRD_SET_TIME_ON)
     {
-        // используется только первый байт
         if (!CheckSize(com, data.size(), { 1 }))
         {
             return;
@@ -3084,7 +3108,6 @@ void Bsp::HdlrComPrdx22(eGB_COM com, pkg_t &data)
 
     if (com == GB_COM_PRD_SET_DURATION)
     {
-        // используется только первый байт
         if (!CheckSize(com, data.size(), { 1 }))
         {
             return;
@@ -3127,7 +3150,6 @@ void Bsp::HdlrComPrdx23(eGB_COM com, pkg_t &data)
 
     if (com == GB_COM_PRD_SET_FREQ_CORR)
     {
-        // используется только первый байт
         if (!CheckSize(com, data.size(), { 1 }))
         {
             return;
@@ -3176,7 +3198,6 @@ void Bsp::HdlrComPrdx24(eGB_COM com, pkg_t &data)
 
     if (com == GB_COM_PRD_SET_BLOCK_COM)
     {
-        // используется только первый байт
         if (!CheckSize(com, data.size(), { 2 }))
         {
             return;
@@ -3236,7 +3257,6 @@ void Bsp::HdlrComPrdx25(eGB_COM com, pkg_t &data)
 
     if (com == GB_COM_PRD_SET_LONG_COM)
     {
-        // используется только первый байт
         if (!CheckSize(com, data.size(), { 2 }))
         {
             return;
@@ -3289,7 +3309,6 @@ void Bsp::HdlrComPrdx26(eGB_COM com, pkg_t &data)
 
     if (com == GB_COM_PRD_SET_TEST_COM)
     {
-        // используется только первый байт
         if (!CheckSize(com, data.size(), { 1 }))
         {
             return;
@@ -3332,7 +3351,6 @@ void Bsp::HdlrComPrdx27(eGB_COM com, pkg_t &data)
 
     if (com == GB_COM_PRD_SET_DR_STATE)
     {
-        // используется только первый байт
         if (!CheckSize(com, data.size(), { 1 }))
         {
             return;
@@ -3381,7 +3399,6 @@ void Bsp::HdlrComPrdx28(eGB_COM com, pkg_t &data)
 
     if (com == GB_COM_PRD_SET_DR_BLOCK)
     {
-        // используется только первый байт
         if (!CheckSize(com, data.size(), { 2 }))
         {
             return;
@@ -3434,7 +3451,6 @@ void Bsp::HdlrComPrdx29(eGB_COM com, pkg_t &data)
 
     if (com == GB_COM_PRD_SET_COM_A)
     {
-        // используется только первый байт
         if (!CheckSize(com, data.size(), { 1 }))
         {
             return;
@@ -3477,7 +3493,6 @@ void Bsp::HdlrComPrdx2C(eGB_COM com, pkg_t &data)
 
     if (com == GB_COM_PRD_SET_COM)
     {
-        // используется только первый байт
         if (!CheckSize(com, data.size(), { 1 }))
         {
             return;
@@ -3522,7 +3537,6 @@ void Bsp::HdlrComPrdx2D(eGB_COM com, pkg_t &data)
 
     if (com == GB_COM_PRD_SET_CF_TM)
     {
-        // используется только первый байт
         if (!CheckSize(com, data.size(), { 2 }))
         {
             return;
@@ -3581,7 +3595,6 @@ void Bsp::HdlrComPrdx2E(eGB_COM com, pkg_t &data)
 
     if (com == GB_COM_PRD_SET_COM_SIGN)
     {
-        // используется только первый байт
         if (!CheckSize(com, data.size(), { 2 }))
         {
             return;
@@ -3797,7 +3810,6 @@ void Bsp::HdlrComGlbx36(eGB_COM com, pkg_t &data)
 
     if (com == GB_COM_SET_COM_PRM_KEEP)
     {
-        // используется только первый байт
         if (!CheckSize(com, data.size(), { 1 }))
         {
             return;
