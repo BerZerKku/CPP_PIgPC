@@ -61,9 +61,7 @@ class clProtocolS
     static const uint8_t MAX_CYCLE_TO_REST_SOST = 5;
 
 public:
-    clProtocolS(uint8_t *buf, uint8_t size, stGBparam *sParam);
-    //	uint8_t addCom	(uint8_t com, ePRTS_ACTION act);
-    //	bool getData	(stMNUparam *param);
+    clProtocolS(uint8_t *buf, uint8_t size);
 
     // буфер прин€тых/передаваемых данных
     uint8_t *const m_buf;
@@ -113,7 +111,26 @@ public:
     virtual bool getData()
     {
         stat_ = statDef_;
-        return false;
+
+        if (m_buf[COM] == 0x11)
+        {
+            stat_ = PRTS_STATUS_WRITE;
+        }
+
+        return stat_ == PRTS_STATUS_WRITE;
+    }
+
+    /// ќтправка команды
+    uint8_t sendData()
+    {
+        uint8_t num = 0;
+
+        if (stat_ == PRTS_STATUS_WRITE)
+        {
+            num = addCom(0x01);
+        }
+
+        return num;
     }
 
     /// ѕроверка текущего состо€ни€
@@ -176,9 +193,6 @@ public:
     }
 
 protected:
-    // структура параметров
-    stGBparam *const sParam_;
-
     // текущий статус работы протокола
     ePRTS_STATUS stat_;
 

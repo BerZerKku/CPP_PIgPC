@@ -82,30 +82,17 @@ class MainWindow : public QMainWindow
         QLineEdit typeOpto;
     } view;
 
-    /// Устройство.
-    enum eDevice
-    {
-        DEVICE_R400M_100_HF_b15 = 0,
-        DEVICE_RZSK_111_HF,
-        DEVICE_K400_088_HF,
-        DEVICE_R400_100_VOLS,
-        DEVICE_RZSK_111_VOLS,
-        DEVICE_K400_088_VOLS
-    };
-
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow() override;
 
 signals:
-    void userChanged(int value);
     void writeByteToBsp(int value);
-    void writeByteToPc(int value);
 
 private:
     Ui::MainWindow *ui;
     QTextCodec *    codec;
-    Bsp *           mBsp = nullptr;
+    Bsp             m_bsp;
 
     QPalette      pred;
     QPalette      pblue;
@@ -114,8 +101,6 @@ private:
 
     QProtocolViewer mProtocolViewer;
 
-    void initBsp();
-    void initEeprom();
     void initView();
     void initKeyboard();
     void InitProtocolViewer();
@@ -136,22 +121,14 @@ private slots:
     void clearSelection();  ///< Очистка выделения в textEdit.
     void setBacklight(bool enable);
     void SlotBspConnection();
-    void SlotBspChange();
 
-    void SlotByteBspToPi(uint8_t byte);
     void SlotBytePiToBsp(uint8_t byte);
+    void SlotByteBspToPi(uint8_t byte);
 
     void test1();
     void test2();
     void test3();
     void test4();
-
-    QString getDeviceName(eGB_TYPE_DEVICE type) const;
-    QString getTypeLine(eGB_TYPE_LINE type) const;
-    void    viewNumComPrd();
-    void    viewNumComPrm();
-    void    viewTypeComp();
-    QString getTypeOpto(eGB_TYPE_OPTO type) const;
 };
 
 // Для использвоании в wrapper

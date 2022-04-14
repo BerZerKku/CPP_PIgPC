@@ -42,6 +42,8 @@ QProtocolViewer::QProtocolViewer(QWidget *parent) : QWidget(parent)
 
     QFont font = mTextEdit.font();
     font.setFamily("Monospace");
+    font.setStyleHint(QFont::TypeWriter);
+    mTextEdit.setFont(font);
 
     // Программа не запускается (Windows) если mTimer сделать не укзаателем
     mTimer.setInterval(25);

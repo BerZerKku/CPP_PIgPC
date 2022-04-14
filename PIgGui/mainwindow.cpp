@@ -8,11 +8,8 @@
 #include <QSerialPortInfo>
 #include <QTimer>
 
-#include "PIg/src/flash.h"
 #include "PIg/src/menu/base.h"
-#include "bsp/bspK400_hf.hpp"
-#include "bsp/bspR400m_hf.hpp"
-#include "bsp/bspRzsk_hf.hpp"
+#include "bsp/bsp.h"
 
 //
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
@@ -27,7 +24,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->verticalLayout->setAlignment(ui->textEdit, Qt::AlignHCenter);
 
     ui->serialBsp->setFixedWidth(ui->serialBsp->sizeHint().width());
-    ui->serialPc->setFixedWidth(ui->serialBsp->width());
 
     ui->serialBsp->setLabelText("Port BSP:");
     ui->serialBsp->setup(4800, QSerialPort::NoParity, QSerialPort::TwoStop);
@@ -41,14 +37,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(ui->serialBsp, &TSerial::openPort, [&]() { ui->mBspConnect->setEnabled(false); });
     connect(ui->serialBsp, &TSerial::closePort, [&]() { ui->mBspConnect->setEnabled(true); });
 
-    ui->serialPc->setLabelText("Port PC:");
-    ui->serialPc->setup(19200, QSerialPort::NoParity, QSerialPort::TwoStop);
-    ui->serialPc->addDefaultPort("COM8");
-    ui->serialPc->addDefaultPort("tnt2");
-
-    connect(ui->serialPc, &TSerial::read, [=](int byte) { pcPushByteFrom(byte, false); });
-    connect(this, &MainWindow::writeByteToPc, ui->serialPc, &TSerial::write);
-    connect(ui->serialPc, &TSerial::sendFinished, [=]() { pcTxEnd(); });
 
     codec = QTextCodec::codecForName("CP1251");
     connect(ui->textEdit, &QTextEdit::selectionChanged, this, &MainWindow::clearSelection);
@@ -63,8 +51,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     pblue = pdefault;
     pblue.setColor(QPalette::Text, Qt::blue);
 
-    initBsp();
-    initEeprom();
+    m_bsp.Init();
     initView();
     initKeyboard();
     InitProtocolViewer();
@@ -103,30 +90,6 @@ MainWindow::~MainWindow()
 }
 
 //
-void MainWindow::initBsp()
-{
-    QComboBox *combo = ui->mBspCombo;
-
-    connect(combo, &QComboBox::currentTextChanged, this, &MainWindow::SlotBspChange);
-
-    combo->addItem(codec->toUnicode("АВАНТ Р400М-100-В"), DEVICE_R400M_100_HF_b15);
-    combo->addItem(codec->toUnicode("АВАНТ РЗСК-111-В"), DEVICE_RZSK_111_HF);
-    combo->addItem(codec->toUnicode("АВАНТ K400-088-В"), DEVICE_K400_088_HF);
-
-    combo->setCurrentIndex(combo->findData(DEVICE_K400_088_HF));
-
-
-    //    ui->mBspCombo->addItem(codec->toUnicode("АВАНТ Р400-100-В"), DEVICE_R400_100_VOLS);
-    //    ui->mBspCombo->addItem(codec->toUnicode("АВАНТ РЗСК-111-В"), DEVICE_RZSK_111_VOLS);
-    //    ui->mBspCombo->addItem(codec->toUnicode("АВАНТ K400-088-В"), DEVICE_K400_088_VOLS);
-}
-
-void MainWindow::initEeprom()
-{
-    menu.sParam.password.init(0);
-}
-
-//
 void MainWindow::initView()
 {
     QTreeWidgetItem *top = nullptr;
@@ -142,16 +105,6 @@ void MainWindow::initView()
     top->setText(0, codec->toUnicode("Пользователь"));
     addViewItem(top, "Пароль пользователя", &view.userPwd);
     addViewItem(top, "Пароль админисратора", &view.admPwd);
-
-    top = new QTreeWidgetItem();
-    ui->treeWidget->addTopLevelItem(top);
-    top->setText(0, codec->toUnicode("Локальная сеть"));
-    addViewItem(top, getNameOfParam(GB_PARAM_INTF_PROTOCOL), &view.lnProtocol);
-    addViewItem(top, getNameOfParam(GB_PARAM_NET_ADDRESS), &view.lnAddress);
-    addViewItem(top, getNameOfParam(GB_PARAM_INTF_BAUDRATE), &view.lnBaudrate);
-    addViewItem(top, getNameOfParam(GB_PARAM_INTF_DATA_BITS), &view.lnDataBits);
-    addViewItem(top, getNameOfParam(GB_PARAM_INTF_PARITY), &view.lnParity);
-    addViewItem(top, getNameOfParam(GB_PARAM_INTF_STOP_BITS), &view.lnStopBits);
 
     top = new QTreeWidgetItem();
     ui->treeWidget->addTopLevelItem(top);
@@ -171,20 +124,6 @@ void MainWindow::initView()
     addViewItem(top, "Тип линии", &view.typeCommLine);
     addViewItem(top, "Совместимость Р400", &view.typeCompatibility);
     addViewItem(top, "Тип оптики", &view.typeOpto);
-
-    top = new QTreeWidgetItem();
-    ui->treeWidget->addTopLevelItem(top);
-    top->setText(0, codec->toUnicode("Параметры общие"));
-    addViewItem(top, "Номер аппарата", &view.deviceNumber);
-
-    // Обновление расскладки клавиатуры при смене аппарата или совместимости
-    // задержка в 200мс нужна для обновления расскладки в ПИ
-    connect(&view.typeDevice,
-            &QLineEdit::textChanged,
-            [=]() { QTimer::singleShot(200, this, &MainWindow::initKeyboard); });
-    connect(&view.typeCompatibility,
-            &QLineEdit::textChanged,
-            [=]() { QTimer::singleShot(200, this, &MainWindow::initKeyboard); });
 
     ui->treeWidget->expandAll();
     ui->treeWidget->resizeColumnToContents(0);
@@ -211,7 +150,7 @@ void MainWindow::InitProtocolViewer()
     connect(ui->pbView, &QPushButton::clicked, &mProtocolViewer, &QProtocolViewer::show);
     connect(this, &MainWindow::writeByteToBsp, this, &MainWindow::SlotBytePiToBsp);
 
-    mProtocolViewer.SetPattern("51 72 8A 9A FF");
+    mProtocolViewer.SetPattern("01 11");
     mProtocolViewer.resize(width(), height());
 
     auto flags = mProtocolViewer.windowFlags();
@@ -238,45 +177,11 @@ void MainWindow::setupTestButtons()
 void MainWindow::hdlrView()
 {
     std::string text;
-    quint8      value8  = 0;
-    quint16     value16 = 0;
 
-    value16 = menu.sParam.password.get();
-    view.userPwd.setText(QString::number(value16));
-
-    value8 = menu.sParam.Uart.Protocol.get();
-    view.lnProtocol.setText(codec->toUnicode(fcProtocol[value8]));
-    value8 = menu.sParam.Uart.NetAddress.get();
-    view.lnAddress.setText(QString::number(value8));
-    value8 = menu.sParam.Uart.BaudRate.get();
-    view.lnBaudrate.setText(codec->toUnicode(fcBaudRate[value8]));
-    value8 = menu.sParam.Uart.DataBits.get();
-    view.lnDataBits.setText(codec->toUnicode(fcDataBits[value8]));
-    value8 = menu.sParam.Uart.Parity.get();
-    view.lnParity.setText(codec->toUnicode(fcParity[value8]));
-    value8 = menu.sParam.Uart.StopBits.get();
-    view.lnStopBits.setText(codec->toUnicode(fcStopBits[value8]));
-
-    value8 = menu.sParam.def.status.getRegime();
-    view.regimeDef.setText(codec->toUnicode(fcRegime[value8]));
-    value8 = menu.sParam.prm.status.getRegime();
-    view.regimePrm.setText(codec->toUnicode(fcRegime[value8]));
-    value8 = menu.sParam.prd.status.getRegime();
-    view.regimePrd.setText(codec->toUnicode(fcRegime[value8]));
-
-    view.typeDevice.setText(getDeviceName(menu.sParam.typeDevice));
-    view.def.setText(menu.sParam.def.status.isEnable() ? "ok" : "---");
-    viewNumComPrm();
-    viewNumComPrd();
-
-    text = getTextValue(GB_PARAM_NUM_OF_DEVICES, menu.sParam.glb.getNumDevices());
-    view.numDevices.setText(codec->toUnicode(text.c_str()));
-
-    view.typeCommLine.setText(getTypeLine(menu.sParam.glb.getTypeLine()));
-    viewTypeComp();
-    view.typeOpto.setText(getTypeOpto(menu.sParam.glb.getTypeOpto()));
-
-    view.deviceNumber.setText(QString::number(menu.sParam.glb.getDeviceNum()));
+    //    value16 = menu.sParam.password.get();
+    //    view.userPwd.setText(QString::number(value16));
+    //    value8 = menu.sParam.Uart.Protocol.get();
+    //    view.lnProtocol.setText(codec->toUnicode(fcProtocol[value8]));
 }
 
 //
@@ -324,29 +229,13 @@ void MainWindow::cycleMenu()
 
     static uint8_t   cnt1s        = 0;
     static uint8_t   cntsendtobsp = 0;
-    static uint8_t   cntsendtopc  = 0;
     QVector<uint8_t> pkg;
 
     vLCDled();
 
     bspRead();
-    pcRead();
 
     mainCycle();
-
-    pkg.clear();
-    len = pcWrite();
-    for (uint8_t i = 0; i < len; i++)
-    {
-        pkg.append(uBufUartPc[i]);
-        emit writeByteToPc(uBufUartPc[i]);
-    }
-
-    if (len > 0)
-    {
-        //        qDebug() << "Pkg to PC: " << Qt::showbase << Qt::hex << pkg;
-        cntsendtopc++;
-    }
 
     pkg.clear();
     len = bspWrite();
@@ -373,15 +262,13 @@ void MainWindow::cycleMenu()
     {
         //                qDebug() << "Send " << cntsendtobsp << " packet to BSP per second.";
         //                qDebug() << "Send " << cntsendtopc << " packet to PC per second.";
-        cntsendtopc  = 0;
         cntsendtobsp = 0;
         cnt1s        = 0;
     }
 
     hdlrView();
 
-    ui->serialBsp->setLedLink(menu.sParam.connectionBsp);
-    ui->serialPc->setLedLink(menu.sParam.connectionPc);
+    ui->serialBsp->setLedLink(menu.IsConnection());
 }
 
 //
@@ -408,95 +295,27 @@ void MainWindow::SlotBspConnection()
 {
     if (ui->serialBsp->isEnabled())
     {
-        connect(this, &MainWindow::writeByteToBsp, mBsp, &Bsp::SlotReadByte);
+        connect(this, &MainWindow::writeByteToBsp, &m_bsp, &Bsp::SlotReadByte);
 
         connect(ui->serialBsp, &TSerial::read, this, &MainWindow::SlotByteBspToPi);
-        connect(mBsp, &Bsp::SignalWriteByte, this, &MainWindow::SlotByteBspToPi);
-        connect(mBsp, &Bsp::SignalSendFinished, [=]() { bspTxEnd(); });
+        connect(&m_bsp, &Bsp::SignalWriteByte, this, &MainWindow::SlotByteBspToPi);
+        connect(&m_bsp, &Bsp::SignalSendFinished, [=]() { bspTxEnd(); });
 
-        ui->serialBsp->setEnabled(false);
-        ui->mBspCombo->setEnabled(false);
         ui->mBspConnect->setText("Disconnect");
     }
     else
     {
-        mBsp->disconnect();
+        m_bsp.disconnect();
 
         disconnect(ui->serialBsp, &TSerial::read, this, &MainWindow::SlotByteBspToPi);
-        disconnect(this, &MainWindow::writeByteToBsp, mBsp, &Bsp::SlotReadByte);
+        disconnect(this, &MainWindow::writeByteToBsp, &m_bsp, &Bsp::SlotReadByte);
 
-        ui->serialBsp->setEnabled(true);
-        ui->mBspCombo->setEnabled(true);
+
         ui->mBspConnect->setText("Connect");
     }
-}
 
-
-/**
- * *****************************************************************************
- *
- * @brief Заменить устройство для симулятора БСП
- *
- * *****************************************************************************
- */
-void MainWindow::SlotBspChange()
-{
-    Bsp *bsp = nullptr;
-
-    switch (static_cast<eDevice>(ui->mBspCombo->currentData().toInt()))
-    {
-    case DEVICE_R400M_100_HF_b15:
-        {
-            bsp = new TBspR400mHf(ui->mBspTree, this);
-            break;
-        }
-
-    case DEVICE_RZSK_111_HF:
-        {
-            bsp = new TBspRzskHf(ui->mBspTree, this);
-            break;
-        }
-
-    case DEVICE_K400_088_HF:
-        {
-            bsp = new TBspK400Hf(ui->mBspTree, this);
-            break;
-        }
-
-    case DEVICE_R400_100_VOLS:
-        {
-            break;
-        }
-
-    case DEVICE_RZSK_111_VOLS:
-        {
-            break;
-        }
-
-    case DEVICE_K400_088_VOLS:
-        {
-            break;
-        }
-    }
-
-    if (bsp != nullptr)
-    {
-        if (mBsp != nullptr)
-        {
-            mBsp->disconnect();
-            delete mBsp;
-        }
-
-        mBsp = bsp;
-        mBsp->Init();
-
-        ui->mBspTree->expandAll();
-        ui->mBspTree->resizeColumnToContents(0);
-        //    ui->mBspTree->resizeColumnToContents(1);
-        ui->mBspTree->header()->setSectionResizeMode(0, QHeaderView::Fixed);
-        //    ui->mBspTree->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-        ui->mBspTree->collapseAll();
-    }
+    m_bsp.SlotStart(ui->serialBsp->isEnabled());
+    ui->serialBsp->setEnabled(!ui->serialBsp->isEnabled());
 }
 
 
@@ -536,140 +355,4 @@ void MainWindow::test3()
 void MainWindow::test4()
 {
     qDebug() << "Set Disable Regime";
-    menu.sParam.txComBuf.addFastCom(GB_COM_SET_REG_DISABLED);
-}
-
-//
-QString MainWindow::getDeviceName(eGB_TYPE_DEVICE type) const
-{
-    QString typeName = codec->toUnicode("Ошибка");
-
-    if (type <= AVANT_MAX)
-    {
-        switch (type)
-        {
-        case AVANT_NO: typeName = codec->toUnicode("Нет"); break;
-        case AVANT_R400: typeName = codec->toUnicode("Р400"); break;
-        case AVANT_RZSK: typeName = codec->toUnicode("РЗСК"); break;
-        case AVANT_K400: typeName = codec->toUnicode("К400"); break;
-        case AVANT_R400M: typeName = codec->toUnicode("Р400М"); break;
-        case AVANT_OPTO: typeName = codec->toUnicode("Оптика"); break;
-        case AVANT_MAX: typeName = codec->toUnicode("MAX"); break;
-        }
-    }
-    else
-    {
-    }
-
-    return typeName;
-}
-
-//
-QString MainWindow::getTypeLine(eGB_TYPE_LINE type) const
-{
-    QString typeName = codec->toUnicode("Ошибка");
-
-    switch (type)
-    {
-    case GB_TYPE_LINE_UM: typeName = codec->toUnicode("ВЧ"); break;
-    case GB_TYPE_LINE_OPTO: typeName = codec->toUnicode("Оптика"); break;
-    case GB_TYPE_LINE_E1: typeName = codec->toUnicode("Е1"); break;
-    case GB_TYPE_LINE_MAX: typeName = codec->toUnicode("MAX"); break;
-    }
-
-    return typeName;
-}
-
-//
-void MainWindow::viewNumComPrd()
-{
-    uint8_t number = menu.sParam.prd.getNumCom();
-    bool    enable = menu.sParam.prd.status.isEnable();
-
-    view.numComPrd.setText(QString::number(number));
-    view.numComPrd.setPalette((enable == (number > 0)) ? pblue : pred);
-}
-
-//
-void MainWindow::viewNumComPrm()
-{
-    uint8_t number = menu.sParam.prm.getNumCom();
-    bool    enable = menu.sParam.prm.status.isEnable();
-
-    view.numComPrm.setText(QString::number(number));
-    view.numComPrm.setPalette((enable == (number > 0)) ? pblue : pred);
-}
-
-//
-void MainWindow::viewTypeComp()
-{
-    eGB_PARAM pn    = GB_PARAM_MAX;
-    uint8_t   min   = 0;
-    uint8_t   max   = 0;
-    uint8_t   value = 0;
-
-    switch (menu.sParam.typeDevice)
-    {
-    case AVANT_K400:
-        {
-            pn    = GB_PARAM_COMP_K400;
-            value = menu.sParam.glb.getCompK400();
-        }
-        break;
-
-    case AVANT_RZSK:
-        {
-            pn    = GB_PARAM_COMP_RZSK;
-            value = menu.sParam.glb.getCompRZSK();
-        }
-        break;
-
-    case AVANT_R400:  // DOWN
-    case AVANT_R400M:
-        {
-            pn    = GB_PARAM_COMP_P400;
-            value = menu.sParam.glb.getCompR400m();
-        }
-        break;
-
-    case AVANT_OPTO: break;
-    case AVANT_NO: break;
-    case AVANT_MAX: break;
-    }
-
-    std::string text = "---";
-    if (pn < GB_PARAM_MAX)
-    {
-        if (value < getAbsMax(pn))
-        {
-            text = getTextValue(pn, value);
-            view.typeCompatibility.setPalette(pblue);
-        }
-        else
-        {
-            text = std::to_string(value);
-            view.typeCompatibility.setPalette(pred);
-        }
-    }
-    else
-    {
-        view.typeCompatibility.setPalette(pdefault);
-    }
-    view.typeCompatibility.setText(codec->toUnicode(text.c_str()));
-}
-
-//
-QString MainWindow::getTypeOpto(eGB_TYPE_OPTO type) const
-{
-    QString typeName = codec->toUnicode("Ошибка");
-
-    switch (type)
-    {
-    case TYPE_OPTO_STANDART: typeName = codec->toUnicode("Стандартная"); break;
-    case TYPE_OPTO_RING_UNI: typeName = codec->toUnicode("Кольцо однонапр."); break;
-    case TYPE_OPTO_RING_BI: typeName = codec->toUnicode("Кольцо двунапр."); break;
-    case TYPE_OPTO_MAX: typeName = codec->toUnicode("MAX"); break;
-    }
-
-    return typeName;
 }

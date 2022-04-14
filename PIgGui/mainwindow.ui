@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>663</width>
+    <width>720</width>
     <height>320</height>
    </rect>
   </property>
@@ -25,20 +25,13 @@
         <property name="text">
          <string>БСП</string>
         </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
        </widget>
       </item>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_3">
-        <item>
-         <widget class="QPushButton" name="mBspConnect">
-          <property name="text">
-           <string>Connect</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QComboBox" name="mBspCombo"/>
-        </item>
         <item>
          <spacer name="horizontalSpacer">
           <property name="orientation">
@@ -51,6 +44,13 @@
            </size>
           </property>
          </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="mBspConnect">
+          <property name="text">
+           <string>Connect</string>
+          </property>
+         </widget>
         </item>
        </layout>
       </item>
@@ -74,9 +74,6 @@
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
        <widget class="TSerial" name="serialBsp" native="true"/>
-      </item>
-      <item>
-       <widget class="TSerial" name="serialPc" native="true"/>
       </item>
       <item>
        <widget class="QTextEdit" name="textEdit">
@@ -191,7 +188,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>663</width>
+     <width>720</width>
      <height>20</height>
     </rect>
    </property>

@@ -104,14 +104,3 @@ void vLCDled()
 
     w->setBacklight(enable);
 }
-
-void setupUart(TInterface::INTERFACE intf,
-               uint16_t              baudrate,
-               TDataBits::DATA_BITS  dbits,
-               TParity::PARITY       parity,
-               TStopBits::STOP_BITS  sbits)
-{
-
-    qDebug() << "interface = " << intf << ", baudrate = " << baudrate << ", databits = " << dbits
-             << ", parity = " << parity << ", stopbits = " << sbits;
-}

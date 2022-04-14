@@ -6,10 +6,7 @@
  */
 #include "protocolS.h"
 
-clProtocolS::clProtocolS(uint8_t* buf, uint8_t size, stGBparam* sParam) :
-    m_buf(buf),
-    sParam_(sParam),
-    size_(size)
+clProtocolS::clProtocolS(uint8_t* buf, uint8_t size) : m_buf(buf), size_(size)
 {
     cnt_      = 0;
     maxLen_   = 0;
@@ -146,8 +143,8 @@ uint8_t clProtocolS::addCom()
         if (len <= (size_ - 5))
         {
             m_buf[len - 1] = getCRC();
-            cnt          = len;
-            maxLen_      = len;
+            cnt            = len;
+            maxLen_        = len;
             setCurrentStatus(PRTS_STATUS_WRITE);
         }
     }

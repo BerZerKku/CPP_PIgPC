@@ -17,7 +17,6 @@
 #include <QTreeWidgetItem>
 
 #include "PIg/src/glbDefine.h"
-#include "PIg/src/parameter/param.h"
 #include "widget/qhexspinbox.h"
 
 typedef QVector<uint8_t> pkg_t;
@@ -25,6 +24,8 @@ typedef QVector<uint8_t> pkg_t;
 class Bsp : public QWidget
 {
     Q_OBJECT
+
+    const int k_timer_tick_ms = 100;
 
 protected:
     typedef void (Bsp::*HdlrCom_t)(eGB_COM com, pkg_t &data);
@@ -34,73 +35,8 @@ protected:
     static const QTextCodec *kCodec;
     static const QString     kTimeFormat;
 
-    struct state_t
-    {
-        QComboBox *regime  = nullptr;
-        QComboBox *state   = nullptr;
-        QSpinBox * dopByte = nullptr;
-        QLineEdit *warning = nullptr;
-        QLineEdit *fault   = nullptr;
-    };
-
-    struct device_t
-    {
-        QComboBox *isDef = nullptr;
-        //
-        QSpinBox *versionPiMcu       = nullptr;
-        QSpinBox *versionBspMcu      = nullptr;
-        QSpinBox *versionBspDsp      = nullptr;
-        QSpinBox *versionBspDspPlis  = nullptr;
-        QSpinBox *versionBsk1PrmPlis = nullptr;
-        QSpinBox *versionBsk1PrdPlis = nullptr;
-        QSpinBox *versionBsk2PrmPlis = nullptr;
-        QSpinBox *versionBsk2PrdPlis = nullptr;
-        QSpinBox *versionBszPlis     = nullptr;
-        QSpinBox *versionDspPlis     = nullptr;
-    };
-
-    struct measure_t
-    {
-        QSpinBox *R     = nullptr;  // сопротивление линии
-        QSpinBox *I     = nullptr;  // ток выхода
-        QSpinBox *U     = nullptr;  // напряжение выхода
-        QSpinBox *Udef1 = nullptr;  // запас по защите, Uз1
-        QSpinBox *Udef2 = nullptr;  // запас по защите, Uз2
-        QSpinBox *Ucf1  = nullptr;  // запас по КС, Uк1
-        QSpinBox *Ucf2  = nullptr;  // запас по КС, Uк2
-        QSpinBox *Un1   = nullptr;  // уровень шумов, Uш1
-        QSpinBox *Un2   = nullptr;  // уровень шумов, Uш2
-        QSpinBox *Sd    = nullptr;  // просечки в сигнале (длит. импульсов ВЧ блокировки ?!)
-        QSpinBox *D     = nullptr;  // отношение сигнал/помеха
-        QSpinBox *T     = nullptr;  // температура
-        QSpinBox *dF    = nullptr;  // отклонение частоты КС на приеме
-    };
-
-    QMap<uint8_t, HdlrCom_t> mComMap;
-
-    QSpinBox  mJrnDefCounter;
-    QCheckBox mJrnDefOverflow;
-
-    QSpinBox  mJrnPrdCounter;
-    QCheckBox mJrnPrdOverflow;
-
-    QSpinBox  mJrnPrmCounter;
-    QCheckBox mJrnPrmOverflow;
-
-    QSpinBox  mJrnGlbCounter;
-    QCheckBox mJrnGlbOverflow;
-
-    QComboBox mControl;
-
-    QCheckBox mDefEnable;
-
-    QComboBox mTestCf1Signal;
-    QComboBox mTestCf2Signal;
-    QComboBox mTestRz1Signal;
-    QComboBox mTestRz2Signal;
-
 public:
-    explicit Bsp(QTreeWidget *tree, QWidget *parent = nullptr);
+    explicit Bsp(QWidget *parent = nullptr);
 
     /// Подсчет контрольной суммы.
     uint8_t calcCrc(pkg_t &pkg);
@@ -114,10 +50,8 @@ public:
     QMap<eGB_PARAM, QVector<QSpinBox *>>       mapSpinBox;
     QMap<eGB_PARAM, QVector<QDoubleSpinBox *>> mapDoubleSpinBox;
 
-    QString getParamName(eGB_PARAM param);
-
-    pkg_t mPkgRx;  ///< Данные на приеме.
-    pkg_t mPkgTx;  ///< Данные для передачи.
+    pkg_t m_pkg_rx;  ///< Данные на приеме.
+    pkg_t m_pkg_tx;  ///< Данные для передачи.
 
     void   CrtParamWidget(QTreeWidgetItem *top, eGB_PARAM param);
     qint16 GetParamValue(eGB_PARAM param, quint8 number = 1);
@@ -142,23 +76,19 @@ public:
     qint16 getDoubleSpinBoxValue(eGB_PARAM param, uint8_t number = 1);
     void   setDoubleSpinBoxValue(eGB_PARAM param, qint16 value, uint8_t number = 1);
 
-    device_t  mDevice;
-    state_t   stateDef;
-    state_t   stateGlb;
-    state_t   statePrm;
-    state_t   statePrm2;
-    state_t   statePrd;
-    measure_t m_measure;
-
 public slots:
     void SlotReadByte(int value);
+    void SlotStart(bool start);
 
 signals:
     void SignalWriteByte(int value);
     void SignalSendFinished();
 
 protected:
-    QTreeWidget *const mTree;
+    QTreeWidget mTree;
+
+    QMap<uint8_t, HdlrCom_t> m_map_com_rx;
+    QMap<uint8_t, HdlrCom_t> m_map_com_tx;
 
     QDateTime dt;  ///< Дата и время.
 
@@ -166,52 +96,13 @@ protected:
     QRegExpValidator pwdValidator;
     QRegExp          errRegExp;
     QRegExpValidator errValidator;
-    QTimer           mTimerSignalSendFinished;
-    QSpinBox         mPrdLightPA;           // светодиоды БСК передатчика
-    QSpinBox         mPrmLightPA;           // светодиоды БСК приемника
-    QSpinBox         mExternalInputsState;  // внешние входы КВП
-    QCheckBox        mLcdLightOn;           // управление подсветкой ПИ
+    QTimer           m_timer;
 
-    void         InitClock();
-    virtual void InitComMap();
-    virtual void InitParam();
-
-    void             crtTreeParam();
-    virtual void     crtTreeDef(QTreeWidgetItem *top);
-    virtual void     crtTreePrd(QTreeWidgetItem *top);
-    virtual void     crtTreePrm(QTreeWidgetItem *top);
-    virtual void     crtTreeGlb(QTreeWidgetItem *top);
-    virtual void     crtTreeInterface(QTreeWidgetItem *top);
-    virtual void     crtTreeDevice();
-    virtual void     crtTreeDevieVersions(QTreeWidgetItem *top);
-    virtual void     crtTreeMeasure();
-    virtual void     crtTreeState();
-    QTreeWidgetItem *crtTreeState(QTreeWidgetItem *top, std::string name, state_t &state);
-    virtual void     crtTest();
-    virtual void     crtJrn();
-    virtual void     crtJrnGlb(QTreeWidgetItem *top);
-    virtual void     crtJrnDef(QTreeWidgetItem *top);
-    virtual void     crtJrnPrm(QTreeWidgetItem *top);
-    virtual void     crtJrnPrd(QTreeWidgetItem *top);
+    void crtTreeParam();
 
     void fillComboboxList(QComboBox *combobox, eGB_PARAM param);
     void fillComboboxListOnOff(QComboBox *combobox);
     void fillComboboxListRegime(QComboBox *combobox);
-
-    void crtComboBox(QTreeWidgetItem *top, eGB_PARAM param);
-    void crtSpinbBoxBits(QTreeWidgetItem *top, eGB_PARAM param);
-    void crtLineEdit(QTreeWidgetItem *top, eGB_PARAM param, std::string);
-    void crtSpinBox(QTreeWidgetItem *top, eGB_PARAM param);
-    void crtDoubleSpinBox(QTreeWidgetItem *top, eGB_PARAM param);
-
-    virtual void FillComboboxListStateDef();
-    virtual void FillComboboxListStatePrm();
-    virtual void FillComboboxListStatePrd();
-    void         FillComboboxListStateGlb();
-    virtual void FillComboBoxListControl() {};
-    virtual void FillComboboxListTest() {};
-
-    quint16 GetDependSame(eGB_PARAM param) const;
 
     void keyPressEvent(QKeyEvent *event) override;
 
@@ -221,110 +112,17 @@ protected:
     quint8 int2bcd(quint8 val, bool *ok = nullptr);
 
     void procCommand(eGB_COM com, pkg_t &data);
-    void procCommandReadParam(eGB_COM com, pkg_t &data);
-    void procCommandWriteParam(eGB_COM com, pkg_t &data);
-
-    uint8_t getCompatibility(eGB_TYPE_DEVICE device);
 
     bool CheckSize(uint8_t com, int size, QVector<int> size_allowed);
 
-public:
-    virtual void HdlrComDummy(eGB_COM com, pkg_t &data);
+    void HdlrComDummy(eGB_COM com, pkg_t &data);
 
-    // Change: 0x80-0x8F
-    virtual void HdlrComDefx00(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    void         HdlrComDefx01(eGB_COM com, pkg_t &data);
-    void         HdlrComDefx02(eGB_COM com, pkg_t &data);
-    void         HdlrComDefx03(eGB_COM com, pkg_t &data);
-    void         HdlrComDefx04(eGB_COM com, pkg_t &data);
-    virtual void HdlrComDefx05(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComDefx06(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); }
-    virtual void HdlrComDefx07(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComDefx08(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComDefx09(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComDefx0A(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComDefx0B(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-
-    // Change: 0x90-0x9F
-    virtual void HdlrComPrmx10(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    void         HdlrComPrmx11(eGB_COM com, pkg_t &data);
-    void         HdlrComPrmx12(eGB_COM com, pkg_t &data);
-    void         HdlrComPrmx13(eGB_COM com, pkg_t &data);
-    void         HdlrComPrmx14(eGB_COM com, pkg_t &data);
-    void         HdlrComPrmx15(eGB_COM com, pkg_t &data);
-    virtual void HdlrComPrmx16(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    void         HdlrComPrmx17(eGB_COM com, pkg_t &data);
-    void         HdlrComPrmx18(eGB_COM com, pkg_t &data);
-    void         HdlrComPrmx19(eGB_COM com, pkg_t &data);
-    void         HdlrComPrmx1B(eGB_COM com, pkg_t &data);
-    void         HdlrComPrmx1C(eGB_COM com, pkg_t &data);
-    void         HdlrComPrmx1D(eGB_COM com, pkg_t &data);
-
-    // Change: 0xA0-0xAF
-    virtual void HdlrComPrdx20(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    void         HdlrComPrdx21(eGB_COM com, pkg_t &data);
-    void         HdlrComPrdx22(eGB_COM com, pkg_t &data);
-    void         HdlrComPrdx23(eGB_COM com, pkg_t &data);
-    void         HdlrComPrdx24(eGB_COM com, pkg_t &data);
-    void         HdlrComPrdx25(eGB_COM com, pkg_t &data);
-    void         HdlrComPrdx26(eGB_COM com, pkg_t &data);
-    void         HdlrComPrdx27(eGB_COM com, pkg_t &data);
-    void         HdlrComPrdx28(eGB_COM com, pkg_t &data);
-    void         HdlrComPrdx29(eGB_COM com, pkg_t &data);
-    virtual void HdlrComPrdx2B(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); }
-    void         HdlrComPrdx2C(eGB_COM com, pkg_t &data);
-    void         HdlrComPrdx2D(eGB_COM com, pkg_t &data);
-    void         HdlrComPrdx2E(eGB_COM com, pkg_t &data);
-
-    // Change:0xB0-0xBF
-    virtual void HdlrComGlbx30(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComGlbx31(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComGlbx32(eGB_COM com, pkg_t &data);
-    void         HdlrComGlbx33(eGB_COM com, pkg_t &data);
-    virtual void HdlrComGlbx34(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComGlbx35(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComGlbx36(eGB_COM com, pkg_t &data);
-    virtual void HdlrComGlbx37(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    void         HdlrComGlbx38(eGB_COM com, pkg_t &data);
-    virtual void HdlrComGlbx39(eGB_COM com, pkg_t &data);
-    void         HdlrComGlbx3A(eGB_COM com, pkg_t &data);
-    void         HdlrComGlbx3B(eGB_COM com, pkg_t &data);
-    virtual void HdlrComGlbx3C(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    void         HdlrComGlbx3D(eGB_COM com, pkg_t &data);
-    virtual void HdlrComGlbx3E(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComGlbx3F(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-
-    void HdlrComRegx51(eGB_COM com, pkg_t &data);
-
-    void         HdlrComRegx70(eGB_COM com, pkg_t &data);
-    void         HdlrComRegx71(eGB_COM com, pkg_t &data);
-    void         HdlrComRegx72(eGB_COM com, pkg_t &data);
-    virtual void HdlrComRegx73(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComRegx74(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    void         HdlrComRegx7D(eGB_COM com, pkg_t &data);
-    virtual void HdlrComRegx7E(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-
-    void HdlrComRegx9A(eGB_COM com, pkg_t &data);
-
-    virtual void HdlrComJrnxC1(eGB_COM com, pkg_t &data);
-    virtual void HdlrComJrnxC2(eGB_COM com, pkg_t &data);
-    virtual void HdlrComJrnxCA(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComJrnxD1(eGB_COM com, pkg_t &data);
-    virtual void HdlrComJrnxD2(eGB_COM com, pkg_t &data);
-    virtual void HdlrComJrnxDA(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComJrnxE1(eGB_COM com, pkg_t &data);
-    virtual void HdlrComJrnxE2(eGB_COM com, pkg_t &data);
-    virtual void HdlrComJrnxEA(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
-    virtual void HdlrComJrnxF1(eGB_COM com, pkg_t &data);
-    virtual void HdlrComJrnxF2(eGB_COM com, pkg_t &data);
-    virtual void HdlrComJrnxFA(eGB_COM com, pkg_t &data) { HdlrComDummy(com, data); };
+    void HdlrComRx01(eGB_COM com, pkg_t &data);
+    void HdlrComTx11(eGB_COM com, pkg_t &data);
 
 protected slots:
-    void setRegime(int index);
-    void setState(int index);
-    void setDopByte(int index);
-    void updateClock();
     void SlotReadPackageFinished();
+    void SlotHandleTick();
 };
 
 #endif  // BSP_H
