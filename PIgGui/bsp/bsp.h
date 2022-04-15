@@ -36,7 +36,7 @@ protected:
     static const QString     kTimeFormat;
 
 public:
-    explicit Bsp(QWidget *parent = nullptr);
+    explicit Bsp(QTreeWidget *tree, QWidget *parent = nullptr);
 
     /// Подсчет контрольной суммы.
     uint8_t calcCrc(pkg_t &pkg);
@@ -45,36 +45,14 @@ public:
 
     void Init();
 
-    QMap<eGB_PARAM, QVector<QComboBox *>>      mapCombobox;
-    QMap<eGB_PARAM, QLineEdit *>               mapLineEdit;
-    QMap<eGB_PARAM, QVector<QSpinBox *>>       mapSpinBox;
-    QMap<eGB_PARAM, QVector<QDoubleSpinBox *>> mapDoubleSpinBox;
-
     pkg_t m_pkg_rx;  ///< Данные на приеме.
     pkg_t m_pkg_tx;  ///< Данные для передачи.
 
-    void   CrtParamWidget(QTreeWidgetItem *top, eGB_PARAM param);
-    qint16 GetParamValue(eGB_PARAM param, quint8 number = 1);
-    void   SetParamValue(eGB_PARAM param, qint16 value, quint8 number = 1);
 
-    quint8 getComboBoxValue(eGB_PARAM param, uint8_t number = 1);
-    quint8 getComboBoxValue(QComboBox *combobox);
-    void   setComboBoxValue(eGB_PARAM param, quint8 value, uint8_t number = 1);
-    void   setComboBoxValueBits(eGB_PARAM param, quint8 value, uint8_t number = 1);
-    int    setComboBoxValue(QComboBox *combobox, quint8 value);
+    QSpinBox m_key;
 
-    QString getLineEditValue(eGB_PARAM param);
-    QString getLineEditValue(QLineEdit *lineedit);
-    void    setLineEditValue(eGB_PARAM param, std::string value);
-    int     setLineEditValue(QLineEdit *lineedit, std::string value);
+    void AddSpinBox(QTreeWidgetItem *top, const QString &name, QSpinBox *spinbox);
 
-    qint16 getSpinBoxValue(eGB_PARAM param, uint8_t number = 1);
-    void   setSpinBoxValue(eGB_PARAM param, qint16 value, uint8_t number = 1);
-    qint16 getSpinBoxValue(QSpinBox *spinbox);
-    int    setSpinBoxValue(QSpinBox *spinbox, qint16 value);
-
-    qint16 getDoubleSpinBoxValue(eGB_PARAM param, uint8_t number = 1);
-    void   setDoubleSpinBoxValue(eGB_PARAM param, qint16 value, uint8_t number = 1);
 
 public slots:
     void SlotReadByte(int value);
@@ -85,7 +63,7 @@ signals:
     void SignalSendFinished();
 
 protected:
-    QTreeWidget mTree;
+    QTreeWidget *const m_tree;
 
     QMap<uint8_t, HdlrCom_t> m_map_com_rx;
     QMap<uint8_t, HdlrCom_t> m_map_com_tx;
@@ -99,10 +77,6 @@ protected:
     QTimer           m_timer;
 
     void crtTreeParam();
-
-    void fillComboboxList(QComboBox *combobox, eGB_PARAM param);
-    void fillComboboxListOnOff(QComboBox *combobox);
-    void fillComboboxListRegime(QComboBox *combobox);
 
     void keyPressEvent(QKeyEvent *event) override;
 

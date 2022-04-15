@@ -11,7 +11,7 @@ void vKEYmain(void)
 {
 }
 
-uint8_t eKEYget(void)
+uint16_t eKEYget(void)
 {
     return 0;
 }

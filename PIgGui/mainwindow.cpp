@@ -16,6 +16,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 {
     ui->setupUi(this);
 
+    m_bsp = new Bsp(ui->mBspTree, this);
+
     setWindowTitle("BSP-PI");
 
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("Windows-1251"));
@@ -51,7 +53,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     pblue = pdefault;
     pblue.setColor(QPalette::Text, Qt::blue);
 
-    m_bsp.Init();
+    m_bsp->Init();
     initView();
     initKeyboard();
     InitProtocolViewer();
@@ -134,7 +136,7 @@ void MainWindow::initKeyboard()
 {
     for (uint8_t i = 1; i <= 2 * NUM_KEY_IN_LAYOUT; i++)
     {
-        ui->kbd->setLayoutButton(i, vKEYgetButtonLayout(i));
+        //        ui->kbd->setLayoutButton(i, vKEYgetButtonLayout(i));
     }
 }
 
@@ -295,26 +297,26 @@ void MainWindow::SlotBspConnection()
 {
     if (ui->serialBsp->isEnabled())
     {
-        connect(this, &MainWindow::writeByteToBsp, &m_bsp, &Bsp::SlotReadByte);
+        connect(this, &MainWindow::writeByteToBsp, m_bsp, &Bsp::SlotReadByte);
 
         connect(ui->serialBsp, &TSerial::read, this, &MainWindow::SlotByteBspToPi);
-        connect(&m_bsp, &Bsp::SignalWriteByte, this, &MainWindow::SlotByteBspToPi);
-        connect(&m_bsp, &Bsp::SignalSendFinished, [=]() { bspTxEnd(); });
+        connect(m_bsp, &Bsp::SignalWriteByte, this, &MainWindow::SlotByteBspToPi);
+        connect(m_bsp, &Bsp::SignalSendFinished, [=]() { bspTxEnd(); });
 
         ui->mBspConnect->setText("Disconnect");
     }
     else
     {
-        m_bsp.disconnect();
+        m_bsp->disconnect();
 
         disconnect(ui->serialBsp, &TSerial::read, this, &MainWindow::SlotByteBspToPi);
-        disconnect(this, &MainWindow::writeByteToBsp, &m_bsp, &Bsp::SlotReadByte);
+        disconnect(this, &MainWindow::writeByteToBsp, m_bsp, &Bsp::SlotReadByte);
 
 
         ui->mBspConnect->setText("Connect");
     }
 
-    m_bsp.SlotStart(ui->serialBsp->isEnabled());
+    m_bsp->SlotStart(ui->serialBsp->isEnabled());
     ui->serialBsp->setEnabled(!ui->serialBsp->isEnabled());
 }
 

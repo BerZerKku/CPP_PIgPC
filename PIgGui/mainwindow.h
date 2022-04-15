@@ -15,10 +15,6 @@
 
 #include "PIg/src/drivers/ks0108.h"
 #include "PIg/src/menu/menu.h"
-#include "PIg/src/protocols/iec101/protocolPcI.h"
-#include "PIg/src/protocols/modbus/protocolPcM.h"
-#include "PIg/src/protocols/standart/protocolBspS.h"
-#include "PIg/src/protocols/standart/protocolPcS.h"
 
 #include "bsp/bsp.h"
 #include "qprotocolviewer.h"
@@ -46,17 +42,17 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
-    friend void    vKEYmain(void);
-    friend uint8_t eKEYget(void);
-    friend uint8_t timePressKey();
-    friend void    vLCDclear(void);
-    friend void    vLCDinit(void);
-    friend void    vLCDmain(void);
-    friend void    vLCDrefresh(void);
-    friend bool    vLCDdrawBoard(uint8_t num);
-    friend bool    vLCDputchar(const char *buf, uint8_t num);
-    friend void    vLCDsetLed(eLCD_LED val);
-    friend void    vLCDled();
+    friend void     vKEYmain(void);
+    friend uint16_t eKEYget(void);
+    friend uint8_t  timePressKey();
+    friend void     vLCDclear(void);
+    friend void     vLCDinit(void);
+    friend void     vLCDmain(void);
+    friend void     vLCDrefresh(void);
+    friend bool     vLCDdrawBoard(uint8_t num);
+    friend bool     vLCDputchar(const char *buf, uint8_t num);
+    friend void     vLCDsetLed(eLCD_LED val);
+    friend void     vLCDled();
 
     struct view_t
     {
@@ -92,7 +88,7 @@ signals:
 private:
     Ui::MainWindow *ui;
     QTextCodec *    codec;
-    Bsp             m_bsp;
+    Bsp *           m_bsp;
 
     QPalette      pred;
     QPalette      pblue;

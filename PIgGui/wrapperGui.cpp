@@ -5,7 +5,6 @@
 #include "PIg/src/drivers/keyboard.h"
 #include "PIg/src/drivers/ks0108.h"
 #include "PIg/src/menu/base.h"
-#include "PIg/src/paramUart.h"
 
 #include <QTextCodec>
 
@@ -17,7 +16,7 @@ void vKEYmain(void)
 {
 }
 
-uint8_t eKEYget(void)
+uint16_t eKEYget(void)
 {
     return w->ui->kbd->getKey();
 }

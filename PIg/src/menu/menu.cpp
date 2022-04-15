@@ -7,20 +7,13 @@
 #include <stdio.h>
 
 #include "debug/debug.hpp"
-#include "drivers/ks0108.h"
 #include "menu.h"
-#include "txCom.h"
 #include "version.hpp"
 
 /// режим подсветки по умолчанию
 #define LED_REGIME LED_SWITCH
 
-/// буфер текста выводимого на ЖКИ
-static char vLCDbuf[SIZE_BUF_STRING + 1];
-
-/// кол-во строк данных отображаемых на экране
-#define NUM_TEXT_LINES (SIZE_BUF_STRING / 20)
-
+char clMenu::vLCDbuf[SIZE_BUF_STRING + 1];
 
 /**
  * *************************************************************************
@@ -33,7 +26,7 @@ static char vLCDbuf[SIZE_BUF_STRING + 1];
  *
  * *************************************************************************
  */
-clMenu::clMenu() : m_connection(false), m_key(KEY_NO)
+clMenu::clMenu() : m_connection(false), m_key(0)
 {
     lineParam_ = 3;
     m_blink    = false;
@@ -74,25 +67,12 @@ void clMenu::proc(void)
         m_blink_counter = 0;
     }
 
-    // Считаем код с клавиатуры
-    // Если нажата любая кнопка - включится кратковременная подсветка
-    uint8_t key_code = eKEYget();
-    eKEY    key      = vKEYgetButton(key_code);
-    if (key != KEY_NO)
+    m_key = eKEYget();
+    if (m_key != 0)
     {
-        if (key == KEY_EMPTY)
-            key = KEY_NO;
-        m_key = key;
-
         vLCDsetLed(LED_SWITCH);
     }
 
-    // вывод в буфер содержимого текущего меню
-    // либо сообщения что тип аппарата не определен
-    //    (this->*lvlMenu)();
-    m_key = KEY_NO;
-
-    // вывод сообщения в случае отсутствия связи с БСП
     if (!m_connection)
     {
         if (m_blink)
@@ -107,8 +87,6 @@ void clMenu::proc(void)
         }
     }
 
-    // преобразование строки символов в данные для вывода на экран
     vLCDputchar(vLCDbuf, lineParam_);
-    // запуск обновления инф-ии на ЖКИ
     vLCDrefresh();
 }

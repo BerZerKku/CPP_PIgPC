@@ -7,7 +7,6 @@ INCLUDEPATH += \
 HEADERS += \
     $${PIG_PATH}/src/avr.h \
     $${PIG_PATH}/src/debug/debug.hpp \
-    $${PIG_PATH}/src/drivers/kbdLayout.h \
     $${PIG_PATH}/src/drivers/keyboard.h \
     $${PIG_PATH}/src/drivers/ks0108.h \
     $${PIG_PATH}/src/drivers/tmp75.h \
@@ -17,7 +16,6 @@ HEADERS += \
     $${PIG_PATH}/src/protocols/standart/protocolS.h
 
 SOURCES += \
-    $${PIG_PATH}/src/drivers/kbdLayout.cpp \
     $${PIG_PATH}/src/debug/debug.cpp \
     $${PIG_PATH}/src/menu/base.cpp \
     $${PIG_PATH}/src/menu/menu.cpp \

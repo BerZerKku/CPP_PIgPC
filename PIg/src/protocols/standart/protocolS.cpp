@@ -6,6 +6,15 @@
  */
 #include "protocolS.h"
 
+/**
+ * *****************************************************************************
+ *
+ * @brief Конструктор.
+ * @param[in] buf Буфер данных.
+ * @param[in] size Размер буфера данных.
+ *
+ * *****************************************************************************
+ */
 clProtocolS::clProtocolS(uint8_t* buf, uint8_t size) : m_buf(buf), size_(size)
 {
     cnt_      = 0;
@@ -16,90 +25,97 @@ clProtocolS::clProtocolS(uint8_t* buf, uint8_t size) : m_buf(buf), size_(size)
     statDef_  = PRTS_STATUS_OFF;
 }
 
-/**	Опрос флага наличия принятой посылки.
+/**
+ * *****************************************************************************
  *
- * 	Если посылка принята, но контрольная сумма неверная - флаг сбрасывается.
+ * @brief Проверяет наличие корректно принятого кадра.
  *
- * 	@param Нет
- * 	@return Нет
+ * Проверяется контрольная сумма.
+ *
+ * @return True если есть принятый кадр, иначе false.
+ *
+ * *****************************************************************************
  */
 bool clProtocolS::checkReadData()
 {
-    bool stat = false;
+    bool check = false;
 
-    // Т.к. обработка посылки уже началась, сбросим счетчик принятых байт
-    //	cnt_ = 0;
-
-    if (!(stat = checkCRC()))
-        setCurrentStatus(PRTS_STATUS_NO);
-
-    return stat;
-}
-
-/** Отправка сообщения лежащего в буфере.
- *
- *  @param Нет
- *  @return Кол-во байт данных приготовленных для передачи
- */
-uint8_t clProtocolS::trCom()
-{
-    setCurrentStatus(PRTS_STATUS_WRITE);
-
-    return maxLen_;
-}
-
-/**	Копирование имеющейся команды в свой буфер.
- *
- * 	Копирование произойдет только если будут найдены синхробайты и размер
- * 	посылки не превышает размер своего буфера.
- *
- * 	@param bufSource Адрес массива с командой
- * 	@return True - в случае удачного копирования, инчае - False
- */
-bool clProtocolS::copyCommandFrom(uint8_t* const bufSource)
-{
-    bool    stat = true;
-    uint8_t cnt  = 0;
-
-    if (bufSource[0] != 0x55)
-        stat = false;
-    else if (bufSource[1] != 0xAA)
-        stat = false;
-    else
+    if (stat_ == PRTS_STATUS_READ_OK)
     {
-        cnt = bufSource[3] + 5;
 
-        if (cnt > size_)
-            stat = false;
-        else
+        check = checkCRC();
+        if (!check)
+            setCurrentStatus(PRTS_STATUS_NO);
+    }
+
+    return check;
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Получает данные из принятой команды.
+ * @param[out] data Данные.
+ * @param[in] size Размер буфера.
+ * @return
+ *
+ * *****************************************************************************
+ */
+bool clProtocolS::getData(uint8_t* data, uint8_t size)
+{
+    stat_ = statDef_;
+
+    if (m_buf[COM] == 0x11)
+    {
+        Q_ASSERT(m_buf[NUM] == 128);
+
+        if (m_buf[NUM] == size)
         {
-            for (uint_fast8_t i = 0; i < cnt; i++)
+            for (uint8_t i = 0; i < size; i++)
             {
-                if (i < size_)
-                    m_buf[i] = bufSource[i];
+                data[i] = m_buf[B1 + i];
             }
         }
+
+        setCurrentStatus(PRTS_STATUS_WRITE_READY);
     }
 
-    // в случае какой-либо ошибки, сообщенеие игнорируется
-    if (!stat)
-    {
-        setCurrentStatus(PRTS_STATUS_NO);
-    }
-    else
-    {
-        setCurrentStatus(PRTS_STATUS_WRITE_PC);
-        maxLen_ = cnt;
-    }
-
-    return stat;
+    return stat_ == PRTS_STATUS_WRITE_READY;
 }
 
-/**	Проверка текущего состояния и сброс его в значение по умолчанию
- * 	при необходимости (когда слишком долго висит одно состояние)
+
+/**
+ * *****************************************************************************
  *
- * 	@param Нет
- * 	@return Нет
+ * @brief Формирует кадр для передачи.
+ * @param[in] com Команда.
+ * @param[in] data Данные.
+ * @param[in] size Количество данных для передачи.
+ * @return Количество байт в кадре.
+ *
+ * *****************************************************************************
+ */
+uint8_t clProtocolS::sendData(uint8_t com, const uint8_t* data, uint8_t size)
+{
+    uint8_t num = 0;
+
+    if (stat_ == PRTS_STATUS_WRITE_READY)
+    {
+        num = addCom(com, size, data);
+    }
+
+    return num;
+}
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Проверяет текущее состояние.
+ *
+ * Сбрасывает состояние в значение по умолчанию, если долго висит другое.
+ *
+ * *****************************************************************************
  */
 void clProtocolS::checkStat()
 {
@@ -123,42 +139,20 @@ void clProtocolS::checkStat()
     }
 }
 
-/**	Подготовка к отправке команды (сама команда, кол-во данных и данные
- * 	уже должны лежать в буфере)
+
+/**
+ * *****************************************************************************
  *
- * 	@param Нет
- * 	@return Кол-во отправляемых байт данных
+ * @brief Формирует кадр для передачи.
+ * @note Устанавливает статус передачи данных.
+ * @param[in] com Команда.
+ * @param[in] size Количество данных для передачи.
+ * @param[in] data Данные.
+ * @return Количество байт в кадре.
+ *
+ * *****************************************************************************
  */
-uint8_t clProtocolS::addCom()
-{
-    uint8_t cnt = 0;
-
-    m_buf[0] = 0x55;
-    m_buf[1] = 0xAA;
-    // команда будет отправлена если лежит не нулевая команда и
-    // под заявленное кол-во данных хватает размера буфера
-    if (m_buf[2] != 0)
-    {
-        uint8_t len = m_buf[3] + 5;
-        if (len <= (size_ - 5))
-        {
-            m_buf[len - 1] = getCRC();
-            cnt            = len;
-            maxLen_        = len;
-            setCurrentStatus(PRTS_STATUS_WRITE);
-        }
-    }
-
-    return cnt;
-}
-
-/**	Подготовка к отправке команды с данными (заполнение буфера)
- * 	@param com Команда
- * 	@param size Кол-во байт данных
- * 	@param b[] Массив данных
- * 	@return Кол-во отправляемых байт данных
- */
-uint8_t clProtocolS::addCom(uint8_t com, uint8_t size, uint8_t b[])
+uint8_t clProtocolS::addCom(uint8_t com, uint8_t size, const uint8_t* data)
 {
     uint8_t cnt = 0;
 
@@ -168,9 +162,9 @@ uint8_t clProtocolS::addCom(uint8_t com, uint8_t size, uint8_t b[])
         m_buf[cnt++] = 0xAA;
         m_buf[cnt++] = com;
         m_buf[cnt++] = size;
-        // Скопируем данные в буфер передатчика
+
         for (uint8_t i = 0; i < size; i++, cnt++)
-            m_buf[cnt] = b[i];
+            m_buf[cnt] = data[i];
         m_buf[cnt++] = getCRC();
 
         maxLen_ = cnt;
@@ -180,75 +174,14 @@ uint8_t clProtocolS::addCom(uint8_t com, uint8_t size, uint8_t b[])
     return cnt;
 }
 
-/**	Подготовка к отправке команды с 2 байтами данных (заполнение буфера)
- * 	@param com Команда
- * 	@param byte1 Первый байт данных
- * 	@param byte2 Второй байт данных
- * 	@return Кол-во отправляемых байт данных
- */
-uint8_t clProtocolS::addCom(uint8_t com, uint8_t byte1, uint8_t byte2)
-{
-    uint8_t cnt = 0;
 
-    m_buf[cnt++] = 0x55;
-    m_buf[cnt++] = 0xAA;
-    m_buf[cnt++] = com;
-    m_buf[cnt++] = 0x02;
-    m_buf[cnt++] = byte1;
-    m_buf[cnt++] = byte2;
-    m_buf[cnt++] = com + 0x02 + byte1 + byte2;
-
-    maxLen_ = cnt;
-    setCurrentStatus(PRTS_STATUS_WRITE);
-
-    return cnt;
-}
-
-/**	Подготовка к отправке команды с 1 байтом данных (заполнение буфера)
- * 	@param com Команда
- * 	@param byte Данные
- * 	@return Кол-во отправляемых байт данных
- */
-uint8_t clProtocolS::addCom(uint8_t com, uint8_t byte)
-{
-    uint8_t cnt = 0;
-
-    m_buf[cnt++] = 0x55;
-    m_buf[cnt++] = 0xAA;
-    m_buf[cnt++] = com;
-    m_buf[cnt++] = 0x01;
-    m_buf[cnt++] = byte;
-    m_buf[cnt++] = com + 0x01 + byte;
-
-    maxLen_ = cnt;
-    setCurrentStatus(PRTS_STATUS_WRITE);
-
-    return cnt;
-}
-
-/**	Подготовка к отправке команды без данных (заполнение буфера)
- * 	@param com Передаваемая команда
- * 	@return Кол-во отправляемых байт данных
- */
-uint8_t clProtocolS::addCom(uint8_t com)
-{
-    uint8_t cnt = 0;
-
-    m_buf[cnt++] = 0x55;
-    m_buf[cnt++] = 0xAA;
-    m_buf[cnt++] = com;
-    m_buf[cnt++] = 00;
-    m_buf[cnt++] = com;
-
-    maxLen_ = cnt;
-    setCurrentStatus(PRTS_STATUS_WRITE);
-
-    return cnt;
-}
-
-/**	Проверка принятой контрольной суммы
- * 	@param Нет
- * 	@return true - если верная контрольная сумма
+/**
+ * *****************************************************************************
+ *
+ * @brief Проверяет контрольную сумму.
+ * @return True если верная контрольная сумма, иначе false.
+ *
+ * *****************************************************************************
  */
 bool clProtocolS::checkCRC() const
 {
@@ -265,11 +198,14 @@ bool clProtocolS::checkCRC() const
     return stat;
 }
 
-/**	Вычислене контрольной суммы содержимого буфера
- * 	и добавление ее в конец посылки.
- * 	@param Нет
- * 	@return false - в случае нехватки места в буфере для КС
+
+/**
+ * *****************************************************************************
  *
+ * @brief Возвращает контрольную сумму для содержимого буфера
+ * @return Контрольная сумма.
+ *
+ * *****************************************************************************
  */
 uint8_t clProtocolS::getCRC() const
 {

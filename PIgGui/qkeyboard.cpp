@@ -11,7 +11,7 @@ QKeyboard::QKeyboard(QWidget *parent) : QWidget(parent), ui(new Ui::QKeyboard)
     ui->setupUi(this);
 
     btns.resize(NUM_KEY_IN_LAYOUT);
-    btnLayout.resize(2 * btns.size());
+    btnLayout.resize(btns.size());
 
     btns.replace(0, ui->btn1);
     btns.replace(1, ui->btn2);
@@ -22,6 +22,7 @@ QKeyboard::QKeyboard(QWidget *parent) : QWidget(parent), ui(new Ui::QKeyboard)
     btns.replace(6, ui->btn7);
     btns.replace(7, ui->btn8);
     btns.replace(8, ui->btn9);
+    btns.replace(9, ui->btn10);
 
     QFont f = ui->btn1->font();
     f.setPointSize(15);
@@ -31,15 +32,13 @@ QKeyboard::QKeyboard(QWidget *parent) : QWidget(parent), ui(new Ui::QKeyboard)
         QPushButton *btn = btns.at(i);
         btn->setFont(f);
         btn->setFocusPolicy(Qt::NoFocus);
-        connect(btn, &QPushButton::clicked, [=]() { btnPressed(i); });
+        connect(btn, &QPushButton::pressed, this, &QKeyboard::btnPressed);
+        connect(btn, &QPushButton::released, this, &QKeyboard::btnPressed);
     }
-
-    reset();
-    refresh();
 
     connect(this, &QKeyboard::clicked, this, &QKeyboard::keyPressed);
 
-    reset();
+    SetLayout();
 }
 
 //
@@ -48,31 +47,127 @@ QKeyboard::~QKeyboard()
     delete ui;
 }
 
+
 //
-void QKeyboard::btnPressed(int value)
+void QKeyboard::reset()
 {
-    Q_ASSERT(value < btns.size());
-
-    if (alt)
+    for (auto &btn : btnLayout)
     {
-        value += btns.size();
+        btn = KEY_NO;
     }
-    eKEY ekey = btnLayout.at(value);
 
-    if (ekey != KEY_NO)
+    alt = false;
+}
+
+
+//
+uint16_t QKeyboard::getKey()
+{
+    return m_key;
+}
+
+
+//
+void QKeyboard::btnPressed()
+{
+
+    uint16_t key = 0;
+    for (int i = 0; i < btns.size(); i++)
     {
-        if (ekey == KEY_FUNC)
+        key |= ((btns.at(i)->isDown()) ? (1) : (0)) << i;
+    }
+
+    m_key = key;
+}
+
+
+//
+void QKeyboard::keyPressed(int value)
+{
+    const QMap<Qt::Key, eKEY> key_map = {
+        { Qt::Key_Backspace, KEY_CANCEL },  //
+        { Qt::Key_C, KEY_CANCEL },          //
+        { Qt::Key_Down, KEY_DOWN },         //
+        { Qt::Key_Left, KEY_LEFT },         //
+        { Qt::Key_F, KEY_FUNC },            //
+        { Qt::Key_M, KEY_MENU },            //
+        { Qt::Key_Return, KEY_ENTER },      //
+        { Qt::Key_Right, KEY_RIGHT },       //
+        { Qt::Key_Up, KEY_UP }              //
+    };
+
+
+    eKEY ekey = key_map.value(static_cast<Qt::Key>(value), KEY_NO);
+
+    if ((ekey != KEY_NO) && (btnLayout.count(ekey) > 0))
+    {
+        int start     = alt ? btns.size() : 0;
+        int keynumber = btnLayout.indexOf(ekey, start);
+
+        if ((keynumber >= 0) && ((keynumber - start) < btns.size()))
         {
-            switchAlt();
+            // Анимация нажатия кнопки, если она есть на экране
+            btns.at(keynumber - start)->animateClick();
         }
         else
         {
-            key = static_cast<uint8_t>(value + 1);
+            m_key = static_cast<uint8_t>(keynumber + 1);
         }
     }
-
-    //    emit debug(QString("Button pressed: %1").arg(name));
 }
+
+
+//
+void QKeyboard::refresh()
+{
+    QColor color;
+
+    color = alt ? kBtnColorSecondary : kBtnColorPrimary;
+
+    Q_ASSERT(btns.size() == NUM_KEY_IN_LAYOUT);
+    Q_ASSERT(btnLayout.size() == btns.size());
+
+    for (quint8 i = 0; i < btns.size(); i++)
+    {
+        QPushButton *btn = btns.at(i);
+
+        btn->setText(getButtonName(btnLayout.at(i)));
+        btn->setEnabled(btnLayout.at(i) != KEY_EMPTY);
+    }
+
+    setButtonTextColor(color);
+}
+
+
+//
+void QKeyboard::setButtonColor(QColor color)
+{
+    if (color.isValid())
+    {
+        QString qss = QString("background-color: %1").arg(color.name());
+        ui->btn1->setStyleSheet(qss);
+        for (int i = 0; i < btns.size(); i++)
+        {
+            btns.at(i)->setStyleSheet(qss);
+        }
+    }
+}
+
+
+//
+void QKeyboard::setButtonTextColor(QColor color)
+{
+    if (color.isValid())
+    {
+        QPalette palette = ui->btn1->palette();
+        palette.setColor(QPalette::ButtonText, color);
+        for (int i = 0; i < btns.size(); i++)
+        {
+            btns.at(i)->setPalette(palette);
+        }
+    }
+}
+
 
 //
 QString QKeyboard::getButtonName(eKEY ekey) const
@@ -181,6 +276,12 @@ QString QKeyboard::getButtonName(eKEY ekey) const
             name = QString::fromLocal8Bit("Режим\nАК");
         }
         break;
+    case KEY_TALK:
+        {
+            name = QString::fromLocal8Bit("Речь");
+        }
+        break;
+    case KEY_MAX: break;
     }
 
     Q_ASSERT(!name.isEmpty());
@@ -188,160 +289,27 @@ QString QKeyboard::getButtonName(eKEY ekey) const
     return name;
 }
 
-//
-uint8_t QKeyboard::getKey()
-{
-    uint8_t tkey = key;
-    key          = 0;
-    return tkey;
-}
 
 //
-void QKeyboard::keyPressed(int value)
+void QKeyboard::SetLayout()
 {
-    eKEY ekey = KEY_NO;
+    SetLayoutK400();
 
-    //    emit debug(QString("keyPressed: 0x%1").arg(value, 8, 16, QLatin1Char('0')));
-
-    switch (static_cast<Qt::Key>(value))
-    {
-    case Qt::Key_Backspace:  // DOWN
-    case Qt::Key_C:
-        {
-            ekey = KEY_CANCEL;
-        }
-        break;
-    case Qt::Key_Down:
-        {
-            ekey = KEY_DOWN;
-        }
-        break;
-    case Qt::Key_Left:
-        {
-            ekey = KEY_LEFT;
-        }
-        break;
-    case Qt::Key_F:
-        {
-            ekey = KEY_FUNC;
-        }
-        break;
-    case Qt::Key_M:
-        {
-            ekey = KEY_MENU;
-        }
-        break;
-    case Qt::Key_Return:
-        {
-            ekey = KEY_ENTER;
-        }
-        break;
-    case Qt::Key_Right:
-        {
-            ekey = KEY_RIGHT;
-        }
-        break;
-    case Qt::Key_Up:
-        {
-            ekey = KEY_UP;
-        }
-        break;
-    default:
-        {
-        }
-    }
-
-    if (btnLayout.count(ekey) > 0)
-    {
-        int start     = alt ? btns.size() : 0;
-        int keynumber = btnLayout.indexOf(ekey, start);
-
-        if ((keynumber >= 0) && ((keynumber - start) < btns.size()))
-        {
-            // Анимация нажатия кнопки, если она есть на экране
-            btns.at(keynumber - start)->animateClick();
-        }
-        else
-        {
-            key = static_cast<uint8_t>(keynumber + 1);
-        }
-    }
-}
-
-//
-void QKeyboard::refresh()
-{
-    QColor color;
-
-    color = alt ? kBtnColorSecondary : kBtnColorPrimary;
-
-    Q_ASSERT(btns.size() == NUM_KEY_IN_LAYOUT);
-    Q_ASSERT(btnLayout.size() == 2 * btns.size());
-
-    for (quint8 i = 0; i < btns.size(); i++)
-    {
-        QPushButton *btn       = btns.at(i);
-        int          keynumber = alt ? i + btns.size() : i;
-        btn->setText(getButtonName(btnLayout.at(keynumber)));
-        btn->setEnabled(btnLayout.at(keynumber) != KEY_EMPTY);
-    }
-
-    setButtonTextColor(color);
-}
-
-//
-void QKeyboard::reset()
-{
-    for (auto &btn : btnLayout)
-    {
-        btn = KEY_NO;
-    }
-
-    alt = false;
-}
-
-//
-void QKeyboard::setButtonColor(QColor color)
-{
-    if (color.isValid())
-    {
-        QString qss = QString("background-color: %1").arg(color.name());
-        ui->btn1->setStyleSheet(qss);
-        for (QPushButton *btn : btns)
-        {
-            btn->setStyleSheet(qss);
-        }
-    }
-}
-
-void QKeyboard::setButtonTextColor(QColor color)
-{
-    if (color.isValid())
-    {
-        QPalette palette = ui->btn1->palette();
-        palette.setColor(QPalette::ButtonText, color);
-        for (QPushButton *btn : btns)
-        {
-            btn->setPalette(palette);
-        }
-    }
-}
-
-void QKeyboard::setLayoutButton(uint8_t number, eKEY key)
-{
-    Q_ASSERT(number > 0);
-    Q_ASSERT(number <= 2 * NUM_KEY_IN_LAYOUT);
-
-    if ((number > 0) && (number <= (2 * NUM_KEY_IN_LAYOUT)))
-    {
-        btnLayout.replace(number - 1, key);
-    }
     refresh();
 }
 
+
 //
-void QKeyboard::switchAlt()
+void QKeyboard::SetLayoutK400()
 {
-    alt = !alt;
-    refresh();
+    btnLayout.replace(0, KEY_FUNC);
+    btnLayout.replace(1, KEY_UP);
+    btnLayout.replace(2, KEY_PUSK_UD);
+    btnLayout.replace(3, KEY_LEFT);
+    btnLayout.replace(4, KEY_MENU);
+    btnLayout.replace(5, KEY_RIGHT);
+    btnLayout.replace(6, KEY_AC_RESET);
+    btnLayout.replace(7, KEY_DOWN);
+    btnLayout.replace(8, KEY_CANCEL);
+    btnLayout.replace(9, KEY_TALK);
 }

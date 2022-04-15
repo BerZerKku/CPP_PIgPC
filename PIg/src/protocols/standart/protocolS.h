@@ -9,7 +9,6 @@
 #define PROTOCOLS_H_
 
 #include "glbDefine.h"
-#include "paramBsp.h"
 #include <stdint.h>
 
 // состояния протокола
@@ -20,7 +19,7 @@ enum ePRTS_STATUS
     PRTS_STATUS_READ,     ///< идет считывание сообщения
     PRTS_STATUS_READ_OK,  ///< соообщение считано полностью, но КС не проверена
     PRTS_STATUS_WAIT_ANSWER,  ///< ожидание ответа
-    PRTS_STATUS_WRITE_PC,     ///< надо передать сообщене на(с) ПК
+    PRTS_STATUS_WRITE_READY,  ///< надо передать сообщене
     PRTS_STATUS_WRITE         ///< передается сообщение
 };
 
@@ -69,9 +68,6 @@ public:
     /// Проверка флага наличия принятой посылки
     bool checkReadData();
 
-    /// Отправка сообщения, возвращает длинну передаваемой посылки
-    uint8_t trCom();
-
     /// Запуск работы данного протокола
     void setEnable(ePRTS_STATUS stat)
     {
@@ -104,37 +100,9 @@ public:
         stat_ = stat;
     }
 
-    /// Копирование посылки из другого буфера
-    bool copyCommandFrom(uint8_t *const bufSource);
-
-    /// Обработка принятого сообщения. В случае неудачи возвращает False.
-    virtual bool getData()
-    {
-        stat_ = statDef_;
-
-        if (m_buf[COM] == 0x11)
-        {
-            stat_ = PRTS_STATUS_WRITE;
-        }
-
-        return stat_ == PRTS_STATUS_WRITE;
-    }
-
-    /// Отправка команды
-    uint8_t sendData()
-    {
-        uint8_t num = 0;
-
-        if (stat_ == PRTS_STATUS_WRITE)
-        {
-            num = addCom(0x01);
-        }
-
-        return num;
-    }
-
-    /// Проверка текущего состояния
-    void checkStat();
+    bool    getData(uint8_t *data, uint8_t size);
+    uint8_t sendData(uint8_t com, const uint8_t *data, uint8_t size);
+    void    checkStat();
 
     /**	Проверка принятого байта на соответствие протоколу
      *
@@ -214,17 +182,8 @@ protected:
     // счетчик одинаковых состояний
     uint8_t cntCycle_;
 
-    // Подготовка к отправке команды (сама команда, кол-во данных и данные
-    // уже должны лежать в буфере)
-    uint8_t addCom();
-    // Подготовка к отправке команды без данных (заполнение буфера)
-    uint8_t addCom(uint8_t com);
-    // Подготовка к отправке команды с 1 байтом данных (заполнение буфера)
-    uint8_t addCom(uint8_t com, uint8_t byte);
-    // Подготовка к отправке команды с 2 байтами данных (заполнение буфера)
-    uint8_t addCom(uint8_t com, uint8_t byte1, uint8_t byte2);
     // Подготовка к отправке команды с данными (заполнение буфера)
-    uint8_t addCom(uint8_t com, uint8_t size, uint8_t buf[]);
+    uint8_t addCom(uint8_t com, uint8_t size, const uint8_t *buf);
 
     // Проверка принятой контрольной суммы
     bool checkCRC() const;

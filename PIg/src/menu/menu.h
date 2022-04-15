@@ -9,6 +9,7 @@
 #define MENU_H_
 
 #include "drivers/keyboard.h"
+#include "drivers/ks0108.h"
 
 /// Время работы одного цикла (зависит от настройки таймеров), мс
 #define TIME_CYLCE 100
@@ -22,6 +23,8 @@ class clMenu
 public:
     clMenu();
     void proc();
+
+    static char vLCDbuf[SIZE_BUF_STRING + 1];
 
     /**
      * *************************************************************************
@@ -43,10 +46,21 @@ public:
      */
     bool IsConnection() const { return m_connection; }
 
+
+    /**
+     * *************************************************************************
+     *
+     * @brief Возвращает коды нажатых кнопок.
+     * @return Коды нажатых кнопок.
+     *
+     * *************************************************************************
+     */
+    uint16_t GetKeys() const { return m_key; }
+
 private:
-    bool    m_connection;     ///< Флаг наличия связи с БСП.
-    eKEY    m_key;            ///< код нажатой кнопки
-    bool    m_blink;          ///< флаг мигания символов
+    bool     m_connection;    ///< Флаг наличия связи с БСП.
+    uint16_t m_key;           ///< коды нажатых кнопок
+    bool     m_blink;         ///< флаг мигания символов
     uint8_t m_blink_counter;  ///< счетчик циклов для мигания символов
     uint8_t m_lcd_init_counter;  ///< счетчик циклов для инициализации дисплея
 

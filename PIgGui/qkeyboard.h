@@ -23,28 +23,24 @@ class QKeyboard : public QWidget
 
 public:
     explicit QKeyboard(QWidget *parent = nullptr);
-    ~QKeyboard();
+    ~QKeyboard() override;
 
-    void    reset();
-    void    setLayoutButton(uint8_t number, eKEY key);
-    uint8_t getKey();
+    void reset();
+
+    uint16_t getKey();
 
 public slots:
-    void btnPressed(int value);
+    void btnPressed();
     void keyPressed(int value);
-
-private slots:
-    void switchAlt();
 
 signals:
     void clicked(int value);
     void debug(QString msg);
 
 private:
-    uint8_t        key = KEY_NO;
-    bool           alt = true;
+    uint16_t       m_key = KEY_NO;
+    bool           alt   = true;
     Ui::QKeyboard *ui;
-    QSignalMapper *signalMapper;
 
     QVector<QPushButton *> btns;
     QVector<eKEY>          btnLayout;
@@ -53,6 +49,10 @@ private:
     void    setButtonColor(QColor color);
     void    setButtonTextColor(QColor color);
     QString getButtonName(eKEY) const;
+    void    setLayoutButton(uint8_t number, eKEY key);
+
+    void SetLayout();
+    void SetLayoutK400();
 };
 
 #endif  // QKEYBOARD_H

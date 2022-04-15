@@ -5,9 +5,6 @@
 
 #include "bsp.h"
 
-#include "PIg/src/flash.h"
-#include "PIg/src/menu/txCom.h"
-
 const QString Bsp::kMsgSizeError       = "Wrong size of data in command %1: %2";
 const QString Bsp::kMsgTimeSourceError = "Wrong source of time: %1";
 
@@ -15,13 +12,20 @@ const QTextCodec *Bsp::kCodec      = QTextCodec::codecForName("CP1251");
 const QString     Bsp::kTimeFormat = "dd.MM.yyyy hh:mm:ss.zzz";
 
 
-// @todo Разделить класс на Р400/Р400м/РЗСК/ОПТИКа
-
-Bsp::Bsp(QWidget *parent) : QWidget(parent)
+/**
+ * *****************************************************************************
+ *
+ * @brief Конструктор.
+ * @param[in] tree Дерево.
+ * @param[in] parent Родитель.
+ *
+ * *****************************************************************************
+ */
+Bsp::Bsp(QTreeWidget *tree, QWidget *parent) : QWidget(parent), m_tree(tree)
 {
     // Эти строки не влияют на содержимое заголовка, но влияют на resize ниже.
-    mTree.headerItem()->setText(0, kCodec->toUnicode("Parameter"));
-    mTree.headerItem()->setText(1, kCodec->toUnicode("Value"));
+    m_tree->headerItem()->setText(0, kCodec->toUnicode("Parameter"));
+    m_tree->headerItem()->setText(1, kCodec->toUnicode("Value"));
 
     //    expandAll();
     //    header()->resizeSections(QHeaderView::ResizeToContents);
@@ -29,15 +33,14 @@ Bsp::Bsp(QWidget *parent) : QWidget(parent)
     //    header()->resizeSection(0, header()->sectionSize(0) + 5);
     //    setFixedWidth(1.75*header()->sectionSize(0));
 
+    m_tree->header()->setSectionResizeMode(0, QHeaderView::Fixed);
+    m_tree->header()->resizeSection(0, 220);
+    m_tree->setFixedWidth(400);
 
-    mTree.header()->setSectionResizeMode(0, QHeaderView::Fixed);
-    mTree.header()->resizeSection(0, 220);
-    mTree.setFixedWidth(400);
+    m_tree->setSelectionMode(QAbstractItemView::NoSelection);
+    m_tree->setFocusPolicy(Qt::NoFocus);
 
-    mTree.setSelectionMode(QAbstractItemView::NoSelection);
-    mTree.setFocusPolicy(Qt::NoFocus);
-
-    mTree.clear();
+    m_tree->clear();
 }
 
 
@@ -50,9 +53,14 @@ Bsp::Bsp(QWidget *parent) : QWidget(parent)
  */
 void Bsp::crtTreeParam()
 {
-    QTreeWidgetItem *top = new QTreeWidgetItem(&mTree);
+    QTreeWidgetItem *top = new QTreeWidgetItem(m_tree);
     top->setText(0, kCodec->toUnicode("Параметры"));
-    mTree.addTopLevelItem(top);
+    m_tree->addTopLevelItem(top);
+
+    m_key.setRange(0, 0xFFFF);
+    m_key.setPrefix("0x");
+    m_key.setDisplayIntegerBase(16);
+    AddSpinBox(top, kCodec->toUnicode("Клавиатура"), &m_key);
 }
 
 
@@ -113,44 +121,32 @@ bool Bsp::checkPkg(QVector<uint8_t> &pkg, eGB_COM &com)
  */
 void Bsp::Init()
 {
-    connect(&m_timer, &QTimer::timeout, this, &Bsp::SlotHandleTick);
+    crtTreeParam();
 
     m_map_com_rx.insert(0x01, &Bsp::HdlrComRx01);
 
     m_map_com_tx.insert(0x11, &Bsp::HdlrComTx11);
+
+    connect(&m_timer, &QTimer::timeout, this, &Bsp::SlotHandleTick);
 }
 
 
-//
-quint8 Bsp::getComboBoxValue(QComboBox *combobox)
+/**
+ * *****************************************************************************
+ *
+ * @brief Добавить SpinBox.
+ * @param[in] top
+ * @param[in] widget Dbl;tn
+ *
+ * *****************************************************************************
+ */
+void Bsp::AddSpinBox(QTreeWidgetItem *top, const QString &name, QSpinBox *spinbox)
 {
-    return static_cast<quint8>(combobox->currentData().toInt());
-}
+    QTreeWidgetItem *item = new QTreeWidgetItem(top);
+    item->setText(0, name);
+    top->addChild(item);
 
-//
-int Bsp::setComboBoxValue(QComboBox *combobox, quint8 value)
-{
-    int index = combobox->findData(value);
-
-    if (index != -1)
-    {
-        combobox->setCurrentIndex(index);
-    }
-
-    return index;
-}
-
-//
-QString Bsp::getLineEditValue(QLineEdit *lineedit)
-{
-    return lineedit->text();
-}
-
-
-//
-qint16 Bsp::getSpinBoxValue(QSpinBox *spinbox)
-{
-    return static_cast<qint16>(spinbox->value());
+    m_tree->setItemWidget(item, 1, spinbox);
 }
 
 
@@ -267,6 +263,7 @@ void Bsp::keyPressEvent(QKeyEvent *event)
     Q_UNUSED(event);
 }
 
+
 //
 quint8 Bsp::bcd2int(quint8 bcd, bool *ok)
 {
@@ -375,10 +372,15 @@ void Bsp::HdlrComRx01(eGB_COM com, pkg_t &data)
 
     if (com == 0x01)
     {
-        if (!CheckSize(com, data.size(), { 3 }))
+        if (!CheckSize(com, data.size(), { 2 }))
         {
             return;
         }
+
+        uint16_t value = data.at(1);
+        value          = static_cast<uint16_t>((value << 8) + data.at(0));
+
+        m_key.setValue(value);
     }
 }
 

@@ -1,7 +1,7 @@
 #include "base.h"
 #include "avr.h"
 #include "drivers/ks0108.h"
-#include "protocols/standart/protocolPcS.h"
+#include "protocols/standart/protocolS.h"
 
 
 /// Максимальное кол-во неполученных сообщений от БСП для ошибки связи
@@ -36,7 +36,7 @@ void bspRead()
     {
         if (s_protocol.checkReadData())
         {
-            s_protocol.getData();
+            s_protocol.getData(reinterpret_cast<uint8_t *>(menu.vLCDbuf), SIZE_BUF_STRING);
         }
         cntLostCom = 0;
     }
@@ -52,9 +52,11 @@ uint8_t bspWrite()
     // Перед передачей проверим статус протокола на залипание.
     s_protocol.checkStat();
 
-    if (s_protocol.getCurrentStatus() == PRTS_STATUS_WRITE)
+    if (s_protocol.getCurrentStatus() == PRTS_STATUS_WRITE_READY)
     {
-        num = s_protocol.sendData();
+        uint16_t keys = menu.GetKeys();
+
+        num = s_protocol.sendData(0x01, reinterpret_cast<uint8_t *>(&keys), sizeof(keys));
     }
 
     return num;
