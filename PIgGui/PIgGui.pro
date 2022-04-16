@@ -44,6 +44,7 @@ HEADERS += \
     qprotocolviewer.h \
     serial.h \
     bsp/bsp.h \
+    unicode.hpp \
     wrapper.h \
     serial/serialport.h \
     widget/combobox.h \

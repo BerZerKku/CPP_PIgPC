@@ -6,6 +6,7 @@ INCLUDEPATH += \
 
 HEADERS += \
     $${PIG_PATH}/src/avr.h \
+    $${PIG_PATH}/src/version.hpp \
     $${PIG_PATH}/src/debug/debug.hpp \
     $${PIG_PATH}/src/drivers/keyboard.h \
     $${PIG_PATH}/src/drivers/ks0108.h \

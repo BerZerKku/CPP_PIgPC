@@ -6,6 +6,8 @@
 #include <QPalette>
 #include <QTextCodec>
 
+#include <unicode.hpp>
+
 QKeyboard::QKeyboard(QWidget *parent) : QWidget(parent), ui(new Ui::QKeyboard)
 {
     ui->setupUi(this);
@@ -178,17 +180,17 @@ QString QKeyboard::getButtonName(eKEY ekey) const
     {
     case KEY_NO:
         {
-            name = "KEY_NO";
+            name = ToUnicode("KEY_NO");
         }
         break;
     case KEY_EMPTY:
         {
-            name = " ";
+            name = ToUnicode(" ");
         }
         break;
     case KEY_FUNC:
         {
-            name = QString::fromLocal8Bit("Фн");
+            name = ToUnicode("Фн");
         }
         break;
     case KEY_ENTER:
@@ -198,7 +200,7 @@ QString QKeyboard::getButtonName(eKEY ekey) const
         break;
     case KEY_CANCEL:
         {
-            name = QString::fromLocal8Bit("Отмена");
+            name = ToUnicode("Отмена");
         }
         break;
     case KEY_DOWN:
@@ -223,62 +225,62 @@ QString QKeyboard::getButtonName(eKEY ekey) const
         break;
     case KEY_MENU:
         {
-            name = QString::fromLocal8Bit("Меню");
+            name = ToUnicode("Меню");
         }
         break;
     case KEY_RESET:
         {
-            name = QString::fromLocal8Bit("Сброс");
+            name = ToUnicode("Сброс");
         }
         break;
     case KEY_PUSK:
         {
-            name = QString::fromLocal8Bit("Пуск");
+            name = ToUnicode("Пуск");
         }
         break;
     case KEY_PUSK_UD:
         {
-            name = QString::fromLocal8Bit("Удал.\nПуск\nПРД");
+            name = ToUnicode("Удал.\nПуск\nПРД");
         }
         break;
     case KEY_PUSK_NALAD:
         {
-            name = QString::fromLocal8Bit("н. Пуск");
+            name = ToUnicode("н. Пуск");
         }
         break;
     case KEY_RESET_IND:
         {
-            name = QString::fromLocal8Bit("Сброс\nинд.");
+            name = ToUnicode("Сброс\nинд.");
         }
         break;
     case KEY_CALL:
         {
-            name = QString::fromLocal8Bit("Вызов");
+            name = ToUnicode("Вызов");
         }
         break;
     case KEY_AC_PUSK:
         {
-            name = QString::fromLocal8Bit("Пуск\nАК");
+            name = ToUnicode("Пуск\nАК");
         }
         break;
     case KEY_AC_PUSK_UD:
         {
-            name = QString::fromLocal8Bit("Удал.\nПуск\nАК");
+            name = ToUnicode("Удал.\nПуск\nАК");
         }
         break;
     case KEY_AC_RESET:
         {
-            name = QString::fromLocal8Bit("Сброс\nАК");
+            name = ToUnicode("Сброс\nАК");
         }
         break;
     case KEY_AC_REGIME:
         {
-            name = QString::fromLocal8Bit("Режим\nАК");
+            name = ToUnicode("Режим\nАК");
         }
         break;
     case KEY_TALK:
         {
-            name = QString::fromLocal8Bit("Речь");
+            name = ToUnicode("Речь");
         }
         break;
     case KEY_MAX: break;

@@ -15,6 +15,10 @@
 
 char clMenu::vLCDbuf[SIZE_BUF_STRING + 1];
 
+static const char s_text_no_connect[] PROGMEM = " Нет связи с БСП!!! ";
+static const char s_text_version[] PROGMEM    = " Версия ПИ: %.2u.%.2u";
+
+
 /**
  * *************************************************************************
  *
@@ -52,9 +56,6 @@ clMenu::clMenu() : m_connection(false), m_key(0)
  */
 void clMenu::proc(void)
 {
-
-    static const char fcNoConnectBsp[] PROGMEM = " Нет связи с БСП!!! ";
-
     if (++m_lcd_init_counter >= k_lcd_init_counter_max)
     {
         vLCDinit();
@@ -75,18 +76,35 @@ void clMenu::proc(void)
 
     if (!m_connection)
     {
+        lineParam_ = 1;
+
+        clearTextBuf();
         if (m_blink)
         {
-            lineParam_ = 1;
-            snprintf_P(&vLCDbuf[0], 20, fcNoConnectBsp);
-            snprintf_P(&vLCDbuf[20], 20, fcNoConnectBsp);
-            snprintf_P(&vLCDbuf[40], 20, fcNoConnectBsp);
-            snprintf_P(&vLCDbuf[60], 20, fcNoConnectBsp);
-            snprintf_P(&vLCDbuf[80], 20, fcNoConnectBsp);
-            snprintf_P(&vLCDbuf[100], 20, fcNoConnectBsp);
+            snprintf_P(&vLCDbuf[0], 21, s_text_no_connect);
         }
+        else
+        {
+            snprintf_P(&vLCDbuf[0], 21, "!23123");
+        }
+
+        snprintf_P(&vLCDbuf[40], 20, s_text_version, PROJECT_VER_MAJOR, PROJECT_VER_MINOR);
     }
 
     vLCDputchar(vLCDbuf, lineParam_);
     vLCDrefresh();
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Очистка буфера текста.
+ *
+ * *****************************************************************************
+ */
+void clMenu::clearTextBuf()
+{
+    for (uint_fast8_t i = 0; i < sizeof(vLCDbuf); i++)
+        vLCDbuf[i] = ' ';
 }

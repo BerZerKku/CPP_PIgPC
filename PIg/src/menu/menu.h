@@ -73,6 +73,8 @@ private:
     // кол-во отображаемых параметров
     uint8_t lineParam_;
 
+    void clearTextBuf();
+
 
 #ifdef TEST_FRIENDS
     TEST_FRIENDS
