@@ -4,7 +4,7 @@
 #include <QString>
 #include <QTextCodec>
 
-QString ToUnicode(const std::string &text)
+inline QString ToUnicode(const std::string &text)
 {
     static const QTextCodec *const kCodec = QTextCodec::codecForName("CP1251");
 

@@ -80,10 +80,10 @@ bool vLCDputchar(const char* buf, uint8_t num)
 
 void vLCDsetLed(eLCD_LED val)
 {
-    if (val == LED_SWITCH)
-        uLedTimeOn = LCD_TIME_LED_ON;
-    else
-        eLed = val;
+    Q_ASSERT(val == LED_OFF || val == LED_SWITCH || val == LED_ON);
+
+    eLed       = val;
+    uLedTimeOn = (eLed == LED_SWITCH) ? (LCD_TIME_LED_ON) : 0;
 }
 
 void vLCDled()

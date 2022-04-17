@@ -30,10 +30,10 @@ class Bsp : public QWidget
 protected:
     typedef void (Bsp::*HdlrCom_t)(eGB_COM com, pkg_t &data);
 
-    static const QString     kMsgSizeError;
-    static const QString     kMsgTimeSourceError;
-    static const QTextCodec *kCodec;
-    static const QString     kTimeFormat;
+    static const QString kMsgSizeError;
+    static const QString kMsgTimeSourceError;
+    static const QString kTimeFormat;
+    static const QString kVersion;
 
 public:
     explicit Bsp(QTreeWidget *tree, QWidget *parent = nullptr);
@@ -48,10 +48,7 @@ public:
     pkg_t m_pkg_rx;  ///< Данные на приеме.
     pkg_t m_pkg_tx;  ///< Данные для передачи.
 
-
-    QSpinBox m_key;
-
-    void AddSpinBox(QTreeWidgetItem *top, const QString &name, QSpinBox *spinbox);
+    void AddWidget(QTreeWidgetItem *top, const QString &name, QWidget *widget);
 
 
 public slots:
@@ -63,6 +60,14 @@ signals:
     void SignalSendFinished();
 
 protected:
+    QSpinBox             m_key;
+    QLineEdit            m_version;
+    QVector<QLineEdit *> m_lines;
+    QSpinBox             m_top_lines;
+    QComboBox            m_led_on;
+    QComboBox            m_cursor_on;
+    QSpinBox             m_cursor_pos;
+
     QTreeWidget *const m_tree;
 
     QMap<uint8_t, HdlrCom_t> m_map_com_rx;

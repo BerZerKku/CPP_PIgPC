@@ -10,13 +10,10 @@
 #include "menu.h"
 #include "version.hpp"
 
-/// режим подсветки по умолчанию
-#define LED_REGIME LED_SWITCH
-
 char clMenu::vLCDbuf[SIZE_BUF_STRING + 1];
 
 static const char s_text_no_connect[] PROGMEM = " Нет связи с БСП!!! ";
-static const char s_text_version[] PROGMEM    = " Версия ПИ: %.2u.%.2u";
+static const char s_text_version[] PROGMEM    = " Версия ПИ: %.2X.%.2X";
 
 
 /**
@@ -32,18 +29,16 @@ static const char s_text_version[] PROGMEM    = " Версия ПИ: %.2u.%.2u";
  */
 clMenu::clMenu() : m_connection(false), m_key(0)
 {
-    lineParam_ = 3;
-    m_blink    = false;
+    m_top_lines = 1;
+    m_blink     = false;
 
     m_blink_counter    = 0;
     m_lcd_init_counter = 0;
 
-    // курсор неактивен
-    cursorEnable_ = false;
-    cursorLine_   = 0;
+    m_cursor_on  = false;
+    m_cursor_pos = 0;
 
-    // установка режима работы подсветки
-    vLCDsetLed(LED_REGIME);
+    vLCDsetLed(LED_ON);
 }
 
 
@@ -69,29 +64,39 @@ void clMenu::proc(void)
     }
 
     m_key = eKEYget();
-    if (m_key != 0)
-    {
-        vLCDsetLed(LED_SWITCH);
-    }
 
     if (!m_connection)
     {
-        lineParam_ = 1;
+        vLCDsetLed(LED_ON);
 
         clearTextBuf();
+
+        m_top_lines = 1;
         if (m_blink)
         {
             snprintf_P(&vLCDbuf[0], 21, s_text_no_connect);
         }
-        else
-        {
-            snprintf_P(&vLCDbuf[0], 21, "!23123");
-        }
 
         snprintf_P(&vLCDbuf[40], 20, s_text_version, PROJECT_VER_MAJOR, PROJECT_VER_MINOR);
     }
+    else
+    {
+        if (m_cursor_on && m_blink)
+        {
+            uint8_t pos = m_cursor_pos - 1;
 
-    vLCDputchar(vLCDbuf, lineParam_);
+            qDebug() << pos;
+
+            if (pos < (SIZE_BUF_STRING - 1))
+            {
+                vLCDbuf[pos] = '_';
+            }
+        }
+
+        vLCDsetLed((m_led_on) ? (LED_ON) : (LED_OFF));
+    }
+
+    vLCDputchar(vLCDbuf, m_top_lines);
     vLCDrefresh();
 }
 

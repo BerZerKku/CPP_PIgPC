@@ -4,12 +4,14 @@
 #include <cmath>
 
 #include "bsp.h"
+#include "menu/menu.h"
+#include "unicode.hpp"
 
 const QString Bsp::kMsgSizeError       = "Wrong size of data in command %1: %2";
 const QString Bsp::kMsgTimeSourceError = "Wrong source of time: %1";
+const QString Bsp::kTimeFormat         = "dd.MM.yyyy hh:mm:ss.zzz";
 
-const QTextCodec *Bsp::kCodec      = QTextCodec::codecForName("CP1251");
-const QString     Bsp::kTimeFormat = "dd.MM.yyyy hh:mm:ss.zzz";
+const QString Bsp::kVersion = "%1.%2";
 
 
 /**
@@ -24,8 +26,8 @@ const QString     Bsp::kTimeFormat = "dd.MM.yyyy hh:mm:ss.zzz";
 Bsp::Bsp(QTreeWidget *tree, QWidget *parent) : QWidget(parent), m_tree(tree)
 {
     // Эти строки не влияют на содержимое заголовка, но влияют на resize ниже.
-    m_tree->headerItem()->setText(0, kCodec->toUnicode("Parameter"));
-    m_tree->headerItem()->setText(1, kCodec->toUnicode("Value"));
+    m_tree->headerItem()->setText(0, ToUnicode("Parameter"));
+    m_tree->headerItem()->setText(1, ToUnicode("Value"));
 
     //    expandAll();
     //    header()->resizeSections(QHeaderView::ResizeToContents);
@@ -53,14 +55,67 @@ Bsp::Bsp(QTreeWidget *tree, QWidget *parent) : QWidget(parent), m_tree(tree)
  */
 void Bsp::crtTreeParam()
 {
-    QTreeWidgetItem *top = new QTreeWidgetItem(m_tree);
-    top->setText(0, kCodec->toUnicode("Параметры"));
+    QTreeWidgetItem *top;
+
+    // Чтение
+
+    top = new QTreeWidgetItem(m_tree);
+    top->setText(0, ToUnicode("Чтение"));
     m_tree->addTopLevelItem(top);
 
     m_key.setRange(0, 0xFFFF);
     m_key.setPrefix("0x");
     m_key.setDisplayIntegerBase(16);
-    AddSpinBox(top, kCodec->toUnicode("Клавиатура"), &m_key);
+    m_key.setReadOnly(true);
+    m_key.setFocusPolicy(Qt::NoFocus);
+    m_key.findChild<QLineEdit *>()->setReadOnly(true);
+    QLineEdit *line = m_key.findChild<QLineEdit *>();
+    connect(line, &QLineEdit::selectionChanged, line, &QLineEdit::deselect);
+    AddWidget(top, ToUnicode("Клавиатура"), &m_key);
+
+    m_version.setReadOnly(true);
+    m_version.setFocusPolicy(Qt::NoFocus);
+    connect(&m_version, &QLineEdit::selectionChanged, &m_version, &QLineEdit::deselect);
+    AddWidget(top, ToUnicode("Версия"), &m_version);
+
+    // Запись
+
+    top = new QTreeWidgetItem(m_tree);
+    top->setText(0, ToUnicode("Чтение"));
+    m_tree->addTopLevelItem(top);
+
+    for (int i = 0; i < (SIZE_BUF_STRING / DISPLAY_ROW_SIZE); i++)
+    {
+        QLineEdit *line = new QLineEdit;
+        QFont      font = line->font();
+
+        font.setFamily("Monospace");
+        font.setStyleHint(QFont::TypeWriter);
+
+        line->setFont(font);
+        line->setMaxLength(DISPLAY_ROW_SIZE);
+
+        m_lines.append(line);
+        AddWidget(top, ToUnicode("Линия %1").arg(i + 1), line);
+    }
+
+    m_top_lines.setRange(1, m_lines.size() - 1);
+    AddWidget(top, ToUnicode("Количество top линий"), &m_top_lines);
+
+    m_led_on.addItem(ToUnicode("0 - Выкл"), 0);
+    m_led_on.addItem(ToUnicode("1 - Вкл"), 1);
+    m_led_on.setEditable(false);
+    AddWidget(top, ToUnicode("Подсветка"), &m_led_on);
+
+    m_cursor_on.addItem(ToUnicode("0 - Выкл"), 0);
+    m_cursor_on.addItem(ToUnicode("1 - Вкл"), 1);
+    m_cursor_on.setEditable(false);
+    AddWidget(top, ToUnicode("Курсор"), &m_cursor_on);
+
+    m_cursor_pos.setRange(1, SIZE_BUF_STRING);
+    AddWidget(top, ToUnicode("Позиция курсора"), &m_cursor_pos);
+
+    m_tree->expandAll();
 }
 
 
@@ -134,19 +189,20 @@ void Bsp::Init()
 /**
  * *****************************************************************************
  *
- * @brief Добавить SpinBox.
- * @param[in] top
- * @param[in] widget Dbl;tn
+ * @brief Добавить виджет.
+ * @param[in] top Верхушка.
+ * @param[in] name Название параметра
+ * @param[in] widget Виджет параметра.
  *
  * *****************************************************************************
  */
-void Bsp::AddSpinBox(QTreeWidgetItem *top, const QString &name, QSpinBox *spinbox)
+void Bsp::AddWidget(QTreeWidgetItem *top, const QString &name, QWidget *widget)
 {
     QTreeWidgetItem *item = new QTreeWidgetItem(top);
     item->setText(0, name);
     top->addChild(item);
 
-    m_tree->setItemWidget(item, 1, spinbox);
+    m_tree->setItemWidget(item, 1, widget);
 }
 
 
@@ -372,15 +428,20 @@ void Bsp::HdlrComRx01(eGB_COM com, pkg_t &data)
 
     if (com == 0x01)
     {
-        if (!CheckSize(com, data.size(), { 2 }))
+        if (!CheckSize(com, data.size(), { 4 }))
         {
             return;
         }
 
-        uint16_t value = data.at(1);
-        value          = static_cast<uint16_t>((value << 8) + data.at(0));
+        uint8_t version_major = data.at(0);
+        uint8_t version_minor = data.at(1);
 
-        m_key.setValue(value);
+        m_version.setText(kVersion.arg(version_major, 2, 16, QLatin1Char('0'))
+                              .arg(version_minor, 2, 16, QLatin1Char('0')));
+
+        uint16_t key = data.at(3);
+        key          = static_cast<uint16_t>((key << 8) + data.at(2));
+        m_key.setValue(key);
     }
 }
 
@@ -396,6 +457,7 @@ void Bsp::HdlrComRx01(eGB_COM com, pkg_t &data)
  */
 void Bsp::HdlrComTx11(eGB_COM com, pkg_t &data)
 {
+    uint8_t value;
     Q_ASSERT(com == 0x11);
 
     data.clear();
@@ -404,12 +466,30 @@ void Bsp::HdlrComTx11(eGB_COM com, pkg_t &data)
     {
         data.append(com);
 
-        for (int i = 0; i < 128; i++)
+        for (int i = 0; i < m_lines.size(); i++)
         {
-            data.append(static_cast<uint8_t>(i));
-        }
-    }
+            QLineEdit *line  = m_lines.at(i);
+            QByteArray chars = line->text().toLocal8Bit();
 
+            for (int j = 0; j < line->maxLength(); j++)
+            {
+                (j < chars.size()) ? data.append(chars.at(j)) : data.append(' ');
+            }
+        }
+
+        value = m_top_lines.value() & 0x07;
+        value |= (m_led_on.currentData().toUInt() == 0) ? (0) : (0x80);
+        data.append(value);
+        value = (m_cursor_pos.value() & 0x7F);
+        value |= (m_cursor_on.currentData().toUInt() == 0) ? (0) : (0x80);
+        data.append(value);
+        data.append(0);
+        data.append(0);
+        data.append(0);
+        data.append(0);
+        data.append(0);
+        data.append(0);
+    }
 
     Q_ASSERT(data.size() == (128 + 1));
 }

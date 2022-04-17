@@ -2,6 +2,7 @@
 #include "avr.h"
 #include "drivers/ks0108.h"
 #include "protocols/standart/protocolS.h"
+#include "version.hpp"
 
 
 /// Максимальное кол-во неполученных сообщений от БСП для ошибки связи
@@ -21,6 +22,7 @@ clMenu menu;
 /// Класс стандартного протокола работающего с БСП
 static clProtocolS s_protocol(uBufUartBsp, BUFF_SIZE_BSP);
 
+data_tx_x11_t s_data_tx_x11;
 
 void bspRead()
 {
@@ -36,7 +38,7 @@ void bspRead()
     {
         if (s_protocol.checkReadData())
         {
-            s_protocol.getData(reinterpret_cast<uint8_t *>(menu.vLCDbuf), SIZE_BUF_STRING);
+            s_protocol.getData(s_data_tx_x11);
         }
         cntLostCom = 0;
     }
@@ -55,8 +57,14 @@ uint8_t bspWrite()
     if (s_protocol.getCurrentStatus() == PRTS_STATUS_WRITE_READY)
     {
         uint16_t keys = menu.GetKeys();
+        uint8_t  data[4];
 
-        num = s_protocol.sendData(0x01, reinterpret_cast<uint8_t *>(&keys), sizeof(keys));
+        data[0] = PROJECT_VER_MAJOR;
+        data[1] = PROJECT_VER_MINOR;
+        data[2] = keys >> 8;
+        data[3] = keys;
+
+        num = s_protocol.sendData(0x01, data, SIZE_OF(data));
     }
 
     return num;
@@ -65,6 +73,13 @@ uint8_t bspWrite()
 
 void mainInit()
 {
+    s_data_tx_x11.lcd_buf      = menu.vLCDbuf;
+    s_data_tx_x11.lcd_buf_size = SIZE_OF(menu.vLCDbuf) - 1;
+    s_data_tx_x11.top_lines    = &menu.m_top_lines;
+    s_data_tx_x11.led_on       = &menu.m_led_on;
+    s_data_tx_x11.cursor_on    = &menu.m_cursor_on;
+    s_data_tx_x11.cursor_pos   = &menu.m_cursor_pos;
+
     s_protocol.setEnable(PRTS_STATUS_NO);
 
     vLCDinit();

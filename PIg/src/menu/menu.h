@@ -25,6 +25,12 @@ public:
     void proc();
 
     static char vLCDbuf[SIZE_BUF_STRING + 1];
+    uint8_t     m_top_lines;   // количество линий в верхнем окне
+    bool        m_cursor_on;   // отображение курсора
+    uint8_t     m_cursor_pos;  // положение курсора
+    bool        m_led_on;      // включение подстветки
+
+    //    static char
 
     /**
      * *************************************************************************
@@ -63,15 +69,6 @@ private:
     bool     m_blink;         ///< флаг мигания символов
     uint8_t m_blink_counter;  ///< счетчик циклов для мигания символов
     uint8_t m_lcd_init_counter;  ///< счетчик циклов для инициализации дисплея
-
-    // true - необходимо вывести на экран курсор
-    bool cursorEnable_;
-
-    // текущее положение курсора (номер строки)
-    uint8_t cursorLine_;
-
-    // кол-во отображаемых параметров
-    uint8_t lineParam_;
 
     void clearTextBuf();
 

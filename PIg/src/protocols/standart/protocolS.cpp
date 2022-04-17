@@ -62,7 +62,7 @@ bool clProtocolS::checkReadData()
  *
  * *****************************************************************************
  */
-bool clProtocolS::getData(uint8_t* data, uint8_t size)
+bool clProtocolS::getData(data_tx_x11_t& data)
 {
     stat_ = statDef_;
 
@@ -70,12 +70,20 @@ bool clProtocolS::getData(uint8_t* data, uint8_t size)
     {
         Q_ASSERT(m_buf[NUM] == 128);
 
-        if (m_buf[NUM] == size)
+        if (m_buf[NUM] == 128)
         {
-            for (uint8_t i = 0; i < size; i++)
+            uint8_t i   = 0;
+            uint8_t pos = B1;
+
+            while (i < data.lcd_buf_size)
             {
-                data[i] = m_buf[B1 + i];
+                data.lcd_buf[i++] = m_buf[pos++];
             }
+
+            *data.top_lines  = m_buf[pos] & 0x07;
+            *data.led_on     = (m_buf[pos++] & 0x80) ? true : false;
+            *data.cursor_pos = m_buf[pos] & 0x7F;
+            *data.cursor_on  = (m_buf[pos++] & 0x80) ? true : false;
         }
 
         setCurrentStatus(PRTS_STATUS_WRITE_READY);

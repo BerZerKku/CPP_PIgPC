@@ -52,6 +52,16 @@ enum ePRTS_DATA_BYTE_NAME
     B22   // 25
 };
 
+struct data_tx_x11_t
+{
+    char *   lcd_buf;
+    uint8_t  lcd_buf_size;
+    uint8_t *top_lines;
+    bool *   led_on;
+    bool *   cursor_on;
+    uint8_t *cursor_pos;
+};
+
 class clProtocolS
 {
     /** Кол-во циклов, после которого залипшее текущее состояние будет сброшено в состояние
@@ -100,7 +110,7 @@ public:
         stat_ = stat;
     }
 
-    bool    getData(uint8_t *data, uint8_t size);
+    bool    getData(data_tx_x11_t &data);
     uint8_t sendData(uint8_t com, const uint8_t *data, uint8_t size);
     void    checkStat();
 
