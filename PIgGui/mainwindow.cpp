@@ -28,17 +28,17 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->serialBsp->setFixedWidth(ui->serialBsp->sizeHint().width());
 
     ui->serialBsp->setLabelText("Port BSP:");
-    ui->serialBsp->setup(4800, QSerialPort::NoParity, QSerialPort::TwoStop);
+    ui->serialBsp->setup(19200, QSerialPort::EvenParity, QSerialPort::OneStop);
     ui->serialBsp->addDefaultPort("COM20");
-    ui->serialBsp->addDefaultPort("COM15");
+    ui->serialBsp->addDefaultPort("COM13");
     ui->serialBsp->addDefaultPort("COM3");
     ui->serialBsp->addDefaultPort("tnt0");
 
     connect(this, &MainWindow::writeByteToBsp, ui->serialBsp, &TSerial::write);
+    connect(ui->serialBsp, &TSerial::read, this, &MainWindow::SlotByteBspToPi);
     connect(ui->serialBsp, &TSerial::sendFinished, [=]() { bspTxEnd(); });
     connect(ui->serialBsp, &TSerial::openPort, [&]() { ui->mBspConnect->setEnabled(false); });
     connect(ui->serialBsp, &TSerial::closePort, [&]() { ui->mBspConnect->setEnabled(true); });
-
 
     codec = QTextCodec::codecForName("CP1251");
     connect(ui->textEdit, &QTextEdit::selectionChanged, this, &MainWindow::clearSelection);
@@ -299,7 +299,6 @@ void MainWindow::SlotBspConnection()
     {
         connect(this, &MainWindow::writeByteToBsp, m_bsp, &Bsp::SlotReadByte);
 
-        connect(ui->serialBsp, &TSerial::read, this, &MainWindow::SlotByteBspToPi);
         connect(m_bsp, &Bsp::SignalWriteByte, this, &MainWindow::SlotByteBspToPi);
         connect(m_bsp, &Bsp::SignalSendFinished, [=]() { bspTxEnd(); });
 
@@ -309,9 +308,7 @@ void MainWindow::SlotBspConnection()
     {
         m_bsp->disconnect();
 
-        disconnect(ui->serialBsp, &TSerial::read, this, &MainWindow::SlotByteBspToPi);
         disconnect(this, &MainWindow::writeByteToBsp, m_bsp, &Bsp::SlotReadByte);
-
 
         ui->mBspConnect->setText("Connect");
     }

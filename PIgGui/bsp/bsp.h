@@ -28,7 +28,7 @@ class Bsp : public QWidget
     const int k_timer_tick_ms = 100;
 
 protected:
-    typedef void (Bsp::*HdlrCom_t)(eGB_COM com, pkg_t &data);
+    typedef void (Bsp::*HdlrCom_t)(uint8_t com, pkg_t &data);
 
     static const QString kMsgSizeError;
     static const QString kMsgTimeSourceError;
@@ -41,7 +41,7 @@ public:
     /// Подсчет контрольной суммы.
     uint8_t calcCrc(pkg_t &pkg);
     /// Проверка пакета.
-    bool checkPkg(pkg_t &pkg, eGB_COM &com);
+    bool checkPkg(pkg_t &pkg, uint8_t &com);
 
     void Init();
 
@@ -90,18 +90,18 @@ protected:
     /// Преобразование целого числа в bcd код.
     quint8 int2bcd(quint8 val, bool *ok = nullptr);
 
-    void procCommand(eGB_COM com, pkg_t &data);
+    void procCommand(uint8_t com, pkg_t &data);
+    void procCommandWrite(uint8_t com, pkg_t &data);
 
     bool CheckSize(uint8_t com, int size, QVector<int> size_allowed);
 
-    void HdlrComDummy(eGB_COM com, pkg_t &data);
+    void HdlrComDummy(uint8_t com, pkg_t &data);
 
-    void HdlrComRx01(eGB_COM com, pkg_t &data);
-    void HdlrComTx11(eGB_COM com, pkg_t &data);
+    void HdlrComRx01(uint8_t com, pkg_t &data);
+    void HdlrComTx11(uint8_t com, pkg_t &data);
 
 protected slots:
     void SlotReadPackageFinished();
-    void SlotHandleTick();
 };
 
 #endif  // BSP_H

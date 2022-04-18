@@ -77,7 +77,7 @@ bool clProtocolS::getData(data_tx_x11_t& data)
 
             while (i < data.lcd_buf_size)
             {
-                data.lcd_buf[i++] = m_buf[pos++];
+                data.lcd_buf[i++] = static_cast<char>(m_buf[pos++]);
             }
 
             *data.top_lines  = m_buf[pos] & 0x07;
@@ -85,11 +85,9 @@ bool clProtocolS::getData(data_tx_x11_t& data)
             *data.cursor_pos = m_buf[pos] & 0x7F;
             *data.cursor_on  = (m_buf[pos++] & 0x80) ? true : false;
         }
-
-        setCurrentStatus(PRTS_STATUS_WRITE_READY);
     }
 
-    return stat_ == PRTS_STATUS_WRITE_READY;
+    return stat_ == statDef_;
 }
 
 
@@ -108,10 +106,7 @@ uint8_t clProtocolS::sendData(uint8_t com, const uint8_t* data, uint8_t size)
 {
     uint8_t num = 0;
 
-    if (stat_ == PRTS_STATUS_WRITE_READY)
-    {
-        num = addCom(com, size, data);
-    }
+    num = addCom(com, size, data);
 
     return num;
 }
@@ -229,3 +224,5 @@ uint8_t clProtocolS::getCRC() const
 
     return crc;
 }
+
+/* ******************************** E N D *********************************** */

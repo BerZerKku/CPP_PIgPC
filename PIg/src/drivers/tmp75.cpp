@@ -5,41 +5,47 @@
  *      Author: Shcheblykin
  */
 
+#include "tmp75.h"
 #include <avr/io.h>
 #include <util/delay.h>
-#include "tmp75.h"
 
 // Конструктор
-TTmp75::TTmp75(uint8_t adr) {
+TTmp75::TTmp75(uint8_t adr)
+{
 
-	// включение подтяжки на выводах SCL, SDA
-	PORTD |= (1 << PD1) | (1 << PD0);
+    // включение подтяжки на выводах SCL, SDA
+    PORTD |= (1 << PD1) | (1 << PD0);
 
-	// fscl = fclk/(16 + 2*TWBR*4^TWPS)
-	// При TWPS = 1 и TWBR = 198, получаем: 16000000/(16 + 2*198*4^1) = 10кГц
-	TWBR = 198;
-	TWSR = (0 << TWPS1) | (1 << TWPS0);
-	// Разрешение работы модуля и прерываний
-	TWCR = (1 << TWIE) | (1 << TWINT) | (1 << TWEN);
+    // fscl = fclk/(16 + 2*TWBR*4^TWPS)
+    // При TWPS = 1 и TWBR = 198, получаем: 16000000/(16 + 2*198*4^1) = 10кГц
+    TWBR = 198;
+    TWSR = (0 << TWPS1) | (1 << TWPS0);
+    // Разрешение работы модуля и прерываний
+    TWCR = (1 << TWIE) | (1 << TWINT) | (1 << TWEN);
 
-	this->adrIC = adr << s_u8AdrBits;
-	temperature = s_i8TempError;
+    this->adrIC = adr << s_u8AdrBits;
+    temperature = s_i8TempError;
 }
 
 //	Запуск процедуры считывания температуры.
-void TTmp75::readTemp() {
-	temperature = s_i8TempError;
+void TTmp75::readTemp()
+{
+    temperature = s_i8TempError;
 
-	uint8_t tmp = TWCR;
+    uint8_t tmp = TWCR;
 
-	if (((tmp & (1 << TWINT)) == 0) || (temperature == s_i8TempError)) {
-		TWCR = (1 << TWINT);
-		TWCR = 	(1 << TWEN) | (1 << TWIE) | (1 << TWSTA);
-	}
+    if (((tmp & (1 << TWINT)) == 0) || (temperature == s_i8TempError))
+    {
+        TWCR = (1 << TWINT);
+        TWCR = (1 << TWEN) | (1 << TWIE) | (1 << TWSTA);
+    }
 }
 
 
 // Считывание температуры.
-int8_t TTmp75::getTemperature() {
-	return temperature;
+int8_t TTmp75::getTemperature()
+{
+    return temperature;
 }
+
+/* ******************************** E N D *********************************** */

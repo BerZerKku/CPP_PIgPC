@@ -11,10 +11,7 @@
 #include "drivers/uart.h"
 #include "menu/base.h"
 #include "menu/menu.h"
-#include "protocols/iec101/protocolPcI.h"
-#include "protocols/modbus/protocolPcM.h"
-#include "protocols/standart/protocolBspS.h"
-#include "protocols/standart/protocolPcS.h"
+#include "protocols/standart/protocolS.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -24,52 +21,14 @@
 /// адрес датчика температуры
 #define TEMP_IC_ADR 0x48
 
-/// адрес пароля пользователя
-#define EEPROM_START_ADDRESS 0x10
-
-/// Структура параметров хранящихся в EEPROM
-struct sEeprom
-{
-    uint16_t              password;   /// Пароль.
-    TInterface::INTERFACE interface;  /// Интерфейс.
-    TProtocol::PROTOCOL   protocol;   /// Протокол.
-    TBaudRate::BAUD_RATE  baudRate;   /// Скорость.
-    TDataBits::DATA_BITS  dataBits;   /// Кол-во бит данных.
-    TParity::PARITY       parity;     /// Четность.
-    TStopBits::STOP_BITS  stopBits;   /// Кол-во стоп-бит.
-};
-
-// параметры хранимые в ЕЕПРОМ
-static sEeprom eeprom;
-
 // Флаг, устанавливается каждые 100мс
 static volatile bool b100ms = false;
 
 // Датчики температуры
 static TTmp75 tmp75(TEMP_IC_ADR);
-/// Класс последовательного порта работающего с ПК
-static TUart uartPC(TUart::PORT_UART1, uBufUartPc, BUFF_SIZE_PC);
 /// Класc последовательного порта работающего с БСП
 static TUart uartBSP(TUart::PORT_UART0, uBufUartBsp, BUFF_SIZE_BSP);
 
-void setupUart(TInterface::INTERFACE intf,
-               uint16_t              baudrate,
-               TDataBits::DATA_BITS  dbits,
-               TParity::PARITY       parity,
-               TStopBits::STOP_BITS  sbits)
-{
-
-    uartPC.open(baudrate, dbits, parity, sbits);
-
-    if (intf != TInterface::USB)
-    {
-        PORTD |= (1 << PD4);
-    }
-    else
-    {
-        PORTD &= ~(1 << PD4);
-    }
-}
 
 /** main.c
  *
@@ -80,21 +39,9 @@ int main(void)
 {
     // запуск последовательного порта для связи с БСП
     // все настройки фиксированы
-    uartBSP.open(4800, TDataBits::_8, TParity::NONE, TStopBits::TWO);
+    uartBSP.open(19200, TDataBits::_8, TParity::EVEN, TStopBits::ONE);
 
     mainInit();
-
-    // установка настроек пользователя, считанных из ЕЕПРОМ
-    // проводится до включения прерываний, чтобы ничего не мешало
-    eeprom_read_block(&eeprom, (sEeprom*) EEPROM_START_ADDRESS, sizeof(eeprom));
-    EEAR = 0;  // сброс адреса ЕЕПРОМ в 0, для защиты данных
-    menu.sParam.password.init(eeprom.password);
-    menu.sParam.Uart.Interface.set(eeprom.interface);
-    menu.sParam.Uart.Protocol.set(eeprom.protocol);
-    menu.sParam.Uart.BaudRate.set(eeprom.baudRate);
-    menu.sParam.Uart.DataBits.set(eeprom.dataBits);
-    menu.sParam.Uart.Parity.set(eeprom.parity);
-    menu.sParam.Uart.StopBits.set(eeprom.stopBits);
 
     sei();
 
@@ -105,26 +52,14 @@ int main(void)
             b100ms = false;
 
             bspRead();
-            pcRead();
 
             mainCycle();
 
-            uartPC.trData(pcWrite());
             uartBSP.trData(bspWrite());
-
-            // TODO переделать работу с EEPROM!
-            eeprom.password  = menu.sParam.password.get();
-            eeprom.interface = menu.sParam.Uart.Interface.get();
-            eeprom.protocol  = menu.sParam.Uart.Protocol.get();
-            eeprom.baudRate  = menu.sParam.Uart.BaudRate.get();
-            eeprom.dataBits  = menu.sParam.Uart.DataBits.get();
-            eeprom.parity    = menu.sParam.Uart.Parity.get();
-            eeprom.stopBits  = menu.sParam.Uart.StopBits.get();
-            eeprom_update_block(&eeprom, (sEeprom*) EEPROM_START_ADDRESS, sizeof(eeprom));
 
 
             // запуск процедуры считывания температуры c датчика
-            menu.sParam.measParam.setTemperature(tmp75.getTemperature());
+            // menu.sParam.measParam.setTemperature(tmp75.getTemperature());
             tmp75.readTemp();
         }
 
@@ -139,8 +74,6 @@ ISR(TIMER0_COMP_vect)
     vLCDmain();
     // подсветка ЖКИ
     vLCDled();
-
-    timer50us();
 }
 
 /// Прерывание по совпадению А Таймер1. Срабатывает раз в 10 мс.
@@ -164,28 +97,6 @@ ISR(TIMER1_COMPA_vect)
     }
 }
 
-///Прерывание по опустошению передающего буфера UART1
-ISR(USART1_UDRE_vect)
-{
-    uartPC.isrUDR();
-}
-
-/// Прерывание по окончанию передачи данных UART1
-ISR(USART1_TX_vect)
-{
-    uartPC.isrTX();
-    pcTxEnd();
-}
-
-/// Прерывание по получению данных UART1
-ISR(USART1_RX_vect)
-{
-    uint8_t state = UCSR1A;
-    uint8_t byte  = UDR1;
-
-    bool error = (state & ((1 << FE1) | (1 << DOR1) | (1 << UPE1)));
-    pcPushByteFrom(byte, error);
-}
 
 /// Прерывание по опустошению передающего буфера UART0
 ISR(USART0_UDRE_vect)
@@ -219,3 +130,5 @@ ISR(TWI_vect)
 
     TWCR |= (1 << TWINT);
 }
+
+/* ******************************** E N D *********************************** */

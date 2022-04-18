@@ -20,4 +20,4 @@ extern void    bspTxEnd();
 /// Буфер для свящи с БСП по последовательному порту
 extern uint8_t uBufUartBsp[BUFF_SIZE_BSP];
 
-#endif  // BASE_HPP
+#endif

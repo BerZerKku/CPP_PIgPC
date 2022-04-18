@@ -6,11 +6,11 @@
  */
 
 #ifndef KEYBOARD_H_
-#define KEYBOARD_H_
+    #define KEYBOARD_H_
 
-#include "glbDefine.h"
+    #include "glbDefine.h"
 
-#define NUM_KEY_IN_LAYOUT 10
+    #define NUM_KEY_IN_LAYOUT 10
 
 /// Функции кнопок
 enum eKEY
@@ -43,6 +43,8 @@ enum eKEY
     KEY_MAX
 };
 
+void     vKEYmain(void);
 uint16_t eKEYget(void);
 
 #endif /* KEYBOARD_H_ */
+/* ******************************** E N D *********************************** */

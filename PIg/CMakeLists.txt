@@ -38,9 +38,9 @@ include(avr/generic-gcc-avr.cmake)
 # name your project
 ##########################################################################
 project(PIg)
-set(PROJECT_VERSION_MAJOR 1)  # hex
-set(PROJECT_VERSION_MINOR 52) # hex
-set(PROJECT_VERSION_PATH  10)  # hex
+set(PROJECT_VERSION_MAJOR 4) # hex
+set(PROJECT_VERSION_MINOR 0) # hex
+set(PROJECT_VERSION_PATH  0) # hex
 
 ##########################################################################
 # status messages
@@ -146,23 +146,11 @@ include_directories(
 add_avr_executable( PIg
     main.cpp
     src/avr.h
-    src/flash.h
-    src/flashArrays.c
-    src/flashArrays.h
-    src/flashParams.cpp
-    src/flashParams.h
     src/glbDefine.h
-    src/glbTypes.h
-    src/paramBsp.h
-    src/paramDef.h
-    src/paramGlb.h
-    src/paramPrd.h
-    src/paramPrm.h
     src/paramUart.h
+    src/version.hpp
     src/debug/debug.cpp
     src/debug/debug.hpp
-    src/drivers/kbdLayout.cpp
-    src/drivers/kbdLayout.h
     src/drivers/keyboard.cpp
     src/drivers/keyboard.h
     src/drivers/ks0108.cpp
@@ -175,37 +163,8 @@ add_avr_executable( PIg
     src/init/init.cpp
     src/menu/base.cpp
     src/menu/base.h
-    src/menu/control.cpp
-    src/menu/control.h
-    src/menu/dateTime.cpp
-    src/menu/dateTime.h
-    src/menu/enterParam.cpp
-    src/menu/enterParam.h
-    src/menu/measure.h
     src/menu/menu.cpp
     src/menu/menu.h
-    src/menu/menuPunkt.h
-    src/menu/password.h
-    src/menu/test.cpp
-    src/menu/test.h
-    src/menu/txCom.cpp
-    src/menu/txCom.h
-    src/parameter/LocalParams.cpp
-    src/parameter/LocalParams.h
-    src/parameter/param.cpp
-    src/parameter/param.h
-    src/protocols/iec101/CIec101.cpp
-    src/protocols/iec101/CIec101.h
-    src/protocols/iec101/protocolPcI.cpp
-    src/protocols/iec101/protocolPcI.h
-    src/protocols/modbus/protocolModbus.cpp
-    src/protocols/modbus/protocolModbus.h
-    src/protocols/modbus/protocolPcM.cpp
-    src/protocols/modbus/protocolPcM.h
-    src/protocols/standart/protocolBspS.cpp
-    src/protocols/standart/protocolBspS.h
-    src/protocols/standart/protocolPcS.cpp
-    src/protocols/standart/protocolPcS.h
     src/protocols/standart/protocolS.cpp
     src/protocols/standart/protocolS.h
 )

@@ -133,7 +133,7 @@ uint8_t Bsp::calcCrc(QVector<uint8_t> &pkg)
 }
 
 //
-bool Bsp::checkPkg(QVector<uint8_t> &pkg, eGB_COM &com)
+bool Bsp::checkPkg(QVector<uint8_t> &pkg, uint8_t &com)
 {
     uint8_t byte;
 
@@ -155,7 +155,7 @@ bool Bsp::checkPkg(QVector<uint8_t> &pkg, eGB_COM &com)
         return false;
     }
 
-    com = static_cast<eGB_COM>(pkg.takeFirst());
+    com = pkg.takeFirst();
 
     byte = pkg.takeFirst();
     if (byte != pkg.size())
@@ -181,8 +181,6 @@ void Bsp::Init()
     m_map_com_rx.insert(0x01, &Bsp::HdlrComRx01);
 
     m_map_com_tx.insert(0x11, &Bsp::HdlrComTx11);
-
-    connect(&m_timer, &QTimer::timeout, this, &Bsp::SlotHandleTick);
 }
 
 
@@ -215,13 +213,55 @@ void Bsp::AddWidget(QTreeWidgetItem *top, const QString &name, QWidget *widget)
  *
  * *****************************************************************************
  */
-void Bsp::procCommand(eGB_COM com, pkg_t &data)
+void Bsp::procCommand(uint8_t com, pkg_t &data)
+{
+    HdlrCom_t hdlr;
+
+    m_pkg_tx.clear();
+
+    hdlr = m_map_com_rx.value(com, &Bsp::HdlrComDummy);
+    (this->*hdlr)(com, data);
+
+    if (com == 0x01)
+    {
+        com  = 0x11;
+        hdlr = m_map_com_tx.value(com, &Bsp::HdlrComDummy);
+        (this->*hdlr)(com, data);
+        procCommandWrite(com, data);
+    }
+}
+
+
+/**
+ * *****************************************************************************
+ *
+ * @brief Передача кадров.
+ * @param[in] com Команда.
+ * @param[in] data Данные.
+ *
+ * *****************************************************************************
+ */
+void Bsp::procCommandWrite(uint8_t com, pkg_t &data)
 {
     m_pkg_tx.clear();
 
-    HdlrCom_t hdlr = m_map_com_rx.value(com, &Bsp::HdlrComDummy);
-    (this->*hdlr)(com, data);
+    if (com == 0x11)
+    {
+        m_pkg_tx.append(data.takeFirst());
+        m_pkg_tx.append(static_cast<uint8_t>(data.size()));
+        m_pkg_tx.append(data);
+        m_pkg_tx.append(calcCrc(m_pkg_tx));
+
+        m_pkg_tx.prepend(0xAA);
+        m_pkg_tx.prepend(0x55);
+
+        for (int i = 0; i < m_pkg_tx.size(); i++)
+        {
+            emit SignalWriteByte(m_pkg_tx.at(i));
+        }
+    }
 }
+
 
 /**
  * *****************************************************************************
@@ -278,7 +318,7 @@ void Bsp::SlotReadByte(int value)
             m_pkg_rx.append(static_cast<uint8_t>(value));
             if (len == 0)
             {
-                eGB_COM com;
+                uint8_t com;
 
                 if (checkPkg(m_pkg_rx, com))
                 {
@@ -405,7 +445,7 @@ bool Bsp::CheckSize(uint8_t com, int size, QVector<int> size_allowed)
  *
  * *****************************************************************************
  */
-void Bsp::HdlrComDummy(eGB_COM com, pkg_t &data)
+void Bsp::HdlrComDummy(uint8_t com, pkg_t &data)
 {
     Q_UNUSED(data)
 
@@ -422,7 +462,7 @@ void Bsp::HdlrComDummy(eGB_COM com, pkg_t &data)
  *
  * *****************************************************************************
  */
-void Bsp::HdlrComRx01(eGB_COM com, pkg_t &data)
+void Bsp::HdlrComRx01(uint8_t com, pkg_t &data)
 {
     Q_ASSERT(com == 0x01);
 
@@ -455,7 +495,7 @@ void Bsp::HdlrComRx01(eGB_COM com, pkg_t &data)
  *
  * *****************************************************************************
  */
-void Bsp::HdlrComTx11(eGB_COM com, pkg_t &data)
+void Bsp::HdlrComTx11(uint8_t com, pkg_t &data)
 {
     uint8_t value;
     Q_ASSERT(com == 0x11);
@@ -504,43 +544,4 @@ void Bsp::HdlrComTx11(eGB_COM com, pkg_t &data)
  */
 void Bsp::SlotReadPackageFinished()
 {
-}
-
-
-/**
- * *****************************************************************************
- *
- * @brief Слот обработки периодических событий.
- *
- * *****************************************************************************
- */
-void Bsp::SlotHandleTick()
-{
-    eGB_COM com = static_cast<eGB_COM>(0x11);
-
-    HdlrCom_t hdlr = m_map_com_tx.value(com, &Bsp::HdlrComDummy);
-    (this->*hdlr)(com, m_pkg_tx);
-
-    if (!m_pkg_tx.isEmpty())
-    {
-        m_pkg_tx.insert(1, static_cast<uint8_t>(m_pkg_tx.size() - 1));
-        m_pkg_tx.append(calcCrc(m_pkg_tx));
-        m_pkg_tx.insert(0, 0x55);
-        m_pkg_tx.insert(1, 0xAA);
-
-        com = static_cast<eGB_COM>(m_pkg_tx.at(2));
-
-        // if (viewCom.count(com) != 0)
-        // {
-        //     qDebug() << "comTx >>> " << showbase << hex << Bsp::pkgTx;
-        // }
-
-        for (uint8_t byte : m_pkg_tx)
-        {
-            emit SignalWriteByte(byte);
-        }
-
-
-        m_pkg_tx.clear();
-    }
 }

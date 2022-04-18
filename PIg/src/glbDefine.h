@@ -168,23 +168,4 @@ enum eGB_COM
     GB_COM_JRN_CLR = 0xFA  // ! стирание журнала событий, только с ПК
 };
 
-
-/// Маски команд
-enum eGB_COM_MASK
-{
-    // Тип устройства
-    GB_COM_MASK_DEVICE     = 0x30,
-    GB_COM_MASK_DEVICE_DEF = 0x00,
-    GB_COM_MASK_DEVICE_PRM = 0x10,
-    GB_COM_MASK_DEVICE_PRD = 0x20,
-    GB_COM_MASK_DEVICE_GLB = 0x30,
-
-    // группа команды
-    GB_COM_MASK_GROUP              = 0xC0,
-    GB_COM_MASK_GROUP_READ_PARAM   = 0x00,
-    GB_COM_MASK_GROUP_WRITE_REGIME = 0x40,
-    GB_COM_MASK_GROUP_WRITE_PARAM  = 0x80,
-    GB_COM_MASK_GROUP_READ_JOURNAL = 0xC0
-};
-
 #endif /* GLBDEF_H_ */

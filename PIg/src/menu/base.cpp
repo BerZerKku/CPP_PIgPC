@@ -22,7 +22,7 @@ clMenu menu;
 /// Класс стандартного протокола работающего с БСП
 static clProtocolS s_protocol(uBufUartBsp, BUFF_SIZE_BSP);
 
-data_tx_x11_t s_data_tx_x11;
+static data_tx_x11_t s_data_tx_x11;
 
 void bspRead()
 {
@@ -54,15 +54,15 @@ uint8_t bspWrite()
     // Перед передачей проверим статус протокола на залипание.
     s_protocol.checkStat();
 
-    if (s_protocol.getCurrentStatus() == PRTS_STATUS_WRITE_READY)
+    if (s_protocol.getCurrentStatus() == PRTS_STATUS_NO)
     {
         uint16_t keys = menu.GetKeys();
         uint8_t  data[4];
 
         data[0] = PROJECT_VER_MAJOR;
         data[1] = PROJECT_VER_MINOR;
-        data[2] = keys >> 8;
-        data[3] = keys;
+        data[2] = static_cast<uint8_t>(keys >> 8);
+        data[3] = static_cast<uint8_t>(keys);
 
         num = s_protocol.sendData(0x01, data, SIZE_OF(data));
     }
@@ -110,3 +110,5 @@ void bspPushByteFrom(uint8_t byte, bool error)
         s_protocol.checkByte(byte);
     }
 }
+
+/* ******************************** E N D *********************************** */

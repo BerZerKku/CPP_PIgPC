@@ -85,8 +85,6 @@ void clMenu::proc(void)
         {
             uint8_t pos = m_cursor_pos - 1;
 
-            qDebug() << pos;
-
             if (pos < (SIZE_BUF_STRING - 1))
             {
                 vLCDbuf[pos] = '_';
@@ -96,6 +94,7 @@ void clMenu::proc(void)
         vLCDsetLed((m_led_on) ? (LED_ON) : (LED_OFF));
     }
 
+    vLCDdrawBoard(m_top_lines);
     vLCDputchar(vLCDbuf, m_top_lines);
     vLCDrefresh();
 }
@@ -113,3 +112,5 @@ void clMenu::clearTextBuf()
     for (uint_fast8_t i = 0; i < sizeof(vLCDbuf); i++)
         vLCDbuf[i] = ' ';
 }
+
+/* ******************************** E N D *********************************** */

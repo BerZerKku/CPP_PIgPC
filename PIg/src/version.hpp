@@ -3,8 +3,8 @@
 
 #define PROJECT_NAME "PIg"
 #define PROJECT_VER  ""
-#define PROJECT_VER_MAJOR 0x1
-#define PROJECT_VER_MINOR 0x52
-#define PTOJECT_VER_PATCH 0x10
+#define PROJECT_VER_MAJOR 0x4
+#define PROJECT_VER_MINOR 0x0
+#define PTOJECT_VER_PATCH 0x0
 
 #endif  // __VERSION_HPP__
