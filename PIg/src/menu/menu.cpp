@@ -94,6 +94,7 @@ void clMenu::proc(void)
         vLCDsetLed((m_led_on) ? (LED_ON) : (LED_OFF));
     }
 
+    vLCDclear();
     vLCDdrawBoard(m_top_lines);
     vLCDputchar(vLCDbuf, m_top_lines);
     vLCDrefresh();

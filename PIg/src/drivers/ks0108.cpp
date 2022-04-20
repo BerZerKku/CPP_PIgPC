@@ -241,10 +241,8 @@ bool vLCDputchar(const char* buf, uint8_t num)
  */
 void vLCDsetLed(eLCD_LED val)
 {
-    if (val == LED_SWITCH)
-        uLedTimeOn = LCD_TIME_LED_ON;
-    else
-        eLed = val;
+    eLed       = val;
+    uLedTimeOn = (eLed == LED_SWITCH) ? (LCD_TIME_LED_ON) : 0;
 }
 
 /** Управление подсветкой (формирование ШИМ).
