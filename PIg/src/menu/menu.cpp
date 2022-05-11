@@ -12,8 +12,9 @@
 
 char clMenu::vLCDbuf[SIZE_BUF_STRING + 1];
 
-static const char s_text_no_connect[] PROGMEM = " Нет связи с БСП!!! ";
-static const char s_text_version[] PROGMEM    = " Версия ПИ: %.2X.%.2X";
+static const char s_text_no_connect[] PROGMEM = "Нет связи с БСП!!!";
+static const char s_text_version[] PROGMEM    = "Версии ПО";
+static const char s_text_version_pi[] PROGMEM = "  ПИ  МК  : %.2X.%.2X";
 
 
 /**
@@ -72,12 +73,8 @@ void clMenu::proc(void)
         clearTextBuf();
 
         m_top_lines = 1;
-        if (m_blink)
-        {
-            snprintf_P(&vLCDbuf[0], 21, s_text_no_connect);
-        }
-
-        snprintf_P(&vLCDbuf[40], 20, s_text_version, PROJECT_VER_MAJOR, PROJECT_VER_MINOR);
+        snprintf_P(&vLCDbuf[0], 21, (m_blink) ? s_text_no_connect : s_text_version);
+        snprintf_P(&vLCDbuf[20], 21, s_text_version_pi, PROJECT_VER_MAJOR, PROJECT_VER_MINOR);
     }
     else
     {
