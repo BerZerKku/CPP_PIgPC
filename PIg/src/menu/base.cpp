@@ -39,8 +39,8 @@ void bspRead()
         if (s_protocol.checkReadData())
         {
             s_protocol.getData(s_data_tx_x11);
+            cntLostCom = 0;
         }
-        cntLostCom = 0;
     }
 
     menu.SetConnection(cntLostCom < MAX_LOST_COM_FROM_BSP);
