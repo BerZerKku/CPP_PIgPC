@@ -61,8 +61,8 @@ uint8_t bspWrite()
 
         data[0] = PROJECT_VER_MAJOR;
         data[1] = PROJECT_VER_MINOR;
-        data[2] = static_cast<uint8_t>(keys >> 8);
-        data[3] = static_cast<uint8_t>(keys);
+        data[2] = static_cast<uint8_t>(keys);
+        data[3] = static_cast<uint8_t>(keys >> 8);
 
         num = s_protocol.sendData(0x01, data, SIZE_OF(data));
     }

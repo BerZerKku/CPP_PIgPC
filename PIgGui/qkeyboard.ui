@@ -14,24 +14,8 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="3" column="2">
-    <widget class="QPushButton" name="btn8">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::ClickFocus</enum>
-     </property>
-     <property name="text">
-      <string>PushButton</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="2">
-    <widget class="QPushButton" name="btn5">
+   <item row="0" column="1">
+    <widget class="QPushButton" name="btn1">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
        <horstretch>0</horstretch>
@@ -78,22 +62,6 @@
      </property>
     </widget>
    </item>
-   <item row="3" column="3">
-    <widget class="QPushButton" name="btn9">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::ClickFocus</enum>
-     </property>
-     <property name="text">
-      <string>PushButton</string>
-     </property>
-    </widget>
-   </item>
    <item row="3" column="1">
     <widget class="QPushButton" name="btn7">
      <property name="sizePolicy">
@@ -110,8 +78,8 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="1">
-    <widget class="QPushButton" name="btn1">
+   <item row="3" column="2">
+    <widget class="QPushButton" name="btn8">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
        <horstretch>0</horstretch>
@@ -126,8 +94,8 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="3">
-    <widget class="QPushButton" name="btn3">
+   <item row="3" column="3">
+    <widget class="QPushButton" name="btn9">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
        <horstretch>0</horstretch>
@@ -158,13 +126,32 @@
      </property>
     </widget>
    </item>
-   <item row="5" column="3">
-    <widget class="QPushButton" name="btn10">
+   <item row="2" column="2">
+    <widget class="QPushButton" name="btn5">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::ClickFocus</enum>
+     </property>
+     <property name="text">
+      <string>PushButton</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="3">
+    <widget class="QPushButton" name="btn3">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::ClickFocus</enum>
      </property>
      <property name="text">
       <string>PushButton</string>

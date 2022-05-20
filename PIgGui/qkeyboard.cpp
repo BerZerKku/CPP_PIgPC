@@ -24,14 +24,14 @@ QKeyboard::QKeyboard(QWidget *parent) : QWidget(parent), ui(new Ui::QKeyboard)
     btns.replace(6, ui->btn7);
     btns.replace(7, ui->btn8);
     btns.replace(8, ui->btn9);
-    btns.replace(9, ui->btn10);
 
     QFont f = ui->btn1->font();
     f.setPointSize(15);
 
-    for (int i = 0; i < btns.size(); i++)
+    for (int i = 0; i < NUM_KEY_IN_LAYOUT; i++)
     {
         QPushButton *btn = btns.at(i);
+
         btn->setFont(f);
         btn->setFocusPolicy(Qt::NoFocus);
         connect(btn, &QPushButton::pressed, this, &QKeyboard::btnPressed);
@@ -129,7 +129,7 @@ void QKeyboard::refresh()
     Q_ASSERT(btns.size() == NUM_KEY_IN_LAYOUT);
     Q_ASSERT(btnLayout.size() == btns.size());
 
-    for (quint8 i = 0; i < btns.size(); i++)
+    for (quint8 i = 0; i < NUM_KEY_IN_LAYOUT; i++)
     {
         QPushButton *btn = btns.at(i);
 
@@ -278,11 +278,6 @@ QString QKeyboard::getButtonName(eKEY ekey) const
             name = ToUnicode("Ðåæèì\nÀÊ");
         }
         break;
-    case KEY_TALK:
-        {
-            name = ToUnicode("Ðå÷ü");
-        }
-        break;
     case KEY_MAX: break;
     }
 
@@ -313,5 +308,4 @@ void QKeyboard::SetLayoutK400()
     btnLayout.replace(6, KEY_AC_RESET);
     btnLayout.replace(7, KEY_DOWN);
     btnLayout.replace(8, KEY_CANCEL);
-    btnLayout.replace(9, KEY_TALK);
 }
