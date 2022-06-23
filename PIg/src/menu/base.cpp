@@ -59,8 +59,8 @@ uint8_t bspWrite()
         uint16_t keys = menu.GetKeys();
         uint8_t  data[4];
 
-        data[0] = PROJECT_VER_MAJOR;
-        data[1] = PROJECT_VER_MINOR;
+        data[0] = PROJECT_VER_MINOR;
+        data[1] = PROJECT_VER_MAJOR;
         data[2] = static_cast<uint8_t>(keys);
         data[3] = static_cast<uint8_t>(keys >> 8);
 
