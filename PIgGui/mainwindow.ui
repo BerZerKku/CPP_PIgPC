@@ -113,6 +113,31 @@
        <widget class="QKeyboard" name="kbd" native="true"/>
       </item>
       <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <item>
+         <widget class="QPushButton" name="pbBsp">
+          <property name="text">
+           <string>Сервер БСП</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pbView">
+          <property name="text">
+           <string>View</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pbVariables">
+          <property name="text">
+           <string>Переменные</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
          <widget class="QPushButton" name="pbTest1">
@@ -139,13 +164,6 @@
          <widget class="QPushButton" name="pbTest4">
           <property name="text">
            <string>Test4</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pbView">
-          <property name="text">
-           <string>View</string>
           </property>
          </widget>
         </item>

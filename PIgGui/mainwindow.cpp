@@ -11,6 +11,7 @@
 #include "PIg/src/menu/base.h"
 #include "bsp/bsp.h"
 
+
 //
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
@@ -44,6 +45,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(ui->textEdit, &QTextEdit::selectionChanged, this, &MainWindow::clearSelection);
 
     connect(ui->mBspConnect, &QPushButton::clicked, this, &MainWindow::SlotBspConnection);
+
+    connect(ui->pbBsp, &QPushButton::clicked, this, &MainWindow::SlotShowBsp);
+    connect(ui->pbVariables, &QPushButton::clicked, this, &MainWindow::SlotShowVariables);
 
     //    палитры
     QLineEdit lineedit;
@@ -82,14 +86,20 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(timerMenu, &QTimer::timeout, this, &MainWindow::cycleMenu);
     timerMenu->start(100);
 
+    SlotShowBsp();
+    SlotShowVariables();
+
     setFocusPolicy(Qt::StrongFocus);
+    setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 }
+
 
 //
 MainWindow::~MainWindow()
 {
     delete ui;
 }
+
 
 //
 void MainWindow::initView()
@@ -132,6 +142,8 @@ void MainWindow::initView()
     ui->treeWidget->resizeColumnToContents(1);
 }
 
+
+//
 void MainWindow::initKeyboard()
 {
     for (uint8_t i = 1; i <= 2 * NUM_KEY_IN_LAYOUT; i++)
@@ -139,6 +151,7 @@ void MainWindow::initKeyboard()
         //        ui->kbd->setLayoutButton(i, vKEYgetButtonLayout(i));
     }
 }
+
 
 /**
  * *****************************************************************************
@@ -159,6 +172,7 @@ void MainWindow::InitProtocolViewer()
     mProtocolViewer.setWindowFlags(flags | Qt::WindowStaysOnTopHint);
 }
 
+
 //
 void MainWindow::setupTestButtons()
 {
@@ -175,6 +189,7 @@ void MainWindow::setupTestButtons()
     connect(ui->pbTest4, &QPushButton::clicked, this, &MainWindow::test4);
 }
 
+
 //
 void MainWindow::hdlrView()
 {
@@ -185,6 +200,7 @@ void MainWindow::hdlrView()
     //    value8 = menu.sParam.Uart.Protocol.get();
     //    view.lnProtocol.setText(codec->toUnicode(fcProtocol[value8]));
 }
+
 
 //
 void MainWindow::addViewItem(QTreeWidgetItem *top, std::string name, QLineEdit *lineedit)
@@ -198,6 +214,7 @@ void MainWindow::addViewItem(QTreeWidgetItem *top, std::string name, QLineEdit *
     lineedit->setFocusPolicy(Qt::NoFocus);
     connect(lineedit, &QLineEdit::selectionChanged, lineedit, &QLineEdit::deselect);
 }
+
 
 //
 bool MainWindow::eventFilter(QObject *object, QEvent *event)
@@ -214,6 +231,7 @@ bool MainWindow::eventFilter(QObject *object, QEvent *event)
     return QMainWindow::eventFilter(object, event);
 }
 
+
 //
 void MainWindow::showEvent(QShowEvent *event)
 {
@@ -223,6 +241,7 @@ void MainWindow::showEvent(QShowEvent *event)
     ui->treeWidget->setFixedWidth(ui->treeWidget->columnWidth(0) * 2.2);
     setFixedSize(sizeHint());
 }
+
 
 //
 void MainWindow::cycleMenu()
@@ -273,6 +292,7 @@ void MainWindow::cycleMenu()
     ui->serialBsp->setLedLink(menu.IsConnection());
 }
 
+
 //
 void MainWindow::clearSelection()
 {
@@ -280,6 +300,7 @@ void MainWindow::clearSelection()
     c.clearSelection();
     ui->textEdit->setTextCursor(c);
 }
+
 
 //
 void MainWindow::setBacklight(bool enable)
@@ -293,6 +314,8 @@ void MainWindow::setBacklight(bool enable)
     }
 }
 
+
+//
 void MainWindow::SlotBspConnection()
 {
     if (ui->serialBsp->isEnabled())
@@ -327,10 +350,39 @@ void MainWindow::SlotByteBspToPi(uint8_t byte)
 
 
 //
+void MainWindow::SlotShowBsp()
+{
+    // @fixme Ќе скрываетс€ при вызове из конструктора + проблемы с уменьшением размера
+    bool visible = false;  // !ui->mBspConnect->isVisible();
+
+    ui->horizontalSpacer->changeSize(0, 0);
+    ui->mBspConnect->setVisible(visible);
+    ui->mBspLabel->setVisible(visible);
+    ui->mBspTree->setVisible(visible);
+
+    resize(minimumSize());
+}
+
+
+//
+void MainWindow::SlotShowVariables()
+{
+    // @fixme Ќе скрываетс€ при вызове из конструктора + проблемы с уменьшением размера
+    bool visible = false;  // !ui->label->isVisible();
+
+    ui->label->setVisible(visible);
+    ui->treeWidget->setVisible(visible);
+
+    resize(minimumSize());
+}
+
+
+//
 void MainWindow::SlotBytePiToBsp(uint8_t byte)
 {
     mProtocolViewer.AddTxByte(byte);
 }
+
 
 //
 void MainWindow::test1()
@@ -344,11 +396,13 @@ void MainWindow::test2()
     qDebug() << "test2 button pressed";
 }
 
+
 //
 void MainWindow::test3()
 {
     qDebug() << "test3 button pressed";
 }
+
 
 //
 void MainWindow::test4()

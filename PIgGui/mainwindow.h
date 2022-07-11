@@ -87,8 +87,8 @@ signals:
 
 private:
     Ui::MainWindow *ui;
-    QTextCodec *    codec;
-    Bsp *           m_bsp;
+    QTextCodec     *codec;
+    Bsp            *m_bsp;
 
     QPalette      pred;
     QPalette      pblue;
@@ -120,6 +120,9 @@ private slots:
 
     void SlotBytePiToBsp(uint8_t byte);
     void SlotByteBspToPi(uint8_t byte);
+
+    void SlotShowBsp();
+    void SlotShowVariables();
 
     void test1();
     void test2();
