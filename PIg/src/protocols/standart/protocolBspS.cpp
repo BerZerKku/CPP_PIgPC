@@ -711,13 +711,17 @@ bool clProtocolBspS::getGlbCommand(eGB_COM com, bool pc)
 
     case GB_COM_GET_VERS:
         {
+            uint8_t num_com;
             uint8_t act = GB_ACT_NO;
+
             // данные о типе аппарата
             act |= sParam_->def.status.setEnable(m_buf[B1] == 1);
-            act |= sParam_->prm.setNumCom(m_buf[B2] * 4);
+            num_com = (m_buf[B2] == 5) ? (5) : (m_buf[B2] * 4);
+            act |= sParam_->prm.setNumCom(num_com);
             sParam_->local.setNumComPrm(sParam_->prm.getNumCom());
             // buf[B3] - прм2
-            act |= sParam_->prd.setNumCom(m_buf[B4] * 4);
+            num_com = (m_buf[B4] == 5) ? (5) : (m_buf[B4] * 4);
+            act |= sParam_->prd.setNumCom(num_com);
             sParam_->local.setNumComPrd(sParam_->prd.getNumCom());
             // кол-во аппаратов в линии
             // в def хранится значение параметра
