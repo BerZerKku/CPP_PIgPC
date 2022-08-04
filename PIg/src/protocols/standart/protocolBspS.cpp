@@ -799,17 +799,25 @@ bool clProtocolBspS::getGlbCommand(eGB_COM com, bool pc)
     case GB_COM_GET_COM_PRD_KEEP:
         {
             uint8_t act = GB_ACT_NO;
-            if (sParam_->typeDevice == AVANT_R400M)
+
+            if (m_buf[NUM] >= 1)
             {
-                act = sParam_->glb.setCompatibility(m_buf[B1]);
-            }
-            else if (sParam_->typeDevice == AVANT_K400)
-            {
-                act = sParam_->glb.setCompatibility(m_buf[B2]);
-            }
-            else if (sParam_->typeDevice == AVANT_RZSK)
-            {
-                act = sParam_->glb.setCompatibility(m_buf[B2]);
+                if (sParam_->typeDevice == AVANT_R400M)
+                {
+                    act = sParam_->glb.setCompatibility(m_buf[B1]);
+                }
+
+                if (m_buf[NUM] >= 2)
+                {
+                    if (sParam_->typeDevice == AVANT_K400)
+                    {
+                        act = sParam_->glb.setCompatibility(m_buf[B2]);
+                    }
+                    else if (sParam_->typeDevice == AVANT_RZSK)
+                    {
+                        act = sParam_->glb.setCompatibility(m_buf[B2]);
+                    }
+                }
             }
 
             // в случае записи нового значения, сбросим флаг конфигурации
