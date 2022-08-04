@@ -36,6 +36,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->serialBsp->addDefaultPort("tnt0");
 
     connect(this, &MainWindow::writeByteToBsp, ui->serialBsp, &TSerial::write);
+    connect(ui->serialBsp, &TSerial::read, this, &MainWindow::SlotByteBspToPi);
     connect(ui->serialBsp, &TSerial::sendFinished, [=]() { bspTxEnd(); });
     connect(ui->serialBsp, &TSerial::openPort, [&]() { ui->mBspConnect->setEnabled(false); });
     connect(ui->serialBsp, &TSerial::closePort, [&]() { ui->mBspConnect->setEnabled(true); });
@@ -403,8 +404,6 @@ void MainWindow::SlotBspConnection()
     if (ui->serialBsp->isEnabled())
     {
         connect(this, &MainWindow::writeByteToBsp, mBsp, &Bsp::SlotReadByte);
-
-        connect(ui->serialBsp, &TSerial::read, this, &MainWindow::SlotByteBspToPi);
         connect(mBsp, &Bsp::SignalWriteByte, this, &MainWindow::SlotByteBspToPi);
         connect(mBsp, &Bsp::SignalSendFinished, [=]() { bspTxEnd(); });
 
