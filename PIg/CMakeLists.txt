@@ -38,7 +38,7 @@ include(avr/generic-gcc-avr.cmake)
 # name your project
 ##########################################################################
 project(PIg)
-set(PROJECT_VERSION_MAJOR A1) # hex
+set(PROJECT_VERSION_MAJOR 1)  # hex
 set(PROJECT_VERSION_MINOR 53) # hex
 set(PROJECT_VERSION_PATH  00) # hex
 
