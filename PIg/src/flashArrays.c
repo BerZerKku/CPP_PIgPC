@@ -47,9 +47,10 @@ const char fcCompK400[][VALUE_STRING_SIZE] PROGMEM = {
 /// Òטן סמגלוסעטלמסעט (ןאנאלוענ ÐÇÑÊ)
 const char fcCompRZSK[][VALUE_STRING_SIZE] PROGMEM = {
     //                    1234567890
-    [GB_COMP_RZSK]     = "ÐÇÑÊ",      //
-    [GB_COMP_RZSK_M]   = "ÐÇÑÊל",     //
-    [GB_COMP_RZSK_3E8] = "ÐÇÑÊ-3 8ך"  //
+    [GB_COMP_RZSK]     = "ÐÇÑÊ",       //
+    [GB_COMP_RZSK_M]   = "ÐÇÑÊל",      //
+    [GB_COMP_RZSK_2E5] = "ÐÇÑÊ-2 5ך",  //
+    [GB_COMP_RZSK_3E8] = "ÐÇÑÊ-3 8ך"   //
 };
 
 static const char fcEventRemote000[] PROGMEM = "";

@@ -6036,8 +6036,10 @@ bool clMenu::fillLvlSetupParamGlbRzsk(eGB_COMP_RZSK comp)
     Q_ASSERT(sParam.glb.getTypeDevice() == AVANT_RZSK);
     Q_ASSERT(sParam.glb.getTypeLine() == GB_TYPE_LINE_UM);
 
+    bool read_only = (comp == GB_COMP_RZSK_2E5) || (comp == GB_COMP_RZSK_3E8);
+
     sParam.local.addParam(GB_PARAM_COMP_RZSK);
-    sParam.local.addParam(GB_PARAM_NUM_OF_DEVICES, comp == GB_COMP_RZSK_3E8);
+    sParam.local.addParam(GB_PARAM_NUM_OF_DEVICES, read_only);
     sParam.local.addParam(GB_PARAM_TIME_SYNCH);
     sParam.local.addParam(GB_PARAM_NUM_OF_DEVICE);
     sParam.local.addParam(GB_PARAM_OUT_CHECK);
