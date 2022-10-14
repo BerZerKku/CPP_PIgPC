@@ -7,8 +7,7 @@
 
 #include "keyboard.h"
 
-static uint16_t s_keys = 0x01FF;  ///< состояние кнопок
-static uint16_t s_mask = 0xFFFF;  ///< маска кнопок
+static uint16_t s_keys = 0x0000;  ///< состояние кнопок
 
 
 /**
@@ -21,7 +20,7 @@ static uint16_t s_mask = 0xFFFF;  ///< маска кнопок
  */
 uint16_t eKEYget(void)
 {
-    return ~(s_keys | s_mask);
+    return s_keys;
 }
 
 
@@ -36,13 +35,21 @@ uint16_t eKEYget(void)
  */
 void vKEYmain(void)
 {
-    uint16_t keys = 0xFE00;
+    uint16_t keys = 0;
+    uint8_t  pinc = PINC;
+    uint8_t  pind = PIND;
+    uint8_t  ping = PING;
 
-    keys |= static_cast<uint16_t>(PIND & 0xC0) >> 6;
-    keys |= static_cast<uint16_t>(PING & 0x03) << 2;
-    keys |= static_cast<uint16_t>(PINC & 0x1F) << 4;
+    keys |= (pind & 0x80) ? (0x0000) : (0x0001);
+    keys |= (ping & 0x02) ? (0x0000) : (0x0002);
+    keys |= (pinc & 0x01) ? (0x0000) : (0x0004);
+    keys |= (ping & 0x01) ? (0x0000) : (0x0008);
+    keys |= (pinc & 0x02) ? (0x0000) : (0x0010);
+    keys |= (pinc & 0x04) ? (0x0000) : (0x0020);
+    keys |= (pind & 0x40) ? (0x0000) : (0x0040);
+    keys |= (pinc & 0x08) ? (0x0000) : (0x0080);
+    keys |= (pinc & 0x10) ? (0x0000) : (0x0100);
 
-    s_mask = s_keys ^ keys;
     s_keys = keys;
 }
 
